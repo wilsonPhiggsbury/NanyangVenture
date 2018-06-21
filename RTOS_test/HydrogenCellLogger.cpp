@@ -42,8 +42,7 @@ const char DELIMITER[] = "> ";
 const size_t DELIMITER_LEN = strlen(DELIMITER);
 HydrogenCellLogger::HydrogenCellLogger(HardwareSerial *port):port(port)
 {
-	if (!(*port))
-		port->begin(19200);
+	port->begin(19200);
 }
 
 void HydrogenCellLogger::init()
@@ -94,6 +93,8 @@ void HydrogenCellLogger::readData()
 }
 void HydrogenCellLogger::send()
 {
+	if (port == &Serial1)Serial.println("Cell1:");
+	else if (port == &Serial2)Serial.println("Cell2:");
 	Serial.print("Volts:");
 	Serial.println(volts);
 	Serial.print("Amps:");

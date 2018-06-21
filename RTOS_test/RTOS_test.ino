@@ -21,7 +21,6 @@ void setup() {
 
 	// initialize serial communication at 9600 bits per second:
 	Serial.begin(9600);
-	Serial1.begin(19200);
 	delay(1000);
 
 	// Semaphores are useful to stop a Task proceeding, where it should be paused to wait,
@@ -40,14 +39,14 @@ void setup() {
 		, (const portCHAR *)"ReadFuelCell"  // A name just for humans
 		, 256  // This stack size can be checked & adjusted by reading the Stack Highwater
 		, NULL
-		, 2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
+		, 1  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
 		, NULL);
 	
 
 	xTaskCreate(
 		TaskReadMotorPower
 		, (const portCHAR *) "ReadMotorPower"
-		, 128  // Stack size
+		, 256  // Stack size
 		, NULL
 		, 1  // Priority
 		, NULL);
@@ -87,15 +86,16 @@ void TaskReadFuelCell(void *pvParameters __attribute__((unused)))  // This is a 
 			xSemaphoreGive(xSerialSemaphore); // Now free or "Give" the Serial Port for others.
 		}
 
-		vTaskDelay(10);  // one tick delay (15ms) in between reads for stability
+		vTaskDelay(pdMS_TO_TICKS(300));  // one tick delay (15ms) in between reads for stability
 	}
 }
 
 void TaskReadMotorPower(void *pvParameters __attribute__((unused)))  // This is a Task.
 {
-	for (;;)
+	HydrogenCellLogger cell2 = HydrogenCellLogger(&Serial2);
+	while(1)
 	{
-
+		cell2.readData();
 		// See if we can obtain or "Take" the Serial Semaphore.
 		// If the semaphore is not available, wait 5 ticks of the Scheduler to see if it becomes free.
 		if (xSemaphoreTake(xSerialSemaphore, (TickType_t)5) == pdTRUE)
@@ -105,6 +105,6 @@ void TaskReadMotorPower(void *pvParameters __attribute__((unused)))  // This is 
 			// so we don't want it getting stolen during the middle of a conversion.
 			xSemaphoreGive(xSerialSemaphore); // Now free or "Give" the Serial Port for others.
 		}
-		vTaskDelay(10);  // one tick delay (15ms) in between reads for stability
+		vTaskDelay(pdMS_TO_TICKS(300));  // one tick delay (15ms) in between reads for stability
 	}
 }
