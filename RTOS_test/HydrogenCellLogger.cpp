@@ -43,6 +43,10 @@ const size_t DELIMITER_LEN = strlen(DELIMITER);
 HydrogenCellLogger::HydrogenCellLogger(HardwareSerial *port):port(port)
 {
 	port->begin(19200);
+	strcpy(volts, "0.00");
+	strcpy(amps, "0.00");
+	strcpy(watts, "0000");
+	strcpy(energy, "00000");
 }
 
 void HydrogenCellLogger::init()
@@ -87,21 +91,32 @@ void HydrogenCellLogger::readData()
 	strncpy(watts, found + DELIMITER_LEN + 12, 4);
 	strncpy(energy, found + DELIMITER_LEN + 18, 5);
 	volts[4] = amps[4] = watts[4] = energy[5] = '\0';
-	send();
+	//debugPrint();
 	// clear tmp string
 	tmpCounter = 0;
 }
-void HydrogenCellLogger::send()
+void HydrogenCellLogger::dumpDataInto(char* location)
 {
-	if (port == &Serial1)Serial.println("Cell1:");
-	else if (port == &Serial2)Serial.println("Cell2:");
-	Serial.print("Volts:");
+	strcpy(location, volts);
+	strcat(location, " ");
+	strcat(location, amps);
+	strcat(location, " ");
+	strcat(location, watts);
+	strcat(location, " ");
+	strcat(location, energy);
+}
+void HydrogenCellLogger::debugPrint()
+{
+	if (port == &Serial1)Serial.println(F("Cell1:"));
+	else if (port == &Serial2)Serial.println(F("Cell2:"));
+	Serial.print(F("Volts:"));
 	Serial.println(volts);
-	Serial.print("Amps:");
+	Serial.print(F("Amps:"));
 	Serial.println(amps);
-	Serial.print("Watts:");
+	Serial.print(F("Watts:"));
 	Serial.println(watts);
-	Serial.print("Energy:");
+	Serial.print(F("Energy:"));
 	Serial.println(energy);
-	Serial.println("______");
+	Serial.println(F("______"));
+
 }

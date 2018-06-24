@@ -25,7 +25,8 @@ class HydrogenCellLogger
 	 HydrogenCellLogger(HardwareSerial *port);
 	 void init();
 	 void readData();
-	 void send();
+	 void dumpDataInto(char * location);
+	 void debugPrint();
 	 float getAmps();
 	 float getVolts();
 	 float getWatts();

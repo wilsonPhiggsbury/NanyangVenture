@@ -22,4 +22,5 @@ C:\Users\MX\AppData\Local\Temp\VMBuilds\RTOS_test\mega_atmega2560\Release\RTOS_t
  D:\Arduino\Projects\libraries\FreeRTOS\src/task.h \
  D:\Arduino\Projects\libraries\FreeRTOS\src/list.h \
  D:\Arduino\Projects\libraries\FreeRTOS\src/semphr.h \
+ D:\Arduino\Projects\libraries\FreeRTOS\src/queue.h \
  D:\Arduino\Projects\libraries\FreeRTOS\src/queue.h
