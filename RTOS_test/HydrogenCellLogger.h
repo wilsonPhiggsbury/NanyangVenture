@@ -13,12 +13,13 @@ class HydrogenCellLogger
 {
  protected:
 	 HardwareSerial *port;
-	 char tmp[100];
+	 char buffer[100];
 	 uint8_t tmpCounter = 0;
 	 char amps[5];
 	 char volts[5];
 	 char watts[5];
 	 char energy[6];
+	 void debugPrint();
 	 
 
  public:
@@ -26,11 +27,6 @@ class HydrogenCellLogger
 	 void init();
 	 void readData();
 	 void dumpDataInto(char * location);
-	 void debugPrint();
-	 float getAmps();
-	 float getVolts();
-	 float getWatts();
-	 float getEnergy();
 };
 
 

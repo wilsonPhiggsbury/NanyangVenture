@@ -9,11 +9,26 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RTOS_test", "RTOS_test\RTOS
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ScratchPad", "ScratchPad\ScratchPad.vcxproj", "{C5F80730-F44F-4478-BDAE-6634EFC2CA88}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LiquidCrystal", "..\libraries\LiquidCrystal\LiquidCrystal.vcxitems", "{71C8833B-DB48-45FC-BF91-791068C94FB0}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Wire", "..\..\ide\hardware\arduino\avr\libraries\Wire\Wire.vcxitems", "{50699B74-4B7A-418A-BCD4-33D264BFE581}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SD", "..\..\ide\libraries\SD\SD.vcxitems", "{FA968CF9-C643-4453-A136-BDED4E20B71A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SPI", "..\..\ide\hardware\arduino\avr\libraries\SPI\SPI.vcxitems", "{6F81BC15-C478-45A4-A060-02D3EAC23A77}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EEPROM", "..\..\ide\hardware\arduino\avr\libraries\EEPROM\EEPROM.vcxitems", "{11B94213-5BA2-44F2-AA88-C7EADEB24346}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\libraries\FreeRTOS\FreeRTOS.vcxitems*{0c87fa96-7876-4b95-b048-06c95b892fe0}*SharedItemsImports = 4
+		..\..\ide\hardware\arduino\avr\libraries\EEPROM\EEPROM.vcxitems*{11b94213-5ba2-44f2-aa88-c7eadeb24346}*SharedItemsImports = 9
 		..\libraries\FreeRTOS\FreeRTOS.vcxitems*{216d3e33-021a-4bd1-93e9-8ea99ee382aa}*SharedItemsImports = 9
+		..\..\ide\hardware\arduino\avr\libraries\Wire\Wire.vcxitems*{50699b74-4b7a-418a-bcd4-33d264bfe581}*SharedItemsImports = 9
+		..\..\ide\hardware\arduino\avr\libraries\SPI\SPI.vcxitems*{6f81bc15-c478-45a4-a060-02d3eac23a77}*SharedItemsImports = 9
+		..\libraries\LiquidCrystal\LiquidCrystal.vcxitems*{71c8833b-db48-45fc-bf91-791068c94fb0}*SharedItemsImports = 9
 		..\libraries\FreeRTOS\FreeRTOS.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		..\..\ide\libraries\SD\SD.vcxitems*{fa968cf9-c643-4453-a136-bded4e20b71a}*SharedItemsImports = 9
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86

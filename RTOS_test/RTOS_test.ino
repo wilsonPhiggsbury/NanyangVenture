@@ -4,10 +4,19 @@
  Author:	MX
 */
 
+#include <EEPROM.h>
+#include "MotorLogger.h"
+#include <SPI.h>
+#include <SD.h>
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
 #include "HydrogenCellLogger.h"
 #include <Arduino_FreeRTOS.h>
 #include <semphr.h>  // add the FreeRTOS functions for Semaphores (or Flags).
 #include <queue.h>
+
+#define IDLEN 2
+#define DATALEN 48
 
 // Declare a mutex Semaphore Handle which we will use to manage the Serial Port.
 // It will be used to ensure only only one Task is accessing this resource at any time.
@@ -19,21 +28,23 @@ typedef enum
 	FuelCell_S,
 	Motor
 }DataSource;
-const char* dataSource[] = { "Master Fuel Cell", "Slave Fuel Cell", "Motor" };
+const char* dataSource[] = { "FM", "FS", "M1" };
 typedef struct
 {
 	DataSource ID;
-	char data[21];
+	char data[DATALEN];
 }QueueItem;
 
 
 // define queues
 QueueHandle_t queueForLogSend = xQueueCreate(2, sizeof(QueueItem));
-QueueHandle_t queueForDisplay = xQueueCreate(1, sizeof(QueueItem));
+QueueHandle_t queueForDisplay = xQueueCreate(2, sizeof(QueueItem));
+// declare globals (please keep to minimum)
+bool SD_avail;
 
 // define tasks, types are: input, control, output
 void TaskReadFuelCell(void *pvParameters);		// Input task:		Refreshes class variables for fuel cell Volts, Amps, Watts and Energy
-//void TaskReadMotorPower(void *pvParameters);	// Input task:		Refreshes class variables for motor Volts and Amps
+void TaskReadMotorPower(void *pvParameters);	// Input task:		Refreshes class variables for motor Volts and Amps
 void TaskQueueOutputData(void *pvParameters);	// Control task:	Controls frequency to queue data from above tasks to output tasks
 void TaskLogSendData(void *pvParameters);		// Output task:		Data logged in SD card and sent through XBee. Logged and sent data should be consistent, hence they are grouped together
 void TaskDisplayData(void *pvParameters);		// Output task:		Display on LCD screen
@@ -49,18 +60,16 @@ void setup() {
 	// initialize serial communication at 9600 bits per second:
 	Serial.begin(9600);
 	delay(1000);
+	// do handshake, block if not acquired...
+	// TBC...
+
+	// wipe the SD and recreate all files
+	// TBC...
+	SD_avail = SD.begin(4);
 
 	// define objects for more complicated procedures
 	HydrogenCellLogger hydroCells[2] = { HydrogenCellLogger(&Serial1),HydrogenCellLogger(&Serial2) };
-	// Semaphores are useful to stop a Task proceeding, where it should be paused to wait,
-	// because it is sharing a resource, such as the Serial port.
-	// Semaphores should only be used whilst the scheduler is running, but we can set it up here.
-	if (fuelCellSemaphore == NULL)  // Check to confirm that the Serial Semaphore has not already been created.
-	{
-		fuelCellSemaphore = xSemaphoreCreateMutex();  // Create a mutex semaphore we will use to manage the Serial Port
-		if ((fuelCellSemaphore) != NULL)
-			xSemaphoreGive((fuelCellSemaphore));  // Make the Serial Port available for use, by "Giving" the Semaphore.
-	}
+
 	// Now set up two Tasks to run independently.
 	xTaskCreate(
 		TaskReadFuelCell
@@ -70,23 +79,30 @@ void setup() {
 		, 3
 		, NULL);
 	xTaskCreate(
+		TaskReadMotorPower
+		, (const portCHAR *)"Motor"
+		, 200
+		, NULL
+		, 3
+		, NULL);
+	xTaskCreate(
 		TaskQueueOutputData
 		, (const portCHAR *)"Enqueue"  // A name just for humans
-		, 300  // This stack size can be checked & adjusted by reading the Stack Highwater
+		, 200  // This stack size can be checked & adjusted by reading the Stack Highwater
 		, hydroCells
 		, 2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
 		, NULL);
 	xTaskCreate(
 		TaskLogSendData
 		, (const portCHAR *) "LogSend"
-		, 150  // Stack size
+		, 300  // Stack size
 		, NULL
 		, 1  // Priority
 		, NULL);
 	xTaskCreate(
 		TaskDisplayData
 		, (const portCHAR *) "Display"
-		, 200  // Stack size
+		, 300  // Stack size
 		, NULL
 		, 1  // Priority
 		, NULL);
@@ -108,18 +124,28 @@ void TaskReadFuelCell(void *pvParameters)
 	HydrogenCellLogger* master = (HydrogenCellLogger*)pvParameters;
 	HydrogenCellLogger* slave = ((HydrogenCellLogger*)pvParameters)+1;
 	TickType_t prevTick = xTaskGetTickCount();
+	TickType_t delay = pdMS_TO_TICKS(975);
 	while (1)
 	{
 		master->readData();
 		slave->readData();
-		vTaskDelayUntil(&prevTick, pdMS_TO_TICKS(975));
+		vTaskDelayUntil(&prevTick, delay);
 	}
+}
+void TaskReadMotorPower(void* pvParameters)
+{
+	while (1)
+	{
+		vTaskDelay(pdMS_TO_TICKS(5000));
+	}
+	
 }
 void TaskQueueOutputData(void *pvParameters)  // This is a Task.
 {
-	QueueItem outgoing;// = { FuelCell_M, "I am a piece of data" };
+	QueueItem outgoing;
 	HydrogenCellLogger* masterCell = ((HydrogenCellLogger*)pvParameters);
 	HydrogenCellLogger* slaveCell = ((HydrogenCellLogger*)pvParameters) + 1;
+	TickType_t delay = pdMS_TO_TICKS(1005);
 	BaseType_t success;
 	while(1) // A Task shall never return or exit.
 	{
@@ -127,54 +153,74 @@ void TaskQueueOutputData(void *pvParameters)  // This is a Task.
 		// Arrange for outgoing fuel cell data
 		outgoing.ID = FuelCell_M;
 		masterCell->dumpDataInto(outgoing.data);
-		success = xQueueSend(queueForLogSend, &outgoing, 100);
+		success &= xQueueSend(queueForLogSend, &outgoing, 100);
+		success &= xQueueSend(queueForDisplay, &outgoing, 100);
 		outgoing.ID = FuelCell_S;
 		slaveCell->dumpDataInto(outgoing.data);
-		success = xQueueSend(queueForLogSend, &outgoing, 100);
+		success &= xQueueSend(queueForLogSend, &outgoing, 100);
+		success &= xQueueSend(queueForDisplay, &outgoing, 100);
 		// Arrange for outgoing motor data
 		// TBC...
 
-		//// See if we can obtain or "Take" the Serial Semaphore.
-		//// If the semaphore is not available, wait 5 ticks of the Scheduler to see if it becomes free.
-		//if (xSemaphoreTake(xSerialSemaphore, (TickType_t)5) == pdTRUE) // take semaphore, wait 5 ticks if fail
-		//{
-		//	// We were able to obtain or "Take" the semaphore and can now access the shared resource.
-		//	// We want to have the Serial Port for us alone, as it takes some time to print,
-		//	// so we don't want it getting stolen during the middle of a conversion.
 
-		//	xSemaphoreGive(xSerialSemaphore); // Now free or "Give" the Serial Port for others.
-		//}
-		vTaskDelay(pdMS_TO_TICKS(1005));  // send one time every 1 second
+		vTaskDelay(delay);  // send one time every 1 second
 	}
 }
 
 void TaskLogSendData(void *pvParameters __attribute__((unused)))  // This is a Task.
 {
 	QueueItem received;
+	TickType_t delay = pdMS_TO_TICKS(300); // delay 300 ms, shorter than reading/queueing tasks since this task has lower priority
+	
 	while(1)
 	{
 		BaseType_t success = xQueueReceive(queueForLogSend, &received, 0);
+		const char* fileName;
 		if (success == pdPASS)
 		{
-			Serial.print(F("Received "));
-			Serial.print(received.data);
-			Serial.print(F(" from "));
-			Serial.println(dataSource[received.ID]);
+			fileName = dataSource[received.ID];
+			Serial.print(fileName);
+			Serial.print('\t');
+			Serial.println(received.data);
+			// -------------- SD store -------------
+			if (SD_avail)
+			{
+				File writtenFile = SD.open(fileName, FILE_WRITE);
+				writtenFile.println(received.data);
+				writtenFile.close();
+			}
 		}
 		else
 		{
-			Serial.println(F("Received nothing."));
+			/*Serial.println(F("Received nothing."));*/
 		}
 		
-		vTaskDelay(pdMS_TO_TICKS(300));  // poll more frequently since more data comes in at a time
+		vTaskDelay(delay);  // poll more frequently since more data comes in at a time
 	}
 }
 void TaskDisplayData(void *pvParameters)
 {
+	LiquidCrystal_I2C lcd = LiquidCrystal_I2C(0x27, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);
+	lcd.begin(20, 4); // sixteen characters across - 2 lines
+	lcd.setBacklight(255);
 	QueueItem received;
+	char toPrint[4][20];
+	toPrint[0][19] = toPrint[1][19] = toPrint[2][19] = toPrint[3][19] = '\0';
+	TickType_t delay = pdMS_TO_TICKS(480);// delay 480 ms, shorter than reading/queueing tasks since this task has lower priority
 	while (1)
 	{
+		BaseType_t success;
+		while (xQueueReceive(queueForDisplay, &received, 0) == pdPASS)
+		{
+			strncpy(toPrint[received.ID], dataSource[received.ID], 2); // truncate heading to 2 letters
+			strcpy(toPrint[received.ID]+2, ":  ");
+			strncpy(toPrint[received.ID]+2+3, received.data, 9);
+			strncpy(toPrint[received.ID] + 2 + 3 + 9, "\0", 1);
 
-		vTaskDelay(pdMS_TO_TICKS(300));
+			lcd.setCursor(0,received.ID);
+			lcd.print(toPrint[received.ID]);
+		}
+
+		vTaskDelay(delay);
 	}
 }

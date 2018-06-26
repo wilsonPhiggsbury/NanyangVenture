@@ -27,7 +27,7 @@ towrite_long[10] = "022.3C 029.3C 029.9C 033.1C 0.84B 53.6V 028.3C OP 41.4C 20 0
 # towrite_long[9] = ""
 # towrite_long[10] = ""
 
-rs = serial.Serial('COM8',19200)
+rs = serial.Serial('COM15',19200)
 counter = 0
 hits = 0
 while True:
@@ -37,7 +37,7 @@ while True:
 		counter += 1
 	prepend = '\r\n>> ' + str(random.randint(0,100)/10).zfill(4) + 'V ' + str(random.randint(0,20)/10).zfill(4) + 'A ' + str(random.randint(100,1000)).zfill(4) + 'W ' + str(random.randint(0,5000)).zfill(5) + 'Wh '
 
-	printValid = counter!=0 and random.randint(0,4) > 2
+	printValid = True#counter!=0 and random.randint(0,4) > 2
 	if(printValid):
 		hits += 1
 		contents = prepend+towrite_long[counter]

@@ -56,33 +56,33 @@ void HydrogenCellLogger::init()
 }
 void HydrogenCellLogger::readData()
 {
-	// read into tmp
+	// read into buffer
 	while (port->available())
 	{
 		if (tmpCounter >= 99)
 		{
-			// tmp overflow
+			// buffer overflow
 			break;
 		}
-		tmp[tmpCounter++] = port->read();
+		buffer[tmpCounter++] = port->read();
 	}
-	tmp[tmpCounter] = '\0';
-	// search tmp for DELIMITER, *found points to start of the DELIMITER (or NULL if not found)
-	char *found = strstr(tmp, DELIMITER);
+	buffer[tmpCounter] = '\0';
+	// search buffer for DELIMITER, *found points to start of the DELIMITER (or NULL if not found)
+	char *found = strstr(buffer, DELIMITER);
 	if (found == NULL)
 	{
-		// DELIMITER nowhere to be found in current tmp. Clear it.
+		// DELIMITER nowhere to be found in current buffer. Clear it.
 		tmpCounter = 0;
 		return;
 	}
 	else if (strlen(found) < DELIMITER_LEN + 23) // 23 = 3 * (4 chars per (V/A/W) + 2 chars separating them) + 5 chars per Wh
 	{
-		// Partial data came in. Migrate to the front of tmp array.
+		// Partial data came in. Migrate to the front of buffer array.
 		uint8_t moveCounter = 0;
 		do
 		{
-			tmp[moveCounter] = *(found+moveCounter);
-		} while (tmp[moveCounter++] != '\0');
+			buffer[moveCounter] = *(found+moveCounter);
+		} while (buffer[moveCounter++] != '\0');
 		tmpCounter = moveCounter-1;
 		return;
 	}
@@ -92,7 +92,7 @@ void HydrogenCellLogger::readData()
 	strncpy(energy, found + DELIMITER_LEN + 18, 5);
 	volts[4] = amps[4] = watts[4] = energy[5] = '\0';
 	//debugPrint();
-	// clear tmp string
+	// clear buffer string
 	tmpCounter = 0;
 }
 void HydrogenCellLogger::dumpDataInto(char* location)
