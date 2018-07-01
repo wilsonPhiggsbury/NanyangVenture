@@ -11,6 +11,8 @@ C:\Users\MX\AppData\Local\Temp\VMBuilds\RTOS_test\mega_atmega2560\Release\RTOS_t
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/USBAPI.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Arduino.h \
  D:\Arduino\ide\hardware\arduino\avr\variants\mega/pins_arduino.h \
+ D:\Arduino\ide\hardware\arduino\avr\libraries\EEPROM\src/EEPROM.h \
+ C:\Users\MX\AppData\Local\Temp\VMBuilds\RTOS_test\mega_atmega2560\Release\MotorLogger.h \
  D:\Arduino\ide\hardware\arduino\avr\libraries\SPI\src/SPI.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Arduino.h \
  D:\Arduino\ide\libraries\SD\src/SD.h \

@@ -38,7 +38,7 @@ Shutting down...
 #include "HydrogenCellLogger.h"
 
 
-const char DELIMITER[] = "> ";
+const char DELIMITER[] = ">>";
 const size_t DELIMITER_LEN = strlen(DELIMITER);
 HydrogenCellLogger::HydrogenCellLogger(HardwareSerial *port):port(port)
 {
@@ -47,6 +47,7 @@ HydrogenCellLogger::HydrogenCellLogger(HardwareSerial *port):port(port)
 	strcpy(amps, "0.00");
 	strcpy(watts, "0000");
 	strcpy(energy, "00000");
+	strcpy(timeStamp, "00000000");
 }
 
 void HydrogenCellLogger::init()
@@ -86,24 +87,36 @@ void HydrogenCellLogger::readData()
 		tmpCounter = moveCounter-1;
 		return;
 	}
+	// update timestamp
+	ultoa(millis(), timeStamp, 16);
+	// update respective variables
 	strncpy(volts, found + DELIMITER_LEN + 0, 4);
 	strncpy(amps, found + DELIMITER_LEN + 6, 4);
 	strncpy(watts, found + DELIMITER_LEN + 12, 4);
 	strncpy(energy, found + DELIMITER_LEN + 18, 5);
 	volts[4] = amps[4] = watts[4] = energy[5] = '\0';
+	
 	//debugPrint();
-	// clear buffer string
+	// clear buffer string by resetting pointer
 	tmpCounter = 0;
+}
+void HydrogenCellLogger::dumpTimestampInto(char* location)
+{
+	strcat(location, timeStamp);//	8
+	strcat(location, "\t");//		1
+	//						SUM =	9
 }
 void HydrogenCellLogger::dumpDataInto(char* location)
 {
-	strcpy(location, volts);
-	strcat(location, " ");
-	strcat(location, amps);
-	strcat(location, " ");
-	strcat(location, watts);
-	strcat(location, " ");
-	strcat(location, energy);
+	strcat(location, volts);//		4
+	strcat(location, "\t");//		1
+	strcat(location, amps);//		4
+	strcat(location, "\t");//		1
+	strcat(location, watts);//		4
+	strcat(location, "\t");//		1
+	strcat(location, energy);//		5
+	//								1 (for '\0')
+	//						SUM =  21
 }
 void HydrogenCellLogger::debugPrint()
 {
@@ -117,6 +130,8 @@ void HydrogenCellLogger::debugPrint()
 	Serial.println(watts);
 	Serial.print(F("Energy:"));
 	Serial.println(energy);
+	Serial.print(F("Time:"));
+	Serial.println(timeStamp);
 	Serial.println(F("______"));
 
 }

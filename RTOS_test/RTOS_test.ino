@@ -16,7 +16,8 @@
 #include <queue.h>
 
 #define IDLEN 2
-#define DATALEN 48
+#define FUELCELL_DATALEN 60
+#define MOTOR_DATALEN 60
 
 // Declare a mutex Semaphore Handle which we will use to manage the Serial Port.
 // It will be used to ensure only only one Task is accessing this resource at any time.
@@ -24,23 +25,29 @@ SemaphoreHandle_t fuelCellSemaphore;
 // Declare queue data structures: ID of enum type and data of String type
 typedef enum
 {
-	FuelCell_M,
-	FuelCell_S,
+	FuelCell,
 	Motor
 }DataSource;
-const char* dataSource[] = { "FM", "FS", "M1" };
+const char* dataSource[] = { "FC", "MT" };
 typedef struct
 {
 	DataSource ID;
-	char data[DATALEN];
+	char data[max(FUELCELL_DATALEN, MOTOR_DATALEN)];
 }QueueItem;
-
+typedef struct
+{
+	HydrogenCellLogger* hydroCells;
+	MotorLogger* motors;
+}Loggers;
+// -- > for passing private variables, TBC...
 
 // define queues
-QueueHandle_t queueForLogSend = xQueueCreate(2, sizeof(QueueItem));
-QueueHandle_t queueForDisplay = xQueueCreate(2, sizeof(QueueItem));
+QueueHandle_t queueForLogSend = xQueueCreate(1, sizeof(QueueItem));
+QueueHandle_t queueForDisplay = xQueueCreate(1, sizeof(QueueItem));
 // declare globals (please keep to minimum)
 bool SD_avail;
+HydrogenCellLogger hydroCells[2] = { HydrogenCellLogger(&Serial1),HydrogenCellLogger(&Serial2) };
+MotorLogger motors[2] = { MotorLogger(0,A0,A1),MotorLogger(1,A2,A3) };
 
 // define tasks, types are: input, control, output
 void TaskReadFuelCell(void *pvParameters);		// Input task:		Refreshes class variables for fuel cell Volts, Amps, Watts and Energy
@@ -68,7 +75,7 @@ void setup() {
 	SD_avail = SD.begin(4);
 
 	// define objects for more complicated procedures
-	HydrogenCellLogger hydroCells[2] = { HydrogenCellLogger(&Serial1),HydrogenCellLogger(&Serial2) };
+
 
 	// Now set up two Tasks to run independently.
 	xTaskCreate(
@@ -82,14 +89,14 @@ void setup() {
 		TaskReadMotorPower
 		, (const portCHAR *)"Motor"
 		, 200
-		, NULL
+		, motors
 		, 3
 		, NULL);
 	xTaskCreate(
 		TaskQueueOutputData
 		, (const portCHAR *)"Enqueue"  // A name just for humans
 		, 200  // This stack size can be checked & adjusted by reading the Stack Highwater
-		, hydroCells
+		, NULL
 		, 2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
 		, NULL);
 	xTaskCreate(
@@ -121,47 +128,72 @@ void loop()
 void TaskReadFuelCell(void *pvParameters)
 {
 	// Obtain fuel cell object references from parameter passed in
-	HydrogenCellLogger* master = (HydrogenCellLogger*)pvParameters;
-	HydrogenCellLogger* slave = ((HydrogenCellLogger*)pvParameters)+1;
+	HydrogenCellLogger* masterCell = (HydrogenCellLogger*)pvParameters;
+	HydrogenCellLogger* slaveCell = ((HydrogenCellLogger*)pvParameters) + 1;
 	TickType_t prevTick = xTaskGetTickCount();
 	TickType_t delay = pdMS_TO_TICKS(975);
 	while (1)
 	{
-		master->readData();
-		slave->readData();
+		masterCell->readData();
+		slaveCell->readData();
 		vTaskDelayUntil(&prevTick, delay);
 	}
 }
 void TaskReadMotorPower(void* pvParameters)
 {
+	MotorLogger* m1 = ((MotorLogger*)pvParameters);
+	MotorLogger* m2 = ((MotorLogger*)pvParameters)+1;
+	/*MotorLogger* m3 = ((MotorLogger*)pvParameters)+2;*/
+	TickType_t delay = pdMS_TO_TICKS(975);
 	while (1)
 	{
-		vTaskDelay(pdMS_TO_TICKS(5000));
+		m1->logData();
+		m2->logData();
+		vTaskDelay(delay);
 	}
 	
 }
 void TaskQueueOutputData(void *pvParameters)  // This is a Task.
 {
 	QueueItem outgoing;
-	HydrogenCellLogger* masterCell = ((HydrogenCellLogger*)pvParameters);
-	HydrogenCellLogger* slaveCell = ((HydrogenCellLogger*)pvParameters) + 1;
+	/*HydrogenCellLogger* masterCell = (HydrogenCellLogger*)pvParameters;
+	HydrogenCellLogger* slaveCell = ((HydrogenCellLogger*)pvParameters) + 1;*/
+	//MotorLogger* motor1 = ((Loggers*)pvParameters)->motors;
+	/*MotorLogger* motor2 = ((Loggers*)pvParameters)->motors + 1;
+	MotorLogger* motor3 = ((Loggers*)pvParameters)->motors + 2;*/
 	TickType_t delay = pdMS_TO_TICKS(1005);
 	BaseType_t success;
+
 	while(1) // A Task shall never return or exit.
 	{
 		success = pdPASS;
 		// Arrange for outgoing fuel cell data
-		outgoing.ID = FuelCell_M;
-		masterCell->dumpDataInto(outgoing.data);
+		outgoing.ID = FuelCell;
+		outgoing.data[0] = '\0';
+		/* ------------------DATA FORMAT------------------
+						FM				FS
+			millis		V	A	W	Wh	V	A	W	Wh
+		--------------------------------------------------*/
+		HydrogenCellLogger::dumpTimestampInto(outgoing.data);
+		hydroCells[0].dumpDataInto(outgoing.data);
+		strcat(outgoing.data, "\t");
+		hydroCells[1].dumpDataInto(outgoing.data);
 		success &= xQueueSend(queueForLogSend, &outgoing, 100);
 		success &= xQueueSend(queueForDisplay, &outgoing, 100);
-		outgoing.ID = FuelCell_S;
-		slaveCell->dumpDataInto(outgoing.data);
-		success &= xQueueSend(queueForLogSend, &outgoing, 100);
-		success &= xQueueSend(queueForDisplay, &outgoing, 100);
-		// Arrange for outgoing motor data
-		// TBC...
 
+		// Arrange for outgoing motor data
+		outgoing.ID = Motor;
+		outgoing.data[0] = '\0';
+		/* ------------------DATA FORMAT------------------
+						M1		M2		M3		M4
+			millis		V	A	V	A	V	A	V	A	
+		--------------------------------------------------*/
+		MotorLogger::dumpTimestampInto(outgoing.data);
+		motors[0].dumpDataInto(outgoing.data);
+		strcat(outgoing.data, "\t");
+		motors[1].dumpDataInto(outgoing.data);
+		success &= xQueueSend(queueForLogSend, &outgoing, 100);
+		success &= xQueueSend(queueForDisplay, &outgoing, 100);
 
 		vTaskDelay(delay);  // send one time every 1 second
 	}
@@ -203,19 +235,33 @@ void TaskDisplayData(void *pvParameters)
 	LiquidCrystal_I2C lcd = LiquidCrystal_I2C(0x27, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);
 	lcd.begin(20, 4); // sixteen characters across - 2 lines
 	lcd.setBacklight(255);
+
 	QueueItem received;
+
 	char toPrint[4][20];
-	toPrint[0][19] = toPrint[1][19] = toPrint[2][19] = toPrint[3][19] = '\0';
+	//toPrint[0][19] = toPrint[1][19] = toPrint[2][19] = toPrint[3][19] = '\0';
+
 	TickType_t delay = pdMS_TO_TICKS(480);// delay 480 ms, shorter than reading/queueing tasks since this task has lower priority
+
 	while (1)
 	{
 		BaseType_t success;
 		while (xQueueReceive(queueForDisplay, &received, 0) == pdPASS)
 		{
-			strncpy(toPrint[received.ID], dataSource[received.ID], 2); // truncate heading to 2 letters
-			strcpy(toPrint[received.ID]+2, ":  ");
-			strncpy(toPrint[received.ID]+2+3, received.data, 9);
-			strncpy(toPrint[received.ID] + 2 + 3 + 9, "\0", 1);
+			strncpy(toPrint[received.ID], dataSource[received.ID], 2); // begin with 2-letter heading (truncated)
+			strcpy(toPrint[received.ID] + 2, ": \0");
+			switch (received.ID)
+			{
+			case FuelCell:
+				strncat(toPrint[received.ID], received.data + 8 + 1, 4 + 1 + 4);
+				//							  ^^^^^^^^^^^^^^^^^^^^^				Received.data[0~8] are 8-char timestamp + 1 tab char. Skip those.
+				//													 ^^^^^^^^^^	Length of first float value + space + length of second float value
+				break;
+			case Motor:
+				strncat(toPrint[received.ID], received.data + 8 + 1, 4 + 1 + 4);
+				break;
+			}
+			
 
 			lcd.setCursor(0,received.ID);
 			lcd.print(toPrint[received.ID]);

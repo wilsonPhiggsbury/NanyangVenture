@@ -1,4 +1,4 @@
-C:\Users\MX\AppData\Local\Temp\VMBuilds\ScratchPad\mega_atmega2560\Debug\FreeRTOS\stream_buffer.c.o: \
+C:\Users\MX\AppData\Local\Temp\VMBuilds\ScratchPad\uno\Debug\FreeRTOS\stream_buffer.c.o: \
  D:\Arduino\Projects\libraries\FreeRTOS\src\stream_buffer.c \
  D:\Arduino\Projects\libraries\FreeRTOS\src\Arduino_FreeRTOS.h \
  D:\Arduino\Projects\libraries\FreeRTOS\src\FreeRTOSConfig.h \

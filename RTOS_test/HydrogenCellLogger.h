@@ -19,14 +19,17 @@ class HydrogenCellLogger
 	 char volts[5];
 	 char watts[5];
 	 char energy[6];
-	 void debugPrint();
+
+	 static char timeStamp[9];
 	 
 
  public:
 	 HydrogenCellLogger(HardwareSerial *port);
 	 void init();
 	 void readData();
+	 static void dumpTimestampInto(char * location);
 	 void dumpDataInto(char * location);
+	 void debugPrint();
 };
 
 

@@ -1,5 +1,5 @@
-C:\Users\MX\AppData\Local\Temp\VMBuilds\ScratchPad\mega_atmega2560\Debug\ScratchPad.cpp.o: \
- C:\Users\MX\AppData\Local\Temp\VMBuilds\ScratchPad\mega_atmega2560\Debug\ScratchPad.cpp \
+C:\Users\MX\AppData\Local\Temp\VMBuilds\ScratchPad\uno\Debug\ScratchPad.cpp.o: \
+ C:\Users\MX\AppData\Local\Temp\VMBuilds\ScratchPad\uno\Debug\ScratchPad.cpp \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/arduino.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/binary.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/WCharacter.h \
@@ -10,7 +10,7 @@ C:\Users\MX\AppData\Local\Temp\VMBuilds\ScratchPad\mega_atmega2560\Debug\Scratch
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Printable.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/USBAPI.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Arduino.h \
- D:\Arduino\ide\hardware\arduino\avr\variants\mega/pins_arduino.h \
+ D:\Arduino\ide\hardware\arduino\avr\variants\standard/pins_arduino.h \
  D:\Arduino\Projects\libraries\FreeRTOS\src/Arduino_FreeRTOS.h \
  D:\Arduino\Projects\libraries\FreeRTOS\src/FreeRTOSConfig.h \
  D:\Arduino\Projects\libraries\FreeRTOS\src/projdefs.h \
