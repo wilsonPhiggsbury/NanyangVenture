@@ -27,12 +27,21 @@
     <ClInclude Include="MotorLogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DisplayInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Wiring.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="HydrogenCellLogger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MotorLogger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DisplayInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

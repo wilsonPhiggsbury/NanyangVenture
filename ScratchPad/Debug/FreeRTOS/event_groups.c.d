@@ -1,4 +1,4 @@
-C:\Users\MX\AppData\Local\Temp\VMBuilds\ScratchPad\uno\Debug\FreeRTOS\event_groups.c.o: \
+C:\Users\MX\AppData\Local\Temp\VMBuilds\ScratchPad\mega_atmega2560\Debug\FreeRTOS\event_groups.c.o: \
  D:\Arduino\Projects\libraries\FreeRTOS\src\event_groups.c \
  D:\Arduino\Projects\libraries\FreeRTOS\src\Arduino_FreeRTOS.h \
  D:\Arduino\Projects\libraries\FreeRTOS\src\FreeRTOSConfig.h \

@@ -29,7 +29,6 @@ private:
 	uint8_t voltReading;
 	uint8_t ampReading;
 	static char timeStamp[9];
-protected:
 
 public:
 	MotorLogger(int motorID, uint8_t voltPin, uint8_t ampPin);

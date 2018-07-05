@@ -5,7 +5,7 @@
 #include "MotorLogger.h"
 
 
-
+char MotorLogger::timeStamp[9];
 MotorLogger::MotorLogger(int motorID, uint8_t voltPin, uint8_t ampPin):voltPin(voltPin),ampPin(ampPin),id(motorID)
 {
 	// populate EEPROM for testing purposes

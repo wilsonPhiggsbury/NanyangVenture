@@ -11,7 +11,7 @@
 
 class HydrogenCellLogger
 {
- protected:
+ private:
 	 HardwareSerial *port;
 	 char buffer[100];
 	 uint8_t tmpCounter = 0;

@@ -1,5 +1,5 @@
-C:\Users\MX\AppData\Local\Temp\VMBuilds\ScratchPad\uno\Debug\ScratchPad.cpp.o: \
- C:\Users\MX\AppData\Local\Temp\VMBuilds\ScratchPad\uno\Debug\ScratchPad.cpp \
+C:\Users\MX\AppData\Local\Temp\VMBuilds\ScratchPad\mega_atmega2560\Debug\ScratchPad.cpp.o: \
+ C:\Users\MX\AppData\Local\Temp\VMBuilds\ScratchPad\mega_atmega2560\Debug\ScratchPad.cpp \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/arduino.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/binary.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/WCharacter.h \
@@ -10,7 +10,14 @@ C:\Users\MX\AppData\Local\Temp\VMBuilds\ScratchPad\uno\Debug\ScratchPad.cpp.o: \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Printable.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/USBAPI.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Arduino.h \
- D:\Arduino\ide\hardware\arduino\avr\variants\standard/pins_arduino.h \
+ D:\Arduino\ide\hardware\arduino\avr\variants\mega/pins_arduino.h \
+ D:\Arduino\Projects\libraries\TFT_ILI9163C/TFT_ILI9163C.h \
+ D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Arduino.h \
+ D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Print.h \
+ D:\Arduino\Projects\libraries\Adafruit_GFX_Library/Adafruit_GFX.h \
+ D:\Arduino\Projects\libraries\Adafruit_GFX_Library/gfxfont.h \
+ D:\Arduino\Projects\libraries\TFT_ILI9163C/_settings/TFT_ILI9163C_settings.h \
+ D:\Arduino\Projects\libraries\TFT_ILI9163C/_settings/TFT_ILI9163C_registers.h \
  D:\Arduino\Projects\libraries\FreeRTOS\src/Arduino_FreeRTOS.h \
  D:\Arduino\Projects\libraries\FreeRTOS\src/FreeRTOSConfig.h \
  D:\Arduino\Projects\libraries\FreeRTOS\src/projdefs.h \
@@ -20,6 +27,5 @@ C:\Users\MX\AppData\Local\Temp\VMBuilds\ScratchPad\uno\Debug\ScratchPad.cpp.o: \
  D:\Arduino\Projects\libraries\FreeRTOS\src/FreeRTOSVariant.h \
  D:\Arduino\Projects\libraries\FreeRTOS\src/task.h \
  D:\Arduino\Projects\libraries\FreeRTOS\src/list.h \
- D:\Arduino\Projects\libraries\FreeRTOS\src/queue.h \
- C:\Program\ Files\ (x86)\Microsoft\ Visual\ Studio\2017\Enterprise\Common7\IDE\Extensions\pd4xo3tv.r1p\Micro\ Platforms\default\debuggers\VM_DBG/VM_DBG.h \
- D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Arduino.h
+ D:\Arduino\ide\hardware\arduino\avr\libraries\SPI\src/SPI.h \
+ C:\Program\ Files\ (x86)\Microsoft\ Visual\ Studio\2017\Enterprise\Common7\IDE\Extensions\pd4xo3tv.r1p\Micro\ Platforms\default\debuggers\VM_DBG/VM_DBG.h

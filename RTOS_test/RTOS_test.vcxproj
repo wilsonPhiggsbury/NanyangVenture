@@ -36,6 +36,8 @@
   </ImportGroup>
   <ImportGroup Label="Shared">
     <Import Project="..\..\libraries\FreeRTOS\FreeRTOS.vcxitems" Label="Shared" />
+    <Import Project="..\..\..\ide\hardware\arduino\avr\libraries\SPI\SPI.vcxitems" Label="Shared" />
+    <Import Project="..\..\..\ide\hardware\arduino\avr\libraries\Wire\Wire.vcxitems" Label="Shared" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -50,7 +52,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\RTOS_test;$(ProjectDir)..\..\..\ide\hardware\arduino\avr\libraries\EEPROM\src;$(ProjectDir)..\..\..\ide\hardware\arduino\avr\libraries\SPI\src;$(ProjectDir)..\..\..\ide\libraries\SD\src;$(ProjectDir)..\..\..\ide\hardware\arduino\avr\libraries\Wire\src;$(ProjectDir)..\..\libraries\LiquidCrystal;$(ProjectDir)..\..\libraries\FreeRTOS\src;$(ProjectDir)..\..\..\ide\libraries\SD\src\utility;$(ProjectDir)..\..\..\ide\hardware\arduino\avr\libraries\Wire\src\utility;$(ProjectDir)..\..\..\ide\libraries;$(ProjectDir)..\..\libraries;$(ProjectDir)..\..\..\ide\hardware\arduino\avr\libraries;$(ProjectDir)..\..\..\ide\hardware\arduino\avr\cores\arduino;$(ProjectDir)..\..\..\ide\hardware\arduino\avr\variants\mega;$(ProjectDir)..\..\..\ide\hardware\tools\avr\avr\include;$(ProjectDir)..\..\..\ide\hardware\tools\avr\avr\include\avr;$(ProjectDir)..\..\..\ide\hardware\tools\avr\lib\gcc\avr\4.8.1\include;$(ProjectDir)..\..\..\ide\hardware\tools\avr\lib\gcc\avr\4.9.2\include;$(ProjectDir)..\..\..\ide\hardware\tools\avr\lib\gcc\avr\4.9.3\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\RTOS_test;$(ProjectDir)..\..\..\ide\hardware\arduino\avr\libraries\EEPROM\src;$(ProjectDir)..\..\..\ide\hardware\arduino\avr\libraries\SPI\src;$(ProjectDir)..\..\..\ide\libraries\SD\src;$(ProjectDir)..\..\..\ide\hardware\arduino\avr\libraries\Wire\src;$(ProjectDir)..\..\libraries\LiquidCrystal;$(ProjectDir)..\..\libraries\FreeRTOS\src;$(ProjectDir)..\..\libraries\TFT_ILI9163C;$(ProjectDir)..\..\..\ide\libraries\SD\src\utility;$(ProjectDir)..\..\..\ide\hardware\arduino\avr\libraries\Wire\src\utility;$(ProjectDir)..\..\libraries\Adafruit_GFX_Library;$(ProjectDir)..\..\..\ide\libraries;$(ProjectDir)..\..\libraries;$(ProjectDir)..\..\..\ide\hardware\arduino\avr\libraries;$(ProjectDir)..\..\..\ide\hardware\arduino\avr\cores\arduino;$(ProjectDir)..\..\..\ide\hardware\arduino\avr\variants\mega;$(ProjectDir)..\..\..\ide\hardware\tools\avr\avr\include;$(ProjectDir)..\..\..\ide\hardware\tools\avr\avr\include\avr;$(ProjectDir)..\..\..\ide\hardware\tools\avr\lib\gcc\avr\4.8.1\include;$(ProjectDir)..\..\..\ide\hardware\tools\avr\lib\gcc\avr\4.9.2\include;$(ProjectDir)..\..\..\ide\hardware\tools\avr\lib\gcc\avr\4.9.3\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>$(ProjectDir)__vm\.RTOS_test.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <PreprocessorDefinitions>__AVR_ATmega2560__;_VMDEBUG=1;F_CPU=16000000L;ARDUINO=10805;ARDUINO_AVR_MEGA2560;ARDUINO_ARCH_AVR;__cplusplus=201103L;_VMICRO_INTELLISENSE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -66,7 +68,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\RTOS_test;$(ProjectDir)..\..\..\ide\hardware\arduino\avr\libraries\EEPROM\src;$(ProjectDir)..\..\..\ide\hardware\arduino\avr\libraries\SPI\src;$(ProjectDir)..\..\..\ide\libraries\SD\src;$(ProjectDir)..\..\..\ide\hardware\arduino\avr\libraries\Wire\src;$(ProjectDir)..\..\libraries\LiquidCrystal;$(ProjectDir)..\..\libraries\FreeRTOS\src;$(ProjectDir)..\..\..\ide\libraries\SD\src\utility;$(ProjectDir)..\..\..\ide\hardware\arduino\avr\libraries\Wire\src\utility;$(ProjectDir)..\..\..\ide\libraries;$(ProjectDir)..\..\libraries;$(ProjectDir)..\..\..\ide\hardware\arduino\avr\libraries;$(ProjectDir)..\..\..\ide\hardware\arduino\avr\cores\arduino;$(ProjectDir)..\..\..\ide\hardware\arduino\avr\variants\mega;$(ProjectDir)..\..\..\ide\hardware\tools\avr\avr\include;$(ProjectDir)..\..\..\ide\hardware\tools\avr\avr\include\avr;$(ProjectDir)..\..\..\ide\hardware\tools\avr\lib\gcc\avr\4.8.1\include;$(ProjectDir)..\..\..\ide\hardware\tools\avr\lib\gcc\avr\4.9.2\include;$(ProjectDir)..\..\..\ide\hardware\tools\avr\lib\gcc\avr\4.9.3\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\RTOS_test;$(ProjectDir)..\..\..\ide\hardware\arduino\avr\libraries\EEPROM\src;$(ProjectDir)..\..\..\ide\hardware\arduino\avr\libraries\SPI\src;$(ProjectDir)..\..\..\ide\libraries\SD\src;$(ProjectDir)..\..\..\ide\hardware\arduino\avr\libraries\Wire\src;$(ProjectDir)..\..\libraries\LiquidCrystal;$(ProjectDir)..\..\libraries\FreeRTOS\src;$(ProjectDir)..\..\libraries\TFT_ILI9163C;$(ProjectDir)..\..\..\ide\libraries\SD\src\utility;$(ProjectDir)..\..\..\ide\hardware\arduino\avr\libraries\Wire\src\utility;$(ProjectDir)..\..\libraries\Adafruit_GFX_Library;$(ProjectDir)..\..\..\ide\libraries;$(ProjectDir)..\..\libraries;$(ProjectDir)..\..\..\ide\hardware\arduino\avr\libraries;$(ProjectDir)..\..\..\ide\hardware\arduino\avr\cores\arduino;$(ProjectDir)..\..\..\ide\hardware\arduino\avr\variants\mega;$(ProjectDir)..\..\..\ide\hardware\tools\avr\avr\include;$(ProjectDir)..\..\..\ide\hardware\tools\avr\avr\include\avr;$(ProjectDir)..\..\..\ide\hardware\tools\avr\lib\gcc\avr\4.8.1\include;$(ProjectDir)..\..\..\ide\hardware\tools\avr\lib\gcc\avr\4.9.2\include;$(ProjectDir)..\..\..\ide\hardware\tools\avr\lib\gcc\avr\4.9.3\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>$(ProjectDir)__vm\.RTOS_test.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <PreprocessorDefinitions>__AVR_ATmega2560__;F_CPU=16000000L;ARDUINO=10805;ARDUINO_AVR_MEGA2560;ARDUINO_ARCH_AVR;__cplusplus=201103L;_VMICRO_INTELLISENSE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -89,11 +91,14 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DisplayInterface.h" />
     <ClInclude Include="HydrogenCellLogger.h" />
     <ClInclude Include="MotorLogger.h" />
+    <ClInclude Include="Wiring.h" />
     <ClInclude Include="__vm\.RTOS_test.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DisplayInterface.cpp" />
     <ClCompile Include="HydrogenCellLogger.cpp" />
     <ClCompile Include="MotorLogger.cpp" />
   </ItemGroup>

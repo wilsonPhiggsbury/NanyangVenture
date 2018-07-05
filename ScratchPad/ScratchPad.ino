@@ -3,16 +3,48 @@
  Created:	6/24/2018 11:37:49 PM
  Author:	MX
 */
+#include <TFT_ILI9163C.h>
 #include <Arduino_FreeRTOS.h>
-#include <queue.h>
+#include <Adafruit_GFX.h>
 
-void TaskQueueOutputData(void *pvParameters);
-void TaskLogSendData(void *pvParameters);
-QueueHandle_t queueForLogSend;
+#include <SPI.h>
+
+// Color definitions
+#define	BLACK   0x0000
+#define	BLUE    0x001F
+#define	RED     0xF800
+#define	GREEN   0x07E0
+#define CYAN    0x07FF
+#define MAGENTA 0xF81F
+#define YELLOW  0xFFE0  
+#define WHITE   0xFFFF
+
+#define  NBINS                12
+const uint8_t bar_Width = 3;
+
+uint32_t     avrg_TmrF = 0;
+uint16_t     t_b[NBINS];
+
+uint16_t datax_;
+#define __CS 10
+#define __DC 9
+
+void TaskQueueOutputData(void *pvParameters __attribute__((unused)));
+
+TFT_ILI9163C tft = TFT_ILI9163C(__CS, __DC);
 void setup() {
-	Serial.begin(9600);
+	Serial.begin(38400);
+	//while(!Serial);
+	tft.begin();
+	tft.setRotation(2);
+	tft.fillScreen(BLACK);
+	tft.setTextWrap(true);
+	tft.setTextColor(WHITE, BLACK);
+	tft.setTextSize(1);
+	tft.setCursor(0, 0);
 	delay(1000);
 
+	datax_ = 0;
 	xTaskCreate(
 		TaskQueueOutputData
 		, (const portCHAR *)"Enqueue"  // A name just for humans
@@ -21,61 +53,36 @@ void setup() {
 		, 1  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
 		, NULL);
 
-	xTaskCreate(
-		TaskLogSendData
-		, (const portCHAR *) "Dequeue"
-		, 256  // Stack size
-		, NULL
-		, 1  // Priority
-		, NULL);
-
-	queueForLogSend = xQueueCreate(1, sizeof(int));
 }
 
 // the loop function runs over and over again until power down or reset
 void loop() {
-  
+	
 }
+
 void TaskQueueOutputData(void *pvParameters __attribute__((unused)))  // This is a Task.
 {
 	while (1) // A Task shall never return or exit.
 	{
-		int data = 100;
-		BaseType_t success = xQueueSend(queueForLogSend, &data, portMAX_DELAY);
-		if (success != pdPASS)
-			Serial.println(F("Fail sending data."));
-		else
-			Serial.println(F("Success sending data."));
-		//// See if we can obtain or "Take" the Serial Semaphore.
-		//// If the semaphore is not available, wait 5 ticks of the Scheduler to see if it becomes free.
-		//if (xSemaphoreTake(xSerialSemaphore, (TickType_t)5) == pdTRUE) // take semaphore, wait 5 ticks if fail
-		//{
-		//	// We were able to obtain or "Take" the semaphore and can now access the shared resource.
-		//	// We want to have the Serial Port for us alone, as it takes some time to print,
-		//	// so we don't want it getting stolen during the middle of a conversion.
-
-		//	xSemaphoreGive(xSerialSemaphore); // Now free or "Give" the Serial Port for others.
-		//}
-		vTaskDelay(pdMS_TO_TICKS(300));  // one tick delay (15ms) in between reads for stability
+		datax_ += 16;
+		if (datax_ >= 1024)
+			datax_ = 0;
+		//Print_Data();
+		uint16_t mapped_y = map(datax_, 0, 1023, 127, 0);
+		tft.fillRect(0, 0, 128 / 16 - 1, mapped_y, BLACK);
+		tft.fillRect(0, 0+mapped_y, 128 / 16 - 1, 127 - mapped_y, WHITE);
+		vTaskDelay(pdMS_TO_TICKS(20));  // one tick delay (15ms) in between reads for stability
 	}
 }
-
-void TaskLogSendData(void *pvParameters __attribute__((unused)))  // This is a Task.
-{
-	int received;
-	while (1)
-	{
-		BaseType_t success = xQueueReceive(queueForLogSend, &received, 0);
-		if (success == pdPASS)
-		{
-			Serial.print(F("Received:"));
-			Serial.println(received);
-		}
-		else
-		{
-			Serial.println(F("Got nothing."));
-		}
-
-		vTaskDelay(pdMS_TO_TICKS(300));  // one tick delay (15ms) in between reads for stability
+void verticalBarGraphs(uint16_t datax[], uint8_t barWidth, uint8_t barHeight, uint8_t vOrigin) {//3,12,64,10
+	uint8_t startX;
+	uint16_t color;
+	uint8_t dataToWidth;
+	uint8_t div;
+	for (uint8_t i = 1; i <= NBINS - 1; i++) {
+		startX = (i * 11);
+		//tft.drawRect((startX-1),vOrigin,barWidth,barHeight,WHITE);//container
+		tft.fillRect(startX, (vOrigin + 1), (bar_Width), dataToWidth, BLACK);//mask ok
+		tft.fillRect(startX, (dataToWidth + vOrigin) + 1, (bar_Width), ((barHeight) - dataToWidth), color);//fillRect(X,Y,width,height,color)
 	}
 }

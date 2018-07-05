@@ -4,42 +4,23 @@
  Author:	MX
 */
 
-#include <EEPROM.h>
-#include "MotorLogger.h"
-#include <SPI.h>
-#include <SD.h>
-#include <Wire.h>
-#include <LiquidCrystal_I2C.h>
-#include "HydrogenCellLogger.h"
 #include <Arduino_FreeRTOS.h>
 #include <semphr.h>  // add the FreeRTOS functions for Semaphores (or Flags).
 #include <queue.h>
+#include <Adafruit_GFX.h>
+#include <TFT_ILI9163C.h>
+#include <SD.h>
+#include <LiquidCrystal_I2C.h>
+#include <EEPROM.h>
 
-#define IDLEN 2
-#define FUELCELL_DATALEN 60
-#define MOTOR_DATALEN 60
+#include "DisplayInterface.h"
+#include "MotorLogger.h"
+#include "HydrogenCellLogger.h"
+
 
 // Declare a mutex Semaphore Handle which we will use to manage the Serial Port.
 // It will be used to ensure only only one Task is accessing this resource at any time.
 SemaphoreHandle_t fuelCellSemaphore;
-// Declare queue data structures: ID of enum type and data of String type
-typedef enum
-{
-	FuelCell,
-	Motor
-}DataSource;
-const char* dataSource[] = { "FC", "MT" };
-typedef struct
-{
-	DataSource ID;
-	char data[max(FUELCELL_DATALEN, MOTOR_DATALEN)];
-}QueueItem;
-typedef struct
-{
-	HydrogenCellLogger* hydroCells;
-	MotorLogger* motors;
-}Loggers;
-// -- > for passing private variables, TBC...
 
 // define queues
 QueueHandle_t queueForLogSend = xQueueCreate(1, sizeof(QueueItem));
@@ -63,7 +44,6 @@ void TaskDisplayData(void *pvParameters);		// Output task:		Display on LCD scree
 
 // the setup function runs once when you press reset or power the board
 void setup() {
-
 	// initialize serial communication at 9600 bits per second:
 	Serial.begin(9600);
 	delay(1000);
@@ -81,14 +61,14 @@ void setup() {
 	xTaskCreate(
 		TaskReadFuelCell
 		, (const portCHAR *)"Fuel"
-		, 200
+		, 150
 		, hydroCells
 		, 3
 		, NULL);
 	xTaskCreate(
 		TaskReadMotorPower
 		, (const portCHAR *)"Motor"
-		, 200
+		, 150
 		, motors
 		, 3
 		, NULL);
@@ -210,7 +190,15 @@ void TaskLogSendData(void *pvParameters __attribute__((unused)))  // This is a T
 		const char* fileName;
 		if (success == pdPASS)
 		{
-			fileName = dataSource[received.ID];
+			switch (received.ID)
+			{
+			case FuelCell:
+				fileName = "FC";
+				break;
+			case Motor:
+				fileName = "MT";
+				break;
+			}
 			Serial.print(fileName);
 			Serial.print('\t');
 			Serial.println(received.data);
@@ -232,11 +220,13 @@ void TaskLogSendData(void *pvParameters __attribute__((unused)))  // This is a T
 }
 void TaskDisplayData(void *pvParameters)
 {
-	LiquidCrystal_I2C lcd = LiquidCrystal_I2C(0x27, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);
-	lcd.begin(20, 4); // sixteen characters across - 2 lines
-	lcd.setBacklight(255);
+	
 
 	QueueItem received;
+	LiquidCrystal_I2C lcdScreen = LiquidCrystal_I2C(LCD1_I2C_ADDR, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);
+	TFT_ILI9163C tftScreen = TFT_ILI9163C(TFT1_SPI_CS, TFT1_SPI_RS, TFT1_SPI_RST);
+	DisplayLCD lcdManager = DisplayLCD(lcdScreen);
+	DisplayTFT tftManager = DisplayTFT(tftScreen);
 
 	char toPrint[4][20];
 	//toPrint[0][19] = toPrint[1][19] = toPrint[2][19] = toPrint[3][19] = '\0';
@@ -248,23 +238,8 @@ void TaskDisplayData(void *pvParameters)
 		BaseType_t success;
 		while (xQueueReceive(queueForDisplay, &received, 0) == pdPASS)
 		{
-			strncpy(toPrint[received.ID], dataSource[received.ID], 2); // begin with 2-letter heading (truncated)
-			strcpy(toPrint[received.ID] + 2, ": \0");
-			switch (received.ID)
-			{
-			case FuelCell:
-				strncat(toPrint[received.ID], received.data + 8 + 1, 4 + 1 + 4);
-				//							  ^^^^^^^^^^^^^^^^^^^^^				Received.data[0~8] are 8-char timestamp + 1 tab char. Skip those.
-				//													 ^^^^^^^^^^	Length of first float value + space + length of second float value
-				break;
-			case Motor:
-				strncat(toPrint[received.ID], received.data + 8 + 1, 4 + 1 + 4);
-				break;
-			}
-			
-
-			lcd.setCursor(0,received.ID);
-			lcd.print(toPrint[received.ID]);
+			lcdManager.printData(received);
+			tftManager.printData(received);
 		}
 
 		vTaskDelay(delay);

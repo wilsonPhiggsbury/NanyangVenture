@@ -17,17 +17,24 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SD", "..\..\ide\libraries\S
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SPI", "..\..\ide\hardware\arduino\avr\libraries\SPI\SPI.vcxitems", "{6F81BC15-C478-45A4-A060-02D3EAC23A77}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EEPROM", "..\..\ide\hardware\arduino\avr\libraries\EEPROM\EEPROM.vcxitems", "{11B94213-5BA2-44F2-AA88-C7EADEB24346}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TFT_ILI9163C", "..\libraries\TFT_ILI9163C\TFT_ILI9163C.vcxitems", "{D54DCAF9-3FA6-4F3E-BA92-BF67A8630607}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Adafruit_GFX_Library", "..\libraries\Adafruit_GFX_Library\Adafruit_GFX_Library.vcxitems", "{8C1A22A5-7653-42A6-B3DD-80639FA902D1}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		..\..\ide\hardware\arduino\avr\libraries\SPI\SPI.vcxitems*{0c87fa96-7876-4b95-b048-06c95b892fe0}*SharedItemsImports = 4
+		..\..\ide\hardware\arduino\avr\libraries\Wire\Wire.vcxitems*{0c87fa96-7876-4b95-b048-06c95b892fe0}*SharedItemsImports = 4
 		..\libraries\FreeRTOS\FreeRTOS.vcxitems*{0c87fa96-7876-4b95-b048-06c95b892fe0}*SharedItemsImports = 4
-		..\..\ide\hardware\arduino\avr\libraries\EEPROM\EEPROM.vcxitems*{11b94213-5ba2-44f2-aa88-c7eadeb24346}*SharedItemsImports = 9
 		..\libraries\FreeRTOS\FreeRTOS.vcxitems*{216d3e33-021a-4bd1-93e9-8ea99ee382aa}*SharedItemsImports = 9
 		..\..\ide\hardware\arduino\avr\libraries\Wire\Wire.vcxitems*{50699b74-4b7a-418a-bcd4-33d264bfe581}*SharedItemsImports = 9
 		..\..\ide\hardware\arduino\avr\libraries\SPI\SPI.vcxitems*{6f81bc15-c478-45a4-a060-02d3eac23a77}*SharedItemsImports = 9
 		..\libraries\LiquidCrystal\LiquidCrystal.vcxitems*{71c8833b-db48-45fc-bf91-791068c94fb0}*SharedItemsImports = 9
+		..\libraries\Adafruit_GFX_Library\Adafruit_GFX_Library.vcxitems*{8c1a22a5-7653-42a6-b3dd-80639fa902d1}*SharedItemsImports = 9
+		..\..\ide\hardware\arduino\avr\libraries\SPI\SPI.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		..\libraries\Adafruit_GFX_Library\Adafruit_GFX_Library.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		..\libraries\FreeRTOS\FreeRTOS.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		..\libraries\TFT_ILI9163C\TFT_ILI9163C.vcxitems*{d54dcaf9-3fa6-4f3e-ba92-bf67a8630607}*SharedItemsImports = 9
 		..\..\ide\libraries\SD\SD.vcxitems*{fa968cf9-c643-4453-a136-bded4e20b71a}*SharedItemsImports = 9
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
