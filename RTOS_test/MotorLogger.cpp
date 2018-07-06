@@ -38,70 +38,64 @@ void MotorLogger::logData()
 {
 	voltReading = analogRead(voltPin);
 	ampReading = analogRead(ampPin);
-	/*voltReading += 16;
-	ampReading += 16;
-	if (voltReading >= 1023)
-		voltReading = 0;
-	if (ampReading >= 1023)
-		ampReading = 0;*/
+	//voltReading += 16;
+	//ampReading += 16;
+	//if (voltReading >= 1023)
+	//	voltReading = 0;
+	//if (ampReading >= 1023)
+	//	ampReading = 0;
 
 	ultoa(millis(), timeStamp, 16);
 }
 void MotorLogger::dumpDataInto(char* location)
 {
+	char tmp[6];
+	float finalReading;
+
+	// convert analog reading into VOLTS using lookup table
+	finalReading = rawToVA(voltReading, V_0, V_N, V_STEP, V_BASE_ADDR);
+	// put into tmp
+	dtostrf(finalReading, 4, 1, tmp);
+
+	strcat(location, tmp);
+	strcat(location, "\t");
+
+	// convert analog reading into AMPS using lookup table
+	finalReading = rawToVA(ampReading, A_0, A_N, A_STEP, A_BASE_ADDR);
+	// put into tmp and ship
+	dtostrf(finalReading, 4, 1, tmp);
+	strcat(location, tmp);
+
+}
+float MotorLogger::rawToVA(uint16_t reading, float first, float last, float step, int baseAddr)
+{
 	float highBound, finalReading;
 	int address;
 	unsigned int thisValue, nextValue;
-	char tmp[6];
 
 
 	// convert reading into voltage using lookup table
-	address = V_BASE_ADDR + (V_ENTRIES) * (id) * (sizeof(unsigned int));
-	highBound = V_0;
+	int entries = ((last - first)/step) + 1;
+	address = baseAddr + (entries) * (id) * (sizeof(unsigned int));
+	highBound = first;
 	EEPROM.get(address, nextValue);
 
-	while (highBound <= V_N+V_STEP && nextValue < voltReading)
+	while (highBound <= last + step && nextValue < reading)
 	{
-		highBound += V_STEP;
+		highBound += step;
 		address += sizeof(unsigned int);
 		thisValue = nextValue;
 		EEPROM.get(address, nextValue);
 	}
 
-	if (highBound <= V_0)
-		finalReading = V_0;
-	else if (highBound >= V_N + V_STEP)
-		finalReading = V_N;
+	if (highBound <= first)
+		finalReading = first;
+	else if (highBound >= last + step)
+		finalReading = last;
 	else
-		finalReading = (voltReading - thisValue) * (V_STEP / (float)(nextValue - thisValue)) + (highBound - V_STEP);//map(voltReading, thisValue, nextValue, highBound-V_STEP, highBound);
-	// put into tmp and ship
-	dtostrf(finalReading, 4, 1, tmp);
-	strcat(location, tmp);
+		finalReading = (reading - thisValue) * (step / (float)(nextValue - thisValue)) + (highBound - step);//map(reading, thisValue, nextValue, highBound-step, highBound);
 
-	strcat(location, "\t");
-
-	// convert reading into amperes using lookup table
-	address = A_BASE_ADDR + (A_ENTRIES) * (id) * (sizeof(unsigned int));
-	highBound = A_0;
-	EEPROM.get(address, nextValue);
-
-	while (highBound <= A_N + A_STEP && nextValue < ampReading)
-	{
-		highBound += A_STEP;
-		address += sizeof(unsigned int);
-		thisValue = nextValue;
-		EEPROM.get(address, nextValue);
-	}
-	if (highBound <= A_0)
-		finalReading = A_0;
-	else if (highBound >= A_N + A_STEP)
-		finalReading = A_N;
-	else
-		finalReading = (ampReading-thisValue) * (A_STEP / (nextValue - thisValue)) + (highBound - A_STEP);//map(ampReading, thisValue, nextValue, highBound-V_STEP, highBound);
-	// put into tmp and ship
-	dtostrf(finalReading, 4, 1, tmp);
-	strcat(location, tmp);
-
+	return finalReading;
 }
 void MotorLogger::dumpTimestampInto(char* location)
 {

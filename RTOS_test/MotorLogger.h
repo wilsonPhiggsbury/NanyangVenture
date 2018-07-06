@@ -40,6 +40,7 @@ private:
 	uint16_t voltReading = 0;
 	uint16_t ampReading = 0;
 	static char timeStamp[9];
+	float rawToVA(uint16_t reading, float first, float last, float step, int baseAddr);
 
 public:
 	MotorLogger(int motorID, uint8_t voltPin, uint8_t ampPin);

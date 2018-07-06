@@ -71,7 +71,7 @@ void setup() {
 		, (const portCHAR *)"Fuel"
 		, 150
 		, hydroCells
-		, 3
+		, 2
 		, NULL);
 	xTaskCreate(
 		TaskReadMotorPower
@@ -97,7 +97,7 @@ void setup() {
 	xTaskCreate(
 		TaskDisplayData
 		, (const portCHAR *) "Display"
-		, 300  // Stack size
+		, 400  // Stack size
 		, NULL
 		, 1  // Priority
 		, NULL);
@@ -132,7 +132,7 @@ void TaskReadMotorPower(void* pvParameters)
 	MotorLogger* m1 = ((MotorLogger*)pvParameters);
 	MotorLogger* m2 = ((MotorLogger*)pvParameters)+1;
 	/*MotorLogger* m3 = ((MotorLogger*)pvParameters)+2;*/
-	TickType_t delay = pdMS_TO_TICKS(975);
+	TickType_t delay = pdMS_TO_TICKS(120);
 	while (1)
 	{
 		m1->logData();
@@ -144,17 +144,21 @@ void TaskReadMotorPower(void* pvParameters)
 void TaskQueueOutputData(void *pvParameters)  // This is a Task.
 {
 	QueueItem outgoing;
+	uint8_t syncCounter = 1;
 	/*HydrogenCellLogger* masterCell = (HydrogenCellLogger*)pvParameters;
 	HydrogenCellLogger* slaveCell = ((HydrogenCellLogger*)pvParameters) + 1;*/
 	//MotorLogger* motor1 = ((Loggers*)pvParameters)->motors;
 	/*MotorLogger* motor2 = ((Loggers*)pvParameters)->motors + 1;
 	MotorLogger* motor3 = ((Loggers*)pvParameters)->motors + 2;*/
-	TickType_t delay = pdMS_TO_TICKS(1005);
+	TickType_t delay = pdMS_TO_TICKS(120);
 	BaseType_t success;
 
 	while(1) // A Task shall never return or exit.
 	{
 		success = pdPASS;
+		syncCounter++;
+		if (syncCounter > 60)
+			syncCounter = 1;
 		// Arrange for outgoing fuel cell data
 		outgoing.ID = FuelCell;
 		outgoing.data[0] = '\0';
@@ -162,19 +166,33 @@ void TaskQueueOutputData(void *pvParameters)  // This is a Task.
 						FM				FS
 			millis		V	A	W	Wh	V	A	W	Wh
 		--------------------------------------------------*/
-		HydrogenCellLogger::dumpTimestampInto(outgoing.data);
-		if (hydroCells[0].hasUpdated())
+		if (syncCounter % 60 == 0)
 		{
-			hydroCells[0].dumpDataInto(outgoing.data);
+			HydrogenCellLogger::dumpTimestampInto(outgoing.data);
+			//hydroCells[0].dumpDataInto(outgoing.data);
+			//strcat(outgoing.data, "\t");
+			//hydroCells[1].dumpDataInto(outgoing.data);
+			if (hydroCells[0].hasUpdated())
+			{
+				hydroCells[0].dumpDataInto(outgoing.data);
+			}
+			else
+			{
+				strcat(outgoing.data, "-");
+			}
 			strcat(outgoing.data, "\t");
-			hydroCells[1].dumpDataInto(outgoing.data);
+			if (hydroCells[1].hasUpdated())
+			{
+				hydroCells[1].dumpDataInto(outgoing.data);
+			}
+			else
+			{
+				strcat(outgoing.data, "-");
+			}
+			success &= xQueueSend(queueForLogSend, &outgoing, 100);
+			success &= xQueueSend(queueForDisplay, &outgoing, 100);
 		}
-		else
-		{
-			strcat(outgoing.data, "------");
-		}
-		success &= xQueueSend(queueForLogSend, &outgoing, 100);
-		success &= xQueueSend(queueForDisplay, &outgoing, 100);
+		
 		
 
 		// Arrange for outgoing motor data
@@ -188,7 +206,7 @@ void TaskQueueOutputData(void *pvParameters)  // This is a Task.
 		motors[0].dumpDataInto(outgoing.data);
 		strcat(outgoing.data, "\t");
 		motors[1].dumpDataInto(outgoing.data);
-		success &= xQueueSend(queueForLogSend, &outgoing, 100);
+		if(syncCounter % 60 == 0)success &= xQueueSend(queueForLogSend, &outgoing, 100);
 		success &= xQueueSend(queueForDisplay, &outgoing, 100);
 
 		vTaskDelay(delay);  // send one time every 1 second
@@ -238,7 +256,7 @@ void TaskDisplayData(void *pvParameters)
 	DisplayLCD lcdManager = DisplayLCD(lcdScreen);
 	DisplayTFT tftManager = DisplayTFT(tftScreen);
 
-	TickType_t delay = pdMS_TO_TICKS(480);// delay 480 ms, shorter than reading/queueing tasks since this task has lower priority
+	TickType_t delay = pdMS_TO_TICKS(105);// delay 480 ms, shorter than reading/queueing tasks since this task has lower priority
 
 	while (1)
 	{
@@ -248,7 +266,7 @@ void TaskDisplayData(void *pvParameters)
 			lcdManager.printData(received);
 			tftManager.printData(received);
 		}
-
+		
 		vTaskDelay(delay);
 	}
 }

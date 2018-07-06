@@ -32,3 +32,4 @@ public:
 
 #endif
 
+char * parseFuelCellData(char * dest, char * source);
