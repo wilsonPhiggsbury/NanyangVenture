@@ -7,11 +7,12 @@ char HydrogenCellLogger::timeStamp[9];
 HydrogenCellLogger::HydrogenCellLogger(HardwareSerial *port):port(port)
 {
 	port->begin(19200);
+	updated = false;
 	strcpy(volts, "0.00");
 	strcpy(amps, "0.00");
 	strcpy(watts, "0000");
 	strcpy(energy, "00000");
-	strcpy(timeStamp, "00000000");
+	strcpy(timeStamp, "0");
 }
 
 void HydrogenCellLogger::init()
@@ -24,20 +25,20 @@ void HydrogenCellLogger::readData()
 	// read into buffer
 	while (port->available())
 	{
-		if (tmpCounter >= 99)
+		if (bufferPointer >= 99)
 		{
 			// buffer overflow
 			break;
 		}
-		buffer[tmpCounter++] = port->read();
+		buffer[bufferPointer++] = port->read();
 	}
-	buffer[tmpCounter] = '\0';
+	buffer[bufferPointer] = '\0';
 	// search buffer for DELIMITER, *found points to start of the DELIMITER (or NULL if not found)
 	char *found = strstr(buffer, DELIMITER);
 	if (found == NULL)
 	{
 		// DELIMITER nowhere to be found in current buffer. Clear it.
-		tmpCounter = 0;
+		bufferPointer = 0;
 		return;
 	}
 	else if (strlen(found) < DELIMITER_LEN + 23) // 23 = 3 * (4 chars per (V/A/W) + 2 chars separating them) + 5 chars per Wh
@@ -48,11 +49,12 @@ void HydrogenCellLogger::readData()
 		{
 			buffer[moveCounter] = *(found+moveCounter);
 		} while (buffer[moveCounter++] != '\0');
-		tmpCounter = moveCounter-1;
+		bufferPointer = moveCounter-1;
 		return;
 	}
 	// update timestamp
 	ultoa(millis(), timeStamp, 16);
+	updated = true;
 	// update respective variables
 	strncpy(volts, found + DELIMITER_LEN + 0, 4);
 	strncpy(amps, found + DELIMITER_LEN + 6, 4);
@@ -62,7 +64,7 @@ void HydrogenCellLogger::readData()
 	
 	//debugPrint();
 	// clear buffer string by resetting pointer
-	tmpCounter = 0;
+	bufferPointer = 0;
 }
 void HydrogenCellLogger::dumpTimestampInto(char* location)
 {
@@ -81,6 +83,12 @@ void HydrogenCellLogger::dumpDataInto(char* location)
 	strcat(location, energy);//		5
 	//								1 (for '\0')
 	//						SUM =  21
+}
+bool HydrogenCellLogger::hasUpdated()
+{
+	bool tmp = updated;
+	updated = false;
+	return tmp;
 }
 void HydrogenCellLogger::debugPrint()
 {

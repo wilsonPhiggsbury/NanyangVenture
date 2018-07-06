@@ -25,4 +25,6 @@ C:\Users\MX\AppData\Local\Temp\VMBuilds\RTOS_test\mega_atmega2560\Release\Displa
  D:\Arduino\Projects\libraries\LiquidCrystal/LCD.h \
  D:\Arduino\Projects\libraries\TFT_ILI9163C/TFT_ILI9163C.h \
  D:\Arduino\Projects\libraries\TFT_ILI9163C/_settings/TFT_ILI9163C_settings.h \
- D:\Arduino\Projects\libraries\TFT_ILI9163C/_settings/TFT_ILI9163C_registers.h
+ D:\Arduino\Projects\libraries\TFT_ILI9163C/_settings/TFT_ILI9163C_registers.h \
+ C:\Users\MX\AppData\Local\Temp\VMBuilds\RTOS_test\mega_atmega2560\Release\MotorLogger.h \
+ D:\Arduino\ide\hardware\arduino\avr\libraries\EEPROM\src/EEPROM.h

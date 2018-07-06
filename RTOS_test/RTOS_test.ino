@@ -46,17 +46,25 @@ void TaskDisplayData(void *pvParameters);		// Output task:		Display on LCD scree
 void setup() {
 	// initialize serial communication at 9600 bits per second:
 	Serial.begin(9600);
-	delay(1000);
+	delay(100);
+	//wipeEEPROM();
+	//motors[0].populateEEPROM();
+	//motors[1].populateEEPROM();
+	//printEEPROM();
+
 	// do handshake, block if not acquired...
 	// TBC...
 
 	// wipe the SD and recreate all files
 	// TBC...
-	SD_avail = SD.begin(4);
-
+	SD_avail = SD.begin(SD_SPI_CS);
+	if (!SD_avail)
+	{
+		Serial.println(F("SD card not present!"));
+	}
 	// define objects for more complicated procedures
-
-
+	
+	
 	// Now set up two Tasks to run independently.
 	xTaskCreate(
 		TaskReadFuelCell
@@ -155,11 +163,19 @@ void TaskQueueOutputData(void *pvParameters)  // This is a Task.
 			millis		V	A	W	Wh	V	A	W	Wh
 		--------------------------------------------------*/
 		HydrogenCellLogger::dumpTimestampInto(outgoing.data);
-		hydroCells[0].dumpDataInto(outgoing.data);
-		strcat(outgoing.data, "\t");
-		hydroCells[1].dumpDataInto(outgoing.data);
+		if (hydroCells[0].hasUpdated())
+		{
+			hydroCells[0].dumpDataInto(outgoing.data);
+			strcat(outgoing.data, "\t");
+			hydroCells[1].dumpDataInto(outgoing.data);
+		}
+		else
+		{
+			strcat(outgoing.data, "------");
+		}
 		success &= xQueueSend(queueForLogSend, &outgoing, 100);
 		success &= xQueueSend(queueForDisplay, &outgoing, 100);
+		
 
 		// Arrange for outgoing motor data
 		outgoing.ID = Motor;
@@ -210,26 +226,17 @@ void TaskLogSendData(void *pvParameters __attribute__((unused)))  // This is a T
 				writtenFile.close();
 			}
 		}
-		else
-		{
-			/*Serial.println(F("Received nothing."));*/
-		}
-		
+
 		vTaskDelay(delay);  // poll more frequently since more data comes in at a time
 	}
 }
 void TaskDisplayData(void *pvParameters)
 {
-	
-
 	QueueItem received;
 	LiquidCrystal_I2C lcdScreen = LiquidCrystal_I2C(LCD1_I2C_ADDR, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);
 	TFT_ILI9163C tftScreen = TFT_ILI9163C(TFT1_SPI_CS, TFT1_SPI_RS, TFT1_SPI_RST);
 	DisplayLCD lcdManager = DisplayLCD(lcdScreen);
 	DisplayTFT tftManager = DisplayTFT(tftScreen);
-
-	char toPrint[4][20];
-	//toPrint[0][19] = toPrint[1][19] = toPrint[2][19] = toPrint[3][19] = '\0';
 
 	TickType_t delay = pdMS_TO_TICKS(480);// delay 480 ms, shorter than reading/queueing tasks since this task has lower priority
 
@@ -244,4 +251,26 @@ void TaskDisplayData(void *pvParameters)
 
 		vTaskDelay(delay);
 	}
+}
+
+void printEEPROM()
+{
+	for (int address = 0; address < EEPROM.length(); address += sizeof(unsigned int))
+	{
+		unsigned int tis;
+		EEPROM.get(address, tis);
+		if (tis == 65535)continue;
+		Serial.print(address);
+		Serial.print(" ");
+		Serial.println(tis);
+	}
+}
+void wipeEEPROM()
+{
+	for (int address = 0; address < EEPROM.length(); address += 1)
+	{
+		uint16_t tis;
+		EEPROM.write(address, 255);
+	}
+	Serial.println("EEPROM wiped.");
 }

@@ -13,9 +13,9 @@
       <TextPosition>
         <Version>4</Version>
         <FileName>.\RTOS_test\RTOS_test.ino</FileName>
-        <startLine>138</startLine>
+        <startLine>119</startLine>
         <StartColumn>0</StartColumn>
-        <EndLine>138</EndLine>
+        <EndLine>119</EndLine>
         <EndColumn>36</EndColumn>
         <MarkerId>0</MarkerId>
         <IsLineBased>1</IsLineBased>
@@ -44,7 +44,7 @@
         <Language>00000000-0000-0000-0000-000000000000</Language>
       </AddressLocation>
       <DataCount>4</DataCount>
-      <AutomationInfo>&lt;vmbp Id='58166e99-b850-4a63-8140-c43e6efe1e50'/&gt;</AutomationInfo>
+      <AutomationInfo>&lt;vmbp Id='b582817a-4674-4f8b-8013-abb2f08c8805'/&gt;</AutomationInfo>
       <TracepointText>FuelCell stack: {uxTaskGetStackHighWaterMark(NULL)}</TracepointText>
       <IsTracepointActive>1</IsTracepointActive>
       <TracepointTargetType>VsOutputWindow</TracepointTargetType>
@@ -69,9 +69,9 @@
       <TextPosition>
         <Version>4</Version>
         <FileName>.\RTOS_test\RTOS_test.ino</FileName>
-        <startLine>151</startLine>
+        <startLine>132</startLine>
         <StartColumn>0</StartColumn>
-        <EndLine>151</EndLine>
+        <EndLine>132</EndLine>
         <EndColumn>20</EndColumn>
         <MarkerId>0</MarkerId>
         <IsLineBased>1</IsLineBased>
@@ -85,7 +85,7 @@
         </Checksum>
       </TextPosition>
       <NamedLocationText>TaskReadMotorPower(void* pvParameters)</NamedLocationText>
-      <NamedLocationLine>8</NamedLocationLine>
+      <NamedLocationLine>9</NamedLocationLine>
       <NamedLocationColumn>0</NamedLocationColumn>
       <HitCountType>IsAMultipleOf</HitCountType>
       <HitCountTarget>1000</HitCountTarget>
@@ -100,7 +100,7 @@
         <Language>00000000-0000-0000-0000-000000000000</Language>
       </AddressLocation>
       <DataCount>4</DataCount>
-      <AutomationInfo>&lt;vmbp Id='74156980-8aa1-4cf7-b286-3e95f50344e7'/&gt;</AutomationInfo>
+      <AutomationInfo>&lt;vmbp Id='ee64aaa3-e392-4704-b437-49adccb0525a'/&gt;</AutomationInfo>
       <TracepointText>Motor stack: {uxTaskGetStackHighWaterMark(NULL)}</TracepointText>
       <IsTracepointActive>1</IsTracepointActive>
       <TracepointTargetType>VsOutputWindow</TracepointTargetType>
@@ -125,9 +125,9 @@
       <TextPosition>
         <Version>4</Version>
         <FileName>.\RTOS_test\RTOS_test.ino</FileName>
-        <startLine>197</startLine>
+        <startLine>178</startLine>
         <StartColumn>0</StartColumn>
-        <EndLine>197</EndLine>
+        <EndLine>178</EndLine>
         <EndColumn>53</EndColumn>
         <MarkerId>0</MarkerId>
         <IsLineBased>1</IsLineBased>
@@ -156,6 +156,7 @@
         <Language>00000000-0000-0000-0000-000000000000</Language>
       </AddressLocation>
       <DataCount>4</DataCount>
+      <AutomationInfo>&lt;vmbp Id='dc9f647f-261e-4e41-95e2-c6d9da20d028'/&gt;</AutomationInfo>
       <TracepointText>QueueTask stack: {uxTaskGetStackHighWaterMark(NULL)}</TracepointText>
       <IsTracepointActive>1</IsTracepointActive>
       <TracepointTargetType>VsOutputWindow</TracepointTargetType>
@@ -180,9 +181,9 @@
       <TextPosition>
         <Version>4</Version>
         <FileName>.\RTOS_test\RTOS_test.ino</FileName>
-        <startLine>229</startLine>
+        <startLine>214</startLine>
         <StartColumn>0</StartColumn>
-        <EndLine>229</EndLine>
+        <EndLine>214</EndLine>
         <EndColumn>80</EndColumn>
         <MarkerId>0</MarkerId>
         <IsLineBased>1</IsLineBased>
@@ -196,7 +197,7 @@
         </Checksum>
       </TextPosition>
       <NamedLocationText>TaskLogSendData(void *pvParameters __attribute__((unused)))</NamedLocationText>
-      <NamedLocationLine>27</NamedLocationLine>
+      <NamedLocationLine>31</NamedLocationLine>
       <NamedLocationColumn>0</NamedLocationColumn>
       <HitCountType>IsAMultipleOf</HitCountType>
       <HitCountTarget>1000</HitCountTarget>
@@ -211,6 +212,7 @@
         <Language>00000000-0000-0000-0000-000000000000</Language>
       </AddressLocation>
       <DataCount>4</DataCount>
+      <AutomationInfo>&lt;vmbp Id='d899b37f-28b8-48bc-a901-9cef17020bfd'/&gt;</AutomationInfo>
       <TracepointText>LogSend stack: {uxTaskGetStackHighWaterMark(NULL)}</TracepointText>
       <IsTracepointActive>1</IsTracepointActive>
       <TracepointTargetType>VsOutputWindow</TracepointTargetType>
@@ -235,9 +237,9 @@
       <TextPosition>
         <Version>4</Version>
         <FileName>.\RTOS_test\RTOS_test.ino</FileName>
-        <startLine>269</startLine>
+        <startLine>238</startLine>
         <StartColumn>0</StartColumn>
-        <EndLine>269</EndLine>
+        <EndLine>238</EndLine>
         <EndColumn>20</EndColumn>
         <MarkerId>0</MarkerId>
         <IsLineBased>1</IsLineBased>
@@ -251,7 +253,7 @@
         </Checksum>
       </TextPosition>
       <NamedLocationText>TaskDisplayData(void *pvParameters)</NamedLocationText>
-      <NamedLocationLine>27</NamedLocationLine>
+      <NamedLocationLine>20</NamedLocationLine>
       <NamedLocationColumn>0</NamedLocationColumn>
       <HitCountType>IsAMultipleOf</HitCountType>
       <HitCountTarget>1000</HitCountTarget>
@@ -266,6 +268,7 @@
         <Language>00000000-0000-0000-0000-000000000000</Language>
       </AddressLocation>
       <DataCount>4</DataCount>
+      <AutomationInfo>&lt;vmbp Id='b28ba886-fd3f-4083-9b54-834df724a0e3'/&gt;</AutomationInfo>
       <TracepointText>DisplayData stack: {uxTaskGetStackHighWaterMark(NULL)}</TracepointText>
       <IsTracepointActive>1</IsTracepointActive>
       <TracepointTargetType>VsOutputWindow</TracepointTargetType>

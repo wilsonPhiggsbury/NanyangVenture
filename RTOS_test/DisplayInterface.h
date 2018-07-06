@@ -24,6 +24,7 @@ class DisplayTFT
 {
 private:
 	TFT_ILI9163C& screen;
+
 public:
 	DisplayTFT(TFT_ILI9163C& screenPtr);
 	void printData(QueueItem& received);

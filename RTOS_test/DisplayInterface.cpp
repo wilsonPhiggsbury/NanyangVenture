@@ -3,6 +3,7 @@
 // 
 
 #include "DisplayInterface.h"
+#include "MotorLogger.h"
 
 // Color definitions
 #define	BLACK   0x0000
@@ -73,9 +74,22 @@ void DisplayTFT::printData(QueueItem& received)
 		{
 			while (*data != '\t')data++;
 			float thisInfo = atof(++data);
-			uint8_t mapped_y = map(thisInfo, 0, 20, 127, 0);
-			screen.fillRect(i * 128/8 + 5, 0, 128 / 16 - 1, mapped_y, BLACK);
-			screen.fillRect(i * 128/8 + 5, 0 + mapped_y, 128 / 16 - 1, 127 - mapped_y, WHITE);
+			uint8_t mapped_y;
+			// input is either volts or amps, alternating and separated by tabs '\t'
+			if(i%2 == 0)mapped_y = map(thisInfo, V_0, V_N, 127, 0);
+			else mapped_y = map(thisInfo, A_0, A_N, 127, 0);
+
+			uint8_t horizontalPos = (i + 1) * 8 + (i * 11);
+			if (i < 2)
+			{
+				screen.fillRect(horizontalPos + 0, 0, 128 / 16 - 1, mapped_y, BLACK);
+				screen.fillRect(horizontalPos + 0, 0 + mapped_y, 128 / 16 - 1, 127 - mapped_y, WHITE);
+			}
+			else
+			{
+				screen.fillRect(horizontalPos + 64-8, 0, 128 / 16 - 1, mapped_y, BLACK);
+				screen.fillRect(horizontalPos + 64-8, 0 + mapped_y, 128 / 16 - 1, 127 - mapped_y, WHITE);
+			}
 		}
 		
 		break;

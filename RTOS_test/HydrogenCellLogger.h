@@ -14,11 +14,12 @@ class HydrogenCellLogger
  private:
 	 HardwareSerial *port;
 	 char buffer[100];
-	 uint8_t tmpCounter = 0;
+	 uint8_t bufferPointer = 0;
 	 char amps[5];
 	 char volts[5];
 	 char watts[5];
 	 char energy[6];
+	 bool updated;
 
 	 static char timeStamp[9];
 	 
@@ -29,6 +30,7 @@ class HydrogenCellLogger
 	 void readData();
 	 static void dumpTimestampInto(char * location);
 	 void dumpDataInto(char * location);
+	 bool hasUpdated();
 	 void debugPrint();
 };
 
