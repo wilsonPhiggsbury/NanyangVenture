@@ -13,9 +13,9 @@
       <TextPosition>
         <Version>4</Version>
         <FileName>.\RTOS_test\RTOS_test.ino</FileName>
-        <startLine>119</startLine>
+        <startLine>133</startLine>
         <StartColumn>0</StartColumn>
-        <EndLine>119</EndLine>
+        <EndLine>133</EndLine>
         <EndColumn>36</EndColumn>
         <MarkerId>0</MarkerId>
         <IsLineBased>1</IsLineBased>
@@ -44,8 +44,8 @@
         <Language>00000000-0000-0000-0000-000000000000</Language>
       </AddressLocation>
       <DataCount>4</DataCount>
-      <AutomationInfo>&lt;vmbp Id='b582817a-4674-4f8b-8013-abb2f08c8805'/&gt;</AutomationInfo>
-      <TracepointText>FuelCell stack: {uxTaskGetStackHighWaterMark(NULL)}</TracepointText>
+      <AutomationInfo>&lt;vmbp Id='79246874-70bf-459a-8455-3677c1e0afae'/&gt;</AutomationInfo>
+      <TracepointText>Motor stack: {uxTaskGetStackHighWaterMark(NULL)}</TracepointText>
       <IsTracepointActive>1</IsTracepointActive>
       <TracepointTargetType>VsOutputWindow</TracepointTargetType>
       <IsBreakWhenHit>0</IsBreakWhenHit>
@@ -69,9 +69,9 @@
       <TextPosition>
         <Version>4</Version>
         <FileName>.\RTOS_test\RTOS_test.ino</FileName>
-        <startLine>132</startLine>
+        <startLine>146</startLine>
         <StartColumn>0</StartColumn>
-        <EndLine>132</EndLine>
+        <EndLine>146</EndLine>
         <EndColumn>20</EndColumn>
         <MarkerId>0</MarkerId>
         <IsLineBased>1</IsLineBased>
@@ -100,8 +100,8 @@
         <Language>00000000-0000-0000-0000-000000000000</Language>
       </AddressLocation>
       <DataCount>4</DataCount>
-      <AutomationInfo>&lt;vmbp Id='ee64aaa3-e392-4704-b437-49adccb0525a'/&gt;</AutomationInfo>
-      <TracepointText>Motor stack: {uxTaskGetStackHighWaterMark(NULL)}</TracepointText>
+      <AutomationInfo>&lt;vmbp Id='304a9699-0bff-4b34-b991-17926ec07fe8'/&gt;</AutomationInfo>
+      <TracepointText>FuelCell stack: {uxTaskGetStackHighWaterMark(NULL)}</TracepointText>
       <IsTracepointActive>1</IsTracepointActive>
       <TracepointTargetType>VsOutputWindow</TracepointTargetType>
       <IsBreakWhenHit>0</IsBreakWhenHit>
@@ -125,9 +125,9 @@
       <TextPosition>
         <Version>4</Version>
         <FileName>.\RTOS_test\RTOS_test.ino</FileName>
-        <startLine>178</startLine>
+        <startLine>221</startLine>
         <StartColumn>0</StartColumn>
-        <EndLine>178</EndLine>
+        <EndLine>221</EndLine>
         <EndColumn>53</EndColumn>
         <MarkerId>0</MarkerId>
         <IsLineBased>1</IsLineBased>
@@ -141,7 +141,7 @@
         </Checksum>
       </TextPosition>
       <NamedLocationText>TaskQueueOutputData(void *pvParameters)</NamedLocationText>
-      <NamedLocationLine>41</NamedLocationLine>
+      <NamedLocationLine>70</NamedLocationLine>
       <NamedLocationColumn>0</NamedLocationColumn>
       <HitCountType>IsAMultipleOf</HitCountType>
       <HitCountTarget>1000</HitCountTarget>
@@ -156,7 +156,7 @@
         <Language>00000000-0000-0000-0000-000000000000</Language>
       </AddressLocation>
       <DataCount>4</DataCount>
-      <AutomationInfo>&lt;vmbp Id='dc9f647f-261e-4e41-95e2-c6d9da20d028'/&gt;</AutomationInfo>
+      <AutomationInfo>&lt;vmbp Id='1530afac-664c-4e90-8ee7-38b6412697cb'/&gt;</AutomationInfo>
       <TracepointText>QueueTask stack: {uxTaskGetStackHighWaterMark(NULL)}</TracepointText>
       <IsTracepointActive>1</IsTracepointActive>
       <TracepointTargetType>VsOutputWindow</TracepointTargetType>
@@ -181,9 +181,9 @@
       <TextPosition>
         <Version>4</Version>
         <FileName>.\RTOS_test\RTOS_test.ino</FileName>
-        <startLine>214</startLine>
+        <startLine>257</startLine>
         <StartColumn>0</StartColumn>
-        <EndLine>214</EndLine>
+        <EndLine>257</EndLine>
         <EndColumn>80</EndColumn>
         <MarkerId>0</MarkerId>
         <IsLineBased>1</IsLineBased>
@@ -212,7 +212,7 @@
         <Language>00000000-0000-0000-0000-000000000000</Language>
       </AddressLocation>
       <DataCount>4</DataCount>
-      <AutomationInfo>&lt;vmbp Id='d899b37f-28b8-48bc-a901-9cef17020bfd'/&gt;</AutomationInfo>
+      <AutomationInfo>&lt;vmbp Id='39b55913-1d76-450a-bdb9-8e3364701dc7'/&gt;</AutomationInfo>
       <TracepointText>LogSend stack: {uxTaskGetStackHighWaterMark(NULL)}</TracepointText>
       <IsTracepointActive>1</IsTracepointActive>
       <TracepointTargetType>VsOutputWindow</TracepointTargetType>
@@ -237,9 +237,9 @@
       <TextPosition>
         <Version>4</Version>
         <FileName>.\RTOS_test\RTOS_test.ino</FileName>
-        <startLine>238</startLine>
+        <startLine>279</startLine>
         <StartColumn>0</StartColumn>
-        <EndLine>238</EndLine>
+        <EndLine>279</EndLine>
         <EndColumn>20</EndColumn>
         <MarkerId>0</MarkerId>
         <IsLineBased>1</IsLineBased>
@@ -253,7 +253,7 @@
         </Checksum>
       </TextPosition>
       <NamedLocationText>TaskDisplayData(void *pvParameters)</NamedLocationText>
-      <NamedLocationLine>20</NamedLocationLine>
+      <NamedLocationLine>18</NamedLocationLine>
       <NamedLocationColumn>0</NamedLocationColumn>
       <HitCountType>IsAMultipleOf</HitCountType>
       <HitCountTarget>1000</HitCountTarget>
@@ -268,8 +268,176 @@
         <Language>00000000-0000-0000-0000-000000000000</Language>
       </AddressLocation>
       <DataCount>4</DataCount>
-      <AutomationInfo>&lt;vmbp Id='b28ba886-fd3f-4083-9b54-834df724a0e3'/&gt;</AutomationInfo>
+      <AutomationInfo>&lt;vmbp Id='b74f6569-eb5f-4252-98db-1533979156bb'/&gt;</AutomationInfo>
       <TracepointText>DisplayData stack: {uxTaskGetStackHighWaterMark(NULL)}</TracepointText>
+      <IsTracepointActive>1</IsTracepointActive>
+      <TracepointTargetType>VsOutputWindow</TracepointTargetType>
+      <IsBreakWhenHit>0</IsBreakWhenHit>
+      <IsRunMacroWhenHit>0</IsRunMacroWhenHit>
+      <UseChecksum>1</UseChecksum>
+      <Labels />
+      <RequestRemapped>0</RequestRemapped>
+      <IsSnapshotWhenHit>1</IsSnapshotWhenHit>
+      <SnapshotCountTarget>1</SnapshotCountTarget>
+      <parentIndex>-1</parentIndex>
+    </Breakpoint>
+    <Breakpoint>
+      <Version>15</Version>
+      <IsEnabled>1</IsEnabled>
+      <IsVisible>1</IsVisible>
+      <IsEmulated>0</IsEmulated>
+      <IsCondition>0</IsCondition>
+      <IsProductionBps>0</IsProductionBps>
+      <ConditionType>WhenTrue</ConditionType>
+      <LocationType>SourceLocation</LocationType>
+      <TextPosition>
+        <Version>4</Version>
+        <FileName>.\RTOS_test\Utilities.ino</FileName>
+        <startLine>60</startLine>
+        <StartColumn>0</StartColumn>
+        <EndLine>60</EndLine>
+        <EndColumn>0</EndColumn>
+        <MarkerId>0</MarkerId>
+        <IsLineBased>1</IsLineBased>
+        <IsDocumentPathNotFound>0</IsDocumentPathNotFound>
+        <ShouldUpdateTextSpan>1</ShouldUpdateTextSpan>
+        <Checksum>
+          <Version>1</Version>
+          <Algorithm>00000000-0000-0000-0000-000000000000</Algorithm>
+          <ByteCount>0</ByteCount>
+          <Bytes />
+        </Checksum>
+      </TextPosition>
+      <NamedLocationText>initSD(char* path)</NamedLocationText>
+      <NamedLocationLine>34</NamedLocationLine>
+      <NamedLocationColumn>0</NamedLocationColumn>
+      <HitCountType>NoHitCount</HitCountType>
+      <HitCountTarget>1</HitCountTarget>
+      <Language>3a12d0b7-c26c-11d0-b442-00a0244a1dd2</Language>
+      <IsMapped>0</IsMapped>
+      <BreakpointType>PendingBreakpoint</BreakpointType>
+      <AddressLocation>
+        <Version>0</Version>
+        <MarkerId>0</MarkerId>
+        <FunctionLine>0</FunctionLine>
+        <FunctionColumn>0</FunctionColumn>
+        <Language>00000000-0000-0000-0000-000000000000</Language>
+      </AddressLocation>
+      <DataCount>4</DataCount>
+      <AutomationInfo>&lt;vmbp Id='ba4393c1-6465-4665-abf6-8f64316e248b'/&gt;</AutomationInfo>
+      <TracepointText>{paddingZeroCounter}</TracepointText>
+      <IsTracepointActive>1</IsTracepointActive>
+      <TracepointTargetType>VsOutputWindow</TracepointTargetType>
+      <IsBreakWhenHit>0</IsBreakWhenHit>
+      <IsRunMacroWhenHit>0</IsRunMacroWhenHit>
+      <UseChecksum>1</UseChecksum>
+      <Labels />
+      <RequestRemapped>0</RequestRemapped>
+      <IsSnapshotWhenHit>1</IsSnapshotWhenHit>
+      <SnapshotCountTarget>1</SnapshotCountTarget>
+      <parentIndex>-1</parentIndex>
+    </Breakpoint>
+    <Breakpoint>
+      <Version>15</Version>
+      <IsEnabled>1</IsEnabled>
+      <IsVisible>1</IsVisible>
+      <IsEmulated>0</IsEmulated>
+      <IsCondition>0</IsCondition>
+      <IsProductionBps>0</IsProductionBps>
+      <ConditionType>WhenTrue</ConditionType>
+      <LocationType>SourceLocation</LocationType>
+      <TextPosition>
+        <Version>4</Version>
+        <FileName>.\RTOS_test\Utilities.ino</FileName>
+        <startLine>65</startLine>
+        <StartColumn>0</StartColumn>
+        <EndLine>65</EndLine>
+        <EndColumn>0</EndColumn>
+        <MarkerId>0</MarkerId>
+        <IsLineBased>1</IsLineBased>
+        <IsDocumentPathNotFound>0</IsDocumentPathNotFound>
+        <ShouldUpdateTextSpan>1</ShouldUpdateTextSpan>
+        <Checksum>
+          <Version>1</Version>
+          <Algorithm>00000000-0000-0000-0000-000000000000</Algorithm>
+          <ByteCount>0</ByteCount>
+          <Bytes />
+        </Checksum>
+      </TextPosition>
+      <NamedLocationText>initSD(char* path)</NamedLocationText>
+      <NamedLocationLine>39</NamedLocationLine>
+      <NamedLocationColumn>0</NamedLocationColumn>
+      <HitCountType>NoHitCount</HitCountType>
+      <HitCountTarget>1</HitCountTarget>
+      <Language>3a12d0b7-c26c-11d0-b442-00a0244a1dd2</Language>
+      <IsMapped>0</IsMapped>
+      <BreakpointType>PendingBreakpoint</BreakpointType>
+      <AddressLocation>
+        <Version>0</Version>
+        <MarkerId>0</MarkerId>
+        <FunctionLine>0</FunctionLine>
+        <FunctionColumn>0</FunctionColumn>
+        <Language>00000000-0000-0000-0000-000000000000</Language>
+      </AddressLocation>
+      <DataCount>4</DataCount>
+      <AutomationInfo>&lt;vmbp Id='e6eec703-f064-47b1-a909-d4ff2ba76801'/&gt;</AutomationInfo>
+      <TracepointText>{index}</TracepointText>
+      <IsTracepointActive>1</IsTracepointActive>
+      <TracepointTargetType>VsOutputWindow</TracepointTargetType>
+      <IsBreakWhenHit>0</IsBreakWhenHit>
+      <IsRunMacroWhenHit>0</IsRunMacroWhenHit>
+      <UseChecksum>1</UseChecksum>
+      <Labels />
+      <RequestRemapped>0</RequestRemapped>
+      <IsSnapshotWhenHit>1</IsSnapshotWhenHit>
+      <SnapshotCountTarget>1</SnapshotCountTarget>
+      <parentIndex>-1</parentIndex>
+    </Breakpoint>
+    <Breakpoint>
+      <Version>15</Version>
+      <IsEnabled>1</IsEnabled>
+      <IsVisible>1</IsVisible>
+      <IsEmulated>0</IsEmulated>
+      <IsCondition>0</IsCondition>
+      <IsProductionBps>0</IsProductionBps>
+      <ConditionType>WhenTrue</ConditionType>
+      <LocationType>SourceLocation</LocationType>
+      <TextPosition>
+        <Version>4</Version>
+        <FileName>.\RTOS_test\Utilities.ino</FileName>
+        <startLine>73</startLine>
+        <StartColumn>0</StartColumn>
+        <EndLine>73</EndLine>
+        <EndColumn>46</EndColumn>
+        <MarkerId>0</MarkerId>
+        <IsLineBased>1</IsLineBased>
+        <IsDocumentPathNotFound>0</IsDocumentPathNotFound>
+        <ShouldUpdateTextSpan>1</ShouldUpdateTextSpan>
+        <Checksum>
+          <Version>1</Version>
+          <Algorithm>00000000-0000-0000-0000-000000000000</Algorithm>
+          <ByteCount>0</ByteCount>
+          <Bytes />
+        </Checksum>
+      </TextPosition>
+      <NamedLocationText>initSD(char* path)</NamedLocationText>
+      <NamedLocationLine>34</NamedLocationLine>
+      <NamedLocationColumn>0</NamedLocationColumn>
+      <HitCountType>NoHitCount</HitCountType>
+      <HitCountTarget>1</HitCountTarget>
+      <Language>3a12d0b7-c26c-11d0-b442-00a0244a1dd2</Language>
+      <IsMapped>0</IsMapped>
+      <BreakpointType>PendingBreakpoint</BreakpointType>
+      <AddressLocation>
+        <Version>0</Version>
+        <MarkerId>0</MarkerId>
+        <FunctionLine>0</FunctionLine>
+        <FunctionColumn>0</FunctionColumn>
+        <Language>00000000-0000-0000-0000-000000000000</Language>
+      </AddressLocation>
+      <DataCount>4</DataCount>
+      <AutomationInfo>&lt;vmbp Id='022f00d3-0177-4939-b604-ae4eff197ec5'/&gt;</AutomationInfo>
+      <TracepointText>{path}</TracepointText>
       <IsTracepointActive>1</IsTracepointActive>
       <TracepointTargetType>VsOutputWindow</TracepointTargetType>
       <IsBreakWhenHit>0</IsBreakWhenHit>

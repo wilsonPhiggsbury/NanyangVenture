@@ -5,8 +5,6 @@ VisualStudioVersion = 15.0.27703.2018
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FreeRTOS", "..\libraries\FreeRTOS\FreeRTOS.vcxitems", "{216D3E33-021A-4BD1-93E9-8EA99EE382AA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RTOS_test", "RTOS_test\RTOS_test.vcxproj", "{0C87FA96-7876-4B95-B048-06C95B892FE0}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ScratchPad", "ScratchPad\ScratchPad.vcxproj", "{C5F80730-F44F-4478-BDAE-6634EFC2CA88}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LiquidCrystal", "..\libraries\LiquidCrystal\LiquidCrystal.vcxitems", "{71C8833B-DB48-45FC-BF91-791068C94FB0}"
@@ -20,6 +18,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TFT_ILI9163C", "..\libraries\TFT_ILI9163C\TFT_ILI9163C.vcxitems", "{D54DCAF9-3FA6-4F3E-BA92-BF67A8630607}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Adafruit_GFX_Library", "..\libraries\Adafruit_GFX_Library\Adafruit_GFX_Library.vcxitems", "{8C1A22A5-7653-42A6-B3DD-80639FA902D1}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NV10_back", "NV10_back\NV10_back.vcxproj", "{0C87FA96-7876-4B95-B048-06C95B892FE0}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -42,14 +42,14 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0C87FA96-7876-4B95-B048-06C95B892FE0}.Debug|x86.ActiveCfg = Debug|Win32
-		{0C87FA96-7876-4B95-B048-06C95B892FE0}.Debug|x86.Build.0 = Debug|Win32
-		{0C87FA96-7876-4B95-B048-06C95B892FE0}.Release|x86.ActiveCfg = Release|Win32
-		{0C87FA96-7876-4B95-B048-06C95B892FE0}.Release|x86.Build.0 = Release|Win32
 		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Debug|x86.ActiveCfg = Debug|Win32
 		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Debug|x86.Build.0 = Debug|Win32
 		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Release|x86.ActiveCfg = Release|Win32
 		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Release|x86.Build.0 = Release|Win32
+		{0C87FA96-7876-4B95-B048-06C95B892FE0}.Debug|x86.ActiveCfg = Debug|Win32
+		{0C87FA96-7876-4B95-B048-06C95B892FE0}.Debug|x86.Build.0 = Debug|Win32
+		{0C87FA96-7876-4B95-B048-06C95B892FE0}.Release|x86.ActiveCfg = Release|Win32
+		{0C87FA96-7876-4B95-B048-06C95B892FE0}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
