@@ -17,13 +17,13 @@
 #include "MotorLogger.h"
 #include "HydrogenCellLogger.h"
 
-#define DEBUG 0
-#if DEBUG == 1
-#define debug(...) Serial.println(__VA_ARGS__)
-#define debug_(...) Serial.print(__VA_ARGS__)
-#else
-#define debug(...)
-#define debug_(...)
+
+
+
+
+#ifdef SERIAL_RX_BUFFER_SIZE
+#undef SERIAL_RX_BUFFER_SIZE
+#define SERIAL_RX_BUFFER_SIZE 128
 #endif
 
 // file names
@@ -40,8 +40,9 @@ QueueHandle_t queueForDisplay = xQueueCreate(1, sizeof(QueueItem));
 // declare globals (please keep to minimum)
 bool SD_avail;
 char path[FILENAME_HEADER_LENGTH + 8 + 4 + 1] = "";
-HydrogenCellLogger hydroCells[2] = { HydrogenCellLogger(&Serial1),HydrogenCellLogger(&Serial2) };
-MotorLogger motors[2] = { MotorLogger(0,A0,A1),MotorLogger(1,A2,A3) };
+// sample filename: /LOG_0002/12345678.txt   1+8+1+8+4+1
+HydrogenCellLogger hydroCells[2] = { HydrogenCellLogger(&Serial3),HydrogenCellLogger(&Serial2) };
+MotorLogger motors[NUM_MOTORS] = { MotorLogger(0,A0,A1),MotorLogger(1,A2,A3),MotorLogger(2,A4,A5) };
 
 // define tasks, types are: input, control, output
 void TaskReadFuelCell(void *pvParameters);		// Input task:		Refreshes class variables for fuel cell Volts, Amps, Watts and Energy
@@ -60,16 +61,15 @@ void setup() {
 	// initialize serial communication at 9600 bits per second:
 	Serial.begin(9600);
 	delay(100);
+	Serial.setTimeout(1000);
+	// do handshake, update EEPROM...
 	//wipeEEPROM();
 	//motors[0].populateEEPROM();
 	//motors[1].populateEEPROM();
 	//printEEPROM();
-
-	// do handshake, block if not acquired...
-	// TBC...
+	populateEEPROM();
 
 	// create all files in a new directory
-	// TBC...
 	SD_avail = initSD(path);
 	
 	// define objects for more complicated procedures
@@ -78,9 +78,9 @@ void setup() {
 	xTaskCreate(
 		TaskReadFuelCell
 		, (const portCHAR *)"Fuel"
-		, 150
+		, 200
 		, hydroCells
-		, 2
+		, 3
 		, NULL);
 	xTaskCreate(
 		TaskReadMotorPower
@@ -92,7 +92,7 @@ void setup() {
 	xTaskCreate(
 		TaskQueueOutputData
 		, (const portCHAR *)"Enqueue"  // A name just for humans
-		, 200  // This stack size can be checked & adjusted by reading the Stack Highwater
+		, 250  // This stack size can be checked & adjusted by reading the Stack Highwater
 		, NULL // Any pointer to pass in
 		, 2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
 		, NULL);
@@ -128,7 +128,7 @@ void TaskReadFuelCell(void *pvParameters)
 	HydrogenCellLogger* masterCell = (HydrogenCellLogger*)pvParameters;
 	HydrogenCellLogger* slaveCell = ((HydrogenCellLogger*)pvParameters) + 1;
 	TickType_t prevTick = xTaskGetTickCount();
-	TickType_t delay = pdMS_TO_TICKS(975);
+	TickType_t delay = pdMS_TO_TICKS(750);
 	while (1)
 	{
 		masterCell->readData();
@@ -141,7 +141,7 @@ void TaskReadMotorPower(void* pvParameters)
 	MotorLogger* m1 = ((MotorLogger*)pvParameters);
 	MotorLogger* m2 = ((MotorLogger*)pvParameters)+1;
 	/*MotorLogger* m3 = ((MotorLogger*)pvParameters)+2;*/
-	TickType_t delay = pdMS_TO_TICKS(120);
+	TickType_t delay = pdMS_TO_TICKS(600);
 	while (1)
 	{
 		m1->logData();
@@ -209,12 +209,16 @@ void TaskQueueOutputData(void *pvParameters)  // This is a Task.
 			millis		V	A	V	A	V	A	V	A	
 		--------------------------------------------------*/
 		
-			MotorLogger::dumpTimestampInto(outgoing.data);
-			motors[0].dumpDataInto(outgoing.data);
-			strcat(outgoing.data, "\t");
-			motors[1].dumpDataInto(outgoing.data);
-			success &= xQueueSend(queueForLogSend, &outgoing, 100);
-			success &= xQueueSend(queueForDisplay, &outgoing, 100);
+		MotorLogger::dumpTimestampInto(outgoing.data);
+		motors[0].dumpDataInto(outgoing.data, false);
+		strcat(outgoing.data, "\t");
+		motors[1].dumpDataInto(outgoing.data, false);
+		success &= xQueueSend(queueForLogSend, &outgoing, 100);
+		outgoing.data[0] = '\0';
+		motors[0].dumpDataInto(outgoing.data, true);
+		strcat(outgoing.data, "\t");
+		motors[1].dumpDataInto(outgoing.data, true);
+		success &= xQueueSend(queueForDisplay, &outgoing, 100);
 		
 		vTaskDelay(delay);  // send one time every 1 second
 	}
@@ -228,16 +232,16 @@ void TaskLogSendData(void *pvParameters __attribute__((unused)))  // This is a T
 	while(1)
 	{
 		BaseType_t success = xQueueReceive(queueForLogSend, &received, 0);
-		const char* fileName;
+		char fileName[3] = "";
 		if (success == pdPASS)
 		{
 			switch (received.ID)
 			{
 			case FuelCell:
-				fileName = FUELCELL_FILENAME;
+				strncpy(fileName, FUELCELL_FILENAME, 2);
 				break;
 			case Motor:
-				fileName = MOTOR_FILENAME;
+				strncpy(fileName, MOTOR_FILENAME, 2);
 				break;
 			}
 			Serial.print(fileName);

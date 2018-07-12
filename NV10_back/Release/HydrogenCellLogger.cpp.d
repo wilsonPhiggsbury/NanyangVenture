@@ -1,6 +1,7 @@
 C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Release\HydrogenCellLogger.cpp.o: \
  C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Release\HydrogenCellLogger.cpp \
  C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Release\HydrogenCellLogger.h \
+ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Release\Wiring.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/arduino.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/binary.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/WCharacter.h \
@@ -11,4 +12,8 @@ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Release\Hydrog
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Printable.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/USBAPI.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Arduino.h \
- D:\Arduino\ide\hardware\arduino\avr\variants\mega/pins_arduino.h
+ D:\Arduino\ide\hardware\arduino\avr\variants\mega/pins_arduino.h \
+ D:\Arduino\ide\hardware\arduino\avr\libraries\SPI\src/SPI.h \
+ D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Arduino.h \
+ D:\Arduino\ide\hardware\arduino\avr\libraries\Wire\src/Wire.h \
+ D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Stream.h

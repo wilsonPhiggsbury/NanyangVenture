@@ -12,6 +12,7 @@
 #endif
 #include <EEPROM.h>
 
+
 #define V_BASE_ADDR 0
 #define A_BASE_ADDR 2048
 // n = (Vn-V0)/V_Resolution + 1
@@ -39,15 +40,19 @@ private:
 	uint8_t ampPin;
 	uint16_t voltReading = 0;
 	uint16_t ampReading = 0;
+	float rawToVA(char which);
 	static char timeStamp[9];
-	float rawToVA(uint16_t reading, float first, float last, float step, int baseAddr);
+	int getAddr(char which);
+	static int getBaseAddr(char which);
 
 public:
 	MotorLogger(int motorID, uint8_t voltPin, uint8_t ampPin);
 	void populateEEPROM();
+	static unsigned int getEntries(char which);
+	bool updateTable(char which, unsigned int content[max(V_ENTRIES, A_ENTRIES)]);
 	uint8_t id;
 	void logData();
-	void dumpDataInto(char * location);
+	void dumpDataInto(char * location, bool raw);
 	static void dumpTimestampInto(char* location);
 
 };

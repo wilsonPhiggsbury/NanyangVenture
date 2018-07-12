@@ -123,8 +123,8 @@ void DisplayTFT::printData(QueueItem& received)
 			float thisInfo = atof(++data);
 			uint8_t mapped_y;
 			// input is either volts or amps, alternating and separated by tabs '\t'
-			if(i%2 == 0)mapped_y = map(thisInfo, V_0, V_N, 127, 0);
-			else mapped_y = map(thisInfo, A_0, A_N, 127, 0);
+			if(i%2 == 0)mapped_y = map(thisInfo, 0, 1023, 127, 0);
+			else mapped_y = map(thisInfo, 0, 1023, 127, 0);
 			// do color: lower = red, higher = blue
 			uint8_t r, g, b, tmp_mapped_y;
 			tmp_mapped_y = constrain(mapped_y, 32, 95);

@@ -21,11 +21,14 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Adafruit_GFX_Library", "..\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NV10_back", "NV10_back\NV10_back.vcxproj", "{0C87FA96-7876-4B95-B048-06C95B892FE0}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MCP_CAN_lib", "..\libraries\MCP_CAN_lib\MCP_CAN_lib.vcxitems", "{146A1678-8B3D-4B0E-8961-45E2201A27DE}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\..\ide\hardware\arduino\avr\libraries\SPI\SPI.vcxitems*{0c87fa96-7876-4b95-b048-06c95b892fe0}*SharedItemsImports = 4
 		..\..\ide\hardware\arduino\avr\libraries\Wire\Wire.vcxitems*{0c87fa96-7876-4b95-b048-06c95b892fe0}*SharedItemsImports = 4
 		..\libraries\FreeRTOS\FreeRTOS.vcxitems*{0c87fa96-7876-4b95-b048-06c95b892fe0}*SharedItemsImports = 4
+		..\libraries\MCP_CAN_lib\MCP_CAN_lib.vcxitems*{146a1678-8b3d-4b0e-8961-45e2201a27de}*SharedItemsImports = 9
 		..\libraries\FreeRTOS\FreeRTOS.vcxitems*{216d3e33-021a-4bd1-93e9-8ea99ee382aa}*SharedItemsImports = 9
 		..\..\ide\hardware\arduino\avr\libraries\Wire\Wire.vcxitems*{50699b74-4b7a-418a-bcd4-33d264bfe581}*SharedItemsImports = 9
 		..\..\ide\hardware\arduino\avr\libraries\SPI\SPI.vcxitems*{6f81bc15-c478-45a4-a060-02d3eac23a77}*SharedItemsImports = 9

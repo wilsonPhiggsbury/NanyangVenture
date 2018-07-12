@@ -23,7 +23,7 @@ void MotorLogger::populateEEPROM()
 {
 	// populate EEPROM for testing purposes
 	const float READING_V_RATIO = 1023 / 5;
-	int address = V_BASE_ADDR + (V_ENTRIES) * (id) * (sizeof(unsigned int));
+	int address = getAddr('V');
 	// lookup table for volts
 	unsigned int voltLookupTable[V_ENTRIES] = {
 		READING_V_RATIO * 0,
@@ -78,7 +78,7 @@ void MotorLogger::populateEEPROM()
 		READING_V_RATIO * 3.07,
 		READING_V_RATIO * 3.20
 	};
-	address = A_BASE_ADDR + (A_ENTRIES) * (id) * (sizeof(unsigned int));
+	address = getAddr('A');
 	debug_("A_ENTRIES: ");debug(A_ENTRIES);debug_("ID: ");debug_(id);debug_(" Address: ");debug(address);
 	for (int i = 0; i < A_ENTRIES; i++)
 	{
@@ -88,6 +88,38 @@ void MotorLogger::populateEEPROM()
 		int offset = sizeof(unsigned int)*i;
 		EEPROM.put(address + offset, content);
 		debug_(address + offset);debug_(" ");debug(content);
+	}
+}
+
+bool MotorLogger::updateTable(char which, unsigned int content[max(V_ENTRIES, A_ENTRIES)])
+{
+	unsigned int entries = MotorLogger::getEntries(which);
+	
+	for (int i = 0; i < entries; i++)
+	{
+		int offset = i * sizeof(unsigned int);
+		int address = getAddr(which) + offset;
+		EEPROM.put(address, content[i]);
+		debug_(address + offset);debug_(" ");debug(content[i]);
+	}
+}
+int MotorLogger::getAddr(char which)
+{
+	unsigned int entries = getEntries(which);
+	int base = getBaseAddr(which);
+	return base + (entries) * (id) * (sizeof(unsigned int));
+}
+int MotorLogger::getBaseAddr(char which)
+{
+	switch (which)
+	{
+	case 'V':
+		return V_BASE_ADDR;
+	case 'A':
+		return A_BASE_ADDR;
+	default:
+		debug(F("Attempted getBaseAddr() with invalid attribute."));
+		return -1;
 	}
 }
 void MotorLogger::logData()
@@ -103,36 +135,51 @@ void MotorLogger::logData()
 
 	ultoa(millis(), timeStamp, 16);
 }
-void MotorLogger::dumpDataInto(char* location)
+void MotorLogger::dumpDataInto(char* location, bool raw)
 {
 	char tmp[6];
 	float finalReading;
 
 	// convert analog reading into VOLTS using lookup table
-	finalReading = rawToVA(voltReading, V_0, V_N, V_STEP, V_BASE_ADDR);
-	// put into tmp
+	if(!raw)finalReading = rawToVA('V');
+	// put into tmp, length 4 (dot inclusive) with 1 decimal place
 	dtostrf(finalReading, 4, 1, tmp);
-
 	strcat(location, tmp);
 	strcat(location, "\t");
 
 	// convert analog reading into AMPS using lookup table
-	finalReading = rawToVA(ampReading, A_0, A_N, A_STEP, A_BASE_ADDR);
+	if(!raw)finalReading = rawToVA('A');
 	// put into tmp and ship
 	dtostrf(finalReading, 4, 1, tmp);
 	strcat(location, tmp);
 
 }
-float MotorLogger::rawToVA(uint16_t reading, float first, float last, float step, int baseAddr)
+float MotorLogger::rawToVA(char which)
 {
-	float highBound, finalReading;
-	int address;
-	unsigned int thisValue, nextValue;
+	float first, last, step, highBound;
+	int entries, address, baseAddress;
+	unsigned int reading, thisValue, nextValue;
 
-
+	switch (which)
+	{
+	case 'V':
+		first = V_0;
+		last = V_N;
+		step = V_STEP;
+		baseAddress = V_BASE_ADDR;
+		reading = voltReading;
+		break;
+	case 'A':
+		first = A_0;
+		last = A_N;
+		step = A_STEP;
+		baseAddress = A_BASE_ADDR;
+		reading = ampReading;
+		break;
+	}
 	// convert reading into voltage using lookup table
-	int entries = ((last - first)/step) + 1;
-	address = baseAddr + (entries) * (id) * (sizeof(unsigned int));
+	entries = ((last - first)/step) + 1;
+	address = baseAddress + (entries) * (id) * (sizeof(unsigned int));
 	highBound = first;
 	EEPROM.get(address, nextValue);
 
@@ -144,6 +191,7 @@ float MotorLogger::rawToVA(uint16_t reading, float first, float last, float step
 		EEPROM.get(address, nextValue);
 	}
 
+	float finalReading;
 	if (highBound <= first)
 		finalReading = first;
 	else if (highBound >= last + step)
@@ -157,4 +205,17 @@ void MotorLogger::dumpTimestampInto(char* location)
 {
 	strcat(location, timeStamp);
 	strcat(location, "\t");
+}
+unsigned int MotorLogger::getEntries(char which)
+{
+	switch (which)
+	{
+	case 'V':
+		return V_ENTRIES;
+	case 'A':
+		return A_ENTRIES;
+	default:
+		debug(F("Attempted getEntries() with invalid attribute."));
+		return 65535;
+	}
 }

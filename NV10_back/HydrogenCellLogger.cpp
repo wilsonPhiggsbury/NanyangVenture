@@ -12,6 +12,8 @@ HydrogenCellLogger::HydrogenCellLogger(HardwareSerial *port):port(port)
 	strcpy(amps, "0.00");
 	strcpy(watts, "0000");
 	strcpy(energy, "00000");
+	strcpy(capacitorVolts, "00.0");
+	strcpy(status, "XX");
 	strcpy(timeStamp, "0");
 }
 
@@ -22,7 +24,7 @@ void HydrogenCellLogger::init()
 }
 void HydrogenCellLogger::readData()
 {
-	// read into buffer
+	// read into buffer, see if data found by using DELIMITER ">>"
 	while (port->available())
 	{
 		if (bufferPointer >= 99)
@@ -41,7 +43,7 @@ void HydrogenCellLogger::readData()
 		bufferPointer = 0;
 		return;
 	}
-	else if (strlen(found) < DELIMITER_LEN + 23) // 23 = 3 * (4 chars per (V/A/W) + 2 chars separating them) + 5 chars per Wh
+	else if (strlen(found) < DELIMITER_LEN + 75) // 75 = (4+2) + (4+2) + (4+2) + (5+37) + (4+9) + (2)
 	{
 		// Partial data came in. Migrate to the front of buffer array.
 		uint8_t moveCounter = 0;
@@ -50,6 +52,7 @@ void HydrogenCellLogger::readData()
 			buffer[moveCounter] = *(found+moveCounter);
 		} while (buffer[moveCounter++] != '\0');
 		bufferPointer = moveCounter-1;
+		debug("move");
 		return;
 	}
 	// update timestamp
@@ -60,9 +63,12 @@ void HydrogenCellLogger::readData()
 	strncpy(amps, found + DELIMITER_LEN + 6, 4);
 	strncpy(watts, found + DELIMITER_LEN + 12, 4);
 	strncpy(energy, found + DELIMITER_LEN + 18, 5);
-	volts[4] = amps[4] = watts[4] = energy[5] = '\0';
+	strncpy(capacitorVolts, found + DELIMITER_LEN + 60, 4);
+	strncpy(status, found + DELIMITER_LEN + 73, 2);
+	//>>00.0V 00.0A 0000W 00000Wh 021.1C 028.3C 028.5C 031.6C 0.90B 59.0V 028.0C IN 00.0C 00 0000
+	//  ^   * ^   * ^   * ^    *                                    ^   *        ^ *
+	//volts[4] = amps[4] = watts[4] = energy[5] = capacitorVolts[4] = status[2] = '\0';
 	
-	//debugPrint();
 	// clear buffer string by resetting pointer
 	bufferPointer = 0;
 }
@@ -74,15 +80,19 @@ void HydrogenCellLogger::dumpTimestampInto(char* location)
 }
 void HydrogenCellLogger::dumpDataInto(char* location)
 {
-	strcat(location, volts);//		4
-	strcat(location, "\t");//		1
-	strcat(location, amps);//		4
-	strcat(location, "\t");//		1
-	strcat(location, watts);//		4
-	strcat(location, "\t");//		1
-	strcat(location, energy);//		5
-	//								1 (for '\0')
-	//						SUM =  21
+	strcat(location, volts);//			4
+	strcat(location, "\t");//			1
+	strcat(location, amps);//			4
+	strcat(location, "\t");//			1
+	strcat(location, watts);//			4
+	strcat(location, "\t");//			1
+	strcat(location, energy);//			5
+	strcat(location, "\t");//			1
+	strcat(location, capacitorVolts);//	4
+	strcat(location, "\t");//			1
+	strcat(location, status);//			2
+	//									1 (for '\0')
+	//							SUM =  29
 }
 bool HydrogenCellLogger::hasUpdated()
 {
