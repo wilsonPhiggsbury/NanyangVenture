@@ -21,10 +21,6 @@
 
 
 
-#ifdef SERIAL_RX_BUFFER_SIZE
-#undef SERIAL_RX_BUFFER_SIZE
-#define SERIAL_RX_BUFFER_SIZE 128
-#endif
 
 // file names
 const char FILENAME_HEADER[] = "LOG";
@@ -62,13 +58,16 @@ void setup() {
 	Serial.begin(9600);
 	delay(100);
 	Serial.setTimeout(1000);
+	pinMode(13, OUTPUT);
 	// do handshake, update EEPROM...
 	//wipeEEPROM();
 	//motors[0].populateEEPROM();
 	//motors[1].populateEEPROM();
-	//printEEPROM();
+	digitalWrite(13, HIGH);
+	printEEPROM();
+	wipeEEPROM();
+	digitalWrite(13, LOW);
 	populateEEPROM();
-
 	// create all files in a new directory
 	SD_avail = initSD(path);
 	

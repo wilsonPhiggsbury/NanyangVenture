@@ -13,6 +13,11 @@ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Debug\MotorLog
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Arduino.h \
  D:\Arduino\ide\hardware\arduino\avr\variants\mega/pins_arduino.h \
  D:\Arduino\ide\hardware\arduino\avr\libraries\EEPROM\src/EEPROM.h \
+ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Debug\Wiring.h \
+ D:\Arduino\ide\hardware\arduino\avr\libraries\SPI\src/SPI.h \
+ D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Arduino.h \
+ D:\Arduino\ide\hardware\arduino\avr\libraries\Wire\src/Wire.h \
+ D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Stream.h \
  D:\Arduino\Projects\libraries\FreeRTOS\src/Arduino_FreeRTOS.h \
  D:\Arduino\Projects\libraries\FreeRTOS\src/FreeRTOSConfig.h \
  D:\Arduino\Projects\libraries\FreeRTOS\src/projdefs.h \

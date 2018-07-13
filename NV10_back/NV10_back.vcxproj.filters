@@ -19,9 +19,6 @@
     <None Include="NV10_back.ino" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="__vm\.RTOS_test.vsarduino.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="HydrogenCellLogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>

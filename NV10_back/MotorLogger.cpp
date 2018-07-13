@@ -3,16 +3,9 @@
 // 
 
 #include "MotorLogger.h"
+#include "Wiring.h"
 #include <Arduino_FreeRTOS.h>
 
-#define DEBUG 0
-#if DEBUG == 1
-#define debug(...) Serial.println(__VA_ARGS__)
-#define debug_(...) Serial.print(__VA_ARGS__)
-#else
-#define debug(...)
-#define debug_(...)
-#endif
 
 char MotorLogger::timeStamp[9];
 MotorLogger::MotorLogger(int motorID, uint8_t voltPin, uint8_t ampPin):voltPin(voltPin),ampPin(ampPin),id(motorID)
@@ -25,7 +18,7 @@ void MotorLogger::populateEEPROM()
 	const float READING_V_RATIO = 1023 / 5;
 	int address = getAddr('V');
 	// lookup table for volts
-	unsigned int voltLookupTable[V_ENTRIES] = {
+	uint16_t voltLookupTable[V_ENTRIES] = {
 		READING_V_RATIO * 0,
 		READING_V_RATIO * 0.32,
 		READING_V_RATIO * 0.64,
@@ -43,15 +36,15 @@ void MotorLogger::populateEEPROM()
 	debug_("V_ENTRIES: ");debug(V_ENTRIES);debug_("ID: ");debug_(id);debug_(" Address: ");debug(address);
 	for (int i = 0; i < V_ENTRIES; i++)
 	{
-		unsigned int content;
+		uint16_t content;
 		content = voltLookupTable[i];
 		//content = ((i * 1024.0) / V_ENTRIES);
-		int offset = sizeof(unsigned int)*i;
+		int offset = sizeof(uint16_t)*i;
 		EEPROM.put(address + offset, content);
 		debug_(address + offset);debug_(" ");debug(content);
 	}
 	// lookup table for amps
-	unsigned int ampLookupTable[A_ENTRIES] = {
+	uint16_t ampLookupTable[A_ENTRIES] = {
 		READING_V_RATIO * 0,
 		READING_V_RATIO * 0.13,
 		READING_V_RATIO * 0.27,
@@ -82,32 +75,32 @@ void MotorLogger::populateEEPROM()
 	debug_("A_ENTRIES: ");debug(A_ENTRIES);debug_("ID: ");debug_(id);debug_(" Address: ");debug(address);
 	for (int i = 0; i < A_ENTRIES; i++)
 	{
-		unsigned int content;
+		uint16_t content;
 		content = ampLookupTable[i];
 		//content = ((i * 1024.0) / A_ENTRIES);
-		int offset = sizeof(unsigned int)*i;
+		int offset = sizeof(uint16_t)*i;
 		EEPROM.put(address + offset, content);
 		debug_(address + offset);debug_(" ");debug(content);
 	}
 }
 
-bool MotorLogger::updateTable(char which, unsigned int content[max(V_ENTRIES, A_ENTRIES)])
+bool MotorLogger::updateTable(char which, uint16_t content[max(V_ENTRIES, A_ENTRIES)])
 {
-	unsigned int entries = MotorLogger::getEntries(which);
-	
+	uint16_t entries = MotorLogger::getEntries(which);
+	debug_("Updating table ");debug(id);
 	for (int i = 0; i < entries; i++)
 	{
-		int offset = i * sizeof(unsigned int);
+		int offset = i * sizeof(uint16_t);
 		int address = getAddr(which) + offset;
 		EEPROM.put(address, content[i]);
-		debug_(address + offset);debug_(" ");debug(content[i]);
+		debug_(address);debug_("-> ");debug(content[i]);
 	}
 }
 int MotorLogger::getAddr(char which)
 {
-	unsigned int entries = getEntries(which);
+	uint16_t entries = getEntries(which);
 	int base = getBaseAddr(which);
-	return base + (entries) * (id) * (sizeof(unsigned int));
+	return base + (entries) * (id) * (sizeof(uint16_t));
 }
 int MotorLogger::getBaseAddr(char which)
 {
@@ -120,6 +113,32 @@ int MotorLogger::getBaseAddr(char which)
 	default:
 		debug(F("Attempted getBaseAddr() with invalid attribute."));
 		return -1;
+	}
+}
+int MotorLogger::getStep(char which)
+{
+	switch (which)
+	{
+	case 'V':
+		return V_STEP;
+	case 'A':
+		return A_STEP;
+	default:
+		debug(F("Attempted getBaseAddr() with invalid attribute."));
+		return -1;
+	}
+}
+uint16_t MotorLogger::getEntries(char which)
+{
+	switch (which)
+	{
+	case 'V':
+		return V_ENTRIES;
+	case 'A':
+		return A_ENTRIES;
+	default:
+		debug(F("Attempted getEntries() with invalid attribute."));
+		return 65535;
 	}
 }
 void MotorLogger::logData()
@@ -141,14 +160,20 @@ void MotorLogger::dumpDataInto(char* location, bool raw)
 	float finalReading;
 
 	// convert analog reading into VOLTS using lookup table
-	if(!raw)finalReading = rawToVA('V');
+	if (raw)
+		finalReading = voltReading;
+	else
+		finalReading = rawToVA('V');
 	// put into tmp, length 4 (dot inclusive) with 1 decimal place
 	dtostrf(finalReading, 4, 1, tmp);
 	strcat(location, tmp);
 	strcat(location, "\t");
 
 	// convert analog reading into AMPS using lookup table
-	if(!raw)finalReading = rawToVA('A');
+	if (raw)
+		finalReading = ampReading;
+	else
+		finalReading = rawToVA('A');
 	// put into tmp and ship
 	dtostrf(finalReading, 4, 1, tmp);
 	strcat(location, tmp);
@@ -158,7 +183,7 @@ float MotorLogger::rawToVA(char which)
 {
 	float first, last, step, highBound;
 	int entries, address, baseAddress;
-	unsigned int reading, thisValue, nextValue;
+	uint16_t reading, thisValue, nextValue;
 
 	switch (which)
 	{
@@ -179,14 +204,14 @@ float MotorLogger::rawToVA(char which)
 	}
 	// convert reading into voltage using lookup table
 	entries = ((last - first)/step) + 1;
-	address = baseAddress + (entries) * (id) * (sizeof(unsigned int));
+	address = baseAddress + (entries) * (id) * (sizeof(uint16_t));
 	highBound = first;
 	EEPROM.get(address, nextValue);
 
 	while (highBound <= last + step && nextValue < reading)
 	{
 		highBound += step;
-		address += sizeof(unsigned int);
+		address += sizeof(uint16_t);
 		thisValue = nextValue;
 		EEPROM.get(address, nextValue);
 	}
@@ -205,17 +230,4 @@ void MotorLogger::dumpTimestampInto(char* location)
 {
 	strcat(location, timeStamp);
 	strcat(location, "\t");
-}
-unsigned int MotorLogger::getEntries(char which)
-{
-	switch (which)
-	{
-	case 'V':
-		return V_ENTRIES;
-	case 'A':
-		return A_ENTRIES;
-	default:
-		debug(F("Attempted getEntries() with invalid attribute."));
-		return 65535;
-	}
 }

@@ -1,10 +1,83 @@
 
+void populateAttribute(char which, uint16_t allData[NUM_MOTORS][max(V_ENTRIES, A_ENTRIES)])
+{
+	uint16_t entries = MotorLogger::getEntries(which);
+	debug();debug(which);
+
+	char thisLine[19] = "";
+	// wait 1s for data, "--\n" will make it start listening for input. all other strings merely refresh the timeout
+	uint8_t timeout;
+	timeout = 5000;
+	while (strcmp(thisLine, "--\n"))
+	{
+		while (!Serial.available() && timeout > 0)
+		{
+			delay(1);
+			timeout--;
+		}
+		thisLine[0] = '\0';
+		Serial.readStringUntil('\n').toCharArray(thisLine, 19);
+		if (timeout == 0)
+		{
+			debug(F("Timeout at start!"));
+			return;
+		}
+	}
+	// flood per line with 50ms delay between
+	for (int j = 0; j < entries; j++)
+	{
+		
+
+		// read this incoming line 
+		// (it is the responsibility for PC side python program to gurante incoming line ends with \n)
+		//Serial.readStringUntil('\n').toCharArray(thisLine, 19);
+		strcpy(thisLine, "0\t111\t122\t123\n");
+		// first integer used to verify validity, remaining goes to EEPROM assignments
+		int thisInt;
+		char* ptr;
+		ptr = strtok(thisLine, "\t");
+		thisInt = atoi(ptr);
+		if (thisInt%entries != 0)
+		{
+			debug(F("EEPROM upload fail!"));
+			return;
+		}
+		for (int i = 0; i < NUM_MOTORS; i++)
+		{
+			ptr = strtok(NULL, "\t");
+			thisInt = atoi(ptr);
+			allData[i][j] = thisInt;
+			debug_(i);debug_(" ");debug_(j);debug_(": ");debug(thisInt);
+		}
+	}
+	// wait 0.5s for string "**\n" to indicate termination
+	timeout = 500;
+	while (strcmp(thisLine, "**\n"))
+	{
+		while (!Serial.available() && timeout > 0)
+		{
+			delay(1);
+			timeout--;
+		}
+		thisLine[0] = '\0';
+		Serial.readStringUntil('\n').toCharArray(thisLine, 19);
+		if (timeout == 0)
+		{
+			debug(F("Timeout at termination!"));
+			return;
+		}
+	}
+	for (int i = 0; i < NUM_MOTORS; i++)
+	{
+		motors[i].updateTable(which, allData[i]);
+	}
+}
 
 void printEEPROM()
 {
-	for (int address = 0; address < EEPROM.length(); address += sizeof(unsigned int))
+	for (int address = 0; address < EEPROM.length(); address += sizeof(uint16_t))
 	{
-		unsigned int tis;
+		uint16_t tis;
 		EEPROM.get(address, tis);
 		if (tis == 65535)continue;
 		Serial.print(address);
@@ -24,54 +97,9 @@ void wipeEEPROM()
 }
 void populateEEPROM()
 {
-	unsigned int allData[NUM_MOTORS][max(V_ENTRIES,A_ENTRIES)];
+	uint16_t allData[NUM_MOTORS][max(V_ENTRIES,A_ENTRIES)];
 	populateAttribute('V', allData);
 	populateAttribute('A', allData);
-}
-void populateAttribute(char which, unsigned int allData[NUM_MOTORS][max(V_ENTRIES,A_ENTRIES)])
-{
-	unsigned int entries = MotorLogger::getEntries(which);
-	// flood per line with 50ms delay per line
-	for (int j = 0; j < entries; j++)
-	{
-		// wait 3s for data
-		uint8_t timeout = 3000;
-		while (!Serial.available() && timeout > 0)
-		{
-			delay(1);
-			timeout--;
-		}
-		if (timeout == 0)
-			break;
-		// read this incoming line 
-		// (it is the responsibility for PC side python program to gurante incoming line ends with \n)
-		char thisLine[16];
-		Serial.readStringUntil('\n').toCharArray(thisLine, 16);
-		// first integer used to verify validity, remaining goes to EEPROM assignments
-		int thisInt;
-		char* ptr;
-		ptr = strtok(thisLine, "\t");
-		if (thisInt%entries != 0)
-		{
-			debug(F("EEPROM upload fail!"));
-			return;
-		}
-		for (int i = 0; i < NUM_MOTORS; i++)
-		{
-			strtok(NULL, "\t");
-			if (ptr == NULL)
-			{
-				debug(F("strtok is not working as expected."));
-				break;
-			}
-			thisInt = atoi(ptr);
-			allData[i][j] = thisInt;
-		}
-	}
-	for (int i = 0; i < entries; i++)
-	{
-		motors[i].updateTable(which, allData[i]);
-	}
 }
 bool initSD(char* path)
 {

@@ -44,12 +44,13 @@ private:
 	static char timeStamp[9];
 	int getAddr(char which);
 	static int getBaseAddr(char which);
+	static int getStep(char which);
 
 public:
 	MotorLogger(int motorID, uint8_t voltPin, uint8_t ampPin);
 	void populateEEPROM();
-	static unsigned int getEntries(char which);
-	bool updateTable(char which, unsigned int content[max(V_ENTRIES, A_ENTRIES)]);
+	static uint16_t getEntries(char which);
+	bool updateTable(char which, uint16_t content[max(V_ENTRIES, A_ENTRIES)]);
 	uint8_t id;
 	void logData();
 	void dumpDataInto(char * location, bool raw);
