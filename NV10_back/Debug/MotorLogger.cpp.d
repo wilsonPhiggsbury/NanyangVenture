@@ -26,4 +26,5 @@ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Debug\MotorLog
  D:\Arduino\Projects\libraries\FreeRTOS\src/mpu_wrappers.h \
  D:\Arduino\Projects\libraries\FreeRTOS\src/FreeRTOSVariant.h \
  D:\Arduino\Projects\libraries\FreeRTOS\src/task.h \
- D:\Arduino\Projects\libraries\FreeRTOS\src/list.h
+ D:\Arduino\Projects\libraries\FreeRTOS\src/list.h \
+ C:\Program\ Files\ (x86)\Microsoft\ Visual\ Studio\2017\Enterprise\Common7\IDE\Extensions\pd4xo3tv.r1p\Micro\ Platforms\default\debuggers\VM_DBG/VM_DBG.h

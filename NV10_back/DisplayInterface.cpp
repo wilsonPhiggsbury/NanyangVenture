@@ -19,67 +19,102 @@ DisplayLCD::DisplayLCD(LiquidCrystal_I2C& screenPtr):screen(screenPtr)
 {
 	screen.begin(20, 4);
 	screen.backlight();
+	screen.print("       V   Ap     Wh");
+	screen.setCursor(0, 1);
+	screen.print("L");
+	screen.setCursor(0, 2);
+	screen.print("R");
+	screen.setCursor(0, 3);
+	screen.print("c");
 }
 void DisplayLCD::printData(QueueItem& received)
 {
-	char toPrint[16] = ""; // instantiate all to '\0'
-	// navigate pointer to start of real readings (to skip the millis)
-	char *data = received.data;
-	while (*(++data) != '\t');
+	char localStrCopy[max(FUELCELL_DATALEN, MOTOR_DATALEN)];
+	strcpy(localStrCopy, received.data);
 	// LCD data comes in as:
 	//	FC	0	-	-
 	//	FC	3af	V	A	W	Wh	Vcap	State	V	A	W	Wh	Vcap	State
-	//	MT	3af	VL	AL	VR	AR	Vcap	Acap	ALp	ARp	Acp
-	/* show the
-			time
-			V
-			Apeak
-			culminative Wh
-		on LCD screen
+	//	MT	3af	V_L	V_R	V_c	A_L	A_R	A_c	Ap_L	Ap_R	Ap_c
+	// (V_L: voltage of left motor, , A_R: current of right motor, Ap_c: peak current of capacitor)
+	/* show on LCD only data with MT header:
+				V	Ap	Wh
+			L
+			R
+			c
 	*/
+
+	// navigate pointer to the start of actual data (skip the millis)
+	char* strPointer;
 	switch (received.ID)
 	{
 	case FuelCell:
-		uint8_t paramsToCut, counter;
-
-		if (data[1] == '-')
-		{
-			screen.setCursor(0, 1);
-			screen.print(F("No data from Master!"));
-		}
-		else
-		{
-			// cut out the tabs, replace by " "
-			screen.setCursor(0, 1);
-			screen.print(F("                    "));
-			screen.setCursor(0, 0);
-			screen.print("FM:");
-			data = parseFuelCellData(toPrint, data);
-			screen.print(toPrint);
-		}
-
-		// move data pointer to FS section, and clear toPrint
-		while (*(++data) != '\t');
-		toPrint[0] = '\0';
-
-		// do it again
-		if (data[1] == '-')
-		{
-			screen.setCursor(0, 3);
-			screen.print(F("No data from Slave!"));
-		}
-		else
-		{
-			screen.setCursor(0, 1);
-			screen.print(F("                    "));
-			screen.setCursor(0, 2);
-			screen.print("FS:");
-			data = parseFuelCellData(toPrint, data);
-			screen.print(toPrint);
-		}
+		//uint8_t paramsToCut, counter;
+		//
+		//if (data[1] == '-')
+		//{
+		//	screen.setCursor(0, 1);
+		//	screen.print(F("No data from Master!"));
+		//}
+		//else
+		//{
+		//	// cut out the tabs, replace by " "
+		//	screen.setCursor(0, 1);
+		//	screen.print(F("                    "));
+		//	screen.setCursor(0, 0);
+		//	screen.print("FM:");
+		//	data = parseFuelCellData(toPrint, data);
+		//	screen.print(toPrint);
+		//}
+		//// move data pointer to FS section, and clear toPrint
+		//while (*(++data) != '\t');
+		//toPrint[0] = '\0';
+		//// do it again
+		//if (data[1] == '-')
+		//{
+		//	screen.setCursor(0, 3);
+		//	screen.print(F("No data from Slave!"));
+		//}
+		//else
+		//{
+		//	screen.setCursor(0, 1);
+		//	screen.print(F("                    "));
+		//	screen.setCursor(0, 2);
+		//	screen.print("FS:");
+		//	data = parseFuelCellData(toPrint, data);
+		//	screen.print(toPrint);
+		//}
 
 		break;
 	case Motor:
+		if (NUM_MOTORS > 3)
+			debug(F("Not enough place to print motor data!"));
+		// print V
+		strPointer = strtok(localStrCopy, "\t");
+		for (int i = 0; i < NUM_MOTORS; i++)
+		{
+			strPointer = strtok(NULL, "\t");
+			screen.setCursor(4, i + 1);
+			screen.print(strPointer);
+		}
+		// skip A
+		for (int i = 0; i < NUM_MOTORS; i++)
+		{
+			strPointer = strtok(NULL, "\t");
+		}
+		// print Apeak
+		for (int i = 0; i < NUM_MOTORS; i++)
+		{
+			strPointer = strtok(NULL, "\t");
+			screen.setCursor(9, i + 1);
+			screen.print(strPointer);
+		}
+		// print Wh
+		for (int i = 0; i < NUM_MOTORS; i++)
+		{
+			strPointer = strtok(NULL, "\t");
+			screen.setCursor(14, i + 1);
+			screen.print(strPointer);
+		}
 		break;
 	}
 }
@@ -129,38 +164,38 @@ void DisplayTFT::printData(QueueItem& received)
 		
 		break;
 	case Motor:
-		int16_t cursorX = 0;
-		for (int i = 0; i < 4; i++)
-		{
-			while (*data != '\t')data++;
-			float thisInfo = atof(++data);
-			uint8_t mapped_y;
-			// input is either volts or amps, alternating and separated by tabs '\t'
-			if(i%2 == 0)mapped_y = map(thisInfo, V_0, V_N, 127, 0);
-			else mapped_y = map(thisInfo, A_0, A_N, 127, 0);
-			// do color: lower = red, higher = blue
-			uint8_t r, g, b, tmp_mapped_y;
-			tmp_mapped_y = constrain(mapped_y, 32, 95);
-			r = map(tmp_mapped_y, 32, 95, 0, 255);
-			g = map(tmp_mapped_y, 32, 95, 127, 0);
-			b = map(tmp_mapped_y, 32, 95, 255, 0);
-			uint16_t color = screen.Color565(r,g,b);
-			//uint8_t horizontalPos = (i + 1) * 8 + (i * 11);
-			cursorX += 8;
-			if (i < 2)
-			{
-				// cursorX + margin
-				screen.fillRect(cursorX + 10, 0, 128 / 16 - 1, mapped_y, BLACK);
-				screen.fillRect(cursorX + 10, 0 + mapped_y, 128 / 16 - 1, 127 - mapped_y, color);
-			}
-			else
-			{
-				// cursorX - margin + rightAlign
-				screen.fillRect(cursorX - 10 + 128-(4 * (8 + 11)), 0, 128 / 16 - 1, mapped_y, BLACK);
-				screen.fillRect(cursorX - 10 + 128-(4 * (8 + 11)), 0 + mapped_y, 128 / 16 - 1, 127 - mapped_y, color);
-			}
-			cursorX += 11;
-		}
+		//int16_t cursorX = 0;
+		//for (int i = 0; i < 4; i++)
+		//{
+		//	while (*data != '\t')data++;
+		//	float thisInfo = atof(++data);
+		//	uint8_t mapped_y;
+		//	// input is either volts or amps, alternating and separated by tabs '\t'
+		//	if(i%2 == 0)mapped_y = map(thisInfo, V_0, V_N, 127, 0);
+		//	else mapped_y = map(thisInfo, A_0, A_N, 127, 0);
+		//	// do color: lower = red, higher = blue
+		//	uint8_t r, g, b, tmp_mapped_y;
+		//	tmp_mapped_y = constrain(mapped_y, 32, 95);
+		//	r = map(tmp_mapped_y, 32, 95, 0, 255);
+		//	g = map(tmp_mapped_y, 32, 95, 127, 0);
+		//	b = map(tmp_mapped_y, 32, 95, 255, 0);
+		//	uint16_t color = screen.Color565(r,g,b);
+		//	//uint8_t horizontalPos = (i + 1) * 8 + (i * 11);
+		//	cursorX += 8;
+		//	if (i < 2)
+		//	{
+		//		// cursorX + margin
+		//		screen.fillRect(cursorX + 10, 0, 128 / 16 - 1, mapped_y, BLACK);
+		//		screen.fillRect(cursorX + 10, 0 + mapped_y, 128 / 16 - 1, 127 - mapped_y, color);
+		//	}
+		//	else
+		//	{
+		//		// cursorX - margin + rightAlign
+		//		screen.fillRect(cursorX - 10 + 128-(4 * (8 + 11)), 0, 128 / 16 - 1, mapped_y, BLACK);
+		//		screen.fillRect(cursorX - 10 + 128-(4 * (8 + 11)), 0 + mapped_y, 128 / 16 - 1, 127 - mapped_y, color);
+		//	}
+		//	cursorX += 11;
+		//}
 		
 		break;
 	}

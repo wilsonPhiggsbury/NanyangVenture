@@ -1,41 +1,38 @@
 
 void wipeEEPROM()
 {
-	debug(F("Wiping EEPROM..."));
 	for (int address = 0; address < EEPROM.length(); address += 1)
 	{
 		uint16_t tis;
 		EEPROM.write(address, 255);
 	}
-	debug(F("EEPROM wiped."));
 }
 bool initSD(char* path)
 {
+	const uint8_t FILENAME_INDEX = 4;
 	if (!SD.begin(SD_SPI_CS))
 	{
-		debug(F("SD card not present!"));
 		return false;
 	}
 	strcat(path, "/");
-	strcat(path, FILENAME_HEADER);
+	strcat(path, "LOG"); // Arduino does not like lengthy path names. Please keep to under 4 alphabets.
 	strcat(path, "_");
 
-	uint8_t fileNameLength = strlen(FILENAME_HEADER);
-	char index[FILENAME_INDEX+1] = "";
-
+	// Comb through existing files in SD card to obtain the latest index. Use it to name our new folder.
 	File f = SD.open("/");
 	File sub;
+	char index[FILENAME_INDEX + 1] = "";
 	int existingIndex = atoi(index);
 	while (sub = f.openNextFile())
 	{
 		if (sub.isDirectory())
 		{
-			int thisIndex = atoi(sub.name() + fileNameLength + 1);
+			int thisIndex = atoi(sub.name() + strlen(path) - 1); // -1 for excluding the '/' at the beginning, as sub.name() does not contain '/'
 			existingIndex = max(thisIndex, existingIndex);
 		}
 	}
 	
-	// pad '0' on the front if number very small
+	// pad '0' on the front if number contains less than 4 digits
 	uint8_t paddingZeroCounter = FILENAME_INDEX;
 	int existingIndex_tmp = existingIndex + 1;
 	while (existingIndex_tmp > 0)
@@ -51,26 +48,29 @@ bool initSD(char* path)
 
 	f.close();
 	sub.close();
-	// path charArray is completed! e.g. /LOG_0002
-	// construct the path
+
+	// A new index number is assigned to *path! e.g. /LOG_0002
 	strcat(path, index);
 	SD.mkdir(path);
 	// initialize the interior folder structure
 	strcat(path, "/");
-	strcpy(path + FILENAME_HEADER_LENGTH + 1, FUELCELL_FILENAME);
-	debug(path);
+
+	strcpy(path + FILENAME_HEADER_LENGTH, FUELCELL_FILENAME);
 	sub = SD.open(path, FILE_WRITE);
 	sub.println(F("Millis\tV_m\tA_m\tW_m\tWh_m\tVcap_m\tState"));
 	sub.close();
-	strcpy(path + FILENAME_HEADER_LENGTH + 1, MOTOR_FILENAME);
-	debug(path);
+
+	strcpy(path + FILENAME_HEADER_LENGTH, MOTOR_FILENAME);
 	sub = SD.open(path, FILE_WRITE);
 	sub.println(F("Millis\tV_left\tA_left\tV_right\tA_right\tV_cap\tA_cap"));
 	sub.close();
-	strcpy(path + FILENAME_HEADER_LENGTH + 1, FUELCELL_RAW_FILENAME);
-	debug(path);
+
+	strcpy(path + FILENAME_HEADER_LENGTH, FUELCELL_RAW_FILENAME);
 	sub = SD.open(path, FILE_WRITE);
 	sub.close();
-	strcpy(path + FILENAME_HEADER_LENGTH + 1, "");
+	// *path should always contain /LOG_****/
+	// We will still use *path variable whenever we write to a file. 
+	// Clean up trailing file names after use.
+	strcpy(path + FILENAME_HEADER_LENGTH, "");
 	return true;
 }

@@ -164,18 +164,20 @@ private:
 	uint16_t voltReading = 0;
 	uint16_t ampReading = 0;
 	uint16_t ampPeak = 0;
+	// As opposed to conventional Wh, this variable takes milliseconds instead of hours as time frame. Processor efficient!
+	// Don't worry, will convert to float when sending.
+	uint32_t totalEnergy = 0; 
 	float rawToVA(char which, float reading);
-	static char timeStamp[9];
-	static int getStep(char which);
+	unsigned long timeStamp;
 
 public:
 	MotorLogger(int motorID, uint8_t voltPin, uint8_t ampPin);
-	static uint16_t getEntries(char which);
 	uint8_t id;
 	void logData();
-	void dumpDataInto(char * location, bool raw);
+	void dumpVoltReadingInto(char * location);
+	void dumpAmpReadingInto(char * location);
 	void dumpAmpPeakInto(char * location);
-	uint16_t getAmpPeak();
-	static void dumpTimestampInto(char* location);
+	void dumpTotalEnergyInto(char * location);
+	void dumpTimestampInto(char* location);
 
 };

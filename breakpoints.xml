@@ -9,13 +9,70 @@
       <IsCondition>1</IsCondition>
       <IsProductionBps>0</IsProductionBps>
       <ConditionType>WhenTrue</ConditionType>
+      <ConditionText>totalEnergy &gt; 180000000</ConditionText>
+      <LocationType>SourceLocation</LocationType>
+      <TextPosition>
+        <Version>4</Version>
+        <FileName>.\NV10_back\MotorLogger.cpp</FileName>
+        <startLine>20</startLine>
+        <StartColumn>0</StartColumn>
+        <EndLine>20</EndLine>
+        <EndColumn>1</EndColumn>
+        <MarkerId>0</MarkerId>
+        <IsLineBased>1</IsLineBased>
+        <IsDocumentPathNotFound>0</IsDocumentPathNotFound>
+        <ShouldUpdateTextSpan>1</ShouldUpdateTextSpan>
+        <Checksum>
+          <Version>1</Version>
+          <Algorithm>00000000-0000-0000-0000-000000000000</Algorithm>
+          <ByteCount>0</ByteCount>
+          <Bytes />
+        </Checksum>
+      </TextPosition>
+      <NamedLocationText>logData()</NamedLocationText>
+      <NamedLocationLine>7</NamedLocationLine>
+      <NamedLocationColumn>0</NamedLocationColumn>
+      <HitCountType>NoHitCount</HitCountType>
+      <HitCountTarget>1</HitCountTarget>
+      <Language>3a12d0b7-c26c-11d0-b442-00a0244a1dd2</Language>
+      <IsMapped>0</IsMapped>
+      <BreakpointType>PendingBreakpoint</BreakpointType>
+      <AddressLocation>
+        <Version>0</Version>
+        <MarkerId>0</MarkerId>
+        <FunctionLine>0</FunctionLine>
+        <FunctionColumn>0</FunctionColumn>
+        <Language>00000000-0000-0000-0000-000000000000</Language>
+      </AddressLocation>
+      <DataCount>4</DataCount>
+      <AutomationInfo>&lt;vmbp Id='1071e5b6-ebb4-49a1-9bde-b7f4724c995a'/&gt;</AutomationInfo>
+      <TracepointText>HALT!</TracepointText>
+      <IsTracepointActive>1</IsTracepointActive>
+      <TracepointTargetType>VsOutputWindow</TracepointTargetType>
+      <IsBreakWhenHit>1</IsBreakWhenHit>
+      <IsRunMacroWhenHit>0</IsRunMacroWhenHit>
+      <UseChecksum>1</UseChecksum>
+      <Labels />
+      <RequestRemapped>0</RequestRemapped>
+      <IsSnapshotWhenHit>1</IsSnapshotWhenHit>
+      <SnapshotCountTarget>1</SnapshotCountTarget>
+      <parentIndex>-1</parentIndex>
+    </Breakpoint>
+    <Breakpoint>
+      <Version>15</Version>
+      <IsEnabled>1</IsEnabled>
+      <IsVisible>1</IsVisible>
+      <IsEmulated>0</IsEmulated>
+      <IsCondition>1</IsCondition>
+      <IsProductionBps>0</IsProductionBps>
+      <ConditionType>WhenTrue</ConditionType>
       <LocationType>SourceLocation</LocationType>
       <TextPosition>
         <Version>4</Version>
         <FileName>.\NV10_back\NV10_back.ino</FileName>
-        <startLine>133</startLine>
+        <startLine>123</startLine>
         <StartColumn>0</StartColumn>
-        <EndLine>133</EndLine>
+        <EndLine>123</EndLine>
         <EndColumn>36</EndColumn>
         <MarkerId>0</MarkerId>
         <IsLineBased>1</IsLineBased>
@@ -44,7 +101,7 @@
         <Language>00000000-0000-0000-0000-000000000000</Language>
       </AddressLocation>
       <DataCount>4</DataCount>
-      <AutomationInfo>&lt;vmbp Id='79246874-70bf-459a-8455-3677c1e0afae'/&gt;</AutomationInfo>
+      <AutomationInfo>&lt;vmbp Id='e8932e4e-947b-4a2d-80d9-b49548476d2c'/&gt;</AutomationInfo>
       <TracepointText>Motor stack: {uxTaskGetStackHighWaterMark(NULL)}</TracepointText>
       <IsTracepointActive>1</IsTracepointActive>
       <TracepointTargetType>VsOutputWindow</TracepointTargetType>
@@ -69,10 +126,10 @@
       <TextPosition>
         <Version>4</Version>
         <FileName>.\NV10_back\NV10_back.ino</FileName>
-        <startLine>146</startLine>
+        <startLine>137</startLine>
         <StartColumn>0</StartColumn>
-        <EndLine>146</EndLine>
-        <EndColumn>20</EndColumn>
+        <EndLine>137</EndLine>
+        <EndColumn>36</EndColumn>
         <MarkerId>0</MarkerId>
         <IsLineBased>1</IsLineBased>
         <IsDocumentPathNotFound>0</IsDocumentPathNotFound>
@@ -100,7 +157,7 @@
         <Language>00000000-0000-0000-0000-000000000000</Language>
       </AddressLocation>
       <DataCount>4</DataCount>
-      <AutomationInfo>&lt;vmbp Id='304a9699-0bff-4b34-b991-17926ec07fe8'/&gt;</AutomationInfo>
+      <AutomationInfo>&lt;vmbp Id='229093cb-1065-4840-9d76-88d374fd2590'/&gt;</AutomationInfo>
       <TracepointText>FuelCell stack: {uxTaskGetStackHighWaterMark(NULL)}</TracepointText>
       <IsTracepointActive>1</IsTracepointActive>
       <TracepointTargetType>VsOutputWindow</TracepointTargetType>
@@ -125,10 +182,10 @@
       <TextPosition>
         <Version>4</Version>
         <FileName>.\NV10_back\NV10_back.ino</FileName>
-        <startLine>221</startLine>
+        <startLine>230</startLine>
         <StartColumn>0</StartColumn>
-        <EndLine>221</EndLine>
-        <EndColumn>53</EndColumn>
+        <EndLine>230</EndLine>
+        <EndColumn>20</EndColumn>
         <MarkerId>0</MarkerId>
         <IsLineBased>1</IsLineBased>
         <IsDocumentPathNotFound>0</IsDocumentPathNotFound>
@@ -141,7 +198,7 @@
         </Checksum>
       </TextPosition>
       <NamedLocationText>TaskQueueOutputData(void *pvParameters)</NamedLocationText>
-      <NamedLocationLine>70</NamedLocationLine>
+      <NamedLocationLine>80</NamedLocationLine>
       <NamedLocationColumn>0</NamedLocationColumn>
       <HitCountType>IsAMultipleOf</HitCountType>
       <HitCountTarget>1000</HitCountTarget>
@@ -156,7 +213,7 @@
         <Language>00000000-0000-0000-0000-000000000000</Language>
       </AddressLocation>
       <DataCount>4</DataCount>
-      <AutomationInfo>&lt;vmbp Id='1530afac-664c-4e90-8ee7-38b6412697cb'/&gt;</AutomationInfo>
+      <AutomationInfo>&lt;vmbp Id='e883d439-aae4-48b2-a7fe-a059f575d52f'/&gt;</AutomationInfo>
       <TracepointText>QueueTask stack: {uxTaskGetStackHighWaterMark(NULL)}</TracepointText>
       <IsTracepointActive>1</IsTracepointActive>
       <TracepointTargetType>VsOutputWindow</TracepointTargetType>
@@ -181,9 +238,9 @@
       <TextPosition>
         <Version>4</Version>
         <FileName>.\NV10_back\NV10_back.ino</FileName>
-        <startLine>257</startLine>
+        <startLine>272</startLine>
         <StartColumn>0</StartColumn>
-        <EndLine>257</EndLine>
+        <EndLine>272</EndLine>
         <EndColumn>80</EndColumn>
         <MarkerId>0</MarkerId>
         <IsLineBased>1</IsLineBased>
@@ -197,7 +254,7 @@
         </Checksum>
       </TextPosition>
       <NamedLocationText>TaskLogSendData(void *pvParameters __attribute__((unused)))</NamedLocationText>
-      <NamedLocationLine>31</NamedLocationLine>
+      <NamedLocationLine>37</NamedLocationLine>
       <NamedLocationColumn>0</NamedLocationColumn>
       <HitCountType>IsAMultipleOf</HitCountType>
       <HitCountTarget>1000</HitCountTarget>
@@ -212,7 +269,7 @@
         <Language>00000000-0000-0000-0000-000000000000</Language>
       </AddressLocation>
       <DataCount>4</DataCount>
-      <AutomationInfo>&lt;vmbp Id='39b55913-1d76-450a-bdb9-8e3364701dc7'/&gt;</AutomationInfo>
+      <AutomationInfo>&lt;vmbp Id='194a85dc-bac2-4305-be56-1a59b5fade4d'/&gt;</AutomationInfo>
       <TracepointText>LogSend stack: {uxTaskGetStackHighWaterMark(NULL)}</TracepointText>
       <IsTracepointActive>1</IsTracepointActive>
       <TracepointTargetType>VsOutputWindow</TracepointTargetType>
@@ -237,9 +294,9 @@
       <TextPosition>
         <Version>4</Version>
         <FileName>.\NV10_back\NV10_back.ino</FileName>
-        <startLine>279</startLine>
+        <startLine>294</startLine>
         <StartColumn>0</StartColumn>
-        <EndLine>279</EndLine>
+        <EndLine>294</EndLine>
         <EndColumn>20</EndColumn>
         <MarkerId>0</MarkerId>
         <IsLineBased>1</IsLineBased>
@@ -268,176 +325,8 @@
         <Language>00000000-0000-0000-0000-000000000000</Language>
       </AddressLocation>
       <DataCount>4</DataCount>
-      <AutomationInfo>&lt;vmbp Id='b74f6569-eb5f-4252-98db-1533979156bb'/&gt;</AutomationInfo>
+      <AutomationInfo>&lt;vmbp Id='4f380f3f-b641-4ec4-b389-d0410cafbc29'/&gt;</AutomationInfo>
       <TracepointText>DisplayData stack: {uxTaskGetStackHighWaterMark(NULL)}</TracepointText>
-      <IsTracepointActive>1</IsTracepointActive>
-      <TracepointTargetType>VsOutputWindow</TracepointTargetType>
-      <IsBreakWhenHit>0</IsBreakWhenHit>
-      <IsRunMacroWhenHit>0</IsRunMacroWhenHit>
-      <UseChecksum>1</UseChecksum>
-      <Labels />
-      <RequestRemapped>0</RequestRemapped>
-      <IsSnapshotWhenHit>1</IsSnapshotWhenHit>
-      <SnapshotCountTarget>1</SnapshotCountTarget>
-      <parentIndex>-1</parentIndex>
-    </Breakpoint>
-    <Breakpoint>
-      <Version>15</Version>
-      <IsEnabled>1</IsEnabled>
-      <IsVisible>1</IsVisible>
-      <IsEmulated>0</IsEmulated>
-      <IsCondition>0</IsCondition>
-      <IsProductionBps>0</IsProductionBps>
-      <ConditionType>WhenTrue</ConditionType>
-      <LocationType>SourceLocation</LocationType>
-      <TextPosition>
-        <Version>4</Version>
-        <FileName>.\NV10_back\Utilities.ino</FileName>
-        <startLine>60</startLine>
-        <StartColumn>0</StartColumn>
-        <EndLine>60</EndLine>
-        <EndColumn>0</EndColumn>
-        <MarkerId>0</MarkerId>
-        <IsLineBased>1</IsLineBased>
-        <IsDocumentPathNotFound>0</IsDocumentPathNotFound>
-        <ShouldUpdateTextSpan>1</ShouldUpdateTextSpan>
-        <Checksum>
-          <Version>1</Version>
-          <Algorithm>00000000-0000-0000-0000-000000000000</Algorithm>
-          <ByteCount>0</ByteCount>
-          <Bytes />
-        </Checksum>
-      </TextPosition>
-      <NamedLocationText>initSD(char* path)</NamedLocationText>
-      <NamedLocationLine>34</NamedLocationLine>
-      <NamedLocationColumn>0</NamedLocationColumn>
-      <HitCountType>NoHitCount</HitCountType>
-      <HitCountTarget>1</HitCountTarget>
-      <Language>3a12d0b7-c26c-11d0-b442-00a0244a1dd2</Language>
-      <IsMapped>0</IsMapped>
-      <BreakpointType>PendingBreakpoint</BreakpointType>
-      <AddressLocation>
-        <Version>0</Version>
-        <MarkerId>0</MarkerId>
-        <FunctionLine>0</FunctionLine>
-        <FunctionColumn>0</FunctionColumn>
-        <Language>00000000-0000-0000-0000-000000000000</Language>
-      </AddressLocation>
-      <DataCount>4</DataCount>
-      <AutomationInfo>&lt;vmbp Id='ba4393c1-6465-4665-abf6-8f64316e248b'/&gt;</AutomationInfo>
-      <TracepointText>{paddingZeroCounter}</TracepointText>
-      <IsTracepointActive>1</IsTracepointActive>
-      <TracepointTargetType>VsOutputWindow</TracepointTargetType>
-      <IsBreakWhenHit>0</IsBreakWhenHit>
-      <IsRunMacroWhenHit>0</IsRunMacroWhenHit>
-      <UseChecksum>1</UseChecksum>
-      <Labels />
-      <RequestRemapped>0</RequestRemapped>
-      <IsSnapshotWhenHit>1</IsSnapshotWhenHit>
-      <SnapshotCountTarget>1</SnapshotCountTarget>
-      <parentIndex>-1</parentIndex>
-    </Breakpoint>
-    <Breakpoint>
-      <Version>15</Version>
-      <IsEnabled>1</IsEnabled>
-      <IsVisible>1</IsVisible>
-      <IsEmulated>0</IsEmulated>
-      <IsCondition>0</IsCondition>
-      <IsProductionBps>0</IsProductionBps>
-      <ConditionType>WhenTrue</ConditionType>
-      <LocationType>SourceLocation</LocationType>
-      <TextPosition>
-        <Version>4</Version>
-        <FileName>.\NV10_back\Utilities.ino</FileName>
-        <startLine>65</startLine>
-        <StartColumn>0</StartColumn>
-        <EndLine>65</EndLine>
-        <EndColumn>0</EndColumn>
-        <MarkerId>0</MarkerId>
-        <IsLineBased>1</IsLineBased>
-        <IsDocumentPathNotFound>0</IsDocumentPathNotFound>
-        <ShouldUpdateTextSpan>1</ShouldUpdateTextSpan>
-        <Checksum>
-          <Version>1</Version>
-          <Algorithm>00000000-0000-0000-0000-000000000000</Algorithm>
-          <ByteCount>0</ByteCount>
-          <Bytes />
-        </Checksum>
-      </TextPosition>
-      <NamedLocationText>initSD(char* path)</NamedLocationText>
-      <NamedLocationLine>39</NamedLocationLine>
-      <NamedLocationColumn>0</NamedLocationColumn>
-      <HitCountType>NoHitCount</HitCountType>
-      <HitCountTarget>1</HitCountTarget>
-      <Language>3a12d0b7-c26c-11d0-b442-00a0244a1dd2</Language>
-      <IsMapped>0</IsMapped>
-      <BreakpointType>PendingBreakpoint</BreakpointType>
-      <AddressLocation>
-        <Version>0</Version>
-        <MarkerId>0</MarkerId>
-        <FunctionLine>0</FunctionLine>
-        <FunctionColumn>0</FunctionColumn>
-        <Language>00000000-0000-0000-0000-000000000000</Language>
-      </AddressLocation>
-      <DataCount>4</DataCount>
-      <AutomationInfo>&lt;vmbp Id='e6eec703-f064-47b1-a909-d4ff2ba76801'/&gt;</AutomationInfo>
-      <TracepointText>{index}</TracepointText>
-      <IsTracepointActive>1</IsTracepointActive>
-      <TracepointTargetType>VsOutputWindow</TracepointTargetType>
-      <IsBreakWhenHit>0</IsBreakWhenHit>
-      <IsRunMacroWhenHit>0</IsRunMacroWhenHit>
-      <UseChecksum>1</UseChecksum>
-      <Labels />
-      <RequestRemapped>0</RequestRemapped>
-      <IsSnapshotWhenHit>1</IsSnapshotWhenHit>
-      <SnapshotCountTarget>1</SnapshotCountTarget>
-      <parentIndex>-1</parentIndex>
-    </Breakpoint>
-    <Breakpoint>
-      <Version>15</Version>
-      <IsEnabled>1</IsEnabled>
-      <IsVisible>1</IsVisible>
-      <IsEmulated>0</IsEmulated>
-      <IsCondition>0</IsCondition>
-      <IsProductionBps>0</IsProductionBps>
-      <ConditionType>WhenTrue</ConditionType>
-      <LocationType>SourceLocation</LocationType>
-      <TextPosition>
-        <Version>4</Version>
-        <FileName>.\NV10_back\Utilities.ino</FileName>
-        <startLine>73</startLine>
-        <StartColumn>0</StartColumn>
-        <EndLine>73</EndLine>
-        <EndColumn>46</EndColumn>
-        <MarkerId>0</MarkerId>
-        <IsLineBased>1</IsLineBased>
-        <IsDocumentPathNotFound>0</IsDocumentPathNotFound>
-        <ShouldUpdateTextSpan>1</ShouldUpdateTextSpan>
-        <Checksum>
-          <Version>1</Version>
-          <Algorithm>00000000-0000-0000-0000-000000000000</Algorithm>
-          <ByteCount>0</ByteCount>
-          <Bytes />
-        </Checksum>
-      </TextPosition>
-      <NamedLocationText>initSD(char* path)</NamedLocationText>
-      <NamedLocationLine>34</NamedLocationLine>
-      <NamedLocationColumn>0</NamedLocationColumn>
-      <HitCountType>NoHitCount</HitCountType>
-      <HitCountTarget>1</HitCountTarget>
-      <Language>3a12d0b7-c26c-11d0-b442-00a0244a1dd2</Language>
-      <IsMapped>0</IsMapped>
-      <BreakpointType>PendingBreakpoint</BreakpointType>
-      <AddressLocation>
-        <Version>0</Version>
-        <MarkerId>0</MarkerId>
-        <FunctionLine>0</FunctionLine>
-        <FunctionColumn>0</FunctionColumn>
-        <Language>00000000-0000-0000-0000-000000000000</Language>
-      </AddressLocation>
-      <DataCount>4</DataCount>
-      <AutomationInfo>&lt;vmbp Id='022f00d3-0177-4939-b604-ae4eff197ec5'/&gt;</AutomationInfo>
-      <TracepointText>{path}</TracepointText>
       <IsTracepointActive>1</IsTracepointActive>
       <TracepointTargetType>VsOutputWindow</TracepointTargetType>
       <IsBreakWhenHit>0</IsBreakWhenHit>

@@ -6,84 +6,89 @@
 #include <Arduino_FreeRTOS.h>
 
 
-char MotorLogger::timeStamp[9];
 MotorLogger::MotorLogger(int motorID, uint8_t voltPin, uint8_t ampPin):voltPin(voltPin),ampPin(ampPin),id(motorID)
 {
 	
-}
-
-int MotorLogger::getStep(char which)
-{
-	switch (which)
-	{
-	case 'V':
-		return V_STEP;
-	case 'A':
-		return A_STEP;
-	default:
-		debug(F("Attempted getBaseAddr() with invalid attribute."));
-		return -1;
-	}
-}
-uint16_t MotorLogger::getEntries(char which)
-{
-	switch (which)
-	{
-	case 'V':
-		return V_ENTRIES;
-	case 'A':
-		return A_ENTRIES;
-	default:
-		debug(F("Attempted getEntries() with invalid attribute."));
-		return 65535;
-	}
 }
 void MotorLogger::logData()
 {
 	voltReading = analogRead(voltPin);
 	ampReading = analogRead(ampPin);
 	ampPeak = max(ampReading, ampPeak);
-	//voltReading += 16;
-	//ampReading += 16;
-	//if (voltReading >= 1023)
-	//	voltReading = 0;
-	//if (ampReading >= 1023)
-	//	ampReading = 0;
-
-	ultoa(millis(), timeStamp, 16);
+	// totalEnergy += timeDiff (milliseconds) * V * I	<-- to convert to Wh, please divide by 3600000. Current form is only for convenience of storage
+	if(timeStamp != 0)
+		totalEnergy += round(rawToVA('V', voltReading) * rawToVA('A', ampReading)) * (millis()-timeStamp);
+	//if (totalEnergy > 180000000)
+	//	Serial.println(millis());
+	timeStamp = millis();
 }
-void MotorLogger::dumpDataInto(char* location, bool raw)
+//void MotorLogger::dumpDataInto(char* location, bool raw)
+//{
+//	char tmp[6];
+//	float finalReading;
+//	if (raw)
+//	{
+//		Serial.println(F("Not implemented."));
+//	}
+//	else
+//	{
+//		strcat(location, "\t");
+//		dumpVoltReadingInto(location);
+//		strcat(location, "\t");
+//		dumpAmpReadingInto(location);
+//	}
+//	//// convert analog reading into VOLTS using lookup table
+//	//debug_("V ID: ");debug(id);
+//	//if (raw)
+//	//	finalReading = voltReading;
+//	//else
+//	//	finalReading = rawToVA('V', voltReading);
+//	//// put into tmp, length 4 (dot inclusive) with 1 decimal place
+//	//dtostrf(finalReading, 4, 1, tmp);
+//	//strcat(location, tmp);
+//	//strcat(location, "\t");
+//
+//	//// convert analog reading into AMPS using lookup table
+//	//debug_("A ID: ");debug(id);
+//	//if (raw)
+//	//	finalReading = ampReading;
+//	//else
+//	//	finalReading = rawToVA('A', ampReading);
+//	//// put into tmp and ship
+//	//dtostrf(finalReading, 4, 1, tmp);
+//	//strcat(location, tmp);
+//
+//}
+void MotorLogger::dumpVoltReadingInto(char *location)
 {
-	char tmp[6];
 	float finalReading;
-
-	// convert analog reading into VOLTS using lookup table
-	debug_("V ID: ");debug(id);
-	if (raw)
-		finalReading = voltReading;
-	else
-		finalReading = rawToVA('V', voltReading);
-	// put into tmp, length 4 (dot inclusive) with 1 decimal place
+	char tmp[6];
+	finalReading = rawToVA('V', voltReading);
 	dtostrf(finalReading, 4, 1, tmp);
 	strcat(location, tmp);
-	strcat(location, "\t");
-
-	// convert analog reading into AMPS using lookup table
-	debug_("A ID: ");debug(id);
-	if (raw)
-		finalReading = ampReading;
-	else
-		finalReading = rawToVA('A', ampReading);
-	// put into tmp and ship
+}
+void MotorLogger::dumpAmpReadingInto(char *location)
+{
+	float finalReading;
+	char tmp[6];
+	finalReading = rawToVA('A', ampReading);
 	dtostrf(finalReading, 4, 1, tmp);
 	strcat(location, tmp);
-
 }
 void MotorLogger::dumpAmpPeakInto(char *location)
 {
 	float finalReading = rawToVA('A', ampPeak);
 	char tmp[6];
 	dtostrf(finalReading, 4, 1, tmp);
+	strcat(location, tmp);
+}
+void MotorLogger::dumpTotalEnergyInto(char *location)
+{
+	//float finalReading = rawToVA('A', ampPeak);
+	// TODO: there is place for optimization by postponing calculate raw first until truly dumping data
+	char tmp[6];
+	float whr = totalEnergy / 3600000.0;
+	dtostrf(whr, 6, 1, tmp);
 	strcat(location, tmp);
 }
 float MotorLogger::rawToVA(char which, float reading)
@@ -108,11 +113,10 @@ float MotorLogger::rawToVA(char which, float reading)
 		TABLE = A_TABLE[id]; // point to this segment of the array
 		break;
 	}
-	debug_(which);debug_(" reading: ");debug(reading);
-	// convert reading into voltage using lookup table
+	// Convert reading into volt/amp using lookup table
+	//	Find two values so that this reading is "sandwiched" between them. Linear map between those two values to obtain real volt/amp value.
 	int i = 0;
 	nextValue = pgm_read_word(TABLE + i);
-	//debug_(which);debug_("-");debug_(i);debug_(":  ");debug(nextValue);
 	if (reading < nextValue)
 		return first;
 	for (i = 1; i<maxIndex; i++)
@@ -131,9 +135,7 @@ float MotorLogger::rawToVA(char which, float reading)
 }
 void MotorLogger::dumpTimestampInto(char* location)
 {
-	strcat(location, timeStamp);
-}
-uint16_t MotorLogger::getAmpPeak()
-{
-	return ampPeak;
+	char tmp[9];
+	ultoa(timeStamp, tmp, 16);
+	strcat(location, tmp);
 }
