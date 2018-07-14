@@ -30,8 +30,6 @@ bool initSD(char* path)
 	{
 		if (sub.isDirectory())
 		{
-			debug("Examining: ");
-			debug(sub.name());
 			int thisIndex = atoi(sub.name() + fileNameLength + 1);
 			existingIndex = max(thisIndex, existingIndex);
 		}
@@ -60,13 +58,19 @@ bool initSD(char* path)
 	// initialize the interior folder structure
 	strcat(path, "/");
 	strcpy(path + FILENAME_HEADER_LENGTH + 1, FUELCELL_FILENAME);
+	debug(path);
+	sub = SD.open(path, FILE_WRITE);
+	sub.println(F("Millis\tV_m\tA_m\tW_m\tWh_m\tVcap_m\tState"));
+	sub.close();
+	strcpy(path + FILENAME_HEADER_LENGTH + 1, MOTOR_FILENAME);
+	debug(path);
+	sub = SD.open(path, FILE_WRITE);
+	sub.println(F("Millis\tV_left\tA_left\tV_right\tA_right\tV_cap\tA_cap"));
+	sub.close();
+	strcpy(path + FILENAME_HEADER_LENGTH + 1, FUELCELL_RAW_FILENAME);
+	debug(path);
 	sub = SD.open(path, FILE_WRITE);
 	sub.close();
-	strcpy(path + FILENAME_HEADER_LENGTH, MOTOR_FILENAME);
-	sub = SD.open(MOTOR_FILENAME, FILE_WRITE);
-	sub.close();
-	strcpy(path + FILENAME_HEADER_LENGTH, FUELCELL_RAW_FILENAME);
-	sub = SD.open(FUELCELL_RAW_FILENAME, FILE_WRITE);
-	sub.close();
+	strcpy(path + FILENAME_HEADER_LENGTH + 1, "");
 	return true;
 }

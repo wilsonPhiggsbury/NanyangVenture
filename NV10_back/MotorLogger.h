@@ -163,7 +163,8 @@ private:
 	uint8_t ampPin;
 	uint16_t voltReading = 0;
 	uint16_t ampReading = 0;
-	float rawToVA(char which);
+	uint16_t ampPeak = 0;
+	float rawToVA(char which, float reading);
 	static char timeStamp[9];
 	static int getStep(char which);
 
@@ -173,6 +174,8 @@ public:
 	uint8_t id;
 	void logData();
 	void dumpDataInto(char * location, bool raw);
+	void dumpAmpPeakInto(char * location);
+	uint16_t getAmpPeak();
 	static void dumpTimestampInto(char* location);
 
 };

@@ -42,6 +42,7 @@ void MotorLogger::logData()
 {
 	voltReading = analogRead(voltPin);
 	ampReading = analogRead(ampPin);
+	ampPeak = max(ampReading, ampPeak);
 	//voltReading += 16;
 	//ampReading += 16;
 	//if (voltReading >= 1023)
@@ -61,7 +62,7 @@ void MotorLogger::dumpDataInto(char* location, bool raw)
 	if (raw)
 		finalReading = voltReading;
 	else
-		finalReading = rawToVA('V');
+		finalReading = rawToVA('V', voltReading);
 	// put into tmp, length 4 (dot inclusive) with 1 decimal place
 	dtostrf(finalReading, 4, 1, tmp);
 	strcat(location, tmp);
@@ -72,15 +73,22 @@ void MotorLogger::dumpDataInto(char* location, bool raw)
 	if (raw)
 		finalReading = ampReading;
 	else
-		finalReading = rawToVA('A');
+		finalReading = rawToVA('A', ampReading);
 	// put into tmp and ship
 	dtostrf(finalReading, 4, 1, tmp);
 	strcat(location, tmp);
 
 }
-float MotorLogger::rawToVA(char which)
+void MotorLogger::dumpAmpPeakInto(char *location)
 {
-	float first, last, step, maxIndex, reading;
+	float finalReading = rawToVA('A', ampPeak);
+	char tmp[6];
+	dtostrf(finalReading, 4, 1, tmp);
+	strcat(location, tmp);
+}
+float MotorLogger::rawToVA(char which, float reading)
+{
+	float first, last, step, maxIndex;
 	uint16_t thisValue, nextValue;
 	const uint16_t* TABLE;
 	switch (which)
@@ -91,7 +99,6 @@ float MotorLogger::rawToVA(char which)
 		step = V_STEP;
 		maxIndex = V_ENTRIES;
 		TABLE = V_TABLE[id]; // point to this segment of the array
-		reading = voltReading;
 		break;
 	case 'A':
 		first = A_0;
@@ -99,7 +106,6 @@ float MotorLogger::rawToVA(char which)
 		step = A_STEP;
 		maxIndex = A_ENTRIES;
 		TABLE = A_TABLE[id]; // point to this segment of the array
-		reading = ampReading;
 		break;
 	}
 	debug_(which);debug_(" reading: ");debug(reading);
@@ -126,4 +132,8 @@ float MotorLogger::rawToVA(char which)
 void MotorLogger::dumpTimestampInto(char* location)
 {
 	strcat(location, timeStamp);
+}
+uint16_t MotorLogger::getAmpPeak()
+{
+	return ampPeak;
 }

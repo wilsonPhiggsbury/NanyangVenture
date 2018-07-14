@@ -28,14 +28,14 @@ const uint8_t FILENAME_INDEX = 4;
 const char FUELCELL_FILENAME[] = "FC_neat.txt";
 const char FUELCELL_RAW_FILENAME[] = "FC_raw.txt";
 const char MOTOR_FILENAME[] = "MT_CAP.txt";
-const uint8_t FILENAME_HEADER_LENGTH = 3+4+1;
+const uint8_t FILENAME_HEADER_LENGTH = 1+3+1+4; /* /LOG_0002 --- 1: / 3: LOG 1: _ 4: 0002 */
 
 // define queues
 QueueHandle_t queueForLogSend = xQueueCreate(1, sizeof(QueueItem));
 QueueHandle_t queueForDisplay = xQueueCreate(1, sizeof(QueueItem));
 // declare globals (please keep to minimum)
 bool SD_avail;
-char path[FILENAME_HEADER_LENGTH + 8 + 4 + 1] = "";
+char path[FILENAME_HEADER_LENGTH + 1 + 8 + 4 + 1] = ""; // +1 for '/', +8 for filename, +4 for '.txt', +1 for '\0'
 // sample filename: /LOG_0002/12345678.txt   1+8+1+8+4+1
 HydrogenCellLogger hydroCells[2] = { HydrogenCellLogger(&Serial3),HydrogenCellLogger(&Serial2) };
 MotorLogger motors[NUM_MOTORS] = { MotorLogger(0,A0,A1),MotorLogger(1,A2,A3),MotorLogger(2,A4,A5) };
@@ -60,35 +60,35 @@ void setup() {
 
 	// create all files in a new directory
 	SD_avail = initSD(path);
-	
+	debug_(F("SD present: "));debug(SD_avail);
 	// define objects for more complicated procedures
 	
 	// Now set up all Tasks to run independently.
 	xTaskCreate(
 		TaskReadFuelCell
 		, (const portCHAR *)"Fuel"
-		, 200
+		, 125
 		, hydroCells
 		, 3
 		, NULL);
 	xTaskCreate(
 		TaskReadMotorPower
 		, (const portCHAR *)"Motor"
-		, 150
+		, 125
 		, motors
 		, 3
 		, NULL);
 	xTaskCreate(
 		TaskQueueOutputData
 		, (const portCHAR *)"Enqueue"  // A name just for humans
-		, 250  // This stack size can be checked & adjusted by reading the Stack Highwater
+		, 200  // This stack size can be checked & adjusted by reading the Stack Highwater
 		, NULL // Any pointer to pass in
 		, 2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
 		, NULL);
 	xTaskCreate(
 		TaskLogSendData
 		, (const portCHAR *) "LogSend"
-		, 300  // Stack size
+		, 650  // Stack size
 		, NULL
 		, 1  // Priority
 		, NULL);
@@ -200,15 +200,23 @@ void TaskQueueOutputData(void *pvParameters)  // This is a Task.
 						M1		M2		M3		M4
 			millis		V	A	V	A	V	A	V	A	
 		--------------------------------------------------*/
-		
-		MotorLogger::dumpTimestampInto(outgoing.data);
-		for (int i = 0; i < NUM_MOTORS; i++)
+		if (syncCounter % 10 == 0)
 		{
-			strcat(outgoing.data, "\t");
-			motors[i].dumpDataInto(outgoing.data, false);
+			MotorLogger::dumpTimestampInto(outgoing.data);
+			for (int i = 0; i < NUM_MOTORS; i++)
+			{
+				strcat(outgoing.data, "\t");
+				motors[i].dumpDataInto(outgoing.data, false);
+			}
+			success &= xQueueSend(queueForLogSend, &outgoing, 100);
+			for (int i = 0; i < NUM_MOTORS; i++)
+			{
+				strcat(outgoing.data, "\t");
+				motors[i].dumpAmpPeakInto(outgoing.data);
+			}
+			success &= xQueueSend(queueForDisplay, &outgoing, 100);
 		}
-		success &= xQueueSend(queueForLogSend, &outgoing, 100);
-		success &= xQueueSend(queueForDisplay, &outgoing, 100);
+		
 		
 		vTaskDelay(delay);  // send one time every 1 second
 	}
@@ -222,28 +230,33 @@ void TaskLogSendData(void *pvParameters __attribute__((unused)))  // This is a T
 	while(1)
 	{
 		BaseType_t success = xQueueReceive(queueForLogSend, &received, 0);
-		char fileName[3] = "";
+		char shortFileName[3] = "";
 		if (success == pdPASS)
 		{
 			switch (received.ID)
 			{
 			case FuelCell:
-				strncpy(fileName, FUELCELL_FILENAME, 2);
+				strncpy(shortFileName, FUELCELL_FILENAME, 2);
+				strcpy(path + FILENAME_HEADER_LENGTH + 1, FUELCELL_FILENAME);
 				break;
 			case Motor:
-				strncpy(fileName, MOTOR_FILENAME, 2);
+				strncpy(shortFileName, MOTOR_FILENAME, 2);
+				strcpy(path + FILENAME_HEADER_LENGTH + 1, MOTOR_FILENAME);
 				break;
 			}
-			Serial.print(fileName);
+			Serial.print(shortFileName);
 			Serial.print('\t');
 			Serial.println(received.data);
 			// -------------- SD store -------------
-			//if (SD_avail)
-			//{
-			//	File writtenFile = SD.open(fileName, FILE_WRITE);
-			//	writtenFile.println(received.data);
-			//	writtenFile.close();
-			//}
+			if (SD_avail)
+			{
+				taskENTER_CRITICAL();
+				File writtenFile = SD.open(path, FILE_WRITE);
+				writtenFile.println(received.data);
+				writtenFile.close();
+				taskEXIT_CRITICAL();
+			}
+			strcpy(path + FILENAME_HEADER_LENGTH + 1, "");
 		}
 
 		vTaskDelay(delay);  // poll more frequently since more data comes in at a time

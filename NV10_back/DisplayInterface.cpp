@@ -26,7 +26,17 @@ void DisplayLCD::printData(QueueItem& received)
 	// navigate pointer to start of real readings (to skip the millis)
 	char *data = received.data;
 	while (*(++data) != '\t');
-
+	// LCD data comes in as:
+	//	FC	0	-	-
+	//	FC	3af	V	A	W	Wh	Vcap	State	V	A	W	Wh	Vcap	State
+	//	MT	3af	VL	AL	VR	AR	Vcap	Acap	ALp	ARp	Acp
+	/* show the
+			time
+			V
+			Apeak
+			culminative Wh
+		on LCD screen
+	*/
 	switch (received.ID)
 	{
 	case FuelCell:
