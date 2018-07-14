@@ -57,17 +57,7 @@ void setup() {
 	// initialize serial communication at 9600 bits per second:
 	Serial.begin(9600);
 	delay(100);
-	Serial.setTimeout(1000);
-	pinMode(13, OUTPUT);
-	// do handshake, update EEPROM...
-	//wipeEEPROM();
-	//motors[0].populateEEPROM();
-	//motors[1].populateEEPROM();
-	digitalWrite(13, HIGH);
-	printEEPROM();
-	wipeEEPROM();
-	digitalWrite(13, LOW);
-	populateEEPROM();
+
 	// create all files in a new directory
 	SD_avail = initSD(path);
 	
@@ -137,14 +127,14 @@ void TaskReadFuelCell(void *pvParameters)
 }
 void TaskReadMotorPower(void* pvParameters)
 {
-	MotorLogger* m1 = ((MotorLogger*)pvParameters);
-	MotorLogger* m2 = ((MotorLogger*)pvParameters)+1;
-	/*MotorLogger* m3 = ((MotorLogger*)pvParameters)+2;*/
-	TickType_t delay = pdMS_TO_TICKS(600);
+	MotorLogger* m = ((MotorLogger*)pvParameters);
+	TickType_t delay = pdMS_TO_TICKS(255);
 	while (1)
 	{
-		m1->logData();
-		m2->logData();
+		for (int i = 0; i < NUM_MOTORS; i++)
+		{
+			(m + i)->logData();
+		}
 		vTaskDelay(delay);
 	}
 	
@@ -158,15 +148,15 @@ void TaskQueueOutputData(void *pvParameters)  // This is a Task.
 	//MotorLogger* motor1 = ((Loggers*)pvParameters)->motors;
 	/*MotorLogger* motor2 = ((Loggers*)pvParameters)->motors + 1;
 	MotorLogger* motor3 = ((Loggers*)pvParameters)->motors + 2;*/
-	TickType_t delay = pdMS_TO_TICKS(1005);
+	TickType_t delay = pdMS_TO_TICKS(255);
 	BaseType_t success;
 
 	while(1) // A Task shall never return or exit.
 	{
 		success = pdPASS;
-		/*syncCounter++;
-		if (syncCounter > 60)
-			syncCounter = 1;*/
+		syncCounter++;
+		if (syncCounter > 10)
+			syncCounter = 1;
 		// Arrange for outgoing fuel cell data
 		outgoing.ID = FuelCell;
 		outgoing.data[0] = '\0';
@@ -175,29 +165,32 @@ void TaskQueueOutputData(void *pvParameters)  // This is a Task.
 			millis		V	A	W	Wh	V	A	W	Wh
 		--------------------------------------------------*/
 		HydrogenCellLogger::dumpTimestampInto(outgoing.data);
+		strcat(outgoing.data, "\t");
 		//hydroCells[0].dumpDataInto(outgoing.data);
 		//strcat(outgoing.data, "\t");
 		//hydroCells[1].dumpDataInto(outgoing.data);
-		if (hydroCells[0].hasUpdated())
+		if (syncCounter % 10 == 0)
 		{
-			hydroCells[0].dumpDataInto(outgoing.data);
+			if (hydroCells[0].hasUpdated())
+			{
+				hydroCells[0].dumpDataInto(outgoing.data);
+			}
+			else
+			{
+				strcat(outgoing.data, "-");
+			}
+			strcat(outgoing.data, "\t");
+			if (hydroCells[1].hasUpdated())
+			{
+				hydroCells[1].dumpDataInto(outgoing.data);
+			}
+			else
+			{
+				strcat(outgoing.data, "-");
+			}
+			success &= xQueueSend(queueForLogSend, &outgoing, 100);
+			success &= xQueueSend(queueForDisplay, &outgoing, 100);
 		}
-		else
-		{
-			strcat(outgoing.data, "-");
-		}
-		strcat(outgoing.data, "\t");
-		if (hydroCells[1].hasUpdated())
-		{
-			hydroCells[1].dumpDataInto(outgoing.data);
-		}
-		else
-		{
-			strcat(outgoing.data, "-");
-		}
-		success &= xQueueSend(queueForLogSend, &outgoing, 100);
-		success &= xQueueSend(queueForDisplay, &outgoing, 100);
-		
 		
 
 		// Arrange for outgoing motor data
@@ -209,14 +202,12 @@ void TaskQueueOutputData(void *pvParameters)  // This is a Task.
 		--------------------------------------------------*/
 		
 		MotorLogger::dumpTimestampInto(outgoing.data);
-		motors[0].dumpDataInto(outgoing.data, false);
-		strcat(outgoing.data, "\t");
-		motors[1].dumpDataInto(outgoing.data, false);
+		for (int i = 0; i < NUM_MOTORS; i++)
+		{
+			strcat(outgoing.data, "\t");
+			motors[i].dumpDataInto(outgoing.data, false);
+		}
 		success &= xQueueSend(queueForLogSend, &outgoing, 100);
-		outgoing.data[0] = '\0';
-		motors[0].dumpDataInto(outgoing.data, true);
-		strcat(outgoing.data, "\t");
-		motors[1].dumpDataInto(outgoing.data, true);
 		success &= xQueueSend(queueForDisplay, &outgoing, 100);
 		
 		vTaskDelay(delay);  // send one time every 1 second

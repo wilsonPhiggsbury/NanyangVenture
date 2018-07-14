@@ -75,8 +75,7 @@ void HydrogenCellLogger::readData()
 void HydrogenCellLogger::dumpTimestampInto(char* location)
 {
 	strcat(location, timeStamp);//	8
-	strcat(location, "\t");//		1
-	//						SUM =	9
+	//						SUM =	8
 }
 void HydrogenCellLogger::dumpDataInto(char* location)
 {

@@ -3,7 +3,6 @@
 // 
 
 #include "MotorLogger.h"
-#include "Wiring.h"
 #include <Arduino_FreeRTOS.h>
 
 
@@ -12,109 +11,7 @@ MotorLogger::MotorLogger(int motorID, uint8_t voltPin, uint8_t ampPin):voltPin(v
 {
 	
 }
-void MotorLogger::populateEEPROM()
-{
-	// populate EEPROM for testing purposes
-	const float READING_V_RATIO = 1023 / 5;
-	int address = getAddr('V');
-	// lookup table for volts
-	uint16_t voltLookupTable[V_ENTRIES] = {
-		READING_V_RATIO * 0,
-		READING_V_RATIO * 0.32,
-		READING_V_RATIO * 0.64,
-		READING_V_RATIO * 0.96, 
-		READING_V_RATIO * 1.28,
-		READING_V_RATIO * 1.60,
-		READING_V_RATIO * 1.92,
-		READING_V_RATIO * 2.24, 
-		READING_V_RATIO * 2.56,
-		READING_V_RATIO * 2.88,
-		READING_V_RATIO * 3.20,
-		READING_V_RATIO * 3.52,
-		READING_V_RATIO * 3.84
-	};
-	debug_("V_ENTRIES: ");debug(V_ENTRIES);debug_("ID: ");debug_(id);debug_(" Address: ");debug(address);
-	for (int i = 0; i < V_ENTRIES; i++)
-	{
-		uint16_t content;
-		content = voltLookupTable[i];
-		//content = ((i * 1024.0) / V_ENTRIES);
-		int offset = sizeof(uint16_t)*i;
-		EEPROM.put(address + offset, content);
-		debug_(address + offset);debug_(" ");debug(content);
-	}
-	// lookup table for amps
-	uint16_t ampLookupTable[A_ENTRIES] = {
-		READING_V_RATIO * 0,
-		READING_V_RATIO * 0.13,
-		READING_V_RATIO * 0.27,
-		READING_V_RATIO * 0.40,
-		READING_V_RATIO * 0.53,
-		READING_V_RATIO * 0.67,
-		READING_V_RATIO * 0.80,
-		READING_V_RATIO * 0.93,
-		READING_V_RATIO * 1.03,
-		READING_V_RATIO * 1.20,
-		READING_V_RATIO * 1.33,
-		READING_V_RATIO * 1.47,
-		READING_V_RATIO * 1.60,
-		READING_V_RATIO * 1.73,
-		READING_V_RATIO * 1.87,
-		READING_V_RATIO * 2.00,
-		READING_V_RATIO * 2.13,
-		READING_V_RATIO * 2.27,
-		READING_V_RATIO * 2.40,
-		READING_V_RATIO * 2.53,
-		READING_V_RATIO * 2.67,
-		READING_V_RATIO * 2.80,
-		READING_V_RATIO * 2.93,
-		READING_V_RATIO * 3.07,
-		READING_V_RATIO * 3.20
-	};
-	address = getAddr('A');
-	debug_("A_ENTRIES: ");debug(A_ENTRIES);debug_("ID: ");debug_(id);debug_(" Address: ");debug(address);
-	for (int i = 0; i < A_ENTRIES; i++)
-	{
-		uint16_t content;
-		content = ampLookupTable[i];
-		//content = ((i * 1024.0) / A_ENTRIES);
-		int offset = sizeof(uint16_t)*i;
-		EEPROM.put(address + offset, content);
-		debug_(address + offset);debug_(" ");debug(content);
-	}
-}
 
-bool MotorLogger::updateTable(char which, uint16_t content[max(V_ENTRIES, A_ENTRIES)])
-{
-	uint16_t entries = MotorLogger::getEntries(which);
-	debug_("Updating table ");debug(id);
-	for (int i = 0; i < entries; i++)
-	{
-		int offset = i * sizeof(uint16_t);
-		int address = getAddr(which) + offset;
-		EEPROM.put(address, content[i]);
-		debug_(address);debug_("-> ");debug(content[i]);
-	}
-}
-int MotorLogger::getAddr(char which)
-{
-	uint16_t entries = getEntries(which);
-	int base = getBaseAddr(which);
-	return base + (entries) * (id) * (sizeof(uint16_t));
-}
-int MotorLogger::getBaseAddr(char which)
-{
-	switch (which)
-	{
-	case 'V':
-		return V_BASE_ADDR;
-	case 'A':
-		return A_BASE_ADDR;
-	default:
-		debug(F("Attempted getBaseAddr() with invalid attribute."));
-		return -1;
-	}
-}
 int MotorLogger::getStep(char which)
 {
 	switch (which)
@@ -160,6 +57,7 @@ void MotorLogger::dumpDataInto(char* location, bool raw)
 	float finalReading;
 
 	// convert analog reading into VOLTS using lookup table
+	debug_("V ID: ");debug(id);
 	if (raw)
 		finalReading = voltReading;
 	else
@@ -170,6 +68,7 @@ void MotorLogger::dumpDataInto(char* location, bool raw)
 	strcat(location, "\t");
 
 	// convert analog reading into AMPS using lookup table
+	debug_("A ID: ");debug(id);
 	if (raw)
 		finalReading = ampReading;
 	else
@@ -181,53 +80,50 @@ void MotorLogger::dumpDataInto(char* location, bool raw)
 }
 float MotorLogger::rawToVA(char which)
 {
-	float first, last, step, highBound;
-	int entries, address, baseAddress;
-	uint16_t reading, thisValue, nextValue;
-
+	float first, last, step, maxIndex, reading;
+	uint16_t thisValue, nextValue;
+	const uint16_t* TABLE;
 	switch (which)
 	{
 	case 'V':
 		first = V_0;
 		last = V_N;
 		step = V_STEP;
-		baseAddress = V_BASE_ADDR;
+		maxIndex = V_ENTRIES;
+		TABLE = V_TABLE[id]; // point to this segment of the array
 		reading = voltReading;
 		break;
 	case 'A':
 		first = A_0;
 		last = A_N;
 		step = A_STEP;
-		baseAddress = A_BASE_ADDR;
+		maxIndex = A_ENTRIES;
+		TABLE = A_TABLE[id]; // point to this segment of the array
 		reading = ampReading;
 		break;
 	}
+	debug_(which);debug_(" reading: ");debug(reading);
 	// convert reading into voltage using lookup table
-	entries = ((last - first)/step) + 1;
-	address = baseAddress + (entries) * (id) * (sizeof(uint16_t));
-	highBound = first;
-	EEPROM.get(address, nextValue);
-
-	while (highBound <= last + step && nextValue < reading)
+	int i = 0;
+	nextValue = pgm_read_word(TABLE + i);
+	//debug_(which);debug_("-");debug_(i);debug_(":  ");debug(nextValue);
+	if (reading < nextValue)
+		return first;
+	for (i = 1; i<maxIndex; i++)
 	{
-		highBound += step;
-		address += sizeof(uint16_t);
-		thisValue = nextValue;
-		EEPROM.get(address, nextValue);
+		thisValue = nextValue; // TABLE[i]
+		nextValue = pgm_read_word(TABLE + i); // TABLE[i+1]
+		if (reading < nextValue)
+		{
+			//reading = map(reading, thisValue, nextValue, (i - 1)*step + first, (i)*step + first);
+			// Map function truncates decimals. Use below implementation.
+			reading = ((reading - thisValue) * (step) / (nextValue - thisValue)) + ((i - 1)*step + first);
+			return reading;
+		}
 	}
-
-	float finalReading;
-	if (highBound <= first)
-		finalReading = first;
-	else if (highBound >= last + step)
-		finalReading = last;
-	else
-		finalReading = (reading - thisValue) * (step / (float)(nextValue - thisValue)) + (highBound - step);//map(reading, thisValue, nextValue, highBound-step, highBound);
-
-	return finalReading;
+	return last;
 }
 void MotorLogger::dumpTimestampInto(char* location)
 {
 	strcat(location, timeStamp);
-	strcat(location, "\t");
 }

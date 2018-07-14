@@ -94,8 +94,11 @@ char* parseFuelCellData(char* dest, char* source)
 DisplayTFT::DisplayTFT(TFT_ILI9163C& screenPtr):screen(screenPtr)
 {
 	screen.begin();
-	screen.setRotation(3);
+	screen.setRotation(2);
 	screen.fillScreen(BLACK);
+	uint8_t roundRectWidth = 5 + 8 + 11 + 8 + 11 + 8;
+	screen.drawRoundRect((5), 5, roundRectWidth, 128 - 5, 5, GREEN);
+	screen.drawRoundRect((128-5) - roundRectWidth, 5, roundRectWidth, 128 - 5, 5, GREEN);
 	/*
 	screen.setTextWrap(true);
 	screen.setTextColor(WHITE, BLACK);
@@ -123,8 +126,8 @@ void DisplayTFT::printData(QueueItem& received)
 			float thisInfo = atof(++data);
 			uint8_t mapped_y;
 			// input is either volts or amps, alternating and separated by tabs '\t'
-			if(i%2 == 0)mapped_y = map(thisInfo, 0, 1023, 127, 0);
-			else mapped_y = map(thisInfo, 0, 1023, 127, 0);
+			if(i%2 == 0)mapped_y = map(thisInfo, V_0, V_N, 127, 0);
+			else mapped_y = map(thisInfo, A_0, A_N, 127, 0);
 			// do color: lower = red, higher = blue
 			uint8_t r, g, b, tmp_mapped_y;
 			tmp_mapped_y = constrain(mapped_y, 32, 95);
@@ -136,13 +139,15 @@ void DisplayTFT::printData(QueueItem& received)
 			cursorX += 8;
 			if (i < 2)
 			{
-				screen.fillRect(cursorX, 0, 128 / 16 - 1, mapped_y, BLACK);
-				screen.fillRect(cursorX, 0 + mapped_y, 128 / 16 - 1, 127 - mapped_y, color);
+				// cursorX + margin
+				screen.fillRect(cursorX + 10, 0, 128 / 16 - 1, mapped_y, BLACK);
+				screen.fillRect(cursorX + 10, 0 + mapped_y, 128 / 16 - 1, 127 - mapped_y, color);
 			}
 			else
 			{
-				screen.fillRect(cursorX + 128-(4 * (8 + 11)), 0, 128 / 16 - 1, mapped_y, BLACK);
-				screen.fillRect(cursorX + 128-(4 * (8 + 11)), 0 + mapped_y, 128 / 16 - 1, 127 - mapped_y, color);
+				// cursorX - margin + rightAlign
+				screen.fillRect(cursorX - 10 + 128-(4 * (8 + 11)), 0, 128 / 16 - 1, mapped_y, BLACK);
+				screen.fillRect(cursorX - 10 + 128-(4 * (8 + 11)), 0 + mapped_y, 128 / 16 - 1, 127 - mapped_y, color);
 			}
 			cursorX += 11;
 		}
