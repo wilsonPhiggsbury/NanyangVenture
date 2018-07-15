@@ -17,7 +17,7 @@
 #include <Wire.h>
 
 #define NUM_MOTORS 3
-#define NUM_HYDROCELLS 2
+#define NUM_FUELCELLS 2
 // Wiring naming convention: DEVICE_PINTYPE_PINNAME
 #define SD_SPI_CS 4			// used by shield, no actual wiring
 #define TFT1_SPI_RS 9

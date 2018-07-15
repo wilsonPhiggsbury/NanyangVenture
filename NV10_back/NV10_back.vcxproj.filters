@@ -19,16 +19,22 @@
     <None Include="NV10_back.ino" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="HydrogenCellLogger.h">
+    <ClInclude Include="CurrentSensorLogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MotorLogger.h">
+    <ClInclude Include="FuelCellLogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DisplayInterface.h">
+    <ClInclude Include="JoulemeterDisplay.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Wiring.h">
+    <ClInclude Include="Behaviour.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="build_options.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="__vm\.NV10_back.vsarduino.h">
@@ -36,14 +42,19 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="HydrogenCellLogger.cpp">
+    <ClCompile Include="FuelCellLogger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MotorLogger.cpp">
+    <ClCompile Include="CurrentSensorLogger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DisplayInterface.cpp">
+    <ClCompile Include="JoulemeterDisplay.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="NV10_back.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

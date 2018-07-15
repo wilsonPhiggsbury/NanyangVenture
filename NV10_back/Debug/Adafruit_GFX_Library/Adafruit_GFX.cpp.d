@@ -1,5 +1,6 @@
 C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Debug\Adafruit_GFX_Library\Adafruit_GFX.cpp.o: \
  D:\Arduino\Projects\libraries\Adafruit_GFX_Library\Adafruit_GFX.cpp \
+ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Debug/build_options.h \
  D:\Arduino\Projects\libraries\Adafruit_GFX_Library\Adafruit_GFX.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Arduino.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/binary.h \

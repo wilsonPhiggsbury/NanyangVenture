@@ -1,5 +1,6 @@
 C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Release\SPI\SPI.cpp.o: \
  D:\Arduino\ide\hardware\arduino\avr\libraries\SPI\src\SPI.cpp \
+ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Release/build_options.h \
  D:\Arduino\ide\hardware\arduino\avr\libraries\SPI\src\SPI.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Arduino.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/binary.h \

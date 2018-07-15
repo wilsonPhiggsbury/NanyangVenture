@@ -17,9 +17,9 @@
 #include <LiquidCrystal_I2C.h>
 #include <EEPROM.h>
 
-#include "DisplayInterface.h"
-#include "MotorLogger.h"
-#include "HydrogenCellLogger.h"
+#include "JoulemeterDisplay.h"
+#include "CurrentSensorLogger.h"
+#include "FuelCellLogger.h"
 
 
 
@@ -38,8 +38,8 @@ QueueHandle_t queueForDisplay = xQueueCreate(1, sizeof(QueueItem));
 bool SD_avail;
 char path[FILENAME_HEADER_LENGTH+ 8 + 4 + 1] = ""; // +8 for filename, +4 for '.txt', +1 for '\0'
 // sample filename: /LOG_0002/12345678.txt   1+8+1+8+4+1
-HydrogenCellLogger hydroCells[NUM_HYDROCELLS] = { HydrogenCellLogger(&Serial3),HydrogenCellLogger(&Serial2) };
-MotorLogger motors[NUM_MOTORS] = { MotorLogger(0,A0,A1),MotorLogger(1,A2,A3),MotorLogger(2,A4,A5) };
+HESFuelCell hydroCells[NUM_FUELCELLS] = { HESFuelCell(&Serial3),HESFuelCell(&Serial2) };
+AttopilotCurrentSensor motors[NUM_MOTORS] = { AttopilotCurrentSensor(0,A0,A1),AttopilotCurrentSensor(1,A2,A3),AttopilotCurrentSensor(2,A4,A5) };
 
 // define tasks, types are: input, control, output
 void TaskReadFuelCell(void *pvParameters);		// Input task:		Refreshes class variables for fuel cell Volts, Amps, Watts and Energy
@@ -98,7 +98,7 @@ void setup() {
 		, 400  // Stack size
 		, NULL
 		, 1  // Priority
-		, NULL);
+		, NULL);Serial.print("Buffer size: ");Serial.println(SERIAL_RX_BUFFER_SIZE);
 	// Now the Task scheduler, which takes over control of scheduling individual Tasks, is automatically started.
 }
 
@@ -113,27 +113,31 @@ void loop()
 void TaskReadFuelCell(void *pvParameters)  // This is a Task.
 {
 	// Obtain fuel cell object references from parameter passed in
-	HydrogenCellLogger* masterCell = (HydrogenCellLogger*)pvParameters;
-	HydrogenCellLogger* slaveCell = ((HydrogenCellLogger*)pvParameters) + 1;
-	TickType_t prevTick = xTaskGetTickCount();
+	HESFuelCell* fuelCell = (HESFuelCell*)pvParameters;
+
+	TickType_t prevTick = xTaskGetTickCount(); // only needed when vTaskDelayUntil is called instead of vTaskDelay
 	TickType_t delay = pdMS_TO_TICKS(READ_FC_INTERVAL);
 	while (1)
 	{
-		masterCell->readData();
-		slaveCell->readData();
-		vTaskDelayUntil(&prevTick, delay);
+		for (int i = 0; i < NUM_FUELCELLS; i++)
+		{
+			(fuelCell + i)->logData();
+		}
+		vTaskDelayUntil(&prevTick, delay); // more accurate compared to vTaskDelay, since the delay is shrunk according to execution time of this piece of code
 	}
 }
 void TaskReadMotorPower(void* pvParameters)
 {
-	MotorLogger* m = ((MotorLogger*)pvParameters);
-	TickType_t prevTick = xTaskGetTickCount();
+	// Obtain current sensor object references from parameter passed in
+	AttopilotCurrentSensor* sensor = (AttopilotCurrentSensor*)pvParameters;
+
+	TickType_t prevTick = xTaskGetTickCount(); // only needed when vTaskDelayUntil is called instead of vTaskDelay
 	TickType_t delay = pdMS_TO_TICKS(READ_MT_INTERVAL);
 	while (1)
 	{
 		for (int i = 0; i < NUM_MOTORS; i++)
 		{
-			(m + i)->logData();
+			(sensor + i)->logData();
 		}
 		vTaskDelayUntil(&prevTick, delay);
 	}
@@ -148,11 +152,11 @@ void TaskQueueOutputData(void *pvParameters)
 
 	QueueItem outgoing;
 	uint8_t syncCounter = 1;
-	//HydrogenCellLogger* masterCell = (HydrogenCellLogger*)pvParameters;
-	//HydrogenCellLogger* slaveCell = ((HydrogenCellLogger*)pvParameters) + 1;
-	//MotorLogger* motor1 = ((Loggers*)pvParameters)->motors;
-	//MotorLogger* motor2 = ((Loggers*)pvParameters)->motors + 1;
-	//MotorLogger* motor3 = ((Loggers*)pvParameters)->motors + 2;
+	//HESFuelCell* masterCell = (HESFuelCell*)pvParameters;
+	//HESFuelCell* slaveCell = ((HESFuelCell*)pvParameters) + 1;
+	//AttopilotCurrentSensor* motor1 = ((Loggers*)pvParameters)->motors;
+	//AttopilotCurrentSensor* motor2 = ((Loggers*)pvParameters)->motors + 1;
+	//AttopilotCurrentSensor* motor3 = ((Loggers*)pvParameters)->motors + 2;
 	TickType_t delay = pdMS_TO_TICKS(QUEUE_DATA_INTERVAL);
 	BaseType_t success;
 
@@ -172,8 +176,8 @@ void TaskQueueOutputData(void *pvParameters)
 
 		if (syncCounter % fuelcell_logsend == 0)
 		{
-			HydrogenCellLogger::dumpTimestampInto(outgoing.data);
-			for (int i = 0; i < NUM_HYDROCELLS; i++)
+			HESFuelCell::dumpTimestampInto(outgoing.data);
+			for (int i = 0; i < NUM_FUELCELLS; i++)
 			{
 				strcat(outgoing.data, "\t");
 				if (hydroCells[i].hasUpdated())
@@ -212,19 +216,19 @@ void TaskQueueOutputData(void *pvParameters)
 				strcat(outgoing.data, "\t");
 				motors[i].dumpAmpReadingInto(outgoing.data);//len 5
 			}
-			for (int i = 0; i < NUM_MOTORS; i++)
-			{
-				strcat(outgoing.data, "\t");
-				motors[i].dumpAmpPeakInto(outgoing.data);//len 5
-			}
-			for (int i = 0; i < NUM_MOTORS; i++)
-			{
-				strcat(outgoing.data, "\t");
-				motors[i].dumpTotalEnergyInto(outgoing.data);//len 7
-			}
 			xQueueSend(queueForLogSend, &outgoing, 100);
 			if (syncCounter % (back_lcd_refresh) == 0)
 			{
+				for (int i = 0; i < NUM_MOTORS; i++)
+				{
+					strcat(outgoing.data, "\t");
+					motors[i].dumpAmpPeakInto(outgoing.data);//len 5
+				}
+				for (int i = 0; i < NUM_MOTORS; i++)
+				{
+					strcat(outgoing.data, "\t");
+					motors[i].dumpTotalEnergyInto(outgoing.data);//len 7
+				}
 				xQueueSend(queueForDisplay, &outgoing, 100);
 			}
 		}
@@ -277,9 +281,7 @@ void TaskDisplayData(void *pvParameters)
 {
 	QueueItem received;
 	LiquidCrystal_I2C lcdScreen = LiquidCrystal_I2C(LCD1_I2C_ADDR, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);
-	TFT_ILI9163C tftScreen = TFT_ILI9163C(TFT1_SPI_CS, TFT1_SPI_RS, TFT1_SPI_RST);
 	DisplayLCD lcdManager = DisplayLCD(lcdScreen);
-	DisplayTFT tftManager = DisplayTFT(tftScreen);
 
 	TickType_t delay = pdMS_TO_TICKS(DISPLAY_INTERVAL);
 
@@ -289,9 +291,6 @@ void TaskDisplayData(void *pvParameters)
 		while (xQueueReceive(queueForDisplay, &received, 0) == pdPASS)
 		{
 			lcdManager.printData(received);
-			tftManager.printData(received);
-		}
-		
-		vTaskDelay(delay);
+		}		vTaskDelay(delay);
 	}
 }

@@ -1,5 +1,6 @@
 C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Release\SD\utility\Sd2Card.cpp.o: \
  D:\Arduino\ide\libraries\SD\src\utility\Sd2Card.cpp \
+ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Release/build_options.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Arduino.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/binary.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/WCharacter.h \

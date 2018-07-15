@@ -1,5 +1,6 @@
 C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Release\TFT_ILI9163C\TFT_ILI9163C.cpp.o: \
  D:\Arduino\Projects\libraries\TFT_ILI9163C\TFT_ILI9163C.cpp \
+ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Release/build_options.h \
  D:\Arduino\Projects\libraries\TFT_ILI9163C\TFT_ILI9163C.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Arduino.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/binary.h \

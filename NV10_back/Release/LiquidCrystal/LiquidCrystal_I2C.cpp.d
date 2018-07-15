@@ -1,5 +1,6 @@
 C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Release\LiquidCrystal\LiquidCrystal_I2C.cpp.o: \
  D:\Arduino\Projects\libraries\LiquidCrystal\LiquidCrystal_I2C.cpp \
+ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Release/build_options.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Arduino.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/binary.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/WCharacter.h \

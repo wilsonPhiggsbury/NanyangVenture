@@ -1,5 +1,4 @@
-// HydrogenCellLogger.h
-#include "Wiring.h"
+// HESFuelCell.h
 #ifndef _HYDROGENCELLLOGGER_h
 #define _HYDROGENCELLLOGGER_h
 
@@ -10,7 +9,7 @@
 #endif
 
 
-class HydrogenCellLogger
+class HESFuelCell
 {
  private:
 	 HardwareSerial *port;
@@ -28,9 +27,9 @@ class HydrogenCellLogger
 	 
 
  public:
-	 HydrogenCellLogger(HardwareSerial *port);
+	 HESFuelCell(HardwareSerial *port);
 	 void init();
-	 void readData();
+	 void logData();
 	 static void dumpTimestampInto(char * location);
 	 void dumpDataInto(char * location);
 	 bool hasUpdated();

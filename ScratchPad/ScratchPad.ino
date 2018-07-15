@@ -39,13 +39,13 @@ void loop() {
 
 void TaskQueueOutputData(void *pvParameters __attribute__((unused)))  // This is a Task.
 {
-	uint8_t msgLength;
-
+	uint8_t msgLength = 8;
+	byte inBuffer[8];
 	while (1) // A Task shall never return or exit.
 	{
 		if (CAN_incoming)
 		{
-			CAN0.readMsgBuf(&msgLength, )
+			CAN0.readMsgBuf(&msgLength, inBuffer);
 			CAN_incoming = false;
 		}
 	}

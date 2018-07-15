@@ -1,5 +1,6 @@
 C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Debug\SD\utility\SdFile.cpp.o: \
  D:\Arduino\ide\libraries\SD\src\utility\SdFile.cpp \
+ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Debug/build_options.h \
  D:\Arduino\ide\libraries\SD\src\utility\SdFat.h \
  D:\Arduino\ide\libraries\SD\src\utility\Sd2Card.h \
  D:\Arduino\ide\libraries\SD\src\utility\Sd2PinMap.h \

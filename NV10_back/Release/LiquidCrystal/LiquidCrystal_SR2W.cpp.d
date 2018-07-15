@@ -1,5 +1,6 @@
 C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Release\LiquidCrystal\LiquidCrystal_SR2W.cpp.o: \
  D:\Arduino\Projects\libraries\LiquidCrystal\LiquidCrystal_SR2W.cpp \
+ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Release/build_options.h \
  D:\Arduino\Projects\libraries\LiquidCrystal\LiquidCrystal_SR2W.h \
  D:\Arduino\Projects\libraries\LiquidCrystal\LCD.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Arduino.h \

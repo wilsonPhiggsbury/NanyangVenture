@@ -2,18 +2,18 @@
 // 
 // 
 
-#include "MotorLogger.h"
-#include <Arduino_FreeRTOS.h>
+#include "CurrentSensorLogger.h"
 
 
-MotorLogger::MotorLogger(int motorID, uint8_t voltPin, uint8_t ampPin):voltPin(voltPin),ampPin(ampPin),id(motorID)
+AttopilotCurrentSensor::AttopilotCurrentSensor(int motorID, uint8_t voltPin, uint8_t ampPin):voltPin(voltPin),ampPin(ampPin),id(motorID)
 {
 	
 }
-void MotorLogger::logData()
+void AttopilotCurrentSensor::logData()
 {
 	voltReading = analogRead(voltPin);
 	ampReading = analogRead(ampPin);
+
 	ampPeak = max(ampReading, ampPeak);
 	// totalEnergy += timeDiff (milliseconds) * V * I	<-- to convert to Wh, please divide by 3600000. Current form is only for convenience of storage
 	if(timeStamp != 0)
@@ -22,44 +22,14 @@ void MotorLogger::logData()
 	//	Serial.println(millis());
 	timeStamp = millis();
 }
-//void MotorLogger::dumpDataInto(char* location, bool raw)
-//{
-//	char tmp[6];
-//	float finalReading;
-//	if (raw)
-//	{
-//		Serial.println(F("Not implemented."));
-//	}
-//	else
-//	{
-//		strcat(location, "\t");
-//		dumpVoltReadingInto(location);
-//		strcat(location, "\t");
-//		dumpAmpReadingInto(location);
-//	}
-//	//// convert analog reading into VOLTS using lookup table
-//	//debug_("V ID: ");debug(id);
-//	//if (raw)
-//	//	finalReading = voltReading;
-//	//else
-//	//	finalReading = rawToVA('V', voltReading);
-//	//// put into tmp, length 4 (dot inclusive) with 1 decimal place
-//	//dtostrf(finalReading, 4, 1, tmp);
-//	//strcat(location, tmp);
-//	//strcat(location, "\t");
-//
-//	//// convert analog reading into AMPS using lookup table
-//	//debug_("A ID: ");debug(id);
-//	//if (raw)
-//	//	finalReading = ampReading;
-//	//else
-//	//	finalReading = rawToVA('A', ampReading);
-//	//// put into tmp and ship
-//	//dtostrf(finalReading, 4, 1, tmp);
-//	//strcat(location, tmp);
-//
-//}
-void MotorLogger::dumpVoltReadingInto(char *location)
+
+void AttopilotCurrentSensor::dumpTimestampInto(char* location)
+{
+	char tmp[9];
+	ultoa(timeStamp, tmp, 16);
+	strcat(location, tmp);
+}
+void AttopilotCurrentSensor::dumpVoltReadingInto(char *location)
 {
 	float finalReading;
 	char tmp[6];
@@ -67,7 +37,7 @@ void MotorLogger::dumpVoltReadingInto(char *location)
 	dtostrf(finalReading, 4, 1, tmp);
 	strcat(location, tmp);
 }
-void MotorLogger::dumpAmpReadingInto(char *location)
+void AttopilotCurrentSensor::dumpAmpReadingInto(char *location)
 {
 	float finalReading;
 	char tmp[6];
@@ -75,14 +45,14 @@ void MotorLogger::dumpAmpReadingInto(char *location)
 	dtostrf(finalReading, 4, 1, tmp);
 	strcat(location, tmp);
 }
-void MotorLogger::dumpAmpPeakInto(char *location)
+void AttopilotCurrentSensor::dumpAmpPeakInto(char *location)
 {
 	float finalReading = rawToVA('A', ampPeak);
 	char tmp[6];
 	dtostrf(finalReading, 4, 1, tmp);
 	strcat(location, tmp);
 }
-void MotorLogger::dumpTotalEnergyInto(char *location)
+void AttopilotCurrentSensor::dumpTotalEnergyInto(char *location)
 {
 	//float finalReading = rawToVA('A', ampPeak);
 	// TODO: there is place for optimization by postponing calculate raw first until truly dumping data
@@ -91,7 +61,7 @@ void MotorLogger::dumpTotalEnergyInto(char *location)
 	dtostrf(whr, 6, 1, tmp);
 	strcat(location, tmp);
 }
-float MotorLogger::rawToVA(char which, float reading)
+float AttopilotCurrentSensor::rawToVA(char which, float reading)
 {
 	float first, last, step, maxIndex;
 	uint16_t thisValue, nextValue;
@@ -132,10 +102,4 @@ float MotorLogger::rawToVA(char which, float reading)
 		}
 	}
 	return last;
-}
-void MotorLogger::dumpTimestampInto(char* location)
-{
-	char tmp[9];
-	ultoa(timeStamp, tmp, 16);
-	strcat(location, tmp);
 }

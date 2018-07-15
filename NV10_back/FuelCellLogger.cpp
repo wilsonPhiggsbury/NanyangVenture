@@ -1,10 +1,10 @@
-#include "HydrogenCellLogger.h"
+#include "FuelCellLogger.h"
 
 
 const char DELIMITER[] = ">>";
 const size_t DELIMITER_LEN = strlen(DELIMITER);
-char HydrogenCellLogger::timeStamp[9];
-HydrogenCellLogger::HydrogenCellLogger(HardwareSerial *port):port(port)
+char HESFuelCell::timeStamp[9];
+HESFuelCell::HESFuelCell(HardwareSerial *port):port(port)
 {
 	port->begin(19200);
 	updated = false;
@@ -17,12 +17,12 @@ HydrogenCellLogger::HydrogenCellLogger(HardwareSerial *port):port(port)
 	strcpy(timeStamp, "0");
 }
 
-void HydrogenCellLogger::init()
+void HESFuelCell::init()
 {
 
 
 }
-void HydrogenCellLogger::readData()
+void HESFuelCell::logData()
 {
 	// read into buffer, see if data found by using DELIMITER ">>"
 	while (port->available())
@@ -52,7 +52,6 @@ void HydrogenCellLogger::readData()
 			buffer[moveCounter] = *(found+moveCounter);
 		} while (buffer[moveCounter++] != '\0');
 		bufferPointer = moveCounter-1;
-		debug("move");
 		return;
 	}
 	// update timestamp
@@ -72,12 +71,12 @@ void HydrogenCellLogger::readData()
 	// clear buffer string by resetting pointer
 	bufferPointer = 0;
 }
-void HydrogenCellLogger::dumpTimestampInto(char* location)
+void HESFuelCell::dumpTimestampInto(char* location)
 {
 	strcat(location, timeStamp);//	8
 	//						SUM =	8
 }
-void HydrogenCellLogger::dumpDataInto(char* location)
+void HESFuelCell::dumpDataInto(char* location)
 {
 	strcat(location, volts);//			4
 	strcat(location, "\t");//			1
@@ -93,13 +92,13 @@ void HydrogenCellLogger::dumpDataInto(char* location)
 	//									1 (for '\0')
 	//							SUM =  29
 }
-bool HydrogenCellLogger::hasUpdated()
+bool HESFuelCell::hasUpdated()
 {
 	bool tmp = updated;
 	updated = false;
 	return tmp;
 }
-void HydrogenCellLogger::debugPrint()
+void HESFuelCell::debugPrint()
 {
 	if (port == &Serial1)Serial.println(F("Cell1:"));
 	else if (port == &Serial2)Serial.println(F("Cell2:"));

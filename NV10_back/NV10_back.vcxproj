@@ -94,16 +94,21 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="DisplayInterface.h" />
-    <ClInclude Include="HydrogenCellLogger.h" />
-    <ClInclude Include="MotorLogger.h" />
-    <ClInclude Include="Wiring.h" />
+    <ClInclude Include="build_options.h" />
+    <ClInclude Include="JoulemeterDisplay.h" />
+    <ClInclude Include="FuelCellLogger.h" />
+    <ClInclude Include="CurrentSensorLogger.h" />
+    <ClInclude Include="Behaviour.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="__vm\.NV10_back.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="DisplayInterface.cpp" />
-    <ClCompile Include="HydrogenCellLogger.cpp" />
-    <ClCompile Include="MotorLogger.cpp" />
+    <ClCompile Include="JoulemeterDisplay.cpp" />
+    <ClCompile Include="FuelCellLogger.cpp" />
+    <ClCompile Include="CurrentSensorLogger.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="NV10_back.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

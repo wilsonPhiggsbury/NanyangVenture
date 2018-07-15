@@ -1,5 +1,6 @@
 C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Debug\NV10_back.cpp.o: \
  C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Debug\NV10_back.cpp \
+ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Debug/build_options.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/arduino.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/binary.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/WCharacter.h \
@@ -41,11 +42,11 @@ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Debug\NV10_bac
  D:\Arduino\Projects\libraries\LiquidCrystal/I2CIO.h \
  D:\Arduino\Projects\libraries\LiquidCrystal/LCD.h \
  D:\Arduino\ide\hardware\arduino\avr\libraries\EEPROM\src/EEPROM.h \
- C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Debug\DisplayInterface.h \
- C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Debug\Wiring.h \
+ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Debug\JoulemeterDisplay.h \
+ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Debug\Behaviour.h \
  D:\Arduino\ide\hardware\arduino\avr\libraries\SPI\src/SPI.h \
  D:\Arduino\ide\hardware\arduino\avr\libraries\Wire\src/Wire.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Stream.h \
- C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Debug\MotorLogger.h \
- C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Debug\HydrogenCellLogger.h \
+ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Debug\CurrentSensorLogger.h \
+ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Debug\FuelCellLogger.h \
  C:\Program\ Files\ (x86)\Microsoft\ Visual\ Studio\2017\Enterprise\Common7\IDE\Extensions\pd4xo3tv.r1p\Micro\ Platforms\default\debuggers\VM_DBG/VM_DBG.h
