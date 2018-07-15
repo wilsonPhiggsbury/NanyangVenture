@@ -24,16 +24,9 @@
 #define A_N 40
 #define A_ENTRIES ((A_N-A_0)/A_STEP)+1
 
-typedef enum
-{
-	leftWheel,
-	rightWheel,
-	capacitor
-}SensorLabel;
 
 
-
-// LOOKUP TABLE declared below, please ensure ordering is the same as the enum declaration above.
+// LOOKUP TABLE declared below
 const uint16_t V_TABLE[NUM_MOTORS][V_ENTRIES] PROGMEM = {
 	{
 		// L.wheel

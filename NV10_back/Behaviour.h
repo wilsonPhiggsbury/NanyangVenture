@@ -18,12 +18,6 @@
 
 #define NUM_MOTORS 3
 #define NUM_FUELCELLS 2
-// Wiring naming convention: DEVICE_PINTYPE_PINNAME
-#define SD_SPI_CS 4			// used by shield, no actual wiring
-#define TFT1_SPI_RS 9
-#define TFT1_SPI_CS 10
-#define TFT1_SPI_RST 11
-#define LCD1_I2C_ADDR 0x27
 
 // Declare data struct constants
 #define FUELCELL_DATALEN 70 // (9+29+29) (timestamp + hydrocell1 + hydrocell2)

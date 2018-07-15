@@ -31,13 +31,13 @@
     <ClInclude Include="Behaviour.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="build_options.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="__vm\.NV10_back.vsarduino.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Wiring.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

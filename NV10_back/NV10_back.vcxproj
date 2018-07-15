@@ -99,7 +99,7 @@
     <ClInclude Include="FuelCellLogger.h" />
     <ClInclude Include="CurrentSensorLogger.h" />
     <ClInclude Include="Behaviour.h" />
-    <ClInclude Include="resource.h" />
+    <ClInclude Include="Wiring.h" />
     <ClInclude Include="__vm\.NV10_back.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>

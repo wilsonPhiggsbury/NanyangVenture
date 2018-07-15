@@ -21,6 +21,7 @@
 #include "CurrentSensorLogger.h"
 #include "FuelCellLogger.h"
 
+#include "Wiring.h"
 
 
 // file names
@@ -38,8 +39,15 @@ QueueHandle_t queueForDisplay = xQueueCreate(1, sizeof(QueueItem));
 bool SD_avail;
 char path[FILENAME_HEADER_LENGTH+ 8 + 4 + 1] = ""; // +8 for filename, +4 for '.txt', +1 for '\0'
 // sample filename: /LOG_0002/12345678.txt   1+8+1+8+4+1
-HESFuelCell hydroCells[NUM_FUELCELLS] = { HESFuelCell(&Serial3),HESFuelCell(&Serial2) };
-AttopilotCurrentSensor motors[NUM_MOTORS] = { AttopilotCurrentSensor(0,A0,A1),AttopilotCurrentSensor(1,A2,A3),AttopilotCurrentSensor(2,A4,A5) };
+HESFuelCell hydroCells[NUM_FUELCELLS] = {
+	HESFuelCell(&FC_MASTER_PORT),
+	HESFuelCell(&FC_SLAVE_PORT)
+};
+AttopilotCurrentSensor motors[NUM_MOTORS] = {
+	AttopilotCurrentSensor(0,L_WHEEL_VPIN,L_WHEEL_APIN),
+	AttopilotCurrentSensor(1,R_WHEEL_VPIN,R_WHEEL_APIN),
+	AttopilotCurrentSensor(2,SUPERCAP_VPIN,SUPERCAP_APIN)
+};
 
 // define tasks, types are: input, control, output
 void TaskReadFuelCell(void *pvParameters);		// Input task:		Refreshes class variables for fuel cell Volts, Amps, Watts and Energy
