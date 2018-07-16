@@ -4,8 +4,9 @@
  Author:	MX
 */
 /*IMPORTANT:
-	Please change SERIAL_RX_BUFFER_SIZE inside of HardwareSerial.h to 128, or fuel cell data will be incomplete.
-	Attempting to parse an incomplete data will result in rubbish.
+	Please go to your Arduino ide exe location and insert the contents of the accompanied folder. 
+	That way it would use build_options.h when compiling, which alters the SERIAL_RX_BUFFER_SIZE.
+	Bigger buffer size required for 100-byte data bursts from fuel cells.
 */
 
 #include <Arduino_FreeRTOS.h>
@@ -17,37 +18,27 @@
 #include <LiquidCrystal_I2C.h>
 #include <EEPROM.h>
 
-#include "JoulemeterDisplay.h"
+#include "JoulemeterDisplay.h"		
 #include "CurrentSensorLogger.h"
 #include "FuelCellLogger.h"
 
 #include "Wiring.h"
 
-
-// file names
-const char FUELCELL_FILENAME[] = "FC_neat.txt";
-const char FUELCELL_RAW_FILENAME[] = "FC_raw.txt";
-const char MOTOR_FILENAME[] = "MT_CAP.txt";
-const uint8_t FILENAME_HEADER_LENGTH = 1+3+1+4+1; /* 
-												  /LOG_0002/ -> 1+3+1+4+1
-												  */
-
 // define queues
 QueueHandle_t queueForLogSend = xQueueCreate(1, sizeof(QueueItem));
 QueueHandle_t queueForDisplay = xQueueCreate(1, sizeof(QueueItem));
-// declare globals (please keep to minimum)
-bool SD_avail;
-char path[FILENAME_HEADER_LENGTH+ 8 + 4 + 1] = ""; // +8 for filename, +4 for '.txt', +1 for '\0'
-// sample filename: /LOG_0002/12345678.txt   1+8+1+8+4+1
 HESFuelCell hydroCells[NUM_FUELCELLS] = {
-	HESFuelCell(&FC_MASTER_PORT),
-	HESFuelCell(&FC_SLAVE_PORT)
+	HESFuelCell(0, &FC_MASTER_PORT),
+	HESFuelCell(1, &FC_SLAVE_PORT)
 };
 AttopilotCurrentSensor motors[NUM_MOTORS] = {
 	AttopilotCurrentSensor(0,L_WHEEL_VPIN,L_WHEEL_APIN),
 	AttopilotCurrentSensor(1,R_WHEEL_VPIN,R_WHEEL_APIN),
 	AttopilotCurrentSensor(2,SUPERCAP_VPIN,SUPERCAP_APIN)
 };
+// define globals
+bool SD_avail;
+char path[FILENAME_HEADER_LENGTH + 8 + 4 + 1]; // +8 for filename, +4 for '.txt', +1 for '\0'
 
 // define tasks, types are: input, control, output
 void TaskReadFuelCell(void *pvParameters);		// Input task:		Refreshes class variables for fuel cell Volts, Amps, Watts and Energy
@@ -55,6 +46,7 @@ void TaskReadMotorPower(void *pvParameters);	// Input task:		Refreshes class var
 void TaskQueueOutputData(void *pvParameters);	// Control task:	Controls frequency to queue data from above tasks to output tasks
 void TaskLogSendData(void *pvParameters);		// Output task:		Data logged in SD card and sent through XBee. Logged and sent data should be consistent, hence they are grouped together
 void TaskDisplayData(void *pvParameters);		// Output task:		Display on LCD screen
+void TaskDoNothing(void* pvParameters);
 
 //// _______________OPTIONAL_____________
 //void TaskReceiveCommands(void *pvParameters);	// Input task:		Enable real-time control of Arduino (if any)
@@ -66,7 +58,6 @@ void setup() {
 	// initialize serial communication at 9600 bits per second:
 	Serial.begin(9600);
 	delay(100);
-
 	// create all files in a new directory
 	SD_avail = initSD(path);
 	// define objects for more complicated procedures
@@ -75,16 +66,16 @@ void setup() {
 	xTaskCreate(
 		TaskReadFuelCell
 		, (const portCHAR *)"Fuel"
-		, 150
+		, 650
 		, hydroCells
-		, 2
+		, 3
 		, NULL);
 	xTaskCreate(
 		TaskReadMotorPower
 		, (const portCHAR *)"Motor"
-		, 150
+		, 175
 		, motors
-		, 3
+		, 2
 		, NULL);
 	xTaskCreate(
 		TaskQueueOutputData
@@ -96,18 +87,25 @@ void setup() {
 	xTaskCreate(
 		TaskLogSendData
 		, (const portCHAR *) "LogSend"
-		, 650  // Stack size
+		, 675  // Stack size
 		, NULL
 		, 1  // Priority
 		, NULL);
 	xTaskCreate(
 		TaskDisplayData
 		, (const portCHAR *) "Display"
-		, 400  // Stack size
+		, 350  // Stack size
 		, NULL
 		, 1  // Priority
-		, NULL);Serial.print("Buffer size: ");Serial.println(SERIAL_RX_BUFFER_SIZE);
-	// Now the Task scheduler, which takes over control of scheduling individual Tasks, is automatically started.
+		, NULL);
+	//xTaskCreate(
+	//	TaskDoNothing
+	//	, (const portCHAR *) "Nothing"
+	//	, 100  // Stack size
+	//	, NULL
+	//	, 0  // Priority
+	//	, NULL);
+	 // Now the Task scheduler, which takes over control of scheduling individual Tasks, is automatically started.
 }
 
 void loop()
@@ -260,15 +258,15 @@ void TaskLogSendData(void *pvParameters __attribute__((unused)))  // This is a T
 			case FuelCell:
 				strncpy(shortFileName, FUELCELL_FILENAME, 2);
 				strcpy(path + FILENAME_HEADER_LENGTH, FUELCELL_FILENAME);
+				Serial.print(shortFileName);
+				Serial.print('\t');
+				Serial.println(received.data);
 				break;
 			case Motor:
 				strncpy(shortFileName, MOTOR_FILENAME, 2);
 				strcpy(path + FILENAME_HEADER_LENGTH, MOTOR_FILENAME);
 				break;
 			}
-			Serial.print(shortFileName);
-			Serial.print('\t');
-			Serial.println(received.data);
 			// -------------- Store into SD -------------
 			if (SD_avail)
 			{
@@ -299,6 +297,18 @@ void TaskDisplayData(void *pvParameters)
 		while (xQueueReceive(queueForDisplay, &received, 0) == pdPASS)
 		{
 			lcdManager.printData(received);
-		}		vTaskDelay(delay);
+		}	
+		vTaskDelay(delay);
+	}
+}
+void TaskDoNothing(void *pvParameters __attribute__((unused)))  // This is a Task.
+{
+	uint32_t totalIdleMillis = 0;
+	uint32_t previousMillis = 0;
+	while (1)
+	{
+		totalIdleMillis += millis()-previousMillis;
+		previousMillis = millis();
+		
 	}
 }

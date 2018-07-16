@@ -14,7 +14,7 @@ bool initSD(char* path)
 	{
 		return false;
 	}
-	strcat(path, "/");
+	strcpy(path, "/");
 	strcat(path, "LOG"); // Arduino does not like lengthy path names. Please keep to under 4 alphabets.
 	strcat(path, "_");
 
@@ -62,10 +62,13 @@ bool initSD(char* path)
 
 	strcpy(path + FILENAME_HEADER_LENGTH, MOTOR_FILENAME);
 	sub = SD.open(path, FILE_WRITE);
-	sub.println(F("Millis\tV_left\tA_left\tV_right\tA_right\tV_cap\tA_cap"));
+	sub.println(F("Millis\tV_left\tV_right\tV_cap\tA_left\tA_right\tA_cap"));
 	sub.close();
 
-	strcpy(path + FILENAME_HEADER_LENGTH, FUELCELL_RAW_FILENAME);
+	strcpy(path + FILENAME_HEADER_LENGTH, MASTER_FUELCELL_RAW_FILENAME);
+	sub = SD.open(path, FILE_WRITE);
+	sub.close();
+	strcpy(path + FILENAME_HEADER_LENGTH, SLAVE_FUELCELL_RAW_FILENAME);
 	sub = SD.open(path, FILE_WRITE);
 	sub.close();
 	// *path should always contain /LOG_****/

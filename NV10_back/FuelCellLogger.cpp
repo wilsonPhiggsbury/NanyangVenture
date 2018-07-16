@@ -1,10 +1,10 @@
 #include "FuelCellLogger.h"
-
+#include <SD.h>
 
 const char DELIMITER[] = ">>";
 const size_t DELIMITER_LEN = strlen(DELIMITER);
 char HESFuelCell::timeStamp[9];
-HESFuelCell::HESFuelCell(HardwareSerial *port):port(port)
+HESFuelCell::HESFuelCell(uint8_t id, HardwareSerial *port):id(id),port(port)
 {
 	port->begin(19200);
 	updated = false;
@@ -17,59 +17,82 @@ HESFuelCell::HESFuelCell(HardwareSerial *port):port(port)
 	strcpy(timeStamp, "0");
 }
 
-void HESFuelCell::init()
-{
-
-
-}
 void HESFuelCell::logData()
 {
 	// read into buffer, see if data found by using DELIMITER ">>"
+	if(!port->available())
+		return;
 	while (port->available())
 	{
-		if (bufferPointer >= 99)
+		if (bufferPointer >= RX_BUFFER_LEN-1)
 		{
 			// buffer overflow
 			break;
 		}
-		buffer[bufferPointer++] = port->read();
+		buffer[bufferPointer] = port->read();
+		// check if there was partial data before this. If yes, lookout for newline indicators!
+		if (hadPartialData && (buffer[bufferPointer] == '>' || buffer[bufferPointer] == '\r' || buffer[bufferPointer] == '\n'))
+		{
+			// if newline confirmed, discard the old partial data. Otherwise, append.
+			buffer[0] = buffer[bufferPointer];
+			bufferPointer = 1;
+			hadPartialData = false;
+		}
+		bufferPointer++;
 	}
 	buffer[bufferPointer] = '\0';
+	debug("Read");
+	//debug("---");
+	//debug(buffer);
+	//debug("***");
 	// search buffer for DELIMITER, *found points to start of the DELIMITER (or NULL if not found)
 	char *found = strstr(buffer, DELIMITER);
 	if (found == NULL)
 	{
 		// DELIMITER nowhere to be found in current buffer. Clear it.
+		// Log the whole row of raw data before discarding
+		writeRawdata(buffer);
+		// then discard by resetting the pointer
 		bufferPointer = 0;
-		return;
+		debug("THROW");
 	}
 	else if (strlen(found) < DELIMITER_LEN + 75) // 75 = (4+2) + (4+2) + (4+2) + (5+37) + (4+9) + (2)
 	{
-		// Partial data came in. Migrate to the front of buffer array.
+		// Log the part about to be discarded
+		writeRawdata(buffer, found);
+		// Partial valid data came in. Migrate wanted parts to the front of buffer array.
 		uint8_t moveCounter = 0;
 		do
 		{
 			buffer[moveCounter] = *(found+moveCounter);
 		} while (buffer[moveCounter++] != '\0');
 		bufferPointer = moveCounter-1;
-		return;
+		hadPartialData = true;
+		debug("SHIFT");
+		// We will continue reading them next time we fire this function.
 	}
-	// update timestamp
-	ultoa(millis(), timeStamp, 16);
-	updated = true;
-	// update respective variables
-	strncpy(volts, found + DELIMITER_LEN + 0, 4);
-	strncpy(amps, found + DELIMITER_LEN + 6, 4);
-	strncpy(watts, found + DELIMITER_LEN + 12, 4);
-	strncpy(energy, found + DELIMITER_LEN + 18, 5);
-	strncpy(capacitorVolts, found + DELIMITER_LEN + 60, 4);
-	strncpy(status, found + DELIMITER_LEN + 73, 2);
-	//>>00.0V 00.0A 0000W 00000Wh 021.1C 028.3C 028.5C 031.6C 0.90B 59.0V 028.0C IN 00.0C 00 0000
-	//  ^   * ^   * ^   * ^    *                                    ^   *        ^ *
-	//volts[4] = amps[4] = watts[4] = energy[5] = capacitorVolts[4] = status[2] = '\0';
-	
-	// clear buffer string by resetting pointer
-	bufferPointer = 0;
+	else
+	{
+		writeRawdata(buffer);
+		// update timestamp
+		ultoa(millis(), timeStamp, 16);
+		updated = true;
+		// update respective variables
+		strncpy(volts, found + DELIMITER_LEN + 0, 4);
+		strncpy(amps, found + DELIMITER_LEN + 6, 4);
+		strncpy(watts, found + DELIMITER_LEN + 12, 4);
+		strncpy(energy, found + DELIMITER_LEN + 18, 5);
+		strncpy(capacitorVolts, found + DELIMITER_LEN + 60, 4);
+		strncpy(status, found + DELIMITER_LEN + 73, 2);
+		if (hadPartialData)
+			debug("SALVAGE");
+		//>>00.0V 00.0A 0000W 00000Wh 021.1C 028.3C 028.5C 031.6C 0.90B 59.0V 028.0C IN 00.0C 00 0000
+		//  ^   * ^   * ^   * ^    *                                    ^   *        ^ *
+		//volts[4] = amps[4] = watts[4] = energy[5] = capacitorVolts[4] = status[2] = '\0';
+
+		// clear buffer string by resetting pointer
+		bufferPointer = 0;
+	}
 }
 void HESFuelCell::dumpTimestampInto(char* location)
 {
@@ -98,22 +121,29 @@ bool HESFuelCell::hasUpdated()
 	updated = false;
 	return tmp;
 }
-void HESFuelCell::debugPrint()
+void HESFuelCell::writeRawdata(char* toWrite)
 {
-	if (port == &Serial1)Serial.println(F("Cell1:"));
-	else if (port == &Serial2)Serial.println(F("Cell2:"));
-	Serial.print(F("Volts:"));
-	Serial.println(volts);
-	Serial.print(F("Amps:"));
-	Serial.println(amps);
-	Serial.print(F("Watts:"));
-	Serial.println(watts);
-	Serial.print(F("Energy:"));
-	Serial.println(energy);
-	Serial.print(F("Time:"));
-	Serial.println(timeStamp);
-	Serial.println(F("______"));
+	if (SD_avail)
+	{
+		if (id == 0)
+			strcpy(path + FILENAME_HEADER_LENGTH, MASTER_FUELCELL_RAW_FILENAME);
+		else if (id == 1)
+			strcpy(path + FILENAME_HEADER_LENGTH, SLAVE_FUELCELL_RAW_FILENAME);
+		else
+			return;
 
+		File rawFCdata = SD.open(path, FILE_WRITE);
+		rawFCdata.print(toWrite);
+		rawFCdata.close();
+		strcpy(path + FILENAME_HEADER_LENGTH, "");
+	}
+}
+void HESFuelCell::writeRawdata(char* toWrite, char* writeUntilHere)
+{
+	char tmp = (*writeUntilHere);
+	(*writeUntilHere) = '\0';
+	writeRawdata(toWrite);
+	(*writeUntilHere) = tmp;
 }
 
 /* H182_v1.3

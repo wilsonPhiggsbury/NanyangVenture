@@ -8,12 +8,17 @@
 	#include "WProgram.h"
 #endif
 
-
+#define RX_BUFFER_LEN 200
+#include "Globals.h"
 class HESFuelCell
 {
  private:
+	 static char timeStamp[9];
+
+	 uint8_t id;
 	 HardwareSerial *port;
-	 char buffer[100];
+	 char buffer[RX_BUFFER_LEN];
+	 bool hadPartialData  = false;
 	 uint8_t bufferPointer = 0;
 	 char amps[5];
 	 char volts[5];
@@ -22,18 +27,16 @@ class HESFuelCell
 	 char capacitorVolts[5];
 	 char status[3];
 	 bool updated;
-
-	 static char timeStamp[9];
+	 void writeRawdata(char* toWrite);
+	 void writeRawdata(char* toWrite, char* writeUntilHere);
 	 
 
- public:
-	 HESFuelCell(HardwareSerial *port);
-	 void init();
+ public: 
+	 HESFuelCell(uint8_t id, HardwareSerial *port);
 	 void logData();
 	 static void dumpTimestampInto(char * location);
 	 void dumpDataInto(char * location);
 	 bool hasUpdated();
-	 void debugPrint();
 };
 
 
