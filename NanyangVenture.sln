@@ -26,7 +26,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NV10_back", "NV10_back\NV10
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MCP_CAN_lib", "..\libraries\MCP_CAN_lib\MCP_CAN_lib.vcxitems", "{146A1678-8B3D-4B0E-8961-45E2201A27DE}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NewFolder1", "NewFolder1", "{B731DFF7-A7B2-4F18-831B-D04250650B2F}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependencies", "Dependencies", "{B731DFF7-A7B2-4F18-831B-D04250650B2F}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution

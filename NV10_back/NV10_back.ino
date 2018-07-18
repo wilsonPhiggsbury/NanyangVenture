@@ -58,6 +58,8 @@ void setup() {
 	// initialize serial communication at 9600 bits per second:
 	Serial.begin(9600);
 	delay(100);
+
+	debug(SERIAL_RX_BUFFER_SIZE);
 	// create all files in a new directory
 	SD_avail = initSD(path);
 	// define objects for more complicated procedures
@@ -66,7 +68,7 @@ void setup() {
 	xTaskCreate(
 		TaskReadFuelCell
 		, (const portCHAR *)"Fuel"
-		, 650
+		, 700
 		, hydroCells
 		, 3
 		, NULL);
@@ -98,6 +100,7 @@ void setup() {
 		, NULL
 		, 1  // Priority
 		, NULL);
+
 	//xTaskCreate(
 	//	TaskDoNothing
 	//	, (const portCHAR *) "Nothing"
@@ -258,15 +261,15 @@ void TaskLogSendData(void *pvParameters __attribute__((unused)))  // This is a T
 			case FuelCell:
 				strncpy(shortFileName, FUELCELL_FILENAME, 2);
 				strcpy(path + FILENAME_HEADER_LENGTH, FUELCELL_FILENAME);
-				Serial.print(shortFileName);
-				Serial.print('\t');
-				Serial.println(received.data);
 				break;
 			case Motor:
 				strncpy(shortFileName, MOTOR_FILENAME, 2);
 				strcpy(path + FILENAME_HEADER_LENGTH, MOTOR_FILENAME);
 				break;
 			}
+			Serial.print(shortFileName);
+			Serial.print('\t');
+			Serial.println(received.data);
 			// -------------- Store into SD -------------
 			if (SD_avail)
 			{

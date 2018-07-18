@@ -35,7 +35,7 @@ while True:
 		counter = 0
 	else:
 		counter += 1
-	prepend = '\r\n>>' + str(random.randint(0,100)/10).zfill(4) + 'V ' + str(random.randint(0,20)/10).zfill(4) + 'A ' + str(random.randint(100,1000)).zfill(4) + 'W ' + str(random.randint(0,5000)).zfill(5) + 'Wh '
+	prepend = '>>' + str(random.randint(0,100)/10).zfill(4) + 'V ' + str(random.randint(0,20)/10).zfill(4) + 'A ' + str(random.randint(100,1000)).zfill(4) + 'W ' + str(random.randint(0,5000)).zfill(5) + 'Wh '
 
 	printValid = True#counter!=0 and random.randint(0,4) > 2
 	if(printValid):
@@ -43,11 +43,14 @@ while True:
 		contents = prepend+towrite_long[counter]
 	else:
 		contents = (towrite_long[counter])
-	rs.write(contents.encode())
+
+	contents += '\r\n'
+	print('Written:',rs.write(contents.encode()))
+	
 
 
 	if(rs.out_waiting):
 		print(rs.out_waiting)
 	elif printValid:
-		print('Sent line',counter,'Contents:',contents,'Hits:',hits)
-	sleep(2.0)
+		print('Sent line',counter,'Contents:',contents)
+	sleep(1.0)

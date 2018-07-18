@@ -1,12 +1,14 @@
 #include "FuelCellLogger.h"
+#include "Behaviour.h"
 #include <SD.h>
 
 const char DELIMITER[] = ">>";
 const size_t DELIMITER_LEN = strlen(DELIMITER);
-char HESFuelCell::timeStamp[9];
+uint32_t HESFuelCell::timeStamp;
 HESFuelCell::HESFuelCell(uint8_t id, HardwareSerial *port):id(id),port(port)
 {
 	port->begin(19200);
+	port->setTimeout(500);
 	updated = false;
 	strcpy(volts, "0.00");
 	strcpy(amps, "0.00");
@@ -14,90 +16,38 @@ HESFuelCell::HESFuelCell(uint8_t id, HardwareSerial *port):id(id),port(port)
 	strcpy(energy, "00000");
 	strcpy(capacitorVolts, "00.0");
 	strcpy(status, "XX");
-	strcpy(timeStamp, "0");
+	timeStamp = 0;
 }
 
 void HESFuelCell::logData()
 {
 	// read into buffer, see if data found by using DELIMITER ">>"
-	if(!port->available())
+	if (!port->available())
 		return;
-	while (port->available())
+	uint8_t bytesRead = port->readBytesUntil('\n', buffer, RX_BUFFER_LEN);
+	writeRawdata(buffer);
+
+	if (bytesRead >= 75)
 	{
-		if (bufferPointer >= RX_BUFFER_LEN-1)
-		{
-			// buffer overflow
-			break;
-		}
-		buffer[bufferPointer] = port->read();
-		// check if there was partial data before this. If yes, lookout for newline indicators!
-		if (hadPartialData && (buffer[bufferPointer] == '>' || buffer[bufferPointer] == '\r' || buffer[bufferPointer] == '\n'))
-		{
-			// if newline confirmed, discard the old partial data. Otherwise, append.
-			buffer[0] = buffer[bufferPointer];
-			bufferPointer = 1;
-			hadPartialData = false;
-		}
-		bufferPointer++;
-	}
-	buffer[bufferPointer] = '\0';
-	debug("Read");
-	//debug("---");
-	//debug(buffer);
-	//debug("***");
-	// search buffer for DELIMITER, *found points to start of the DELIMITER (or NULL if not found)
-	char *found = strstr(buffer, DELIMITER);
-	if (found == NULL)
-	{
-		// DELIMITER nowhere to be found in current buffer. Clear it.
-		// Log the whole row of raw data before discarding
-		writeRawdata(buffer);
-		// then discard by resetting the pointer
-		bufferPointer = 0;
-		debug("THROW");
-	}
-	else if (strlen(found) < DELIMITER_LEN + 75) // 75 = (4+2) + (4+2) + (4+2) + (5+37) + (4+9) + (2)
-	{
-		// Log the part about to be discarded
-		writeRawdata(buffer, found);
-		// Partial valid data came in. Migrate wanted parts to the front of buffer array.
-		uint8_t moveCounter = 0;
-		do
-		{
-			buffer[moveCounter] = *(found+moveCounter);
-		} while (buffer[moveCounter++] != '\0');
-		bufferPointer = moveCounter-1;
-		hadPartialData = true;
-		debug("SHIFT");
-		// We will continue reading them next time we fire this function.
-	}
-	else
-	{
-		writeRawdata(buffer);
-		// update timestamp
-		ultoa(millis(), timeStamp, 16);
 		updated = true;
+		timeStamp = millis();
 		// update respective variables
-		strncpy(volts, found + DELIMITER_LEN + 0, 4);
-		strncpy(amps, found + DELIMITER_LEN + 6, 4);
-		strncpy(watts, found + DELIMITER_LEN + 12, 4);
-		strncpy(energy, found + DELIMITER_LEN + 18, 5);
-		strncpy(capacitorVolts, found + DELIMITER_LEN + 60, 4);
-		strncpy(status, found + DELIMITER_LEN + 73, 2);
-		if (hadPartialData)
-			debug("SALVAGE");
+		strncpy(volts, buffer + DELIMITER_LEN + 0, 4);
+		strncpy(amps, buffer + DELIMITER_LEN + 6, 4);
+		strncpy(watts, buffer + DELIMITER_LEN + 12, 4);
+		strncpy(energy, buffer + DELIMITER_LEN + 18, 5);
+		strncpy(capacitorVolts, buffer + DELIMITER_LEN + 60, 4);
+		strncpy(status, buffer + DELIMITER_LEN + 73, 2);
 		//>>00.0V 00.0A 0000W 00000Wh 021.1C 028.3C 028.5C 031.6C 0.90B 59.0V 028.0C IN 00.0C 00 0000
 		//  ^   * ^   * ^   * ^    *                                    ^   *        ^ *
-		//volts[4] = amps[4] = watts[4] = energy[5] = capacitorVolts[4] = status[2] = '\0';
-
-		// clear buffer string by resetting pointer
-		bufferPointer = 0;
 	}
 }
 void HESFuelCell::dumpTimestampInto(char* location)
 {
-	strcat(location, timeStamp);//	8
-	//						SUM =	8
+	char timeStampString[9];
+	ultoa(timeStamp, timeStampString, 16);
+	strcat(location, timeStampString);//	8
+	//								SUM =	8
 }
 void HESFuelCell::dumpDataInto(char* location)
 {
@@ -181,4 +131,5 @@ Shutting down...
 >>57.1V 00.0A 0000W 00000Wh 022.5C 029.4C 030.1C 033.3C 0.59B 53.8V 028.4C SD 41.4C 20 0000
 >>58.9V 00.0A 0000W 00000Wh 022.5C 029.5C 030.3C 033.4C 0.58B 54.0V 028.7C SD 41.4C 20 0000
 >>59.3V 00.0A 0000W 00000Wh 022.6C 029.6C 030.4C 033.4C 0.90B 53.9V 028.4C SD 41.4C 20 0000
->>59.5V 00.0A 0000W 00000Wh 022.7C 029.6C 030.4C 033.5C 0.91B 53.9V 027.9C SD 41.4C 20 0000 */
+>>59.5V 00.0A 0000W 00000Wh 022.7C 029.6C 030.4C 033.5C 0.91B 53.9V 027.9C SD 41.4C 20 0000 
+*/

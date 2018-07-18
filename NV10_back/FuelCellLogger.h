@@ -8,12 +8,12 @@
 	#include "WProgram.h"
 #endif
 
-#define RX_BUFFER_LEN 200
+#define RX_BUFFER_LEN 100
 #include "Globals.h"
 class HESFuelCell
 {
  private:
-	 static char timeStamp[9];
+	 static uint32_t timeStamp;
 
 	 uint8_t id;
 	 HardwareSerial *port;
