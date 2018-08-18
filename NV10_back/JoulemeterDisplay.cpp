@@ -18,7 +18,7 @@ DisplayLCD::DisplayLCD(LiquidCrystal_I2C& screenPtr):screen(screenPtr)
 {
 	screen.begin(20, 4);
 	screen.backlight();
-	screen.print("       V   Ap     Wh");
+	screen.print("       V    A     Wh");
 	screen.setCursor(0, 1);
 	screen.print("L");
 	screen.setCursor(0, 2);
@@ -50,30 +50,30 @@ void DisplayLCD::printData(QueueItem& received)
 
 		break;
 	case Motor:
-		if (NUM_MOTORS > 3)
+		if (NUM_CURRENTSENSORS > 3)
 			debug(F("Not enough place to print motor data!"));
 		// print V
 		strPointer = strtok(localStrCopy, "\t");
-		for (int i = 0; i < NUM_MOTORS; i++)
+		for (int i = 0; i < NUM_CURRENTSENSORS; i++)
 		{
 			strPointer = strtok(NULL, "\t");
 			screen.setCursor(4, i + 1);
 			screen.print(strPointer);
 		}
-		// skip A
-		for (int i = 0; i < NUM_MOTORS; i++)
-		{
-			strPointer = strtok(NULL, "\t");
-		}
 		// print Apeak
-		for (int i = 0; i < NUM_MOTORS; i++)
+		for (int i = 0; i < NUM_CURRENTSENSORS; i++)
 		{
 			strPointer = strtok(NULL, "\t");
 			screen.setCursor(9, i + 1);
 			screen.print(strPointer);
 		}
+		// skip A
+		for (int i = 0; i < NUM_CURRENTSENSORS; i++)
+		{
+			strPointer = strtok(NULL, "\t");
+		}
 		// print Wh
-		for (int i = 0; i < NUM_MOTORS; i++)
+		for (int i = 0; i < NUM_CURRENTSENSORS; i++)
 		{
 			strPointer = strtok(NULL, "\t");
 			screen.setCursor(14, i + 1);

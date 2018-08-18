@@ -21,13 +21,13 @@ HESFuelCell::HESFuelCell(uint8_t id, HardwareSerial *port):id(id),port(port)
 
 void HESFuelCell::logData()
 {
-	// read into buffer, see if data found by using DELIMITER ">>"
+	// read into buffer, see if data found by using DELIMITER "\n"
 	if (!port->available())
 		return;
 	uint8_t bytesRead = port->readBytesUntil('\n', buffer, RX_BUFFER_LEN);
 	writeRawdata(buffer);
 
-	if (bytesRead >= 75)
+	if (bytesRead >= 77)
 	{
 		updated = true;
 		timeStamp = millis();
@@ -40,6 +40,11 @@ void HESFuelCell::logData()
 		strncpy(status, buffer + DELIMITER_LEN + 73, 2);
 		//>>00.0V 00.0A 0000W 00000Wh 021.1C 028.3C 028.5C 031.6C 0.90B 59.0V 028.0C IN 00.0C 00 0000
 		//  ^   * ^   * ^   * ^    *                                    ^   *        ^ *
+		//  ".........:.........:.........:.........:.........".........:.........:.........:.........:........."
+	}
+	else
+	{
+		writeRawdata("**\n");
 	}
 }
 void HESFuelCell::dumpTimestampInto(char* location)
@@ -87,13 +92,6 @@ void HESFuelCell::writeRawdata(char* toWrite)
 		rawFCdata.close();
 		strcpy(path + FILENAME_HEADER_LENGTH, "");
 	}
-}
-void HESFuelCell::writeRawdata(char* toWrite, char* writeUntilHere)
-{
-	char tmp = (*writeUntilHere);
-	(*writeUntilHere) = '\0';
-	writeRawdata(toWrite);
-	(*writeUntilHere) = tmp;
 }
 
 /* H182_v1.3

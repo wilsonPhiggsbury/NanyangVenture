@@ -11,7 +11,6 @@
 
 #endif
 #include "Behaviour.h"
-#include <EEPROM.h>
 
 // range of volt & amp readings expected
 #define V_STEP 5
@@ -27,7 +26,7 @@
 
 
 // LOOKUP TABLE declared below
-const uint16_t V_TABLE[NUM_MOTORS][V_ENTRIES] PROGMEM = {
+const uint16_t V_TABLE[NUM_CURRENTSENSORS][V_ENTRIES] PROGMEM = {
 	{
 		// L.wheel
 		0,
@@ -77,78 +76,78 @@ const uint16_t V_TABLE[NUM_MOTORS][V_ENTRIES] PROGMEM = {
 		779
 	}
 };
-const uint16_t A_TABLE[NUM_MOTORS][A_ENTRIES] PROGMEM = {
+const uint16_t A_TABLE[NUM_CURRENTSENSORS][A_ENTRIES] PROGMEM = {
 	{
 		// L.wheel
 		0,
 		15,
-		29,
-		44,
-		59,
-		74,
-		89,
-		104,
-		118,
-		133,
-		148,
-		161,
-		178,
-		193,
-		208,
-		223,
-		237,
-		252,
-		267,
-		282,
-		297
+		30,
+		45,
+		60,
+		75,
+		90,
+		105,
+		120,
+		135,
+		151,
+		165,
+		181,
+		195,
+		211,
+		225,
+		242,
+		256,
+		271,
+		286,
+		301
 	},
 	{
 		// R.wheel
-		1,
+		2,
 		17,
-		32,
-		47,
-		62,
-		77,
-		93,
-		108,
-		123,
-		138,
-		153,
-		169,
-		184,
-		199,
-		215,
-		230,
-		245,
-		260,
-		276,
-		291,
-		306
+		33,
+		48,
+		64,
+		80,
+		95,
+		110,
+		125,
+		141,
+		156,
+		172,
+		187,
+		202,
+		218,
+		233,
+		250,
+		264,
+		280,
+		296,
+		311
 	},
 	{
 		// Capacitor
 		0,
-		5,
-		12,
+		6,
+		13,
 		19,
-		26,
-		32,
-		39,
-		46,
-		53,
-		60,
-		67,
-		74,
-		81,
-		87,
-		94,
-		101,
-		108,
-		115,
-		122,
-		129,
-		135
+		27,
+		33,
+		40,
+		47,
+		54,
+		61,
+		68,
+		75,
+		82,
+		89,
+		96,
+		103,
+		110,
+		117,
+		123,
+		130,
+		137
 	}
 };
 
@@ -162,7 +161,7 @@ private:
 	uint16_t ampPeak = 0;
 	// As opposed to conventional Wh, this variable takes milliseconds instead of hours as time frame due to calculation efficiency.
 	// Don't worry, will convert to float when sending.
-	uint32_t totalEnergy = 0; 
+	float totalEnergy = 0; 
 	float rawToVA(char which, float reading);
 	unsigned long timeStamp;
 

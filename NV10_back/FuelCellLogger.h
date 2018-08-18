@@ -28,7 +28,6 @@ class HESFuelCell
 	 char status[3];
 	 bool updated;
 	 void writeRawdata(char* toWrite);
-	 void writeRawdata(char* toWrite, char* writeUntilHere);
 	 
 
  public: 

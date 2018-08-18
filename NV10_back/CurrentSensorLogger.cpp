@@ -7,7 +7,7 @@
 
 AttopilotCurrentSensor::AttopilotCurrentSensor(int motorID, uint8_t voltPin, uint8_t ampPin):voltPin(voltPin),ampPin(ampPin),id(motorID)
 {
-	
+	// id is only for accessing lookup table
 }
 void AttopilotCurrentSensor::logData()
 {
@@ -16,8 +16,12 @@ void AttopilotCurrentSensor::logData()
 
 	ampPeak = max(ampReading, ampPeak);
 	// totalEnergy += timeDiff (milliseconds) * V * I	<-- to convert to Wh, please divide by 3600000. Current form is only for convenience of storage
-	if(timeStamp != 0)
-		totalEnergy += round(rawToVA('V', voltReading) * rawToVA('A', ampReading)) * (millis()-timeStamp);
+	if (timeStamp != 0)
+	{
+		float usedEnergy = rawToVA('V', voltReading) * rawToVA('A', ampReading);
+		usedEnergy *= (millis() - timeStamp);
+		totalEnergy +=  usedEnergy;
+	}
 	//if (totalEnergy > 180000000)
 	//	Serial.println(millis());
 	timeStamp = millis();
@@ -57,7 +61,7 @@ void AttopilotCurrentSensor::dumpTotalEnergyInto(char *location)
 	//float finalReading = rawToVA('A', ampPeak);
 	// TODO: there is place for optimization by postponing calculate raw first until truly dumping data
 	char tmp[6];
-	float whr = totalEnergy / 3600000.0;
+	float whr = totalEnergy / 3600000;
 	dtostrf(whr, 6, 1, tmp);
 	strcat(location, tmp);
 }
@@ -84,7 +88,7 @@ float AttopilotCurrentSensor::rawToVA(char which, float reading)
 		break;
 	}
 	// Convert reading into volt/amp using lookup table
-	//	Find two values so that this reading is "sandwiched" between them. Linear map between those two values to obtain real volt/amp value.
+	//	Find two values in lookup table so that this reading is "sandwiched" between them. Linear map between those two values to obtain real volt/amp value.
 	int i = 0;
 	nextValue = pgm_read_word(TABLE + i);
 	if (reading < nextValue)

@@ -31,7 +31,7 @@ HESFuelCell hydroCells[NUM_FUELCELLS] = {
 	HESFuelCell(0, &FC_MASTER_PORT),
 	HESFuelCell(1, &FC_SLAVE_PORT)
 };
-AttopilotCurrentSensor motors[NUM_MOTORS] = {
+AttopilotCurrentSensor motors[NUM_CURRENTSENSORS] = {
 	AttopilotCurrentSensor(0,L_WHEEL_VPIN,L_WHEEL_APIN),
 	AttopilotCurrentSensor(1,R_WHEEL_VPIN,R_WHEEL_APIN),
 	AttopilotCurrentSensor(2,SUPERCAP_VPIN,SUPERCAP_APIN)
@@ -144,7 +144,7 @@ void TaskReadMotorPower(void* pvParameters)
 	TickType_t delay = pdMS_TO_TICKS(READ_MT_INTERVAL);
 	while (1)
 	{
-		for (int i = 0; i < NUM_MOTORS; i++)
+		for (int i = 0; i < NUM_CURRENTSENSORS; i++)
 		{
 			(sensor + i)->logData();
 		}
@@ -215,12 +215,12 @@ void TaskQueueOutputData(void *pvParameters)
 		if (syncCounter % motor_logsend == 0)
 		{
 			motors[0].dumpTimestampInto(outgoing.data);
-			for (int i = 0; i < NUM_MOTORS; i++)
+			for (int i = 0; i < NUM_CURRENTSENSORS; i++)
 			{
 				strcat(outgoing.data, "\t");
 				motors[i].dumpVoltReadingInto(outgoing.data);//len 5
 			}
-			for (int i = 0; i < NUM_MOTORS; i++)
+			for (int i = 0; i < NUM_CURRENTSENSORS; i++)
 			{
 				strcat(outgoing.data, "\t");
 				motors[i].dumpAmpReadingInto(outgoing.data);//len 5
@@ -228,12 +228,12 @@ void TaskQueueOutputData(void *pvParameters)
 			xQueueSend(queueForLogSend, &outgoing, 100);
 			if (syncCounter % (back_lcd_refresh) == 0)
 			{
-				for (int i = 0; i < NUM_MOTORS; i++)
+				for (int i = 0; i < NUM_CURRENTSENSORS; i++)
 				{
 					strcat(outgoing.data, "\t");
 					motors[i].dumpAmpPeakInto(outgoing.data);//len 5
 				}
-				for (int i = 0; i < NUM_MOTORS; i++)
+				for (int i = 0; i < NUM_CURRENTSENSORS; i++)
 				{
 					strcat(outgoing.data, "\t");
 					motors[i].dumpTotalEnergyInto(outgoing.data);//len 7
