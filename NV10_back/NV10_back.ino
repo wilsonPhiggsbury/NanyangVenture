@@ -1,12 +1,7 @@
 /*
- Name:		RTOS_test.ino
+ Name:		NV10_back.ino
  Created:	6/19/2018 1:42:24 PM
  Author:	MX
-*/
-/*IMPORTANT:
-	Please go to your Arduino ide exe location and insert the contents of the accompanied folder. 
-	That way it would use build_options.h when compiling, which alters the SERIAL_RX_BUFFER_SIZE.
-	Bigger buffer size required for 100-byte data bursts from fuel cells.
 */
 
 #include <Arduino_FreeRTOS.h>
@@ -18,7 +13,7 @@
 #include <LiquidCrystal_I2C.h>
 #include <EEPROM.h>
 
-#include "JoulemeterDisplay.h"		
+#include "JoulemeterDisplay.h"	
 #include "CurrentSensorLogger.h"
 #include "FuelCellLogger.h"
 
@@ -68,7 +63,7 @@ void setup() {
 	xTaskCreate(
 		TaskReadFuelCell
 		, (const portCHAR *)"Fuel"
-		, 700
+		, 725
 		, hydroCells
 		, 3
 		, NULL);
@@ -82,7 +77,7 @@ void setup() {
 	xTaskCreate(
 		TaskQueueOutputData
 		, (const portCHAR *)"Enqueue"  // A name just for humans
-		, 250  // This stack size can be checked & adjusted by reading the Stack Highwater
+		, 275  // This stack size can be checked & adjusted by reading the Stack Highwater
 		, NULL // Any pointer to pass in
 		, 2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
 		, NULL);
@@ -100,6 +95,7 @@ void setup() {
 		, NULL
 		, 1  // Priority
 		, NULL);
+	// Now the Task scheduler, which takes over control of scheduling individual Tasks, is automatically started.
 
 	//xTaskCreate(
 	//	TaskDoNothing
@@ -108,7 +104,6 @@ void setup() {
 	//	, NULL
 	//	, 0  // Priority
 	//	, NULL);
-	 // Now the Task scheduler, which takes over control of scheduling individual Tasks, is automatically started.
 }
 
 void loop()
@@ -160,7 +155,7 @@ void TaskQueueOutputData(void *pvParameters)
 	const uint16_t back_lcd_refresh = BACK_LCD_REFRESH_INTERVAL / QUEUE_DATA_INTERVAL;
 
 	QueueItem outgoing;
-	uint8_t syncCounter = 1;
+	uint8_t syncCounter = 0;
 	//HESFuelCell* masterCell = (HESFuelCell*)pvParameters;
 	//HESFuelCell* slaveCell = ((HESFuelCell*)pvParameters) + 1;
 	//AttopilotCurrentSensor* motor1 = ((Loggers*)pvParameters)->motors;
@@ -173,18 +168,18 @@ void TaskQueueOutputData(void *pvParameters)
 	{
 		success = pdPASS;
 		syncCounter++;
-		if (syncCounter > 100)
-			syncCounter = 1;
-		// Arrange for outgoing fuel cell data
-		outgoing.ID = FuelCell;
-		outgoing.data[0] = '\0';
+		if (syncCounter >= 128)
+			syncCounter = 0;
 		/* ------------------DATA FORMAT------------------
-						FM						FS
-			millis		V	A	W	Wh	V_c	St	V	A	W	Wh	V_c	St
+						FM								FS
+			millis		V	A	W	Wh	T	P	V_c	St	V	A	W	Wh	T	P	V_c	St
 		--------------------------------------------------*/
 
 		if (syncCounter % fuelcell_logsend == 0)
 		{
+			// Arrange for outgoing fuel cell data
+			outgoing.ID = FuelCell;
+			outgoing.data[0] = '\0';
 			HESFuelCell::dumpTimestampInto(outgoing.data);
 			for (int i = 0; i < NUM_FUELCELLS; i++)
 			{
@@ -195,7 +190,7 @@ void TaskQueueOutputData(void *pvParameters)
 				}
 				else
 				{
-					strcat(outgoing.data, "-");
+					strcat(outgoing.data, "-\t-\t-\t-\t-\t-\t-\t-");
 				}
 			}
 			xQueueSend(queueForLogSend, &outgoing, 100);
@@ -203,9 +198,6 @@ void TaskQueueOutputData(void *pvParameters)
 		}
 		
 
-		// Arrange for outgoing motor data
-		outgoing.ID = Motor;
-		outgoing.data[0] = '\0';
 		/* ------------------DATA FORMAT------------------
 			Lwheel(L) -> Rwheel(R) -> Capacitor(c)
 
@@ -214,6 +206,9 @@ void TaskQueueOutputData(void *pvParameters)
 		--------------------------------------------------*/
 		if (syncCounter % motor_logsend == 0)
 		{
+			// Arrange for outgoing motor data
+			outgoing.ID = Motor;
+			outgoing.data[0] = '\0';
 			motors[0].dumpTimestampInto(outgoing.data);
 			for (int i = 0; i < NUM_CURRENTSENSORS; i++)
 			{
@@ -300,7 +295,7 @@ void TaskDisplayData(void *pvParameters)
 		while (xQueueReceive(queueForDisplay, &received, 0) == pdPASS)
 		{
 			lcdManager.printData(received);
-		}	
+		}
 		vTaskDelay(delay);
 	}
 }

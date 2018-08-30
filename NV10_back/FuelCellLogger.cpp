@@ -2,8 +2,6 @@
 #include "Behaviour.h"
 #include <SD.h>
 
-const char DELIMITER[] = ">>";
-const size_t DELIMITER_LEN = strlen(DELIMITER);
 uint32_t HESFuelCell::timeStamp;
 HESFuelCell::HESFuelCell(uint8_t id, HardwareSerial *port):id(id),port(port)
 {
@@ -14,6 +12,8 @@ HESFuelCell::HESFuelCell(uint8_t id, HardwareSerial *port):id(id),port(port)
 	strcpy(amps, "0.00");
 	strcpy(watts, "0000");
 	strcpy(energy, "00000");
+	strcpy(maxTemperature, "000.0");
+	strcpy(pressure, "0.00");
 	strcpy(capacitorVolts, "00.0");
 	strcpy(status, "XX");
 	timeStamp = 0;
@@ -25,26 +25,59 @@ void HESFuelCell::logData()
 	if (!port->available())
 		return;
 	uint8_t bytesRead = port->readBytesUntil('\n', buffer, RX_BUFFER_LEN);
-	writeRawdata(buffer);
+	writeAsRawData(buffer);
 
 	if (bytesRead >= 77)
 	{
 		updated = true;
 		timeStamp = millis();
 		// update respective variables
-		strncpy(volts, buffer + DELIMITER_LEN + 0, 4);
-		strncpy(amps, buffer + DELIMITER_LEN + 6, 4);
-		strncpy(watts, buffer + DELIMITER_LEN + 12, 4);
-		strncpy(energy, buffer + DELIMITER_LEN + 18, 5);
-		strncpy(capacitorVolts, buffer + DELIMITER_LEN + 60, 4);
-		strncpy(status, buffer + DELIMITER_LEN + 73, 2);
+		char* readPtr = strtok(buffer, ">");	// buffer + 1 to skip the first char '>', strtok will find the 2nd one
+		if (readPtr == NULL)
+			return;
+
+		readPtr = strtok(readPtr, " ");
+		strncpy(volts, readPtr, 4);
+
+		readPtr = strtok(NULL, " ");
+		strncpy(amps, readPtr , 4);
+
+		readPtr = strtok(NULL, " ");
+		strncpy(watts, readPtr, 4);
+
+		readPtr = strtok(NULL, " ");
+		strncpy(energy, readPtr, 5);
+
+		// take max stack temperature out of 4 readings
+		float thisMaxTemp, prevMaxTemp = 0;
+		for (int i = 0; i < 4; i++)
+		{
+			char tmp[6];
+			readPtr = strtok(NULL, " ");
+			strncpy(tmp, readPtr, 5);
+			tmp[5] = '\0';
+			thisMaxTemp = max(atof(tmp), prevMaxTemp);
+		}
+		dtostrf(thisMaxTemp, 5, 1, maxTemperature);
+
+		readPtr = strtok(NULL, " ");
+		strncpy(pressure, readPtr, 4);
+
+		readPtr = strtok(NULL, " ");
+		strncpy(capacitorVolts, readPtr, 4);
+
+		readPtr = strtok(NULL, " ");
+		// skip average temperature
+
+		readPtr = strtok(NULL, " ");
+		strncpy(status, readPtr, 2);
 		//>>00.0V 00.0A 0000W 00000Wh 021.1C 028.3C 028.5C 031.6C 0.90B 59.0V 028.0C IN 00.0C 00 0000
-		//  ^   * ^   * ^   * ^    *                                    ^   *        ^ *
+		//  ^   * ^   * ^   * ^    *  ^    * ^    * ^    * ^    * ^   * ^   *        ^ *
 		//  ".........:.........:.........:.........:.........".........:.........:.........:.........:........."
 	}
 	else
 	{
-		writeRawdata("**\n");
+		writeAsRawData("**");
 	}
 }
 void HESFuelCell::dumpTimestampInto(char* location)
@@ -56,19 +89,23 @@ void HESFuelCell::dumpTimestampInto(char* location)
 }
 void HESFuelCell::dumpDataInto(char* location)
 {
-	strcat(location, volts);//			4
-	strcat(location, "\t");//			1
-	strcat(location, amps);//			4
-	strcat(location, "\t");//			1
-	strcat(location, watts);//			4
-	strcat(location, "\t");//			1
-	strcat(location, energy);//			5
-	strcat(location, "\t");//			1
-	strcat(location, capacitorVolts);//	4
-	strcat(location, "\t");//			1
+	strcat(location, volts);//			5
+	strcat(location, "\t");
+	strcat(location, amps);//			5
+	strcat(location, "\t");
+	strcat(location, watts);//			5
+	strcat(location, "\t");
+	strcat(location, energy);//			6
+	strcat(location, "\t");
+	strcat(location, maxTemperature);//	6
+	strcat(location, "\t");
+	strcat(location, pressure);//		5
+	strcat(location, "\t");
+	strcat(location, capacitorVolts);//	5
+	strcat(location, "\t");
 	strcat(location, status);//			2
-	//									1 (for '\0')
-	//							SUM =  29
+
+	//							SUM =  39
 }
 bool HESFuelCell::hasUpdated()
 {
@@ -76,7 +113,7 @@ bool HESFuelCell::hasUpdated()
 	updated = false;
 	return tmp;
 }
-void HESFuelCell::writeRawdata(char* toWrite)
+void HESFuelCell::writeAsRawData(char* toWrite)
 {
 	if (SD_avail)
 	{
@@ -89,9 +126,23 @@ void HESFuelCell::writeRawdata(char* toWrite)
 
 		File rawFCdata = SD.open(path, FILE_WRITE);
 		rawFCdata.print(toWrite);
+		rawFCdata.print("\n");
 		rawFCdata.close();
 		strcpy(path + FILENAME_HEADER_LENGTH, "");
 	}
+}
+void HESFuelCell::debugPrint(char* buffer, int howMuch)
+{
+	for (int i = 0;i < howMuch;i++)
+	{
+		if (buffer[i] >= 32)Serial.print((char)buffer[i]);
+		else {
+			Serial.print(" _");
+			Serial.print((uint8_t)buffer[i]);
+		}
+
+	}
+	Serial.println();
 }
 
 /* H182_v1.3

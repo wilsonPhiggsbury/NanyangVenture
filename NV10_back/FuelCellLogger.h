@@ -24,10 +24,14 @@ class HESFuelCell
 	 char volts[5];
 	 char watts[5];
 	 char energy[6];
+	 char maxTemperature[6];
+	 char pressure[5];
 	 char capacitorVolts[5];
 	 char status[3];
 	 bool updated;
-	 void writeRawdata(char* toWrite);
+	 void writeAsRawData(char* toWrite);
+
+	 void debugPrint(char* buffer, int howMuch);
 	 
 
  public: 

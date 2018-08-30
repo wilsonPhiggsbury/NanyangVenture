@@ -60,14 +60,14 @@ void DisplayLCD::printData(QueueItem& received)
 			screen.setCursor(4, i + 1);
 			screen.print(strPointer);
 		}
-		// print Apeak
+		// print A
 		for (int i = 0; i < NUM_CURRENTSENSORS; i++)
 		{
 			strPointer = strtok(NULL, "\t");
 			screen.setCursor(9, i + 1);
 			screen.print(strPointer);
 		}
-		// skip A
+		// skip Apeak
 		for (int i = 0; i < NUM_CURRENTSENSORS; i++)
 		{
 			strPointer = strtok(NULL, "\t");

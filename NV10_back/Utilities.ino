@@ -57,7 +57,7 @@ bool initSD(char* path)
 
 	strcpy(path + FILENAME_HEADER_LENGTH, FUELCELL_FILENAME);
 	sub = SD.open(path, FILE_WRITE);
-	sub.println(F("Millis\tV_m\tA_m\tW_m\tWh_m\tVcap_m\tState"));
+	sub.println(F("Millis\tV_m\tA_m\tW_m\tWh_m\tTmp_m\tPres_m\tVcap_m\tState_m\tV_s\tA_s\tW_s\tWh_s\tTmp_s\tPres_s\tVcap_s\tState_s"));
 	sub.close();
 
 	strcpy(path + FILENAME_HEADER_LENGTH, MOTOR_FILENAME);

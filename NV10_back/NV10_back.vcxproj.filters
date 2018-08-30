@@ -15,20 +15,26 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Utilities.ino" />
     <None Include="NV10_back.ino" />
+    <None Include="Utilities.ino" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Behaviour.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="build_options.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="CurrentSensorLogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FuelCellLogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="JoulemeterDisplay.h">
+    <ClInclude Include="Globals.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Behaviour.h">
+    <ClInclude Include="JoulemeterDisplay.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="__vm\.NV10_back.vsarduino.h">
@@ -37,25 +43,19 @@
     <ClInclude Include="Wiring.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Globals.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="build_options.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="FuelCellLogger.cpp">
+    <Text Include="board.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="CurrentSensorLogger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CurrentSensorLogger.cpp">
+    <ClCompile Include="FuelCellLogger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="JoulemeterDisplay.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="board.txt" />
   </ItemGroup>
 </Project>

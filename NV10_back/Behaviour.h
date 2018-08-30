@@ -20,7 +20,7 @@
 #define NUM_CURRENTSENSORS 3
 
 // Declare data struct constants
-#define FUELCELL_DATALEN 70 // (9+29+29) (timestamp + hydrocell1 + hydrocell2)
+#define FUELCELL_DATALEN 88 // (9+39+39+1) (timestamp + hydrocell1 + hydrocell2)
 #define MOTOR_DATALEN 76 // (9 + 3*(5+5+5+7) + 1) (timestamp + motors*(volt + amp + ampPeak + Wh))
 // define structs
 typedef enum
@@ -43,7 +43,7 @@ typedef struct
 
 #define FUELCELL_LOGSEND_INTERVAL 1000 // must be higher than 1000ms, meaningless if send faster than fuel cell data coming in
 #define MOTOR_LOGSEND_INTERVAL 300 // enables furious plotting on PC side, try not to overtax the XBee though
-#define BACK_LCD_REFRESH_INTERVAL 1*MOTOR_LOGSEND_INTERVAL // can be slower, won't look at it often
+#define BACK_LCD_REFRESH_INTERVAL 2*MOTOR_LOGSEND_INTERVAL // can be slower, won't look at it often
 #define HUD_REFRESH_INTERVAL 600 // snappy feedback on board!
 
 // Declare task intervals
