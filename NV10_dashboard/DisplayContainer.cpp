@@ -25,7 +25,7 @@ void DisplayContainer::draw()
 	DisplayElement* thisChild = firstChild;
 	while (thisChild != NULL)
 	{
-		thisChild->draw();
+		thisChild->update("RANDOMSTUFF");
 		thisChild = thisChild->next;
 	}
 }

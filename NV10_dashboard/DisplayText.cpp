@@ -1,53 +1,64 @@
 #include "DisplayText.h"
 
+const int textWidthPerSize = 6;
+const int textHeightPerSize = 8;
 
-
-DisplayText::DisplayText()
+DisplayText::DisplayText(ILI9488* screen, uint16_t xPos, uint16_t yPos, uint16_t width, uint16_t height):DisplayElement(screen, xPos, yPos, width, height)
 {
+	// use superclass constructor to assign all basic values
+	// default settings
+	textRows = textCols = 1;
+	// fill these with rubbish before calling refreshSettings(), which acts as the real initializing function
+	textSize = 0;
+	cursorX = cursorY = 0;
+	refreshSettings();
+}
+void DisplayText::draw()
+{
+	screen->setTextColor(foreground, background); // set BG color as well so that BG can wipe out the old text
+	screen->setTextSize(textSize);
+	screen->setCursor(cursorX, cursorY);
+	screen->print(text);
 	
 }
-void DisplayText::init(ILI9488* screen, uint16_t xPos, uint16_t yPos, uint16_t width, uint16_t height)
+void DisplayText::update(char* value)
 {
-	margin = 12;
-	DisplayElement::init(screen, xPos, yPos, width, height);
-	Serial.println("Initializing text element...");
+	text = value;
+	draw();
+}
+void DisplayText::setTextLength(uint8_t length)
+{
+	textCols = length;
+	refreshSettings();
+}
+void DisplayText::refreshSettings()
+{
+	// clear text box
+	screen->setTextColor(foreground, background);
+	screen->setTextSize(textSize);
+	screen->setCursor(cursorX, cursorY);
+	for (int i = 0; i < text.length(); i++)
+		screen->print(" ");
 	// a char of text size 1 is 6px * 8px (H * V), which is ratio 3 / 4
 	if (width > height * 3 / 4)
 	{
-		// take text size using height, 1/3 margin included 
-		textSize = (height - margin) / 8;
+		// take text size using height, margin excluded 
+		textSize = (height - margin) / textHeightPerSize / textRows;
 		Serial.println("Height < Width, take height");
 	}
 	else
 	{
-		// take text size using width, 1/3 margin included 
-		textSize = (width - margin) / 6;
+		// take text size using width, margin excluded 
+		textSize = (width - margin) / textWidthPerSize / textCols;
 		Serial.println("Width < Height, take width.");
 	}
 	Serial.print("Text size: ");
 	Serial.println(textSize);
 
-	cursorX = xPos + width / 2 - textSize * 6 / 2;
-	cursorY = yPos + height / 2 - textSize * 8 / 2;
+	cursorX = xPos + width / 2 - textCols * textSize * textWidthPerSize / 2;
+	cursorY = yPos + height / 2 - textRows * textSize * textHeightPerSize / 2;
+}
 
-	screen->setTextColor(ILI9488_WHITE, ILI9488_BLACK); // set white as font color, black as font BG so that BG can wipe out the old text
-	screen->setTextSize(textSize);
-}
-void DisplayText::draw()
-{
-	screen->setCursor(cursorX - (text.length()-1)*textSize*6/2, cursorY);
-	screen->print(text);
-	//screen->print(textSize);
-	//screen->print(" ");
-	//screen->print(cursorX);
-	//screen->print(" ");
-	//screen->print(cursorY);
-	//screen->print(" ");
-}
-void DisplayText::update(char* value)
-{
-	text = value;
-}
 DisplayText::~DisplayText()
 {
 }

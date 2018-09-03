@@ -20,7 +20,6 @@ void setup() {
 	digitalWrite(screenLED, HIGH);
 	Serial.begin(9600);
 	delay(1000);
-	Serial.println("DONE INIT");
 	// 480 x 320 pixels
 	/*Dashboard Info
 		Fuel cell info x2
@@ -42,7 +41,7 @@ void setup() {
 	xTaskCreate(
 		TaskRefreshScreen
 		, (const portCHAR *)"Refresh"  // A name just for humans
-		, 250  // This stack size can be checked & adjusted by reading the Stack Highwater
+		, 500  // This stack size can be checked & adjusted by reading the Stack Highwater
 		, NULL // Any pointer to pass in
 		, 2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
 		, NULL);
@@ -56,27 +55,40 @@ void loop() {
 }
 void TaskRefreshScreen(void* pvParameters)
 {
-	ILI9488 testScreen = ILI9488(10, 7, 8);
-	testScreen.begin();
-	testScreen.setRotation(1);
-	testScreen.fillScreen(ILI9488_BLACK);
+	ILI9488 leftScreen = ILI9488(10, 7, 8);
+	leftScreen.begin();
+	leftScreen.setRotation(3);
+	leftScreen.fillScreen(ILI9488_BLACK);
 
-	DisplayText testElement = DisplayText();
-	DisplayText testElement2 = DisplayText();
-	testElement.init(&testScreen, 0, 0, 240, 50);
-	testElement2.init(&testScreen, 240, 0, 240, 50);
+	DisplayText testElement1 = DisplayText(&leftScreen, 0, 0, 50, 320);
+	DisplayText testElement2 = DisplayText(&leftScreen, 50, 0, 190, 50);
+	DisplayText testElement3 = DisplayText(&leftScreen, 240, 0, 50, 320);
+	DisplayText testElement4 = DisplayText(&leftScreen, 290, 0, 190, 50);
+	testElement1.setMargin(6);
+	testElement2.setMargin(12);
+	testElement3.setMargin(6);
+	testElement4.setMargin(10);
+	testElement1.setTextLength(2);
+	testElement2.setTextLength(4);
+	testElement3.setTextLength(2);
+	testElement4.setTextLength(5);
+
 	while (1)
 	{
-		testElement2.update("12.4");
-		testElement.update("50.0");
-		testElement.draw();
-		testElement2.draw();
+		testElement1.setColors(ILI9488_WHITE, ILI9488_RED);
+		testElement3.setColors(ILI9488_WHITE, ILI9488_MAGENTA);
+		testElement1.update("SD");
+		testElement2.update("----");
+		testElement3.update("x(");
+		testElement4.update("DEAD");
 		vTaskDelay(pdMS_TO_TICKS(1000));
-		testElement.update("XXOX");
-		testElement2.update("OOXO");
-		testElement.draw();
-		testElement2.draw();
-		vTaskDelay(pdMS_TO_TICKS(1000));
+		testElement1.setColors(ILI9488_BLACK, ILI9488_GREEN);
+		testElement3.setColors(ILI9488_BLACK, ILI9488_GREENYELLOW);
+		testElement1.update("OP");
+		testElement2.update("55.2");
+		testElement3.update(":)");
+		testElement4.update("ALIVE");
+		vTaskDelay(pdMS_TO_TICKS(2000));
 	}
 }
 void TaskReadCAN(void* pvParameters)
