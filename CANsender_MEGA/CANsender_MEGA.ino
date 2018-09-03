@@ -6,18 +6,17 @@ Author:	MX
 #include <mcp_can_dfs.h>
 #include <mcp_can.h>
 #include <Arduino_FreeRTOS.h>
-#include <Adafruit_GFX.h>
 
 #include <SPI.h>
 
 void TaskQueueOutputData(void *pvParameters __attribute__((unused)));
-MCP_CAN CAN0 = MCP_CAN(7);
+MCP_CAN CAN0 = MCP_CAN(48);
 bool CAN_incoming = false;
 void CAN_ISR();
 void setup() {
 	Serial.begin(9600);
 	delay(1000);
-	if (CAN0.begin(CAN_1000KBPS) == CAN_OK)
+	if (CAN0.begin(CAN_250KBPS) == CAN_OK)
 	{
 		Serial.println("CAN sender MEGA initialized.");
 	}
@@ -26,7 +25,7 @@ void setup() {
 		Serial.println("CAN INIT fail");
 		while (1);
 	}
-	attachInterrupt(digitalPinToInterrupt(20), CAN_ISR, FALLING);
+	attachInterrupt(digitalPinToInterrupt(19), CAN_ISR, FALLING);
 
 	xTaskCreate(
 		TaskQueueOutputData

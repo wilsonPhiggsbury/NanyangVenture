@@ -14,9 +14,10 @@
 
 void TaskRefreshScreen(void* pvParameters);
 void TaskReadCAN(void* pvParameters);
+const int screenLED = 9;
 void setup() {
-	pinMode(6, OUTPUT);
-	digitalWrite(6, HIGH);
+	pinMode(screenLED, OUTPUT);
+	digitalWrite(screenLED, HIGH);
 	Serial.begin(9600);
 	delay(1000);
 	Serial.println("DONE INIT");
@@ -55,17 +56,26 @@ void loop() {
 }
 void TaskRefreshScreen(void* pvParameters)
 {
-	ILI9488 testScreen = ILI9488(4, 5, 3);
+	ILI9488 testScreen = ILI9488(10, 7, 8);
+	testScreen.begin();
+	testScreen.setRotation(1);
+	testScreen.fillScreen(ILI9488_BLACK);
 
 	DisplayText testElement = DisplayText();
-	testElement.init(&testScreen, 0, 0, 200, 50);
+	DisplayText testElement2 = DisplayText();
+	testElement.init(&testScreen, 0, 0, 240, 50);
+	testElement2.init(&testScreen, 240, 0, 240, 50);
 	while (1)
 	{
+		testElement2.update("12.4");
 		testElement.update("50.0");
 		testElement.draw();
+		testElement2.draw();
 		vTaskDelay(pdMS_TO_TICKS(1000));
 		testElement.update("XXOX");
+		testElement2.update("OOXO");
 		testElement.draw();
+		testElement2.draw();
 		vTaskDelay(pdMS_TO_TICKS(1000));
 	}
 }

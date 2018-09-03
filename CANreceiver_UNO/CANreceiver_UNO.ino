@@ -64,12 +64,12 @@ void TaskQueueOutputData(void *pvParameters __attribute__((unused)))  // This is
 			for (int i = 0;i < 8;i++)
 			{
 				outBuffer[i] = data[i];
-			}
+			}/*
 			byte sentStat = CAN0.sendMsgBuf(0x001, 0, 8, outBuffer);
 			if (sentStat == CAN_OK)
 				Serial.println("Response Sent.");
 			else
-				Serial.println("Response NOT sent.");
+				Serial.println("Response NOT sent.");*/
 			CAN_incoming = false;
 		}
 		else if (CAN_incoming == -1)

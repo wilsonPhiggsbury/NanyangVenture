@@ -1,4 +1,4 @@
-C:\Users\MX\AppData\Local\Temp\VMBuilds\CANsender_MEGA\uno\Debug\FreeRTOS\tasks.c.o: \
+C:\Users\MX\AppData\Local\Temp\VMBuilds\CANsender_MEGA\mega_atmega2560\Debug\FreeRTOS\tasks.c.o: \
  D:\Arduino\Projects\libraries\FreeRTOS\src\tasks.c \
  D:\Arduino\Projects\libraries\FreeRTOS\src\Arduino_FreeRTOS.h \
  D:\Arduino\Projects\libraries\FreeRTOS\src\FreeRTOSConfig.h \

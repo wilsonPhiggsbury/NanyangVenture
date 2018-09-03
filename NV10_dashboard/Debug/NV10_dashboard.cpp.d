@@ -155,6 +155,7 @@ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_dashboard\arduino_due_x_dbg\Debug\N
  D:\Arduino\Projects\libraries\Adafruit_GFX_Library/Adafruit_GFX.h \
  D:\Arduino\Projects\libraries\Adafruit_GFX_Library/gfxfont.h \
  C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_dashboard\arduino_due_x_dbg\Debug\DisplayContainer.h \
+ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_dashboard\arduino_due_x_dbg\Debug\DisplayElement.h \
+ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_dashboard\arduino_due_x_dbg\Debug\DisplayText.h \
  C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_dashboard\arduino_due_x_dbg\Debug\DisplayGauge.h \
- C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_dashboard\arduino_due_x_dbg\Debug\DisplayContainerElement.h \
  C:\Program\ Files\ (x86)\Microsoft\ Visual\ Studio\2017\Enterprise\Common7\IDE\Extensions\pd4xo3tv.r1p\Micro\ Platforms\default\debuggers\VM_DBG/VM_DBG.h

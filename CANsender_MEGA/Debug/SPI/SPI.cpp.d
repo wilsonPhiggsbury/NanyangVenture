@@ -1,4 +1,4 @@
-C:\Users\MX\AppData\Local\Temp\VMBuilds\CANsender_MEGA\uno\Debug\SPI\SPI.cpp.o: \
+C:\Users\MX\AppData\Local\Temp\VMBuilds\CANsender_MEGA\mega_atmega2560\Debug\SPI\SPI.cpp.o: \
  D:\Arduino\ide\hardware\arduino\avr\libraries\SPI\src\SPI.cpp \
  D:\Arduino\ide\hardware\arduino\avr\libraries\SPI\src\SPI.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Arduino.h \
@@ -11,4 +11,4 @@ C:\Users\MX\AppData\Local\Temp\VMBuilds\CANsender_MEGA\uno\Debug\SPI\SPI.cpp.o: 
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Printable.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/USBAPI.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Arduino.h \
- D:\Arduino\ide\hardware\arduino\avr\variants\standard/pins_arduino.h
+ D:\Arduino\ide\hardware\arduino\avr\variants\mega/pins_arduino.h

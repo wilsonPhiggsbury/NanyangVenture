@@ -1,4 +1,4 @@
-C:\Users\MX\AppData\Local\Temp\VMBuilds\CANsender_MEGA\uno\Debug\FreeRTOS\variantHooks.cpp.o: \
+C:\Users\MX\AppData\Local\Temp\VMBuilds\CANsender_MEGA\mega_atmega2560\Debug\FreeRTOS\variantHooks.cpp.o: \
  D:\Arduino\Projects\libraries\FreeRTOS\src\variantHooks.cpp \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Arduino.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/binary.h \
@@ -10,7 +10,7 @@ C:\Users\MX\AppData\Local\Temp\VMBuilds\CANsender_MEGA\uno\Debug\FreeRTOS\varian
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Printable.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/USBAPI.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Arduino.h \
- D:\Arduino\ide\hardware\arduino\avr\variants\standard/pins_arduino.h \
+ D:\Arduino\ide\hardware\arduino\avr\variants\mega/pins_arduino.h \
  D:\Arduino\Projects\libraries\FreeRTOS\src\Arduino_FreeRTOS.h \
  D:\Arduino\Projects\libraries\FreeRTOS\src\FreeRTOSConfig.h \
  D:\Arduino\Projects\libraries\FreeRTOS\src\projdefs.h \

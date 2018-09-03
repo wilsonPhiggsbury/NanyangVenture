@@ -1,4 +1,4 @@
-C:\Users\MX\AppData\Local\Temp\VMBuilds\CANsender_MEGA\uno\Debug\MCP_CAN_lib\mcp_can.cpp.o: \
+C:\Users\MX\AppData\Local\Temp\VMBuilds\CANsender_MEGA\mega_atmega2560\Debug\MCP_CAN_lib\mcp_can.cpp.o: \
  D:\Arduino\Projects\libraries\MCP_CAN_lib\mcp_can.cpp \
  D:\Arduino\Projects\libraries\MCP_CAN_lib\mcp_can.h \
  D:\Arduino\Projects\libraries\MCP_CAN_lib\mcp_can_dfs.h \
@@ -12,5 +12,5 @@ C:\Users\MX\AppData\Local\Temp\VMBuilds\CANsender_MEGA\uno\Debug\MCP_CAN_lib\mcp
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Printable.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/USBAPI.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Arduino.h \
- D:\Arduino\ide\hardware\arduino\avr\variants\standard/pins_arduino.h \
+ D:\Arduino\ide\hardware\arduino\avr\variants\mega/pins_arduino.h \
  D:\Arduino\ide\hardware\arduino\avr\libraries\SPI\src/SPI.h

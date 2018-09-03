@@ -139,4 +139,5 @@ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_dashboard\arduino_due_x_dbg\Debug\D
  D:\Arduino\ide\portable\packages\arduino\hardware\sam\1.6.11\cores\arduino/Stream.h \
  D:\Arduino\ide\portable\packages\arduino\hardware\sam\1.6.11\cores\arduino/Print.h \
  D:\Arduino\Projects\libraries\Adafruit_GFX_Library/Adafruit_GFX.h \
- D:\Arduino\Projects\libraries\Adafruit_GFX_Library/gfxfont.h
+ D:\Arduino\Projects\libraries\Adafruit_GFX_Library/gfxfont.h \
+ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_dashboard\arduino_due_x_dbg\Debug\DisplayElement.h

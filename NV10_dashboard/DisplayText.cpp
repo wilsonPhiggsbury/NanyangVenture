@@ -8,19 +8,20 @@ DisplayText::DisplayText()
 }
 void DisplayText::init(ILI9488* screen, uint16_t xPos, uint16_t yPos, uint16_t width, uint16_t height)
 {
+	margin = 12;
 	DisplayElement::init(screen, xPos, yPos, width, height);
 	Serial.println("Initializing text element...");
 	// a char of text size 1 is 6px * 8px (H * V), which is ratio 3 / 4
 	if (width > height * 3 / 4)
 	{
 		// take text size using height, 1/3 margin included 
-		textSize = height * 2 / 3 / 8;
+		textSize = (height - margin) / 8;
 		Serial.println("Height < Width, take height");
 	}
 	else
 	{
 		// take text size using width, 1/3 margin included 
-		textSize = width * 2 / 3 / 6;
+		textSize = (width - margin) / 6;
 		Serial.println("Width < Height, take width.");
 	}
 	Serial.print("Text size: ");

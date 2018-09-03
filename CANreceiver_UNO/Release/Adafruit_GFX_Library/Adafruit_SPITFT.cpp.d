@@ -1,4 +1,4 @@
-C:\Users\MX\AppData\Local\Temp\VMBuilds\ScratchPad2\uno\Release\Adafruit_GFX_Library\Adafruit_SPITFT.cpp.o: \
+C:\Users\MX\AppData\Local\Temp\VMBuilds\CANreceiver_UNO\uno\Release\Adafruit_GFX_Library\Adafruit_SPITFT.cpp.o: \
  D:\Arduino\Projects\libraries\Adafruit_GFX_Library\Adafruit_SPITFT.cpp \
  D:\Arduino\Projects\libraries\Adafruit_GFX_Library\Adafruit_SPITFT.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Arduino.h \
