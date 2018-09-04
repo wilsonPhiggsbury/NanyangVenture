@@ -1,6 +1,6 @@
-			FM				FS
-	millis		V	A	W	Wh	V	A	W	Wh	<-- top two rows written from PROGMEM constant, not sent
-FC	FFFFEEEE	02.3	23.1	9038	29399	02.3	23.1	9038	29399
+			FM					FS
+	millis		V	A	W	Wh		V	A	W	Wh	<-- top two rows written from PROGMEM constant, not sent
+FC	FFFFEEEE	02.3	23.1	9038	29399		02.3	23.1	9038	29399
 
 
 

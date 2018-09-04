@@ -156,5 +156,6 @@ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_dashboard\arduino_due_x_dbg\Release
  D:\Arduino\Projects\libraries\Adafruit_GFX_Library/gfxfont.h \
  C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_dashboard\arduino_due_x_dbg\Release\DisplayContainer.h \
  C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_dashboard\arduino_due_x_dbg\Release\DisplayElement.h \
+ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_dashboard\arduino_due_x_dbg\Release\DisplayBar.h \
  C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_dashboard\arduino_due_x_dbg\Release\DisplayText.h \
  C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_dashboard\arduino_due_x_dbg\Release\DisplayGauge.h

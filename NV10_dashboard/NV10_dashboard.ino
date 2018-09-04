@@ -9,6 +9,7 @@
 #include <FreeRTOS_ARM.h>
 #include <ILI9488.h>
 #include "DisplayContainer.h"
+#include "DisplayBar.h""
 #include "DisplayText.h"
 #include "DisplayGauge.h"
 
@@ -62,33 +63,42 @@ void TaskRefreshScreen(void* pvParameters)
 
 	DisplayText testElement1 = DisplayText(&leftScreen, 0, 0, 50, 320);
 	DisplayText testElement2 = DisplayText(&leftScreen, 50, 0, 190, 50);
-	DisplayText testElement3 = DisplayText(&leftScreen, 240, 0, 50, 320);
+	DisplayBar testElement3 = DisplayBar(&leftScreen, 240, 100, 240, 50);
 	DisplayText testElement4 = DisplayText(&leftScreen, 290, 0, 190, 50);
+
+
 	testElement1.setMargin(6);
 	testElement2.setMargin(12);
 	testElement3.setMargin(6);
 	testElement4.setMargin(10);
-	testElement1.setTextLength(2);
-	testElement2.setTextLength(4);
-	testElement3.setTextLength(2);
-	testElement4.setTextLength(5);
+
+	testElement3.setRange(0,100);
+	testElement3.setOrientation(DisplayBar::RIGHT_TO_LEFT);
 
 	while (1)
 	{
+		char randStr[4];
+		itoa(random(0,100), randStr, 10);
 		testElement1.setColors(ILI9488_WHITE, ILI9488_RED);
-		testElement3.setColors(ILI9488_WHITE, ILI9488_MAGENTA);
+		testElement3.setColors(ILI9488_CYAN, ILI9488_BLACK);
 		testElement1.update("SD");
 		testElement2.update("----");
-		testElement3.update("x(");
+		testElement3.update(randStr);
 		testElement4.update("DEAD");
-		vTaskDelay(pdMS_TO_TICKS(1000));
+		vTaskDelay(pdMS_TO_TICKS(300));
+		itoa(random(0, 100), randStr, 10);
 		testElement1.setColors(ILI9488_BLACK, ILI9488_GREEN);
-		testElement3.setColors(ILI9488_BLACK, ILI9488_GREENYELLOW);
+		testElement3.setColors(ILI9488_WHITE, ILI9488_BLACK);
 		testElement1.update("OP");
 		testElement2.update("55.2");
-		testElement3.update(":)");
+		testElement3.update(randStr);
 		testElement4.update("ALIVE");
-		vTaskDelay(pdMS_TO_TICKS(2000));
+		vTaskDelay(pdMS_TO_TICKS(300));
+
+		itoa(random(0, 100), randStr, 10);
+		testElement3.update(randStr);
+		vTaskDelay(pdMS_TO_TICKS(300));
+
 	}
 }
 void TaskReadCAN(void* pvParameters)

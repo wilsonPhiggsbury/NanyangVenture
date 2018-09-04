@@ -16,9 +16,10 @@ void DisplayGauge::setRange(uint16_t minVal, uint16_t maxVal)
 }
 void DisplayGauge::draw()
 {
+
 }
 
 bool DisplayGauge::update(uint16_t value)
 {
-	if (!inRange(value))return false;
+	
 }

@@ -2,19 +2,15 @@
 
 DisplayElement::DisplayElement(ILI9488* screen, uint16_t xPos, uint16_t yPos, uint16_t width, uint16_t height):screen(screen),xPos(xPos),yPos(yPos),width(width),height(height)
 {
-	margin = 12;
-	borderStroke = 3;
-	borderFill = ILI9488_WHITE;
-	for (uint8_t pixels = 0; pixels < borderStroke; pixels++)
-		screen->drawRect(xPos + pixels, yPos + pixels, width - 2 * pixels, height - 2 * pixels, borderFill);
-
-	foreground = ILI9488_WHITE;
-	background = ILI9488_BLACK;
 }
 
 DisplayElement::~DisplayElement()
 {
 	
+}
+void DisplayElement::init()
+{
+	drawBorder(borderStroke, borderFill);
 }
 void DisplayElement::drawBorder(uint8_t stroke, uint16_t fill)
 {
