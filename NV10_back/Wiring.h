@@ -5,8 +5,8 @@
 // Wiring naming convention: DEVICE_PINTYPE_PINNAME
 
 // internal use, no exterior connections should be made to these pins
-#define SD_SPI_CS 4			// used by shield for SD card
-#define CAN_CS 46			// used by CAN shield
+#define SD_SPI_CS_PIN 4			// used by shield for SD card
+#define CAN_CS_PIN 46			// used by CAN shield
 #define CAN_INTERRUPT_PIN 19
 //#define TFT1_SPI_RS 23
 //#define TFT1_SPI_RST 25

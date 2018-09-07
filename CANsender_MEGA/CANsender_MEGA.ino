@@ -9,7 +9,7 @@ Author:	MX
 
 #include <SPI.h>
 
-void TaskQueueOutputData(void *pvParameters __attribute__((unused)));
+void QueueOutputData(void *pvParameters __attribute__((unused)));
 MCP_CAN CAN0 = MCP_CAN(48);
 bool CAN_incoming = false;
 void CAN_ISR();
@@ -28,7 +28,7 @@ void setup() {
 	attachInterrupt(digitalPinToInterrupt(19), CAN_ISR, FALLING);
 
 	xTaskCreate(
-		TaskQueueOutputData
+		QueueOutputData
 		, (const portCHAR *)"Enqueue"  // A name just for humans
 		, 400  // This stack size can be checked & adjusted by reading the Stack Highwater
 		, NULL
@@ -41,7 +41,7 @@ void loop() {
 
 }
 
-void TaskQueueOutputData(void *pvParameters __attribute__((unused)))  // This is a Task.
+void QueueOutputData(void *pvParameters __attribute__((unused)))  // This is a Task.
 {
 	uint8_t msgLength = 8;
 	byte outBuffer[8];

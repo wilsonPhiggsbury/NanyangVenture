@@ -234,5 +234,6 @@ __attribute__((always_inline)) static __INLINE void __set_PRIMASK(uint32_t priMa
 
 
 #include "NV10_dashboard.ino"
+#include "Dashboard_Tasks.ino"
 #endif
 #endif

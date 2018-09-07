@@ -15,15 +15,12 @@ void AttopilotCurrentSensor::logData()
 	ampReading = analogRead(ampPin);
 
 	ampPeak = max(ampReading, ampPeak);
-	// totalEnergy += timeDiff (milliseconds) * V * I	<-- to convert to Wh, please divide by 3600000. Current form is only for convenience of storage
-	if (timeStamp != 0)
+	/*if (timeStamp != 0)
 	{
 		float usedEnergy = rawToVA('V', voltReading) * rawToVA('A', ampReading);
 		usedEnergy *= (millis() - timeStamp);
 		totalEnergy +=  usedEnergy;
-	}
-	//if (totalEnergy > 180000000)
-	//	Serial.println(millis());
+	}*/
 	timeStamp = millis();
 }
 
@@ -33,38 +30,34 @@ void AttopilotCurrentSensor::dumpTimestampInto(char* location)
 	ultoa(timeStamp, tmp, 16);
 	strcat(location, tmp);
 }
-void AttopilotCurrentSensor::dumpVoltReadingInto(char *location)
+void AttopilotCurrentSensor::dumpDataInto(char* location)
 {
 	float finalReading;
 	char tmp[6];
-	finalReading = rawToVA('V', voltReading);
-	dtostrf(finalReading, 4, 1, tmp);
-	strcat(location, tmp);
+
+	dumpAttributeInto(location, voltReading, 'V');
+	dumpAttributeInto(location, ampReading, 'A');
+	dumpAttributeInto(location, ampPeak, 'A');
 }
-void AttopilotCurrentSensor::dumpAmpReadingInto(char *location)
+void AttopilotCurrentSensor::dumpAttributeInto(char* location, uint16_t attribute, char conversionType)
 {
 	float finalReading;
 	char tmp[6];
-	finalReading = rawToVA('A', ampReading);
+
+	strcat(location, "\t");
+	finalReading = rawToVA(conversionType, attribute);
 	dtostrf(finalReading, 4, 1, tmp);
 	strcat(location, tmp);
 }
-void AttopilotCurrentSensor::dumpAmpPeakInto(char *location)
-{
-	float finalReading = rawToVA('A', ampPeak);
-	char tmp[6];
-	dtostrf(finalReading, 4, 1, tmp);
-	strcat(location, tmp);
-}
-void AttopilotCurrentSensor::dumpTotalEnergyInto(char *location)
-{
-	//float finalReading = rawToVA('A', ampPeak);
-	// TODO: there is place for optimization by postponing calculate raw first until truly dumping data
-	char tmp[6];
-	float whr = totalEnergy / 3600000;
-	dtostrf(whr, 6, 1, tmp);
-	strcat(location, tmp);
-}
+//void AttopilotCurrentSensor::dumpTotalEnergyInto(char *location)
+//{
+//	//float finalReading = rawToVA('A', ampPeak);
+//	// TODO: there is place for optimization by postponing calculate raw first until truly dumping data
+//	char tmp[6];
+//	float whr = totalEnergy / 3600000;
+//	dtostrf(whr, 6, 1, tmp);
+//	strcat(location, tmp);
+//}
 float AttopilotCurrentSensor::rawToVA(char which, float reading)
 {
 	float first, last, step, maxIndex;

@@ -150,12 +150,19 @@ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_dashboard\arduino_due_x_dbg\Release
  D:\Arduino\Projects\libraries\FreeRTOS_ARM\src/utility/semphr.h \
  D:\Arduino\Projects\libraries\FreeRTOS_ARM\src/utility/queue.h \
  D:\Arduino\Projects\libraries\FreeRTOS_ARM\src/utility/portmacro.h \
+ D:\Arduino\Projects\libraries\MCP_CAN_lib/mcp_can.h \
+ D:\Arduino\Projects\libraries\MCP_CAN_lib/mcp_can_dfs.h \
+ D:\Arduino\ide\portable\packages\arduino\hardware\sam\1.6.11\libraries\SPI\src/SPI.h \
  D:\Arduino\Projects\libraries\ILI9488/ILI9488.h \
  D:\Arduino\ide\portable\packages\arduino\hardware\sam\1.6.11\cores\arduino/Print.h \
  D:\Arduino\Projects\libraries\Adafruit_GFX_Library/Adafruit_GFX.h \
  D:\Arduino\Projects\libraries\Adafruit_GFX_Library/gfxfont.h \
+ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_dashboard\arduino_due_x_dbg\Release\Wiring_Dashboard.h \
+ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_dashboard\arduino_due_x_dbg\Release\Behaviour_Dashboard.h \
+ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_dashboard\arduino_due_x_dbg\Release\CAN_ID_protocol.h \
  C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_dashboard\arduino_due_x_dbg\Release\DisplayContainer.h \
  C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_dashboard\arduino_due_x_dbg\Release\DisplayElement.h \
  C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_dashboard\arduino_due_x_dbg\Release\DisplayBar.h \
  C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_dashboard\arduino_due_x_dbg\Release\DisplayText.h \
- C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_dashboard\arduino_due_x_dbg\Release\DisplayGauge.h
+ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_dashboard\arduino_due_x_dbg\Release\DisplayGauge.h \
+ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_dashboard\arduino_due_x_dbg\Release\Bitmaps.h

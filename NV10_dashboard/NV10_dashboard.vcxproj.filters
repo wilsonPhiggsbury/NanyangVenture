@@ -16,42 +16,55 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="NV10_dashboard.ino" />
+    <None Include="Dashboard_Tasks.ino" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="DisplayContainer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DisplayText.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DisplayBar.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DisplayGauge.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DisplayElement.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="DisplayContainer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="__vm\.NV10_dashboard.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DisplayText.h">
+    <ClInclude Include="Bitmaps.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DisplayBar.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DisplayGauge.h">
+    <ClInclude Include="DisplayContainer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DisplayElement.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DisplayGauge.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DisplayText.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\NV10_back\CAN_ID_protocol.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Wiring_Dashboard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Behaviour_Dashboard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="DisplayBar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DisplayContainer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DisplayElement.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DisplayGauge.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DisplayText.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

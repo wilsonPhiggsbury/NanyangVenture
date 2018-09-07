@@ -14,6 +14,18 @@ void DisplayBar::update(char* value)
 }
 void DisplayBar::draw()
 {
+	//Serial.print("thisVal: ");
+	//Serial.print(thisValue);
+	// For LEFT_TO_RIGHT facing bars, value incremented
+	//Serial.print("X: ");
+	//Serial.print(xPos + margin + floor(toWidthScale(prevValue)));
+	//Serial.print("Y: ");
+	//Serial.print(yPos + margin);
+	//Serial.print("WIDTH: ");
+	//Serial.print(ceil(toWidthScale(thisValue - prevValue)));
+	//Serial.print("HEIGHT: ");
+	//Serial.print(actualHeight);
+	//Serial.println();
 	if (facing == -1)
 	{
 		if (thisValue > prevValue)
@@ -89,5 +101,5 @@ void DisplayBar::refreshSettings()
 }
 float DisplayBar::toWidthScale(float value)
 {
-	return (value - minVal) / (maxVal - minVal) * actualWidth;
+	return value / maxVal * actualWidth;
 }

@@ -46,10 +46,10 @@ void DisplayLCD::printData(QueueItem& received)
 	char* strPointer;
 	switch (received.ID)
 	{
-	case FuelCell:
+	case FC:
 
 		break;
-	case Motor:
+	case CS:
 		if (NUM_CURRENTSENSORS > 3)
 			debug(F("Not enough place to print motor data!"));
 		// print V
@@ -60,17 +60,17 @@ void DisplayLCD::printData(QueueItem& received)
 			screen.setCursor(4, i + 1);
 			screen.print(strPointer);
 		}
-		// print A
+		// skip A
+		for (int i = 0; i < NUM_CURRENTSENSORS; i++)
+		{
+			strPointer = strtok(NULL, "\t");
+		}
+		// print Apeak
 		for (int i = 0; i < NUM_CURRENTSENSORS; i++)
 		{
 			strPointer = strtok(NULL, "\t");
 			screen.setCursor(9, i + 1);
 			screen.print(strPointer);
-		}
-		// skip Apeak
-		for (int i = 0; i < NUM_CURRENTSENSORS; i++)
-		{
-			strPointer = strtok(NULL, "\t");
 		}
 		// print Wh
 		for (int i = 0; i < NUM_CURRENTSENSORS; i++)

@@ -10,7 +10,7 @@ void wipeEEPROM()
 bool initSD(char* path)
 {
 	const uint8_t FILENAME_INDEX = 4;
-	if (!SD.begin(SD_SPI_CS))
+	if (!SD.begin(SD_SPI_CS_PIN))
 	{
 		return false;
 	}
@@ -76,4 +76,8 @@ bool initSD(char* path)
 	// Clean up trailing file names after use.
 	strcpy(path + FILENAME_HEADER_LENGTH, "");
 	return true;
+}
+void storeWheelInterval_ISR()
+{
+	speedo.storeWheelInterval();
 }

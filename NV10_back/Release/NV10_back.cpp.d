@@ -12,6 +12,11 @@ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Release\NV10_b
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/USBAPI.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Arduino.h \
  D:\Arduino\ide\hardware\arduino\avr\variants\mega/pins_arduino.h \
+ D:\Arduino\Projects\libraries\MCP_CAN_lib/mcp_can.h \
+ D:\Arduino\Projects\libraries\MCP_CAN_lib/mcp_can_dfs.h \
+ D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Arduino.h \
+ D:\Arduino\ide\hardware\arduino\avr\libraries\SPI\src/SPI.h \
+ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Release\CAN_ID_protocol.h \
  D:\Arduino\Projects\libraries\FreeRTOS\src/Arduino_FreeRTOS.h \
  D:\Arduino\Projects\libraries\FreeRTOS\src/FreeRTOSConfig.h \
  D:\Arduino\Projects\libraries\FreeRTOS\src/projdefs.h \
@@ -21,11 +26,8 @@ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Release\NV10_b
  D:\Arduino\Projects\libraries\FreeRTOS\src/FreeRTOSVariant.h \
  D:\Arduino\Projects\libraries\FreeRTOS\src/task.h \
  D:\Arduino\Projects\libraries\FreeRTOS\src/list.h \
- D:\Arduino\Projects\libraries\FreeRTOS\src/semphr.h \
- D:\Arduino\Projects\libraries\FreeRTOS\src/queue.h \
  D:\Arduino\Projects\libraries\FreeRTOS\src/queue.h \
  D:\Arduino\Projects\libraries\Adafruit_GFX_Library/Adafruit_GFX.h \
- D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Arduino.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Print.h \
  D:\Arduino\Projects\libraries\Adafruit_GFX_Library/gfxfont.h \
  D:\Arduino\Projects\libraries\TFT_ILI9163C/TFT_ILI9163C.h \
@@ -44,10 +46,10 @@ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Release\NV10_b
  D:\Arduino\ide\hardware\arduino\avr\libraries\EEPROM\src/EEPROM.h \
  C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Release\JoulemeterDisplay.h \
  C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Release\Behaviour.h \
- D:\Arduino\ide\hardware\arduino\avr\libraries\SPI\src/SPI.h \
  D:\Arduino\ide\hardware\arduino\avr\libraries\Wire\src/Wire.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Stream.h \
  C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Release\CurrentSensorLogger.h \
  C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Release\FuelCellLogger.h \
  C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Release\Globals.h \
+ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Release\Speedometer.h \
  C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Release\Wiring.h

@@ -17,6 +17,7 @@
   <ItemGroup>
     <None Include="NV10_back.ino" />
     <None Include="Utilities.ino" />
+    <None Include="Back_Tasks.ino" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Behaviour.h">
@@ -43,6 +44,15 @@
     <ClInclude Include="Wiring.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Speedometer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\NV10_dashboard\CAN_address_protocol.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CAN_ID_protocol.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="board.txt" />
@@ -55,6 +65,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="JoulemeterDisplay.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Speedometer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

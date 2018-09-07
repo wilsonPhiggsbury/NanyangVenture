@@ -164,15 +164,14 @@ private:
 	float totalEnergy = 0; 
 	float rawToVA(char which, float reading);
 	unsigned long timeStamp;
+	void dumpAttributeInto(char * location, uint16_t attribute, char conversionType);
 
 public:
 	AttopilotCurrentSensor(int motorID, uint8_t voltPin, uint8_t ampPin);
 	uint8_t id;
 	void logData();
 	void dumpTimestampInto(char* location);
-	void dumpVoltReadingInto(char * location);
-	void dumpAmpReadingInto(char * location);
-	void dumpAmpPeakInto(char * location);
-	void dumpTotalEnergyInto(char * location);
+	void dumpDataInto(char * location);
+	//void dumpTotalEnergyInto(char * location);
 
 };
