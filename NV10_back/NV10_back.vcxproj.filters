@@ -47,9 +47,6 @@
     <ClInclude Include="Speedometer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\NV10_dashboard\CAN_address_protocol.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="CAN_ID_protocol.h">
       <Filter>Header Files</Filter>
     </ClInclude>

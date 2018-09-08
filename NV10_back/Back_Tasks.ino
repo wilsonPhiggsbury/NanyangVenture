@@ -102,6 +102,7 @@ void QueueOutputData(void *pvParameters)
 			}
 			xQueueSend(queueForLogSend, &outgoing, 100);
 			xQueueSend(queueForDisplay, &outgoing, 100);
+			xQueueSend(queueForSendCAN, &outgoing, 100);
 			//if (syncCounter % (back_lcd_refresh) == 0)
 			//{
 			//	for (int i = 0; i < NUM_CURRENTSENSORS; i++)
@@ -177,47 +178,68 @@ void DisplayData(void *pvParameters)
 		vTaskDelay(delay);
 	}
 }
-void SendCANFrame(void *pvParameters __attribute__((unused)))  // This is a Task.
-{
-	QueueItem received;
-	TickType_t delay = pdMS_TO_TICKS(CAN_FRAME_INTERVAL); // delay 300 ms, shorter than reading/queueing tasks since this task has lower priority
-	if (CANObj.begin(MCP_ANY, CAN_1000KBPS, MCP_16MHZ) != CAN_OK)
-	{
-		Serial.println(F("NV10_back CAN init fail!"));
-		vTaskSuspend(NULL);
-	}
-
-	while (1)
-	{
-		BaseType_t success = xQueueReceive(queueForSendCAN, &received, 0);
-		if (success == pdPASS)
-		{
-			unsigned long id = NV_CAN_BACK;
-			switch (received.ID)
-			{
-			case FC:
-				id &= 0xFFD; // clear 2nd bit
-				break;
-			case CS:
-				id |= 0x002; // set 2nd bit
-				break;
-			}
-			byte buf[8];
-			char* partial = strtok(received.data, "\t"); // skip the timestamp
-			while (partial != NULL)
-			{
-				partial = strtok(NULL, "\t");
-				
-				byte len = strlen(partial);
-				memcpy(buf, partial, len); // does not copy '\0'
-				byte status = CANObj.sendMsgBuf(id, len, buf);
-				if (status != CAN_OK)
-				{
-					break;
-				}
-			}
-			// set last bit for final frame
-			CANObj.sendMsgBuf(id | 0x001, 0, buf); // WARNING
-		}
-	}
-}
+//void SendCANFrame(void *pvParameters __attribute__((unused)))  // This is a Task.
+//{
+//	QueueItem received;
+//	TickType_t delay = pdMS_TO_TICKS(CAN_FRAME_INTERVAL); // delay 300 ms, shorter than reading/queueing tasks since this task has lower priority
+//	if (CANObj.begin(MCP_ANY, CAN_1000KBPS, MCP_16MHZ) != CAN_OK)
+//	{
+//		Serial.println(F("NV10_back CAN init fail!"));
+//		vTaskSuspend(NULL);
+//	}
+//	else
+//	{
+//		Serial.println(F("NV10_back CAN init success!"));
+//	}
+//
+//	while (1)
+//	{
+//		BaseType_t success = xQueueReceive(queueForSendCAN, &received, 0);
+//		if (success == pdPASS)
+//		{
+//			unsigned long id = NV_CAN_BACK;
+//			switch (received.ID)
+//			{
+//			case FC:
+//				id &= 0xFFD; // clear 2nd bit
+//				break;
+//			case CS:
+//				id |= 0x002; // set 2nd bit
+//				break;
+//			}
+//			char* curSeg = received.data;
+//			byte curSegBuffer[8];
+//			byte curSegLen = strcspn(received.data, "\t"); // skip the timestamp
+//			curSeg += curSegLen + 1; // advance to next segment
+//			////////////char* partial = strtok(received.data, "\t");
+//			while (curSegLen != 0)
+//			{
+//				////////////partial = strtok(NULL, "\t");
+//				curSegLen = strcspn(received.data, "\t");
+//				////////////byte len = strlen(partial);
+//				// copy contents from curSeg into curSegBuffer, only for type conversion compability with CANObj.setMsgBuf()
+//				memcpy(curSegBuffer, curSeg, curSegLen); // does not copy '\0'
+//				byte status = CANObj.sendMsgBuf(id, curSegLen, curSegBuffer);
+//				// advance to next segment
+//				Serial.print("Sent ID:");
+//				Serial.println(id);
+//				Serial.print("Content:\n");
+//				for (int i = 0; i < curSegLen; i++)
+//				{
+//					Serial.print((int)curSegBuffer[i]);
+//					Serial.print(" ");
+//				}
+//				Serial.println();
+//				curSeg += curSegLen + 1;
+//				if (status != CAN_OK)
+//					break;
+//
+//
+//			}
+//			// set last bit for final frame
+//			CANObj.sendMsgBuf(id | 0x001, 0, curSegBuffer); // WARNING, content is random
+//			Serial.print("Sent last frame");
+//		}
+//		vTaskDelay(pdMS_TO_TICKS(150));
+//	}
+//}

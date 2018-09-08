@@ -6,7 +6,8 @@
 
 
 // the setup function runs once when you press reset or power the board
-#include <FreeRTOS_ARM.h>
+#include <Arduino_FreeRTOS.h>
+#include <queue.h>
 #include <mcp_can.h>
 #include <ILI9488.h>
 
@@ -20,7 +21,7 @@
 #include "DisplayBar.h""
 #include "DisplayText.h"
 #include "DisplayGauge.h"
-#include "Bitmaps.h"
+//#include "Bitmaps.h"
 
 const int screenLED = 9;
 
@@ -30,7 +31,6 @@ TaskHandle_t ReadCAN;
 QueueHandle_t queueForDisplay = xQueueCreate(1, sizeof(QueueItem));
 MCP_CAN CANObj = MCP_CAN(CAN_CS_PIN);
 void setup() {
-	CANObj.setMode(MCP_NORMAL);
 	attachInterrupt(digitalPinToInterrupt(CAN_INTERRUPT_PIN), CAN_incoming, FALLING);
 	pinMode(screenLED, OUTPUT);
 	digitalWrite(screenLED, HIGH);
@@ -70,6 +70,11 @@ void setup() {
 		, NULL);
 
 	vTaskStartScheduler();
+	while (1)
+	{
+		Serial.println(F("NV10_DASHBOARD IS SLEEPING BECAUSE CAN_INIT FAIL..."));
+		delay(2000);
+	}
 }
 
 // the loop function runs over and over again until power down or reset
@@ -87,7 +92,7 @@ void TaskRefreshScreen(void* pvParameters)
 	leftScreen.begin();
 	leftScreen.setRotation(1);
 	leftScreen.fillScreen(ILI9488_BLACK);
-	leftScreen.drawRGBBitmap(77, 0, image, 150, 150);
+	//leftScreen.drawRGBBitmap(77, 0, image, 150, 150);
 	//leftScreen.setAddrWindow(120, 80, 240, 160);
 	//leftScreen.pushColors(image, 9600, true);
 	//leftScreen.fillRect(240, 80, 120, 80, ILI9488_RED);
@@ -153,6 +158,17 @@ void TaskRefreshScreen(void* pvParameters)
 }
 void TaskReadCAN(void* pvParameters)
 {
+	if (CANObj.begin(MCP_ANY, CAN_1000KBPS, MCP_16MHZ) != CAN_OK)
+	{
+		Serial.println(F("NV10_back CAN init fail!"));
+		vTaskEndScheduler();
+	}
+	else
+	{
+		Serial.println(F("NV10_back CAN init success!"));
+	}
+	CANObj.setMode(MCP_NORMAL);
+
 	byte buf[8];
 	uint32_t id;
 	byte len;
@@ -179,11 +195,12 @@ void TaskReadCAN(void* pvParameters)
 			outgoing.ID = CS;
 		else
 			outgoing.ID = FC;
-
-		xQueueSend(queueForDisplay, &outgoing, 100);
+		Serial.print("Recv ID:");
+		Serial.println(id);
+		Serial.print("Content:\n");
+		Serial.println(outgoing.data);
+		//xQueueSend(queueForDisplay, &outgoing, 100);
 		counter = 0;
 		vTaskSuspend(ReadCAN);
 	}
-
-	//}
 }

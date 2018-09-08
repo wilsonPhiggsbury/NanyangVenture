@@ -30,12 +30,12 @@ HESFuelCell hydroCells[NUM_FUELCELLS] = {
 	HESFuelCell(1, &FC_SLAVE_PORT)
 };
 AttopilotCurrentSensor motors[NUM_CURRENTSENSORS] = {
-	AttopilotCurrentSensor(0,L_WHEEL_VPIN,L_WHEEL_APIN),
-	AttopilotCurrentSensor(1,R_WHEEL_VPIN,R_WHEEL_APIN),
-	AttopilotCurrentSensor(2,SUPERCAP_VPIN,SUPERCAP_APIN)
+	AttopilotCurrentSensor(0,CAP_IN_VPIN,CAP_IN_APIN),
+	AttopilotCurrentSensor(1,CAP_OUT_VPIN,CAP_OUT_APIN),
+	AttopilotCurrentSensor(2,MOTOR_VPIN,MOTOR_APIN)
 };
 Speedometer speedo = Speedometer(1000);
-MCP_CAN CANObj = MCP_CAN(CAN_CS_PIN);
+// MCP_CAN CANObj = MCP_CAN(CAN_CS_PIN);
 // define globals
 bool SD_avail;
 char path[FILENAME_HEADER_LENGTH + 8 + 4 + 1]; // +8 for filename, +4 for '.txt', +1 for '\0'
@@ -46,7 +46,7 @@ void ReadMotorPower(void *pvParameters);	// Input task:		Refreshes class variabl
 void QueueOutputData(void *pvParameters);	// Control task:	Controls frequency to queue data from above tasks to output tasks
 void LogSendData(void *pvParameters);		// Output task:		Data logged in SD card and sent through XBee. Logged and sent data should be consistent, hence they are grouped together
 void DisplayData(void *pvParameters);		// Output task:		Display on LCD screen
-void SendCANFrame(void* pvParameters);
+// void SendCANFrame(void* pvParameters);
 
 //// _______________OPTIONAL_____________
 //void TaskReceiveCommands(void *pvParameters);	// Input task:		Enable real-time control of Arduino (if any)
@@ -100,13 +100,13 @@ void setup() {
 		, NULL
 		, 1  // Priority
 		, NULL);
-	xTaskCreate(
-		SendCANFrame
-		, (const portCHAR *) "Nothing"
-		, 100  // Stack size
-		, NULL
-		, 0  // Priority
-		, NULL);
+	//xTaskCreate(
+	//	SendCANFrame
+	//	, (const portCHAR *) "Nothing"
+	//	, 250  // Stack size
+	//	, NULL
+	//	, 0  // Priority
+	//	, NULL);
 	// Now the Task scheduler, which takes over control of scheduling individual Tasks, is automatically started.
 
 }
