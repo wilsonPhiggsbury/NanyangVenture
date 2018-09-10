@@ -9,6 +9,8 @@
 #endif
 
 #define RX_BUFFER_LEN 100
+
+#include "FrameFormats.h"
 #include "Globals.h"
 class HESFuelCell
 {
@@ -18,27 +20,28 @@ class HESFuelCell
 	 uint8_t id;
 	 HardwareSerial *port;
 	 char buffer[RX_BUFFER_LEN];
-	 bool hadPartialData  = false;
 	 uint8_t bufferPointer = 0;
-	 char amps[5];
-	 char volts[5];
-	 char watts[5];
-	 char energy[6];
-	 char maxTemperature[6];
-	 char pressure[5];
-	 char capacitorVolts[5];
-	 char status[3];
+	 float loggedParams[FUELCELL_READVALUES];
 	 bool updated;
 	 void writeAsRawData(char* toWrite);
 
-	 void debugPrint(char* buffer, int howMuch);
+	 typedef enum {
+		 volts,
+		 amps,
+		 watts,
+		 energy,
+		 maxTemperature,
+		 pressure,
+		 capacitorVolts,
+		 status
+	 }LoggedParams;
 	 
 
  public: 
 	 HESFuelCell(uint8_t id, HardwareSerial *port);
 	 void logData();
-	 static void dumpTimestampInto(char * location);
-	 void dumpDataInto(char * location);
+	 static void dumpTimestampInto(uint32_t * location);
+	 void dumpDataInto(float location[QUEUEITEM_DATAPOINTS][QUEUEITEM_READVALUES]);
 	 bool hasUpdated();
 };
 

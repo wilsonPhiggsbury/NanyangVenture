@@ -30,8 +30,18 @@ void TaskReadCAN(void* pvParameters);
 TaskHandle_t ReadCAN;
 QueueHandle_t queueForDisplay = xQueueCreate(1, sizeof(QueueItem));
 MCP_CAN CANObj = MCP_CAN(CAN_CS_PIN);
+volatile bool incoming = false;
 void setup() {
 	attachInterrupt(digitalPinToInterrupt(CAN_INTERRUPT_PIN), CAN_incoming, FALLING);
+	if (CANObj.begin(CAN_1000KBPS) != CAN_OK)
+	{
+		Serial.println(F("NV10_dashboard CAN init fail!"));
+		while (1);
+	}
+	else
+	{
+		Serial.println(F("NV10_dashboard CAN init success!"));
+	}
 	pinMode(screenLED, OUTPUT);
 	digitalWrite(screenLED, HIGH);
 	Serial.begin(9600);
@@ -60,14 +70,14 @@ void setup() {
 		, 250  // This stack size can be checked & adjusted by reading the Stack Highwater
 		, NULL // Any pointer to pass in
 		, 1  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
-		, &ReadCAN);
+		, NULL);
 	xTaskCreate(
 		TaskReadCAN
-		, (const portCHAR *)"Refresh"  // A name just for humans
+		, (const portCHAR *)"ReadCAN"  // A name just for humans
 		, 500  // This stack size can be checked & adjusted by reading the Stack Highwater
 		, NULL // Any pointer to pass in
 		, 2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
-		, NULL);
+		, &ReadCAN);
 
 	vTaskStartScheduler();
 	while (1)
@@ -83,7 +93,7 @@ void loop() {
 }
 void CAN_incoming()
 {
-	xTaskResumeFromISR(ReadCAN);
+	incoming = true;
 }
 void TaskRefreshScreen(void* pvParameters)
 {
@@ -158,16 +168,7 @@ void TaskRefreshScreen(void* pvParameters)
 }
 void TaskReadCAN(void* pvParameters)
 {
-	if (CANObj.begin(MCP_ANY, CAN_1000KBPS, MCP_16MHZ) != CAN_OK)
-	{
-		Serial.println(F("NV10_back CAN init fail!"));
-		vTaskEndScheduler();
-	}
-	else
-	{
-		Serial.println(F("NV10_back CAN init success!"));
-	}
-	CANObj.setMode(MCP_NORMAL);
+	
 
 	byte buf[8];
 	uint32_t id;
@@ -177,30 +178,41 @@ void TaskReadCAN(void* pvParameters)
 	uint8_t counter = 0;
 	while (1)
 	{
-		byte status = CANObj.readMsgBuf(&id, &len, buf);
-
-		// Populate outgoing data string. id's first bit is 1 means end of msg
-		while (status == CAN_OK && id&1 != 1)
+		Serial.println("ALIVE");
+		if (incoming)
 		{
-			strcpy(outgoing.data + counter, "\t");
-			counter += 1;
-			memcpy(outgoing.data + counter, buf, len);
-			counter += len;
-			CANObj.readMsgBuf(&id, &len, buf);
-		}
-		strcpy(outgoing.data + counter, "\0");
+			incoming = false;
+			if (CANObj.checkError() != CAN_OK)
+			{
+				Serial.println("Data spoilt...");
+			}
+			byte status = CANObj.readMsgBuf(&len, buf);
+			if (status != CAN_OK)
+				Serial.println("No data...");
+			// Populate outgoing data string. id's first bit is 1 means end of msg
+			while (status == CAN_OK && CANObj.getCanId() & 1 != 1)
+			{
+				strcpy(outgoing.data + counter, "\t");
+				counter += 1;
+				memcpy(outgoing.data + counter, buf, len);
+				counter += len;
+				CANObj.readMsgBuf(&len, buf);
+			}
+			strcpy(outgoing.data + counter, "\0");
 
-		// Populate outgoing data type.
-		if (id & 2)
-			outgoing.ID = CS;
-		else
-			outgoing.ID = FC;
-		Serial.print("Recv ID:");
-		Serial.println(id);
-		Serial.print("Content:\n");
-		Serial.println(outgoing.data);
-		//xQueueSend(queueForDisplay, &outgoing, 100);
-		counter = 0;
-		vTaskSuspend(ReadCAN);
+			// Populate outgoing data type.
+			if (id & 2)
+				outgoing.ID = CS;
+			else
+				outgoing.ID = FC;
+			Serial.print("Recv ID:");
+			Serial.println(id);
+			Serial.print("Content:\n");
+			Serial.println(outgoing.data);
+			//xQueueSend(queueForDisplay, &outgoing, 100);
+			counter = 0;
+		}
+		
+		vTaskDelay(pdMS_TO_TICKS(150));
 	}
 }

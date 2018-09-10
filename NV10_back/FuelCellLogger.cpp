@@ -1,5 +1,5 @@
 #include "FuelCellLogger.h"
-#include "Behaviour.h"
+#include <SPI.h>
 #include <SD.h>
 
 uint32_t HESFuelCell::timeStamp;
@@ -8,14 +8,7 @@ HESFuelCell::HESFuelCell(uint8_t id, HardwareSerial *port):id(id),port(port)
 	port->begin(19200);
 	port->setTimeout(500);
 	updated = false;
-	strcpy(volts, "0.00");
-	strcpy(amps, "0.00");
-	strcpy(watts, "0000");
-	strcpy(energy, "00000");
-	strcpy(maxTemperature, "000.0");
-	strcpy(pressure, "0.00");
-	strcpy(capacitorVolts, "00.0");
-	strcpy(status, "XX");
+	
 	timeStamp = 0;
 }
 
@@ -37,40 +30,41 @@ void HESFuelCell::logData()
 			return;
 
 		readPtr = strtok(readPtr, " ");
-		strncpy(volts, readPtr, 4);
+		loggedParams[volts] = atof(readPtr);
 
 		readPtr = strtok(NULL, " ");
-		strncpy(amps, readPtr , 4);
+		loggedParams[amps] = atof(readPtr);
 
 		readPtr = strtok(NULL, " ");
-		strncpy(watts, readPtr, 4);
+		loggedParams[watts] = atof(readPtr);
 
 		readPtr = strtok(NULL, " ");
-		strncpy(energy, readPtr, 5);
+		loggedParams[energy] = atof(readPtr);
 
 		// take max stack temperature out of 4 readings
-		float thisMaxTemp, prevMaxTemp = 0;
+		float thisMaxTemp = 0;
 		for (int i = 0; i < 4; i++)
 		{
-			char tmp[6];
 			readPtr = strtok(NULL, " ");
-			strncpy(tmp, readPtr, 5);
-			tmp[5] = '\0';
-			thisMaxTemp = max(atof(tmp), prevMaxTemp);
+			thisMaxTemp = max(atof(readPtr), loggedParams[maxTemperature]);
 		}
-		dtostrf(thisMaxTemp, 5, 1, maxTemperature);
+		loggedParams[maxTemperature] = thisMaxTemp;
 
 		readPtr = strtok(NULL, " ");
-		strncpy(pressure, readPtr, 4);
+		loggedParams[pressure] = atof(readPtr);
 
 		readPtr = strtok(NULL, " ");
-		strncpy(capacitorVolts, readPtr, 4);
+		loggedParams[capacitorVolts] = atof(readPtr);
 
 		readPtr = strtok(NULL, " ");
 		// skip average temperature
 
 		readPtr = strtok(NULL, " ");
-		strncpy(status, readPtr, 2);
+		if (strcmp(readPtr, "OP") != 0)
+			loggedParams[status] = 0;	// died
+		else
+			loggedParams[status] = 1;	// alive
+		
 		//>>00.0V 00.0A 0000W 00000Wh 021.1C 028.3C 028.5C 031.6C 0.90B 59.0V 028.0C IN 00.0C 00 0000
 		//  ^   * ^   * ^   * ^    *  ^    * ^    * ^    * ^    * ^   * ^   *        ^ *
 		//  ".........:.........:.........:.........:.........".........:.........:.........:.........:........."
@@ -80,32 +74,18 @@ void HESFuelCell::logData()
 		writeAsRawData("**");
 	}
 }
-void HESFuelCell::dumpTimestampInto(char* location)
+void HESFuelCell::dumpTimestampInto(uint32_t* location)
 {
-	char timeStampString[9];
-	ultoa(timeStamp, timeStampString, 16);
-	strcat(location, timeStampString);//	8
-	//								SUM =	8
+	*location = timeStamp;
 }
-void HESFuelCell::dumpDataInto(char* location)
+void HESFuelCell::dumpDataInto(float location[QUEUEITEM_DATAPOINTS][QUEUEITEM_READVALUES])
 {
-	strcat(location, volts);//			5
-	strcat(location, "\t");
-	strcat(location, amps);//			5
-	strcat(location, "\t");
-	strcat(location, watts);//			5
-	strcat(location, "\t");
-	strcat(location, energy);//			6
-	strcat(location, "\t");
-	strcat(location, maxTemperature);//	6
-	strcat(location, "\t");
-	strcat(location, pressure);//		5
-	strcat(location, "\t");
-	strcat(location, capacitorVolts);//	5
-	strcat(location, "\t");
-	strcat(location, status);//			2
-
-	//							SUM =  39
+	// expect QueueItem.data to come in
+	float* thisSlot = location[id];
+	for (int i = 0; i < FUELCELL_READVALUES; i++)
+	{
+		thisSlot[i] = loggedParams[i];
+	}
 }
 bool HESFuelCell::hasUpdated()
 {
@@ -130,19 +110,6 @@ void HESFuelCell::writeAsRawData(char* toWrite)
 		rawFCdata.close();
 		strcpy(path + FILENAME_HEADER_LENGTH, "");
 	}
-}
-void HESFuelCell::debugPrint(char* buffer, int howMuch)
-{
-	for (int i = 0;i < howMuch;i++)
-	{
-		if (buffer[i] >= 32)Serial.print((char)buffer[i]);
-		else {
-			Serial.print(" _");
-			Serial.print((uint8_t)buffer[i]);
-		}
-
-	}
-	Serial.println();
 }
 
 /* H182_v1.3

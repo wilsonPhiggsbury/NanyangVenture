@@ -10,13 +10,13 @@ Author:	MX
 #include <SPI.h>
 
 void QueueOutputData(void *pvParameters __attribute__((unused)));
-MCP_CAN CAN0 = MCP_CAN(48);
+MCP_CAN CAN0 = MCP_CAN(7);
 bool CAN_incoming = false;
 void CAN_ISR();
 void setup() {
 	Serial.begin(9600);
 	delay(1000);
-	if (CAN0.begin(CAN_250KBPS) == CAN_OK)
+	if (CAN0.begin(CAN_500KBPS) == CAN_OK)
 	{
 		Serial.println("CAN sender MEGA initialized.");
 	}
@@ -25,7 +25,7 @@ void setup() {
 		Serial.println("CAN INIT fail");
 		while (1);
 	}
-	attachInterrupt(digitalPinToInterrupt(19), CAN_ISR, FALLING);
+	attachInterrupt(digitalPinToInterrupt(20), CAN_ISR, FALLING);
 
 	xTaskCreate(
 		QueueOutputData
@@ -61,7 +61,7 @@ void QueueOutputData(void *pvParameters __attribute__((unused)))  // This is a T
 		else {
 			Serial.println("Error Sending Message...");
 		}
-		delay(2000);   // send data per 2000ms
+		vTaskDelay(pdMS_TO_TICKS(150));   // send data per 2000ms
 	}
 }
 void CAN_ISR()

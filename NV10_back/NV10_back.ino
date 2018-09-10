@@ -5,16 +5,13 @@
 */
 
 #include <mcp_can.h>
-#include "CAN_ID_protocol.h"
+#include "Behaviour.h"
 #include <Arduino_FreeRTOS.h>
 #include <queue.h>
-#include <Adafruit_GFX.h>
-#include <TFT_ILI9163C.h>
+#include <SPI.h>
 #include <SD.h>
-#include <LiquidCrystal_I2C.h>
-#include <EEPROM.h>
 
-#include "JoulemeterDisplay.h"	
+//#include "JoulemeterDisplay.h"	
 #include "CurrentSensorLogger.h"
 #include "FuelCellLogger.h"
 #include "Speedometer.h"
@@ -35,7 +32,7 @@ AttopilotCurrentSensor motors[NUM_CURRENTSENSORS] = {
 	AttopilotCurrentSensor(2,MOTOR_VPIN,MOTOR_APIN)
 };
 Speedometer speedo = Speedometer(1000);
-// MCP_CAN CANObj = MCP_CAN(CAN_CS_PIN);
+MCP_CAN CANObj = MCP_CAN(CAN_CS_PIN);
 // define globals
 bool SD_avail;
 char path[FILENAME_HEADER_LENGTH + 8 + 4 + 1]; // +8 for filename, +4 for '.txt', +1 for '\0'
@@ -46,7 +43,7 @@ void ReadMotorPower(void *pvParameters);	// Input task:		Refreshes class variabl
 void QueueOutputData(void *pvParameters);	// Control task:	Controls frequency to queue data from above tasks to output tasks
 void LogSendData(void *pvParameters);		// Output task:		Data logged in SD card and sent through XBee. Logged and sent data should be consistent, hence they are grouped together
 void DisplayData(void *pvParameters);		// Output task:		Display on LCD screen
-// void SendCANFrame(void* pvParameters);
+void SendCANFrame(void* pvParameters);
 
 //// _______________OPTIONAL_____________
 //void TaskReceiveCommands(void *pvParameters);	// Input task:		Enable real-time control of Arduino (if any)
@@ -58,12 +55,21 @@ void setup() {
 	// initialize serial communication at 9600 bits per second:
 	Serial.begin(9600);
 	delay(100);
-	debug(SERIAL_RX_BUFFER_SIZE);
+
 	// create all files in a new directory
 	SD_avail = initSD(path);
 	// initialize speedometer
 	attachInterrupt(digitalPinToInterrupt(SPEEDOMETER_INTERRUPT_PIN), storeWheelInterval_ISR, FALLING);
-	
+	// initialize CAN bus
+	if (CANObj.begin(CAN_1000KBPS) != CAN_OK)
+	{
+		Serial.println(F("NV10_back CAN init fail!"));
+		while (1);
+	}
+	else
+	{
+		Serial.println(F("NV10_back CAN init success!"));
+	}
 	// Now set up all Tasks to run independently. Task functions are found in Tasks.ino
 	xTaskCreate(
 		ReadFuelCell
@@ -77,7 +83,7 @@ void setup() {
 		, (const portCHAR *)"CSensor"
 		, 175
 		, motors
-		, 2
+		, 3
 		, NULL);
 	xTaskCreate(
 		QueueOutputData
@@ -89,25 +95,25 @@ void setup() {
 	xTaskCreate(
 		LogSendData
 		, (const portCHAR *) "LogSend"
-		, 675  // Stack size
-		, NULL
-		, 1  // Priority
-		, NULL);
-	xTaskCreate(
-		DisplayData
-		, (const portCHAR *) "Display"
-		, 350  // Stack size
+		, 800  // Stack size
 		, NULL
 		, 1  // Priority
 		, NULL);
 	//xTaskCreate(
+	//	DisplayData
+	//	, (const portCHAR *) "Display"
+	//	, 350  // Stack size
+	//	, NULL
+	//	, 1  // Priority
+	//	, NULL);
+	//xTaskCreate(
 	//	SendCANFrame
-	//	, (const portCHAR *) "Nothing"
+	//	, (const portCHAR *) "CAN la!" // where got cannot?
 	//	, 250  // Stack size
 	//	, NULL
-	//	, 0  // Priority
+	//	, 1  // Priority
 	//	, NULL);
-	// Now the Task scheduler, which takes over control of scheduling individual Tasks, is automatically started.
+	 //Now the Task scheduler, which takes over control of scheduling individual Tasks, is automatically started.
 
 }
 

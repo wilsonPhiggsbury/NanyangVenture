@@ -11,10 +11,10 @@ AttopilotCurrentSensor::AttopilotCurrentSensor(int motorID, uint8_t voltPin, uin
 }
 void AttopilotCurrentSensor::logData()
 {
-	voltReading = analogRead(voltPin);
-	ampReading = analogRead(ampPin);
+	loggedParams[volt] = analogRead(voltPin);
+	loggedParams[amp] = analogRead(ampPin);
 
-	ampPeak = max(ampReading, ampPeak);
+	//ampPeak = max(ampReading, ampPeak);
 	/*if (timeStamp != 0)
 	{
 		float usedEnergy = rawToVA('V', voltReading) * rawToVA('A', ampReading);
@@ -24,55 +24,34 @@ void AttopilotCurrentSensor::logData()
 	timeStamp = millis();
 }
 
-void AttopilotCurrentSensor::dumpTimestampInto(char* location)
+void AttopilotCurrentSensor::dumpTimestampInto(uint32_t* location)
 {
-	char tmp[9];
-	ultoa(timeStamp, tmp, 16);
-	strcat(location, tmp);
+	*location = timeStamp;
 }
-void AttopilotCurrentSensor::dumpDataInto(char* location)
+void AttopilotCurrentSensor::dumpDataInto(float location[QUEUEITEM_DATAPOINTS][QUEUEITEM_READVALUES])
 {
-	float finalReading;
-	char tmp[6];
-
-	dumpAttributeInto(location, voltReading, 'V');
-	dumpAttributeInto(location, ampReading, 'A');
-	dumpAttributeInto(location, ampPeak, 'A');
+	float* thisSlot = location[id];
+	// only convert to Volt/Amp during send, don't convert during logging as logging happens mroe frequently
+	for (int i = 0; i < CURRENTSENSOR_READVALUES; i++)
+	{
+		thisSlot[i] = rawToVA((LoggedParameters)i, loggedParams[i]);
+	}
 }
-void AttopilotCurrentSensor::dumpAttributeInto(char* location, uint16_t attribute, char conversionType)
-{
-	float finalReading;
-	char tmp[6];
-
-	strcat(location, "\t");
-	finalReading = rawToVA(conversionType, attribute);
-	dtostrf(finalReading, 4, 1, tmp);
-	strcat(location, tmp);
-}
-//void AttopilotCurrentSensor::dumpTotalEnergyInto(char *location)
-//{
-//	//float finalReading = rawToVA('A', ampPeak);
-//	// TODO: there is place for optimization by postponing calculate raw first until truly dumping data
-//	char tmp[6];
-//	float whr = totalEnergy / 3600000;
-//	dtostrf(whr, 6, 1, tmp);
-//	strcat(location, tmp);
-//}
-float AttopilotCurrentSensor::rawToVA(char which, float reading)
+float AttopilotCurrentSensor::rawToVA(LoggedParameters which, float reading)
 {
 	float first, last, step, maxIndex;
 	uint16_t thisValue, nextValue;
 	const uint16_t* TABLE;
 	switch (which)
 	{
-	case 'V':
+	case volt:
 		first = V_0;
 		last = V_N;
 		step = V_STEP;
 		maxIndex = V_ENTRIES;
 		TABLE = V_TABLE[id]; // point to this segment of the array
 		break;
-	case 'A':
+	case amp:
 		first = A_0;
 		last = A_N;
 		step = A_STEP;

@@ -65,22 +65,20 @@ void QueueOutputData(void *pvParameters)
 		{
 			// Arrange for outgoing fuel cell data
 			outgoing.ID = FC;
-			outgoing.data[0] = '\0';
-			HESFuelCell::dumpTimestampInto(outgoing.data);
+			HESFuelCell::dumpTimestampInto(&outgoing.timeStamp);
 			for (int i = 0; i < NUM_FUELCELLS; i++)
 			{
-				strcat(outgoing.data, "\t");
 				if (hydroCells[i].hasUpdated())
 				{
 					hydroCells[i].dumpDataInto(outgoing.data);
 				}
-				else
+				/*else
 				{
 					strcat(outgoing.data, "-\t-\t-\t-\t-\t-\t-\t-");
-				}
+				}*/
 			}
 			xQueueSend(queueForLogSend, &outgoing, 100);
-			xQueueSend(queueForDisplay, &outgoing, 100);
+			//xQueueSend(queueForDisplay, &outgoing, 100);
 		}
 
 
@@ -94,14 +92,13 @@ void QueueOutputData(void *pvParameters)
 		{
 			// Arrange for outgoing current sensor data
 			outgoing.ID = CS;
-			outgoing.data[0] = '\0';
-			motors[0].dumpTimestampInto(outgoing.data);
+			motors[0].dumpTimestampInto(&outgoing.timeStamp);
 			for (int i = 0; i < NUM_CURRENTSENSORS; i++)
 			{
 				motors[i].dumpDataInto(outgoing.data);//len 5
 			}
 			xQueueSend(queueForLogSend, &outgoing, 100);
-			xQueueSend(queueForDisplay, &outgoing, 100);
+			//xQueueSend(queueForDisplay, &outgoing, 100);
 			xQueueSend(queueForSendCAN, &outgoing, 100);
 			//if (syncCounter % (back_lcd_refresh) == 0)
 			//{
@@ -132,71 +129,65 @@ void LogSendData(void *pvParameters __attribute__((unused)))  // This is a Task.
 		char shortFileName[3] = "";
 		if (success == pdPASS)
 		{
-			switch (received.ID)
-			{
-			case FC:
-				strncpy(shortFileName, FUELCELL_FILENAME, 2);
-				strcpy(path + FILENAME_HEADER_LENGTH, FUELCELL_FILENAME);
-				break;
-			case CS:
-				strncpy(shortFileName, MOTOR_FILENAME, 2);
-				strcpy(path + FILENAME_HEADER_LENGTH, MOTOR_FILENAME);
-				break;
-			}
-			Serial.print(shortFileName);
-			Serial.print('\t');
-			Serial.println(received.data);
+			strcat(shortFileName, dataPoint_shortNames[received.ID]);
+			strcpy(path + FILENAME_HEADER_LENGTH, dataPoint_shortNames[received.ID]);
+			strcat(path, ".txt");
+
+			//strncpy(shortFileName, MOTOR_FILENAME, 2);
+			//strcpy(path + FILENAME_HEADER_LENGTH, MOTOR_FILENAME);
+
+			// Make container for string representation of queueItem data
+			// 3 for short name, 9 for timestamp, remaining for all the floats and delimiters like \t " "
+			char data[3 + 9 + (FLOAT_TO_STRING_LEN + 1)*(QUEUEITEM_DATAPOINTS*QUEUEITEM_READVALUES) + QUEUEITEM_DATAPOINTS];
+			//					^^						floats and spacebar						^^^	  ^^	tabs		^^
+			received.toString(data);
 			// -------------- Store into SD -------------
 			if (SD_avail)
 			{
 				File writtenFile = SD.open(path, FILE_WRITE);
-				writtenFile.println(received.data);
+				writtenFile.println(data);
 				writtenFile.close();
 			}
-			// *path should only remain as /LOG_****/. Clean up after use
+			// *path should only remain as /LOG_****/
+			// clean up after use
 			strcpy(path + FILENAME_HEADER_LENGTH, "");
+
+			// finally print out the data to be transmitted by XBee
+			Serial.print(data);
 		}
 
-		vTaskDelay(delay);  // poll more frequently since more data comes in at a time
-	}
-}
-void DisplayData(void *pvParameters)
-{
-	QueueItem received;
-	LiquidCrystal_I2C lcdScreen = LiquidCrystal_I2C(LCD1_I2C_ADDR, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);
-	DisplayLCD lcdManager = DisplayLCD(lcdScreen);
-
-	TickType_t delay = pdMS_TO_TICKS(DISPLAY_INTERVAL);
-
-	while (1)
-	{
-		BaseType_t success;
-		while (xQueueReceive(queueForDisplay, &received, 0) == pdPASS)
-		{
-			lcdManager.printData(received);
-		}
 		vTaskDelay(delay);
 	}
 }
+//void DisplayData(void *pvParameters)
+//{
+//	QueueItem received;
+//	LiquidCrystal_I2C lcdScreen = LiquidCrystal_I2C(LCD1_I2C_ADDR, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);
+//	DisplayLCD lcdManager = DisplayLCD(lcdScreen);
+//
+//	TickType_t delay = pdMS_TO_TICKS(DISPLAY_INTERVAL);
+//
+//	while (1)
+//	{
+//		BaseType_t success;
+//		while (xQueueReceive(queueForDisplay, &received, 0) == pdPASS)
+//		{
+//			lcdManager.printData(received);
+//		}
+//		vTaskDelay(delay);
+//	}
+//}
 //void SendCANFrame(void *pvParameters __attribute__((unused)))  // This is a Task.
 //{
 //	QueueItem received;
 //	TickType_t delay = pdMS_TO_TICKS(CAN_FRAME_INTERVAL); // delay 300 ms, shorter than reading/queueing tasks since this task has lower priority
-//	if (CANObj.begin(MCP_ANY, CAN_1000KBPS, MCP_16MHZ) != CAN_OK)
-//	{
-//		Serial.println(F("NV10_back CAN init fail!"));
-//		vTaskSuspend(NULL);
-//	}
-//	else
-//	{
-//		Serial.println(F("NV10_back CAN init success!"));
-//	}
-//
+//	
 //	while (1)
 //	{
 //		BaseType_t success = xQueueReceive(queueForSendCAN, &received, 0);
 //		if (success == pdPASS)
 //		{
+//			taskENTER_CRITICAL();
 //			unsigned long id = NV_CAN_BACK;
 //			switch (received.ID)
 //			{
@@ -209,37 +200,39 @@ void DisplayData(void *pvParameters)
 //			}
 //			char* curSeg = received.data;
 //			byte curSegBuffer[8];
-//			byte curSegLen = strcspn(received.data, "\t"); // skip the timestamp
+//			byte curSegLen = strcspn(curSeg, "\t"); // skip the timestamp
 //			curSeg += curSegLen + 1; // advance to next segment
 //			////////////char* partial = strtok(received.data, "\t");
 //			while (curSegLen != 0)
 //			{
 //				////////////partial = strtok(NULL, "\t");
-//				curSegLen = strcspn(received.data, "\t");
+//				curSegLen = strcspn(curSeg, "\t");
 //				////////////byte len = strlen(partial);
 //				// copy contents from curSeg into curSegBuffer, only for type conversion compability with CANObj.setMsgBuf()
 //				memcpy(curSegBuffer, curSeg, curSegLen); // does not copy '\0'
-//				byte status = CANObj.sendMsgBuf(id, curSegLen, curSegBuffer);
+//				byte status = CANObj.sendMsgBuf(id, 0, curSegLen, curSegBuffer);
 //				// advance to next segment
 //				Serial.print("Sent ID:");
 //				Serial.println(id);
 //				Serial.print("Content:\n");
 //				for (int i = 0; i < curSegLen; i++)
 //				{
-//					Serial.print((int)curSegBuffer[i]);
-//					Serial.print(" ");
+//					Serial.print((char)curSegBuffer[i]);
 //				}
 //				Serial.println();
 //				curSeg += curSegLen + 1;
 //				if (status != CAN_OK)
+//				{
 //					break;
+//				}
 //
 //
 //			}
 //			// set last bit for final frame
-//			CANObj.sendMsgBuf(id | 0x001, 0, curSegBuffer); // WARNING, content is random
-//			Serial.print("Sent last frame");
+//			CANObj.sendMsgBuf(id | 0x001, 0, 2, curSegBuffer); // WARNING, content is random
+//			taskEXIT_CRITICAL();
 //		}
+//		
 //		vTaskDelay(pdMS_TO_TICKS(150));
 //	}
 //}

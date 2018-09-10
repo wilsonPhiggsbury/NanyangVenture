@@ -1,12 +1,4 @@
 
-void wipeEEPROM()
-{
-	for (int address = 0; address < EEPROM.length(); address += 1)
-	{
-		uint16_t tis;
-		EEPROM.write(address, 255);
-	}
-}
 bool initSD(char* path)
 {
 	const uint8_t FILENAME_INDEX = 4;
@@ -57,12 +49,12 @@ bool initSD(char* path)
 
 	strcpy(path + FILENAME_HEADER_LENGTH, FUELCELL_FILENAME);
 	sub = SD.open(path, FILE_WRITE);
-	sub.println(F("Millis\tV_m\tA_m\tW_m\tWh_m\tTmp_m\tPres_m\tVcap_m\tState_m\tV_s\tA_s\tW_s\tWh_s\tTmp_s\tPres_s\tVcap_s\tState_s"));
+	sub.println(F("Millis\t V_m A_m W_m Wh_m Tmp_m Pres_m Vcap_m State_m\t V_s A_s W_s Wh_s Tmp_s Pres_s Vcap_s State_s"));
 	sub.close();
 
 	strcpy(path + FILENAME_HEADER_LENGTH, MOTOR_FILENAME);
 	sub = SD.open(path, FILE_WRITE);
-	sub.println(F("Millis\tV_left\tV_right\tV_cap\tA_left\tA_right\tA_cap"));
+	sub.println(F("Millis\t V_capIN A_capIN\t V_capOUT A_capOUT\t V_MT A_MT"));
 	sub.close();
 
 	strcpy(path + FILENAME_HEADER_LENGTH, MASTER_FUELCELL_RAW_FILENAME);

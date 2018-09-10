@@ -9,7 +9,6 @@
 	#include "WProgram.h"
 #endif
 
-#include "Behaviour.h"
 class Speedometer
 {
 public:

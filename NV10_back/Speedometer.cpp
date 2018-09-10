@@ -3,6 +3,7 @@
 // 
 
 #include "Speedometer.h"
+#include "Behaviour.h"
 
 Speedometer::Speedometer(uint16_t diameter_in_mm):wheelDiameter(diameter_in_mm)
 {

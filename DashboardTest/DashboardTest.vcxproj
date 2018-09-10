@@ -38,6 +38,7 @@
     <Import Project="..\..\libraries\ILI9488\ILI9488.vcxitems" Label="Shared" />
     <Import Project="..\..\..\ide\portable\packages\arduino\hardware\sam\1.6.11\libraries\SPI\SPI.vcxitems" Label="Shared" />
     <Import Project="..\..\libraries\Adafruit_GFX_Library\Adafruit_GFX_Library.vcxitems" Label="Shared" />
+    <Import Project="..\SharedProtocols\SharedProtocols.vcxitems" Label="Shared" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
