@@ -189,7 +189,7 @@ void TaskReadCAN(void* pvParameters)
 			byte status = CANObj.readMsgBuf(&len, buf);
 			if (status != CAN_OK)
 				Serial.println("No data...");
-			// Populate outgoing data string. id's first bit is 1 means end of msg
+			// Populate outgoing payload string. id's first bit is 1 means end of msg
 			while (status == CAN_OK && CANObj.getCanId() & 1 != 1)
 			{
 				strcpy(outgoing.data + counter, "\t");
@@ -200,7 +200,7 @@ void TaskReadCAN(void* pvParameters)
 			}
 			strcpy(outgoing.data + counter, "\0");
 
-			// Populate outgoing data type.
+			// Populate outgoing payload type.
 			if (id & 2)
 				outgoing.ID = CS;
 			else

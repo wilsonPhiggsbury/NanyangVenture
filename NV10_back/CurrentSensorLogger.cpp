@@ -4,7 +4,7 @@
 
 #include "CurrentSensorLogger.h"
 
-
+uint32_t AttopilotCurrentSensor::timeStamp;
 AttopilotCurrentSensor::AttopilotCurrentSensor(int motorID, uint8_t voltPin, uint8_t ampPin):voltPin(voltPin),ampPin(ampPin),id(motorID)
 {
 	// id is only for accessing lookup table
@@ -24,17 +24,25 @@ void AttopilotCurrentSensor::logData()
 	timeStamp = millis();
 }
 
-void AttopilotCurrentSensor::dumpTimestampInto(uint32_t* location)
+void AttopilotCurrentSensor::dumpTimestampInto(unsigned long* location)
 {
 	*location = timeStamp;
 }
 void AttopilotCurrentSensor::dumpDataInto(float location[QUEUEITEM_DATAPOINTS][QUEUEITEM_READVALUES])
 {
-	float* thisSlot = location[id];
 	// only convert to Volt/Amp during send, don't convert during logging as logging happens mroe frequently
+	processData();
+	float* thisSlot = location[id];
 	for (int i = 0; i < CURRENTSENSOR_READVALUES; i++)
 	{
-		thisSlot[i] = rawToVA((LoggedParameters)i, loggedParams[i]);
+		thisSlot[i] = loggedParams[i];
+	}
+}
+void AttopilotCurrentSensor::processData()
+{
+	for (int i = 0; i < CURRENTSENSOR_READVALUES; i++)
+	{
+		loggedParams[i] = rawToVA((LoggedParameters)i, loggedParams[i]);
 	}
 }
 float AttopilotCurrentSensor::rawToVA(LoggedParameters which, float reading)

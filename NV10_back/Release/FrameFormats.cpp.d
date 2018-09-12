@@ -1,6 +1,7 @@
-C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Release\LiquidCrystal\LiquidCrystal_I2C.cpp.o: \
- D:\Arduino\Projects\libraries\LiquidCrystal\LiquidCrystal_I2C.cpp \
+C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Release\FrameFormats.cpp.o: \
+ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Release\FrameFormats.cpp \
  C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Release/build_options.h \
+ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Release\FrameFormats.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Arduino.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/binary.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/WCharacter.h \
@@ -11,8 +12,4 @@ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Release\Liquid
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Printable.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/USBAPI.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Arduino.h \
- D:\Arduino\ide\hardware\arduino\avr\variants\mega/pins_arduino.h \
- D:\Arduino\Projects\libraries\LiquidCrystal\I2CIO.h \
- D:\Arduino\Projects\libraries\LiquidCrystal\LiquidCrystal_I2C.h \
- D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Print.h \
- D:\Arduino\Projects\libraries\LiquidCrystal\LCD.h
+ D:\Arduino\ide\hardware\arduino\avr\variants\mega/pins_arduino.h

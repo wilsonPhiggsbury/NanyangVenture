@@ -49,20 +49,20 @@ bool initSD(char* path)
 
 	strcpy(path + FILENAME_HEADER_LENGTH, FUELCELL_FILENAME);
 	sub = SD.open(path, FILE_WRITE);
-	sub.println(F("Millis\t V_m A_m W_m Wh_m Tmp_m Pres_m Vcap_m State_m\t V_s A_s W_s Wh_s Tmp_s Pres_s Vcap_s State_s"));
+	sub.println(F("\tMillis\t  V_m  A_m   W_m   Wh_mTmp_m Pres_m Vcap_m State_m\t  V_s  A_s   W_s   Wh_sTmp_s Pres_s Vcap_s State_s"));
 	sub.close();
 
-	strcpy(path + FILENAME_HEADER_LENGTH, MOTOR_FILENAME);
+	strcpy(path + FILENAME_HEADER_LENGTH, CURRENTSENSOR_FILENAME);
 	sub = SD.open(path, FILE_WRITE);
-	sub.println(F("Millis\t V_capIN A_capIN\t V_capOUT A_capOUT\t V_MT A_MT"));
+	sub.println(F("\tMillis\t V_cI A_cI\t V_cO A_cO\t V_MT A_MT"));
 	sub.close();
 
-	strcpy(path + FILENAME_HEADER_LENGTH, MASTER_FUELCELL_RAW_FILENAME);
-	sub = SD.open(path, FILE_WRITE);
-	sub.close();
-	strcpy(path + FILENAME_HEADER_LENGTH, SLAVE_FUELCELL_RAW_FILENAME);
-	sub = SD.open(path, FILE_WRITE);
-	sub.close();
+	//strcpy(path + FILENAME_HEADER_LENGTH, MASTER_FUELCELL_RAW_FILENAME);
+	//sub = SD.open(path, FILE_WRITE);
+	//sub.close();
+	//strcpy(path + FILENAME_HEADER_LENGTH, SLAVE_FUELCELL_RAW_FILENAME);
+	//sub = SD.open(path, FILE_WRITE);
+	//sub.close();
 	// *path should always contain /LOG_****/
 	// We will still use *path variable whenever we write to a file. 
 	// Clean up trailing file names after use.

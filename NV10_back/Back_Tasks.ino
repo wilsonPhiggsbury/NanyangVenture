@@ -38,7 +38,7 @@ void QueueOutputData(void *pvParameters)
 	const uint16_t fuelcell_logsend = FUELCELL_LOGSEND_INTERVAL / QUEUE_DATA_INTERVAL;
 	const uint16_t motor_logsend = MOTOR_LOGSEND_INTERVAL / QUEUE_DATA_INTERVAL;
 	const uint16_t CAN_frame_interval = CAN_FRAME_INTERVAL / QUEUE_DATA_INTERVAL;
-	const uint16_t back_lcd_refresh = BACK_LCD_REFRESH_INTERVAL / QUEUE_DATA_INTERVAL;
+	const uint16_t speedo_refresh_interval = SPEEDOMETER_REFRESH_INTERVAL / QUEUE_DATA_INTERVAL;
 
 	QueueItem outgoing;
 	uint8_t syncCounter = 0;
@@ -63,7 +63,7 @@ void QueueOutputData(void *pvParameters)
 
 		if (syncCounter % fuelcell_logsend == 0)
 		{
-			// Arrange for outgoing fuel cell data
+			// Arrange for outgoing fuel cell payload
 			outgoing.ID = FC;
 			HESFuelCell::dumpTimestampInto(&outgoing.timeStamp);
 			for (int i = 0; i < NUM_FUELCELLS; i++)
@@ -74,7 +74,7 @@ void QueueOutputData(void *pvParameters)
 				}
 				/*else
 				{
-					strcat(outgoing.data, "-\t-\t-\t-\t-\t-\t-\t-");
+					strcat(outgoing.payload, "-\t-\t-\t-\t-\t-\t-\t-");
 				}*/
 			}
 			xQueueSend(queueForLogSend, &outgoing, 100);
@@ -90,29 +90,36 @@ void QueueOutputData(void *pvParameters)
 		--------------------------------------------------*/
 		if (syncCounter % motor_logsend == 0)
 		{
-			// Arrange for outgoing current sensor data
+			// Arrange for outgoing current sensor payload
 			outgoing.ID = CS;
-			motors[0].dumpTimestampInto(&outgoing.timeStamp);
+			AttopilotCurrentSensor::dumpTimestampInto(&outgoing.timeStamp);
 			for (int i = 0; i < NUM_CURRENTSENSORS; i++)
 			{
 				motors[i].dumpDataInto(outgoing.data);//len 5
 			}
 			xQueueSend(queueForLogSend, &outgoing, 100);
 			//xQueueSend(queueForDisplay, &outgoing, 100);
-			xQueueSend(queueForSendCAN, &outgoing, 100);
+			//xQueueSend(queueForSendCAN, &outgoing, 100);
 			//if (syncCounter % (back_lcd_refresh) == 0)
 			//{
 			//	for (int i = 0; i < NUM_CURRENTSENSORS; i++)
 			//	{
-			//		strcat(outgoing.data, "\t");
-			//		motors[i].dumpAmpPeakInto(outgoing.data);//len 5
+			//		strcat(outgoing.payload, "\t");
+			//		motors[i].dumpAmpPeakInto(outgoing.payload);//len 5
 			//	}
 			//	for (int i = 0; i < NUM_CURRENTSENSORS; i++)
 			//	{
-			//		strcat(outgoing.data, "\t");
-			//		motors[i].dumpTotalEnergyInto(outgoing.data);//len 7
+			//		strcat(outgoing.payload, "\t");
+			//		motors[i].dumpTotalEnergyInto(outgoing.payload);//len 7
 			//	}
 			//}
+		}
+		if (syncCounter % speedo_refresh_interval == 0)
+		{
+			outgoing.ID = SM;
+			Speedometer::dumpTimestampInto(&outgoing.timeStamp);
+			speedo.dumpDataInto(outgoing.data);
+			//xQueueSend(queueForLogSend, &outgoing, 100);
 		}
 		vTaskDelay(delay);
 	}
@@ -133,10 +140,10 @@ void LogSendData(void *pvParameters __attribute__((unused)))  // This is a Task.
 			strcpy(path + FILENAME_HEADER_LENGTH, dataPoint_shortNames[received.ID]);
 			strcat(path, ".txt");
 
-			//strncpy(shortFileName, MOTOR_FILENAME, 2);
-			//strcpy(path + FILENAME_HEADER_LENGTH, MOTOR_FILENAME);
+			//strncpy(shortFileName, CURRENTSENSOR_FILENAME, 2);
+			//strcpy(path + FILENAME_HEADER_LENGTH, CURRENTSENSOR_FILENAME);
 
-			// Make container for string representation of queueItem data
+			// Make container for string representation of queueItem payload
 			// 3 for short name, 9 for timestamp, remaining for all the floats and delimiters like \t " "
 			char data[3 + 9 + (FLOAT_TO_STRING_LEN + 1)*(QUEUEITEM_DATAPOINTS*QUEUEITEM_READVALUES) + QUEUEITEM_DATAPOINTS];
 			//					^^						floats and spacebar						^^^	  ^^	tabs		^^
@@ -144,16 +151,20 @@ void LogSendData(void *pvParameters __attribute__((unused)))  // This is a Task.
 			// -------------- Store into SD -------------
 			if (SD_avail)
 			{
+				// DO NOT SWITCH OUT THIS TASK IN THE MIDST OF WRITING A FILE ON SD CARD
+				// (consequence: some serial payload may be missed. Hang or miss payload? Tough choice...)
+				taskENTER_CRITICAL();
 				File writtenFile = SD.open(path, FILE_WRITE);
 				writtenFile.println(data);
 				writtenFile.close();
+				taskEXIT_CRITICAL();
 			}
 			// *path should only remain as /LOG_****/
 			// clean up after use
 			strcpy(path + FILENAME_HEADER_LENGTH, "");
 
-			// finally print out the data to be transmitted by XBee
-			Serial.print(data);
+			// finally print out the payload to be transmitted by XBee
+			Serial.println(data);
 		}
 
 		vTaskDelay(delay);
@@ -177,62 +188,100 @@ void LogSendData(void *pvParameters __attribute__((unused)))  // This is a Task.
 //		vTaskDelay(delay);
 //	}
 //}
-//void SendCANFrame(void *pvParameters __attribute__((unused)))  // This is a Task.
-//{
-//	QueueItem received;
-//	TickType_t delay = pdMS_TO_TICKS(CAN_FRAME_INTERVAL); // delay 300 ms, shorter than reading/queueing tasks since this task has lower priority
-//	
-//	while (1)
-//	{
-//		BaseType_t success = xQueueReceive(queueForSendCAN, &received, 0);
-//		if (success == pdPASS)
-//		{
-//			taskENTER_CRITICAL();
-//			unsigned long id = NV_CAN_BACK;
-//			switch (received.ID)
-//			{
-//			case FC:
-//				id &= 0xFFD; // clear 2nd bit
-//				break;
-//			case CS:
-//				id |= 0x002; // set 2nd bit
-//				break;
-//			}
-//			char* curSeg = received.data;
-//			byte curSegBuffer[8];
-//			byte curSegLen = strcspn(curSeg, "\t"); // skip the timestamp
-//			curSeg += curSegLen + 1; // advance to next segment
-//			////////////char* partial = strtok(received.data, "\t");
-//			while (curSegLen != 0)
-//			{
-//				////////////partial = strtok(NULL, "\t");
-//				curSegLen = strcspn(curSeg, "\t");
-//				////////////byte len = strlen(partial);
-//				// copy contents from curSeg into curSegBuffer, only for type conversion compability with CANObj.setMsgBuf()
-//				memcpy(curSegBuffer, curSeg, curSegLen); // does not copy '\0'
-//				byte status = CANObj.sendMsgBuf(id, 0, curSegLen, curSegBuffer);
-//				// advance to next segment
-//				Serial.print("Sent ID:");
-//				Serial.println(id);
-//				Serial.print("Content:\n");
-//				for (int i = 0; i < curSegLen; i++)
-//				{
-//					Serial.print((char)curSegBuffer[i]);
-//				}
-//				Serial.println();
-//				curSeg += curSegLen + 1;
-//				if (status != CAN_OK)
-//				{
-//					break;
-//				}
-//
-//
-//			}
-//			// set last bit for final frame
-//			CANObj.sendMsgBuf(id | 0x001, 0, 2, curSegBuffer); // WARNING, content is random
-//			taskEXIT_CRITICAL();
-//		}
-//		
-//		vTaskDelay(pdMS_TO_TICKS(150));
-//	}
-//}
+void SendCANFrame(void *pvParameters __attribute__((unused)))  // This is a Task.
+{
+	QueueItem received;
+	TickType_t delay = pdMS_TO_TICKS(CAN_FRAME_INTERVAL*10); // delay 150 ms, shorter than reading/queueing tasks since this task has lower priority
+	
+	while (1)
+	{
+		BaseType_t success = xQueueReceive(queueForSendCAN, &received, 0);
+		// we are going to encode 2 floats into 1 frame (2*4bytes = 8bytes)
+		NV_CanFrames framesCollection;
+		if (success == pdPASS)
+		{
+			// ------------------------  convert to frames --------------------
+			received.toFrames(&framesCollection);
+			for (uint8_t i = 0; i < framesCollection.numFrames; i++)
+			{
+				NV_CanFrame& thisFrame = framesCollection.frames[i];
+				byte status = CANObj.sendMsgBuf(thisFrame.id, 0, thisFrame.length, thisFrame.payload);
+				if (status != CAN_OK)
+				{
+					// handle sending error
+				}
+			}
+
+
+
+		}
+		//Serial.print("ST: ");Serial.println(uxTaskGetStackHighWaterMark(NULL));
+		vTaskDelay(delay);
+
+			//// ------------------------------ covert back -----------------------------------
+			//bool convertSucess = framesCollection.toQueueItem(&received);
+			//if (!convertSucess)
+			//{
+			//	// handle error frame
+			//	Serial.println(F("Failed to convert!"));
+			//	vTaskSuspend(NULL);
+			//}
+			//else
+			//{
+			//	// pass on converted queue item to the display
+
+			//}
+
+
+			//// -- test payload --
+			//received.ID = CS;
+			//received.timeStamp = 0x89ABCDEF;
+			//for (int i = 0; i < 8; i++)
+			//{
+			//	received.payload[0][i] = (i + 11) / 10.0;
+			//}
+			//for (int i = 0; i < 8; i++)
+			//{
+			//	received.payload[1][i] = (i + 21) / 10.0;
+			//}
+			//for (int i = 0; i < 8; i++)
+			//{
+			//	received.payload[2][i] = (i + 31) / 10.0;
+			//}
+			//// -- test payload --
+			//// verify if toFrames is working well...
+			//// print raw frames
+			//while ((framesCollection.frames[i].id & B11) != B11)
+			//{
+			//	Serial.print("Frame ");
+			//	Serial.print(i);
+			//	Serial.print(": ");
+			//	Serial.print(framesCollection.frames[i].id);
+			//	Serial.print(" ");
+			//	Serial.print(framesCollection.frames[i].length);
+			//	Serial.print("\n");
+			//	for (int j = 0;j<framesCollection.frames[i].length;j++)
+			//		Serial.println(framesCollection.frames[i].payload[j], 16);
+			//	i++;
+			//}
+			//Serial.print("Frame ");
+			//Serial.print(i);
+			//Serial.print(": ");
+			//Serial.print(framesCollection.frames[i].id);
+			//Serial.print(" ");
+			//Serial.print(framesCollection.frames[i].length);
+			//Serial.print("\n");
+			//for (int j = 0;j<framesCollection.frames[i].length;j++)
+			//	Serial.println(framesCollection.frames[i].payload[j], 16);
+			//// print converted results
+			//if (!convertSucess)
+			//{
+			//	Serial.println("CONVERSION ERROR...");
+			//	while (1);
+			//}
+			//char payload[3 + 9 + (FLOAT_TO_STRING_LEN + 1)*(QUEUEITEM_DATAPOINTS*QUEUEITEM_READVALUES) + QUEUEITEM_DATAPOINTS];
+			//received.toString(payload);
+			//Serial.println(payload);
+
+	}
+}

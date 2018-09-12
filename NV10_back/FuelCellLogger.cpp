@@ -1,8 +1,11 @@
 #include "FuelCellLogger.h"
 #include <SPI.h>
 #include <SD.h>
+#include <Arduino_FreeRTOS.h>
 
 uint32_t HESFuelCell::timeStamp;
+char* HESFuelCell::path;
+bool HESFuelCell::SD_avail = false;
 HESFuelCell::HESFuelCell(uint8_t id, HardwareSerial *port):id(id),port(port)
 {
 	port->begin(19200);
@@ -11,10 +14,14 @@ HESFuelCell::HESFuelCell(uint8_t id, HardwareSerial *port):id(id),port(port)
 	
 	timeStamp = 0;
 }
-
+void HESFuelCell::setPath(char* thePath)
+{
+	SD_avail = true;
+	path = thePath;
+}
 void HESFuelCell::logData()
 {
-	// read into buffer, see if data found by using DELIMITER "\n"
+	// read into buffer, see if payload found by using DELIMITER "\n"
 	if (!port->available())
 		return;
 	uint8_t bytesRead = port->readBytesUntil('\n', buffer, RX_BUFFER_LEN);
@@ -74,13 +81,13 @@ void HESFuelCell::logData()
 		writeAsRawData("**");
 	}
 }
-void HESFuelCell::dumpTimestampInto(uint32_t* location)
+void HESFuelCell::dumpTimestampInto(unsigned long* location)
 {
 	*location = timeStamp;
 }
 void HESFuelCell::dumpDataInto(float location[QUEUEITEM_DATAPOINTS][QUEUEITEM_READVALUES])
 {
-	// expect QueueItem.data to come in
+	// expect QueueItem.payload to come in
 	float* thisSlot = location[id];
 	for (int i = 0; i < FUELCELL_READVALUES; i++)
 	{
@@ -97,17 +104,17 @@ void HESFuelCell::writeAsRawData(char* toWrite)
 {
 	if (SD_avail)
 	{
-		if (id == 0)
-			strcpy(path + FILENAME_HEADER_LENGTH, MASTER_FUELCELL_RAW_FILENAME);
-		else if (id == 1)
-			strcpy(path + FILENAME_HEADER_LENGTH, SLAVE_FUELCELL_RAW_FILENAME);
-		else
-			return;
+		// outcome: path = /LOG****/FC*raw.txt
+		strcpy(path + FILENAME_HEADER_LENGTH, dataPoint_shortNames[FC]);
+		itoa(id, path + FILENAME_HEADER_LENGTH + 2, 10);
+		strcpy(path + FILENAME_HEADER_LENGTH + 2 + 1, "raw.txt");
 
+		// higher priority task does not need critical section eh?
 		File rawFCdata = SD.open(path, FILE_WRITE);
 		rawFCdata.print(toWrite);
-		rawFCdata.print("\n");
+		rawFCdata.print("\r\n");
 		rawFCdata.close();
+
 		strcpy(path + FILENAME_HEADER_LENGTH, "");
 	}
 }

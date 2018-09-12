@@ -7,6 +7,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)FrameFormats.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)FrameFormatsConversion.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)FrameFormats.cpp" />
   </ItemGroup>
 </Project>

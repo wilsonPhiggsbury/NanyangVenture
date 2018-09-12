@@ -94,11 +94,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\NV10_back\NV10_back.vcxproj">
-      <Project>{b2680710-9fbd-4579-b8a3-a9dd6be86f8d}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="..\NV10_back\CAN_ID_protocol.h" />
     <ClInclude Include="Bitmaps.h" />
     <ClInclude Include="Behaviour_Dashboard.h" />

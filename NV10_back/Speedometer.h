@@ -8,18 +8,26 @@
 #else
 	#include "WProgram.h"
 #endif
-
+#include "FrameFormats.h"
 class Speedometer
 {
 public:
-	Speedometer(uint16_t diameter);
+	Speedometer(uint8_t id, uint16_t diameter);
 	void storeWheelInterval();
+	static void dumpTimestampInto(unsigned long * location);
+	void dumpDataInto(float location[QUEUEITEM_DATAPOINTS][QUEUEITEM_READVALUES]);
 	float calculateSpeed_MS();
-	float calculateSpeed_KMH();
 private:
 	uint16_t wheelDiameter; // in millimeters
 	uint16_t timeDiff = 0;
 	unsigned long lastTime = 0;
+	static unsigned long timeStamp;
+	void processData();
+	uint8_t id;
+	float loggedParams[SPEEDOMETER_READVALUES] = {};
+	typedef enum {
+		kmh
+	}LoggedParams;
 };
 
 #endif

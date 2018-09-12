@@ -49,7 +49,7 @@ void QueueOutputData(void *pvParameters __attribute__((unused)))  // This is a T
 
 	while (1) // A Task shall never return or exit.
 	{
-		// send data:  ID = 0x100, Standard CAN Frame, Data length = 8 bytes, 'data' = array of data bytes to 
+		// send payload:  ID = 0x100, Standard CAN Frame, Data length = 8 bytes, 'payload' = array of payload bytes to 
 		for (int i = 0;i < 8;i++)
 		{
 			outBuffer[i] = data[i];
@@ -61,7 +61,7 @@ void QueueOutputData(void *pvParameters __attribute__((unused)))  // This is a T
 		else {
 			Serial.println("Error Sending Message...");
 		}
-		vTaskDelay(pdMS_TO_TICKS(150));   // send data per 2000ms
+		vTaskDelay(pdMS_TO_TICKS(150));   // send payload per 2000ms
 	}
 }
 void CAN_ISR()

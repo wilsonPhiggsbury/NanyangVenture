@@ -12,6 +12,7 @@
 #endif
 
 #include "FrameFormats.h"
+
 // range of volt & amp readings expected
 #define V_STEP 5
 #define V_0 0
@@ -26,7 +27,7 @@
 
 
 // LOOKUP TABLE declared below
-const uint16_t V_TABLE[NUM_CURRENTSENSORS][V_ENTRIES] PROGMEM = {
+const uint16_t V_TABLE[][V_ENTRIES] PROGMEM = {
 	{
 		// CAP_IN
 		0,
@@ -76,7 +77,7 @@ const uint16_t V_TABLE[NUM_CURRENTSENSORS][V_ENTRIES] PROGMEM = {
 		785
 	},
 };
-const uint16_t A_TABLE[NUM_CURRENTSENSORS][A_ENTRIES] PROGMEM = {
+const uint16_t A_TABLE[][A_ENTRIES] PROGMEM = {
 	{
 		// CAP_IN
 		0.0,
@@ -154,28 +155,30 @@ const uint16_t A_TABLE[NUM_CURRENTSENSORS][A_ENTRIES] PROGMEM = {
 class AttopilotCurrentSensor
 {
 private:
+	static uint32_t timeStamp;
+
+	uint8_t id;
+	uint8_t voltPin;
+	uint8_t ampPin;
+
+	float loggedParams[CURRENTSENSOR_READVALUES] = {};
 	typedef enum {
 		volt,
 		amp
 	}LoggedParameters;
 
-	uint8_t voltPin;
-	uint8_t ampPin;
-	float loggedParams[CURRENTSENSOR_READVALUES];
-
 	//uint16_t ampPeak = 0;
 	// As opposed to conventional Wh, this variable takes milliseconds instead of hours as time frame due to calculation efficiency.
 	// Don't worry, will convert to float when sending.
 	//float totalEnergy = 0; 
+	void processData();
 	float rawToVA(LoggedParameters which, float reading);
-	uint32_t timeStamp;
 
 
 public:
 	AttopilotCurrentSensor(int motorID, uint8_t voltPin, uint8_t ampPin);
-	uint8_t id;
 	void logData();
-	void dumpTimestampInto(uint32_t* location);
+	static void dumpTimestampInto(unsigned long* location);
 	void dumpDataInto(float location[QUEUEITEM_DATAPOINTS][QUEUEITEM_READVALUES]);
 	//void dumpTotalEnergyInto(char * location);
 

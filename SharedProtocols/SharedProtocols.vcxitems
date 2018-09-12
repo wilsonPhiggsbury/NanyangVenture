@@ -17,7 +17,7 @@
     <Text Include="$(MSBuildThisFileDirectory)readme.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)FrameFormatsConversion.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)FrameFormats.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)FrameFormats.h" />

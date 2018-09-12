@@ -1,7 +1,7 @@
-C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Debug\Adafruit_GFX_Library\Adafruit_SPITFT.cpp.o: \
- D:\Arduino\Projects\libraries\Adafruit_GFX_Library\Adafruit_SPITFT.cpp \
+C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Debug\FrameFormats.cpp.o: \
+ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Debug\FrameFormats.cpp \
  C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Debug/build_options.h \
- D:\Arduino\Projects\libraries\Adafruit_GFX_Library\Adafruit_SPITFT.h \
+ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Debug\FrameFormats.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Arduino.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/binary.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/WCharacter.h \
@@ -13,9 +13,4 @@ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_back\mega_atmega2560\Debug\Adafruit
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/USBAPI.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Arduino.h \
  D:\Arduino\ide\hardware\arduino\avr\variants\mega/pins_arduino.h \
- D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Print.h \
- D:\Arduino\ide\hardware\arduino\avr\libraries\SPI\src/SPI.h \
- D:\Arduino\Projects\libraries\Adafruit_GFX_Library\Adafruit_GFX.h \
- D:\Arduino\Projects\libraries\Adafruit_GFX_Library\gfxfont.h \
- D:\Arduino\ide\hardware\arduino\avr\cores\arduino/wiring_private.h \
- D:\Arduino\Projects\libraries\Adafruit_GFX_Library\Adafruit_SPITFT_Macros.h
+ C:\Program\ Files\ (x86)\Microsoft\ Visual\ Studio\2017\Enterprise\Common7\IDE\Extensions\pd4xo3tv.r1p\Micro\ Platforms\default\debuggers\VM_DBG/VM_DBG.h
