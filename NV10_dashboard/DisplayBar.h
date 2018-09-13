@@ -20,7 +20,8 @@ private:
 	uint16_t minVal = 0;
 	uint16_t maxVal = 100;
 	uint16_t actualWidth, actualHeight;
-	float prevValue, thisValue;
+	float prevValue = 0;
+	float thisValue = 0;
 	int8_t facing = 1;
 	void refreshSettings();
 	float toWidthScale(float value);

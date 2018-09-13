@@ -4,82 +4,62 @@
 
 #include "CurrentSensorLogger.h"
 
-
+uint32_t AttopilotCurrentSensor::timeStamp;
 AttopilotCurrentSensor::AttopilotCurrentSensor(int motorID, uint8_t voltPin, uint8_t ampPin):voltPin(voltPin),ampPin(ampPin),id(motorID)
 {
 	// id is only for accessing lookup table
 }
 void AttopilotCurrentSensor::logData()
 {
-	voltReading = analogRead(voltPin);
-	ampReading = analogRead(ampPin);
+	loggedParams[volt] = analogRead(voltPin);
+	loggedParams[amp] = analogRead(ampPin);
 
-	ampPeak = max(ampReading, ampPeak);
-	// totalEnergy += timeDiff (milliseconds) * V * I	<-- to convert to Wh, please divide by 3600000. Current form is only for convenience of storage
-	if (timeStamp != 0)
+	//ampPeak = max(ampReading, ampPeak);
+	/*if (timeStamp != 0)
 	{
 		float usedEnergy = rawToVA('V', voltReading) * rawToVA('A', ampReading);
 		usedEnergy *= (millis() - timeStamp);
 		totalEnergy +=  usedEnergy;
-	}
-	//if (totalEnergy > 180000000)
-	//	Serial.println(millis());
+	}*/
 	timeStamp = millis();
 }
 
-void AttopilotCurrentSensor::dumpTimestampInto(char* location)
+void AttopilotCurrentSensor::dumpTimestampInto(unsigned long* location)
 {
-	char tmp[9];
-	ultoa(timeStamp, tmp, 16);
-	strcat(location, tmp);
+	*location = timeStamp;
 }
-void AttopilotCurrentSensor::dumpVoltReadingInto(char *location)
+void AttopilotCurrentSensor::dumpDataInto(float location[QUEUEITEM_DATAPOINTS][QUEUEITEM_READVALUES])
 {
-	float finalReading;
-	char tmp[6];
-	finalReading = rawToVA('V', voltReading);
-	dtostrf(finalReading, 4, 1, tmp);
-	strcat(location, tmp);
+	// only convert to Volt/Amp during send, don't convert during logging as logging happens mroe frequently
+	processData();
+	float* thisSlot = location[id];
+	for (int i = 0; i < CURRENTSENSOR_READVALUES; i++)
+	{
+		thisSlot[i] = loggedParams[i];
+	}
 }
-void AttopilotCurrentSensor::dumpAmpReadingInto(char *location)
+void AttopilotCurrentSensor::processData()
 {
-	float finalReading;
-	char tmp[6];
-	finalReading = rawToVA('A', ampReading);
-	dtostrf(finalReading, 4, 1, tmp);
-	strcat(location, tmp);
+	for (int i = 0; i < CURRENTSENSOR_READVALUES; i++)
+	{
+		loggedParams[i] = rawToVA((LoggedParameters)i, loggedParams[i]);
+	}
 }
-void AttopilotCurrentSensor::dumpAmpPeakInto(char *location)
-{
-	float finalReading = rawToVA('A', ampPeak);
-	char tmp[6];
-	dtostrf(finalReading, 4, 1, tmp);
-	strcat(location, tmp);
-}
-void AttopilotCurrentSensor::dumpTotalEnergyInto(char *location)
-{
-	//float finalReading = rawToVA('A', ampPeak);
-	// TODO: there is place for optimization by postponing calculate raw first until truly dumping data
-	char tmp[6];
-	float whr = totalEnergy / 3600000;
-	dtostrf(whr, 6, 1, tmp);
-	strcat(location, tmp);
-}
-float AttopilotCurrentSensor::rawToVA(char which, float reading)
+float AttopilotCurrentSensor::rawToVA(LoggedParameters which, float reading)
 {
 	float first, last, step, maxIndex;
 	uint16_t thisValue, nextValue;
 	const uint16_t* TABLE;
 	switch (which)
 	{
-	case 'V':
+	case volt:
 		first = V_0;
 		last = V_N;
 		step = V_STEP;
 		maxIndex = V_ENTRIES;
 		TABLE = V_TABLE[id]; // point to this segment of the array
 		break;
-	case 'A':
+	case amp:
 		first = A_0;
 		last = A_N;
 		step = A_STEP;

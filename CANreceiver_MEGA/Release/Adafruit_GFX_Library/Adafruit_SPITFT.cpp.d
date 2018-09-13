@@ -1,4 +1,4 @@
-C:\Users\MX\AppData\Local\Temp\VMBuilds\Scratchpad3\mega_atmega2560\Release\Adafruit_GFX_Library\Adafruit_SPITFT.cpp.o: \
+C:\Users\MX\AppData\Local\Temp\VMBuilds\CANreceiver_MEGA\mega_atmega2560\Release\Adafruit_GFX_Library\Adafruit_SPITFT.cpp.o: \
  D:\Arduino\Projects\libraries\Adafruit_GFX_Library\Adafruit_SPITFT.cpp \
  D:\Arduino\Projects\libraries\Adafruit_GFX_Library\Adafruit_SPITFT.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Arduino.h \

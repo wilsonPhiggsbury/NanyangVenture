@@ -1,16 +1,8 @@
 
-void wipeEEPROM()
-{
-	for (int address = 0; address < EEPROM.length(); address += 1)
-	{
-		uint16_t tis;
-		EEPROM.write(address, 255);
-	}
-}
 bool initSD(char* path)
 {
 	const uint8_t FILENAME_INDEX = 4;
-	if (!SD.begin(SD_SPI_CS))
+	if (!SD.begin(SD_SPI_CS_PIN))
 	{
 		return false;
 	}
@@ -57,23 +49,27 @@ bool initSD(char* path)
 
 	strcpy(path + FILENAME_HEADER_LENGTH, FUELCELL_FILENAME);
 	sub = SD.open(path, FILE_WRITE);
-	sub.println(F("Millis\tV_m\tA_m\tW_m\tWh_m\tTmp_m\tPres_m\tVcap_m\tState_m\tV_s\tA_s\tW_s\tWh_s\tTmp_s\tPres_s\tVcap_s\tState_s"));
+	sub.println(F("\tMillis\t  V_m  A_m   W_m   Wh_mTmp_m Pres_m Vcap_m State_m\t  V_s  A_s   W_s   Wh_sTmp_s Pres_s Vcap_s State_s"));
 	sub.close();
 
-	strcpy(path + FILENAME_HEADER_LENGTH, MOTOR_FILENAME);
+	strcpy(path + FILENAME_HEADER_LENGTH, CURRENTSENSOR_FILENAME);
 	sub = SD.open(path, FILE_WRITE);
-	sub.println(F("Millis\tV_left\tV_right\tV_cap\tA_left\tA_right\tA_cap"));
+	sub.println(F("\tMillis\t V_cI A_cI\t V_cO A_cO\t V_MT A_MT"));
 	sub.close();
 
-	strcpy(path + FILENAME_HEADER_LENGTH, MASTER_FUELCELL_RAW_FILENAME);
-	sub = SD.open(path, FILE_WRITE);
-	sub.close();
-	strcpy(path + FILENAME_HEADER_LENGTH, SLAVE_FUELCELL_RAW_FILENAME);
-	sub = SD.open(path, FILE_WRITE);
-	sub.close();
+	//strcpy(path + FILENAME_HEADER_LENGTH, MASTER_FUELCELL_RAW_FILENAME);
+	//sub = SD.open(path, FILE_WRITE);
+	//sub.close();
+	//strcpy(path + FILENAME_HEADER_LENGTH, SLAVE_FUELCELL_RAW_FILENAME);
+	//sub = SD.open(path, FILE_WRITE);
+	//sub.close();
 	// *path should always contain /LOG_****/
 	// We will still use *path variable whenever we write to a file. 
 	// Clean up trailing file names after use.
 	strcpy(path + FILENAME_HEADER_LENGTH, "");
 	return true;
+}
+void storeWheelInterval_ISR()
+{
+	speedo.storeWheelInterval();
 }

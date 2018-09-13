@@ -4,44 +4,55 @@
  Author:	MX
 */
 
-#include <Arduino_FreeRTOS.h>
-#include <semphr.h>  // add the FreeRTOS functions for Semaphores (or Flags).
-#include <queue.h>
-#include <Adafruit_GFX.h>
-#include <TFT_ILI9163C.h>
+#include <FreeRTOS_AVR.h>
+#include <mcp_can.h>
+#include "Behaviour.h"
+#include <SPI.h>
 #include <SD.h>
-#include <LiquidCrystal_I2C.h>
-#include <EEPROM.h>
 
-#include "JoulemeterDisplay.h"	
+//#include "JoulemeterDisplay.h"	
 #include "CurrentSensorLogger.h"
 #include "FuelCellLogger.h"
+#include "Speedometer.h"
 
 #include "Wiring.h"
 
+// file names
+const char FUELCELL_FILENAME[] = "FC.txt";
+const char CURRENTSENSOR_FILENAME[] = "CS.txt";
+const uint8_t FILENAME_HEADER_LENGTH = 1 + 8 + 1;
+// sample filename: /LOG_0002/12345678.txt   1+8+1+8+4+1, 
+//											  ^^^ | ^^^
+//										   HEADER | FILENAME
+
 // define queues
 QueueHandle_t queueForLogSend = xQueueCreate(1, sizeof(QueueItem));
-QueueHandle_t queueForDisplay = xQueueCreate(1, sizeof(QueueItem));
+//QueueHandle_t queueForDisplay = xQueueCreate(1, sizeof(QueueItem));
+QueueHandle_t queueForSendCAN = xQueueCreate(1, sizeof(QueueItem));
+// define instances of main modules
 HESFuelCell hydroCells[NUM_FUELCELLS] = {
 	HESFuelCell(0, &FC_MASTER_PORT),
 	HESFuelCell(1, &FC_SLAVE_PORT)
 };
 AttopilotCurrentSensor motors[NUM_CURRENTSENSORS] = {
-	AttopilotCurrentSensor(0,L_WHEEL_VPIN,L_WHEEL_APIN),
-	AttopilotCurrentSensor(1,R_WHEEL_VPIN,R_WHEEL_APIN),
-	AttopilotCurrentSensor(2,SUPERCAP_VPIN,SUPERCAP_APIN)
+	AttopilotCurrentSensor(0,CAP_IN_VPIN,CAP_IN_APIN),
+	AttopilotCurrentSensor(1,CAP_OUT_VPIN,CAP_OUT_APIN),
+	AttopilotCurrentSensor(2,MOTOR_VPIN,MOTOR_APIN)
 };
+// ATTR: wheel diameter
+Speedometer speedo = Speedometer(0, 545);
+MCP_CAN CANObj = MCP_CAN(CAN_CS_PIN);
 // define globals
 bool SD_avail;
 char path[FILENAME_HEADER_LENGTH + 8 + 4 + 1]; // +8 for filename, +4 for '.txt', +1 for '\0'
 
 // define tasks, types are: input, control, output
-void TaskReadFuelCell(void *pvParameters);		// Input task:		Refreshes class variables for fuel cell Volts, Amps, Watts and Energy
-void TaskReadMotorPower(void *pvParameters);	// Input task:		Refreshes class variables for motor Volts and Amps
-void TaskQueueOutputData(void *pvParameters);	// Control task:	Controls frequency to queue data from above tasks to output tasks
-void TaskLogSendData(void *pvParameters);		// Output task:		Data logged in SD card and sent through XBee. Logged and sent data should be consistent, hence they are grouped together
-void TaskDisplayData(void *pvParameters);		// Output task:		Display on LCD screen
-void TaskDoNothing(void* pvParameters);
+void ReadFuelCell(void *pvParameters);		// Input task:		Refreshes class variables for fuel cell Volts, Amps, Watts and Energy
+void ReadMotorPower(void *pvParameters);	// Input task:		Refreshes class variables for motor Volts and Amps
+void QueueOutputData(void *pvParameters);	// Control task:	Controls frequency to queue payload from above tasks to output tasks
+void LogSendData(void *pvParameters);		// Output task:		Data logged in SD card and sent through XBee. Logged and sent payload should be consistent, hence they are grouped together
+void DisplayData(void *pvParameters);		// Output task:		Display on LCD screen
+void SendCANFrame(void* pvParameters);
 
 //// _______________OPTIONAL_____________
 //void TaskReceiveCommands(void *pvParameters);	// Input task:		Enable real-time control of Arduino (if any)
@@ -54,259 +65,63 @@ void setup() {
 	Serial.begin(9600);
 	delay(100);
 
-	debug(SERIAL_RX_BUFFER_SIZE);
 	// create all files in a new directory
 	SD_avail = initSD(path);
-	// define objects for more complicated procedures
-	
-	// Now set up all Tasks to run independently.
-	xTaskCreate(
-		TaskReadFuelCell
-		, (const portCHAR *)"Fuel"
-		, 725
-		, hydroCells
-		, 3
-		, NULL);
-	xTaskCreate(
-		TaskReadMotorPower
-		, (const portCHAR *)"Motor"
-		, 175
-		, motors
-		, 2
-		, NULL);
-	xTaskCreate(
-		TaskQueueOutputData
-		, (const portCHAR *)"Enqueue"  // A name just for humans
-		, 275  // This stack size can be checked & adjusted by reading the Stack Highwater
-		, NULL // Any pointer to pass in
-		, 2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
-		, NULL);
-	xTaskCreate(
-		TaskLogSendData
-		, (const portCHAR *) "LogSend"
-		, 675  // Stack size
-		, NULL
-		, 1  // Priority
-		, NULL);
-	xTaskCreate(
-		TaskDisplayData
-		, (const portCHAR *) "Display"
-		, 350  // Stack size
-		, NULL
-		, 1  // Priority
-		, NULL);
-	// Now the Task scheduler, which takes over control of scheduling individual Tasks, is automatically started.
-
+	if (SD_avail)
+		HESFuelCell::setPath(path);
+	// initialize speedometer
+	attachInterrupt(digitalPinToInterrupt(SPEEDOMETER_INTERRUPT_PIN), storeWheelInterval_ISR, FALLING);
+	// initialize CAN bus
+	if (CANObj.begin(CAN_1000KBPS) != CAN_OK)
+	{
+		Serial.println(F("NV10_back CAN init fail!"));
+		while (1);
+	}
+	else
+	{
+		Serial.println(F("NV10_back CAN init success!"));
+	}
+	// Now set up all Tasks to run independently. Task functions are found in Tasks.ino
 	//xTaskCreate(
-	//	TaskDoNothing
-	//	, (const portCHAR *) "Nothing"
-	//	, 100  // Stack size
-	//	, NULL
-	//	, 0  // Priority
+	//	ReadFuelCell
+	//	, (const portCHAR *)"Fuel"
+	//	, 725
+	//	, hydroCells
+	//	, 3
 	//	, NULL);
+	//xTaskCreate(
+	//	ReadMotorPower
+	//	, (const portCHAR *)"CSensor"
+	//	, 175
+	//	, motors
+	//	, 3
+	//	, NULL);
+	//xTaskCreate(
+	//	QueueOutputData
+	//	, (const portCHAR *)"Enqueue"  // A name just for humans
+	//	, 275  // This stack size can be checked & adjusted by reading the Stack Highwater
+	//	, NULL // Any pointer to pass in
+	//	, 2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
+	//	, NULL);
+	//xTaskCreate(
+	//	LogSendData
+	//	, (const portCHAR *) "LogSend"
+	//	, 800  // Stack size
+	//	, NULL
+	//	, 1  // Priority
+	//	, NULL);
+	xTaskCreate(
+		SendCANFrame
+		, (const portCHAR *) "CAN la!" // where got cannot?
+		, 800  // Stack size
+		, NULL
+		, 1  // Priority
+		, NULL);
+	vTaskStartScheduler();
+
 }
 
 void loop()
 {
 	// Empty. Things are done in Tasks.
-}
-
-/*--------------------------------------------------*/
-/*---------------------- Tasks ---------------------*/
-/*--------------------------------------------------*/
-void TaskReadFuelCell(void *pvParameters)  // This is a Task.
-{
-	// Obtain fuel cell object references from parameter passed in
-	HESFuelCell* fuelCell = (HESFuelCell*)pvParameters;
-
-	TickType_t prevTick = xTaskGetTickCount(); // only needed when vTaskDelayUntil is called instead of vTaskDelay
-	TickType_t delay = pdMS_TO_TICKS(READ_FC_INTERVAL);
-	while (1)
-	{
-		for (int i = 0; i < NUM_FUELCELLS; i++)
-		{
-			(fuelCell + i)->logData();
-		}
-		vTaskDelayUntil(&prevTick, delay); // more accurate compared to vTaskDelay, since the delay is shrunk according to execution time of this piece of code
-	}
-}
-void TaskReadMotorPower(void* pvParameters)
-{
-	// Obtain current sensor object references from parameter passed in
-	AttopilotCurrentSensor* sensor = (AttopilotCurrentSensor*)pvParameters;
-
-	TickType_t prevTick = xTaskGetTickCount(); // only needed when vTaskDelayUntil is called instead of vTaskDelay
-	TickType_t delay = pdMS_TO_TICKS(READ_MT_INTERVAL);
-	while (1)
-	{
-		for (int i = 0; i < NUM_CURRENTSENSORS; i++)
-		{
-			(sensor + i)->logData();
-		}
-		vTaskDelayUntil(&prevTick, delay);
-	}
-	
-}
-void TaskQueueOutputData(void *pvParameters)
-{
-	const uint16_t fuelcell_logsend = FUELCELL_LOGSEND_INTERVAL / QUEUE_DATA_INTERVAL;
-	const uint16_t motor_logsend = MOTOR_LOGSEND_INTERVAL / QUEUE_DATA_INTERVAL;
-	const uint16_t hud_refresh = HUD_REFRESH_INTERVAL / QUEUE_DATA_INTERVAL;
-	const uint16_t back_lcd_refresh = BACK_LCD_REFRESH_INTERVAL / QUEUE_DATA_INTERVAL;
-
-	QueueItem outgoing;
-	uint8_t syncCounter = 0;
-	//HESFuelCell* masterCell = (HESFuelCell*)pvParameters;
-	//HESFuelCell* slaveCell = ((HESFuelCell*)pvParameters) + 1;
-	//AttopilotCurrentSensor* motor1 = ((Loggers*)pvParameters)->motors;
-	//AttopilotCurrentSensor* motor2 = ((Loggers*)pvParameters)->motors + 1;
-	//AttopilotCurrentSensor* motor3 = ((Loggers*)pvParameters)->motors + 2;
-	TickType_t delay = pdMS_TO_TICKS(QUEUE_DATA_INTERVAL);
-	BaseType_t success;
-
-	while(1) // A Task shall never return or exit.
-	{
-		success = pdPASS;
-		syncCounter++;
-		if (syncCounter >= 128)
-			syncCounter = 0;
-		/* ------------------DATA FORMAT------------------
-						FM								FS
-			millis		V	A	W	Wh	T	P	V_c	St	V	A	W	Wh	T	P	V_c	St
-		--------------------------------------------------*/
-
-		if (syncCounter % fuelcell_logsend == 0)
-		{
-			// Arrange for outgoing fuel cell data
-			outgoing.ID = FuelCell;
-			outgoing.data[0] = '\0';
-			HESFuelCell::dumpTimestampInto(outgoing.data);
-			for (int i = 0; i < NUM_FUELCELLS; i++)
-			{
-				strcat(outgoing.data, "\t");
-				if (hydroCells[i].hasUpdated())
-				{
-					hydroCells[i].dumpDataInto(outgoing.data);
-				}
-				else
-				{
-					strcat(outgoing.data, "-\t-\t-\t-\t-\t-\t-\t-");
-				}
-			}
-			xQueueSend(queueForLogSend, &outgoing, 100);
-			xQueueSend(queueForDisplay, &outgoing, 100);
-		}
-		
-
-		/* ------------------DATA FORMAT------------------
-			Lwheel(L) -> Rwheel(R) -> Capacitor(c)
-
-			millis		V_L		V_R		V_c		A_L		A_R		A_c		Ap_L*	Ap_R*	Ap_c*	Wh_L*	Wh_R*	Wh_c*
-			*: only for display, not for logsend
-		--------------------------------------------------*/
-		if (syncCounter % motor_logsend == 0)
-		{
-			// Arrange for outgoing motor data
-			outgoing.ID = Motor;
-			outgoing.data[0] = '\0';
-			motors[0].dumpTimestampInto(outgoing.data);
-			for (int i = 0; i < NUM_CURRENTSENSORS; i++)
-			{
-				strcat(outgoing.data, "\t");
-				motors[i].dumpVoltReadingInto(outgoing.data);//len 5
-			}
-			for (int i = 0; i < NUM_CURRENTSENSORS; i++)
-			{
-				strcat(outgoing.data, "\t");
-				motors[i].dumpAmpReadingInto(outgoing.data);//len 5
-			}
-			xQueueSend(queueForLogSend, &outgoing, 100);
-			if (syncCounter % (back_lcd_refresh) == 0)
-			{
-				for (int i = 0; i < NUM_CURRENTSENSORS; i++)
-				{
-					strcat(outgoing.data, "\t");
-					motors[i].dumpAmpPeakInto(outgoing.data);//len 5
-				}
-				for (int i = 0; i < NUM_CURRENTSENSORS; i++)
-				{
-					strcat(outgoing.data, "\t");
-					motors[i].dumpTotalEnergyInto(outgoing.data);//len 7
-				}
-				xQueueSend(queueForDisplay, &outgoing, 100);
-			}
-		}
-		vTaskDelay(delay);
-	}
-}
-
-void TaskLogSendData(void *pvParameters __attribute__((unused)))  // This is a Task.
-{
-	QueueItem received;
-	TickType_t delay = pdMS_TO_TICKS(LOGSEND_INTERVAL); // delay 300 ms, shorter than reading/queueing tasks since this task has lower priority
-	
-	while(1)
-	{
-		BaseType_t success = xQueueReceive(queueForLogSend, &received, 0);
-		char shortFileName[3] = "";
-		if (success == pdPASS)
-		{
-			switch (received.ID)
-			{
-			case FuelCell:
-				strncpy(shortFileName, FUELCELL_FILENAME, 2);
-				strcpy(path + FILENAME_HEADER_LENGTH, FUELCELL_FILENAME);
-				break;
-			case Motor:
-				strncpy(shortFileName, MOTOR_FILENAME, 2);
-				strcpy(path + FILENAME_HEADER_LENGTH, MOTOR_FILENAME);
-				break;
-			}
-			Serial.print(shortFileName);
-			Serial.print('\t');
-			Serial.println(received.data);
-			// -------------- Store into SD -------------
-			if (SD_avail)
-			{
-				taskENTER_CRITICAL();
-				File writtenFile = SD.open(path, FILE_WRITE);
-				writtenFile.println(received.data);
-				writtenFile.close();
-				taskEXIT_CRITICAL();
-			}
-			// *path should only remain as /LOG_****/. Clean up after use
-			strcpy(path + FILENAME_HEADER_LENGTH, "");
-		}
-
-		vTaskDelay(delay);  // poll more frequently since more data comes in at a time
-	}
-}
-void TaskDisplayData(void *pvParameters)
-{
-	QueueItem received;
-	LiquidCrystal_I2C lcdScreen = LiquidCrystal_I2C(LCD1_I2C_ADDR, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);
-	DisplayLCD lcdManager = DisplayLCD(lcdScreen);
-
-	TickType_t delay = pdMS_TO_TICKS(DISPLAY_INTERVAL);
-
-	while (1)
-	{
-		BaseType_t success;
-		while (xQueueReceive(queueForDisplay, &received, 0) == pdPASS)
-		{
-			lcdManager.printData(received);
-		}
-		vTaskDelay(delay);
-	}
-}
-void TaskDoNothing(void *pvParameters __attribute__((unused)))  // This is a Task.
-{
-	uint32_t totalIdleMillis = 0;
-	uint32_t previousMillis = 0;
-	while (1)
-	{
-		totalIdleMillis += millis()-previousMillis;
-		previousMillis = millis();
-		
-	}
 }

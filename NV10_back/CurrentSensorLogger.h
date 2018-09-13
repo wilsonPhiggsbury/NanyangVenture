@@ -10,7 +10,8 @@
 #endif
 
 #endif
-#include "Behaviour.h"
+
+#include "FrameFormats.h"
 
 // range of volt & amp readings expected
 #define V_STEP 5
@@ -26,9 +27,25 @@
 
 
 // LOOKUP TABLE declared below
-const uint16_t V_TABLE[NUM_CURRENTSENSORS][V_ENTRIES] PROGMEM = {
+const uint16_t V_TABLE[][V_ENTRIES] PROGMEM = {
 	{
-		// L.wheel
+		// CAP_IN
+		0,
+		62,
+		128,
+		193,
+		257,
+		323,
+		388,
+		453,
+		519,
+		584,
+		648,
+		714,
+		779
+	},
+	{
+		// CAP_OUT *not tested*
 		0,
 		62,
 		128,
@@ -44,7 +61,7 @@ const uint16_t V_TABLE[NUM_CURRENTSENSORS][V_ENTRIES] PROGMEM = {
 		782
 	},
 	{
-		// R.wheel
+		// Motor
 		0,
 		62,
 		128,
@@ -59,120 +76,110 @@ const uint16_t V_TABLE[NUM_CURRENTSENSORS][V_ENTRIES] PROGMEM = {
 		719,
 		785
 	},
-	{
-		// Capacitor
-		0,
-		62,
-		128,
-		193,
-		257,
-		323,
-		388,
-		453,
-		519,
-		584,
-		648,
-		714,
-		779
-	}
 };
-const uint16_t A_TABLE[NUM_CURRENTSENSORS][A_ENTRIES] PROGMEM = {
+const uint16_t A_TABLE[][A_ENTRIES] PROGMEM = {
 	{
-		// L.wheel
-		0,
-		15,
-		30,
-		45,
-		60,
-		75,
-		90,
-		105,
-		120,
-		135,
-		151,
-		165,
-		181,
-		195,
-		211,
-		225,
-		242,
-		256,
-		271,
-		286,
-		301
+		// CAP_IN
+		0.0,
+		5.5,
+		12.0,
+		18.5,
+		26.0,
+		32.0,
+		39.5,
+		46.0,
+		53.5,
+		60.0,
+		66.0,
+		73.5,
+		80.0,
+		88.0,
+		94.5,
+		100.0,
+		107.0,
+		114.0,
+		120.0,
+		127.0,
+		134.5
 	},
 	{
-		// R.wheel
-		2,
-		17,
-		33,
-		48,
-		64,
-		80,
-		95,
-		110,
-		125,
-		141,
-		156,
-		172,
-		187,
-		202,
-		218,
-		233,
-		250,
-		264,
-		280,
-		296,
-		311
+		// CAP_OUT
+		0.0,
+		4.0,
+		10.0,
+		17.0,
+		24.0,
+		31.0,
+		38.0,
+		46.0,
+		52.5,
+		60.0,
+		67.0,
+		73.5,
+		81.0,
+		88.0,
+		95.0,
+		103.0,
+		110.0,
+		116.5,
+		123.5,
+		131.0,
+		138.0
 	},
 	{
-		// Capacitor
-		0,
-		6,
-		13,
-		19,
-		27,
-		33,
-		40,
-		47,
-		54,
-		61,
-		68,
-		75,
-		82,
-		89,
-		96,
-		103,
-		110,
-		117,
-		123,
-		130,
-		137
+		// Motor
+		2.0,
+		17.0,
+		32.0,
+		46.5,
+		62.0,
+		78.0,
+		92.5,
+		107.0,
+		122.5,
+		138.0,
+		153.0,
+		168.0,
+		183.5,
+		198.5,
+		214.0,
+		229.0,
+		244.0,
+		259.0,
+		275.0,
+		290.0,
+		304.5
 	}
 };
 
 class AttopilotCurrentSensor
 {
 private:
+	static uint32_t timeStamp;
+
+	uint8_t id;
 	uint8_t voltPin;
 	uint8_t ampPin;
-	uint16_t voltReading = 0;
-	uint16_t ampReading = 0;
-	uint16_t ampPeak = 0;
+
+	float loggedParams[CURRENTSENSOR_READVALUES] = {};
+	typedef enum {
+		volt,
+		amp
+	}LoggedParameters;
+
+	//uint16_t ampPeak = 0;
 	// As opposed to conventional Wh, this variable takes milliseconds instead of hours as time frame due to calculation efficiency.
 	// Don't worry, will convert to float when sending.
-	float totalEnergy = 0; 
-	float rawToVA(char which, float reading);
-	unsigned long timeStamp;
+	//float totalEnergy = 0; 
+	void processData();
+	float rawToVA(LoggedParameters which, float reading);
+
 
 public:
 	AttopilotCurrentSensor(int motorID, uint8_t voltPin, uint8_t ampPin);
-	uint8_t id;
 	void logData();
-	void dumpTimestampInto(char* location);
-	void dumpVoltReadingInto(char * location);
-	void dumpAmpReadingInto(char * location);
-	void dumpAmpPeakInto(char * location);
-	void dumpTotalEnergyInto(char * location);
+	static void dumpTimestampInto(unsigned long* location);
+	void dumpDataInto(float location[QUEUEITEM_DATAPOINTS][QUEUEITEM_READVALUES]);
+	//void dumpTotalEnergyInto(char * location);
 
 };

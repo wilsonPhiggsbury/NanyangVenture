@@ -6,9 +6,9 @@
 #include "Wiring.h"
 #include "CurrentSensorLogger.h"
 AttopilotCurrentSensor motors[NUM_CURRENTSENSORS] = {
-	AttopilotCurrentSensor(0,L_WHEEL_VPIN,L_WHEEL_APIN),
-	AttopilotCurrentSensor(1,R_WHEEL_VPIN,R_WHEEL_APIN),
-	AttopilotCurrentSensor(2,SUPERCAP_VPIN,SUPERCAP_APIN)
+	AttopilotCurrentSensor(0,CAP_IN_VPIN,CAP_IN_APIN),
+	AttopilotCurrentSensor(1,CAP_OUT_VPIN,CAP_OUT_APIN),
+	AttopilotCurrentSensor(2,MOTOR_VPIN,MOTOR_APIN)
 };
 // the setup function runs once when you press reset or power the board
 void setup() {
@@ -21,15 +21,15 @@ void loop() {
 	int v, a;
 
 	Serial.print(F("L. Wheel:\t"));
-	analogReadVA(L_WHEEL_VPIN, L_WHEEL_APIN, &v, &a);
+	analogReadVA(CAP_IN_VPIN, CAP_IN_APIN, &v, &a);
 	printVA(v, a);
 
 	Serial.print(F("R. Wheel:\t"));
-	analogReadVA(R_WHEEL_VPIN, R_WHEEL_APIN, &v, &a);
+	analogReadVA(CAP_OUT_VPIN, CAP_OUT_APIN, &v, &a);
 	printVA(v, a);
 
 	Serial.print(F("SuperCap:\t"));
-	analogReadVA(SUPERCAP_VPIN, SUPERCAP_APIN, &v, &a);
+	analogReadVA(MOTOR_VPIN, MOTOR_APIN, &v, &a);
 	printVA(v, a);
 
 }

@@ -3,6 +3,23 @@
  Created:	8/31/2018 2:34:05 AM
  Author:	MX
 */
+#include <FreeRTOS_AVR.h>
+#include <basic_io_avr.h>
+#include <timers.h>
+#include <task.h>
+#include <StackMacros.h>
+#include <semphr.h>
+#include <queue.h>
+#include <projdefs.h>
+#include <portmacro.h>
+#include <portable.h>
+#include <mpu_wrappers.h>
+#include <list.h>
+#include <FreeRTOSConfig.h>
+#include <FreeRTOS.h>
+#include <event_groups.h>
+#include <deprecated_definitions.h>
+#include <croutine.h>
 #include <ILI9488.h>>
 // the setup function runs once when you press reset or power the board
 ILI9488 screen = ILI9488(4, 5, 3);
@@ -12,172 +29,12 @@ uint16_t margin = 12;
 uint16_t textSize = 36;
 uint32_t prevMicros;
 void setup() {
-	screen.begin();
-	screen.setRotation(4);
-	screen.fillScreen(ILI9488_BLACK);
-	//testText(screen);
-
-	screen.setTextColor(ILI9488_WHITE);
-	screen.setTextSize(textSize / 6);
-	hPos = 1 * (margin + textSize);
-	vPos = 0;
-	hPos += margin / 2;
-	vPos += 12;
-	screen.setCursor(hPos, vPos);
-	screen.print("V");
-	vPos += 48;
-	vPos += 12;
-	screen.setCursor(hPos, vPos);
-	screen.print("A");
-	vPos += 48;
-	vPos += 12;
-	screen.setCursor(hPos, vPos);
-	screen.print("W");
-	vPos += 48;
-	vPos += 12;
-	screen.setCursor(hPos, vPos);
-	screen.print("J");
-	vPos += 48;
+	
 }
 
 // the loop function runs over and over again until power down or reset
 void loop() {
-	prevMicros = micros();
-	screen.setTextColor(ILI9488_WHITE);
-	screen.setTextSize(textSize / 6);
-	hPos = 2 * (margin + textSize);
-	vPos = 0;
-	hPos += margin;
-	vPos += margin;
-	screen.setCursor(hPos, vPos);
-	screen.print("50.0");
-	vPos += (textSize + margin);
-	vPos += margin;
-	screen.setCursor(hPos, vPos);
-	screen.print("10.5");
-	vPos += (textSize + margin);
-	vPos += margin;
-	screen.setCursor(hPos, vPos);
-	screen.print("2310");
-	vPos += (textSize + margin);
-	vPos += margin;
-	screen.setCursor(hPos, vPos);
-	screen.print("10000");
-	vPos += (textSize + margin);
-	delay(1000);
-	screen.setTextColor(ILI9488_BLACK);
-	hPos = 2 * (margin + textSize);
-	vPos = 0;
-	hPos += margin;
-	vPos += margin;
-	screen.setCursor(hPos, vPos);
-	screen.print("50.0");
-	vPos += (textSize + margin);
-	vPos += margin;
-	screen.setCursor(hPos, vPos);
-	screen.print("10.5");
-	vPos += (textSize + margin);
-	vPos += margin;
-	screen.setCursor(hPos, vPos);
-	screen.print("2310");
-	vPos += (textSize + margin);
-	vPos += margin;
-	screen.setCursor(hPos, vPos);
-	screen.print("10000");
-	vPos += (textSize + margin);
-	screen.setTextColor(ILI9488_WHITE);
-	screen.setTextSize(textSize / 6);
-	hPos = 2 * (margin + textSize);
-	vPos = 0;
-	hPos += margin;
-	vPos += margin;
-	screen.setCursor(hPos, vPos);
-	screen.print("11.1");
-	vPos += (textSize + margin);
-	vPos += margin;
-	screen.setCursor(hPos, vPos);
-	screen.print("22.2");
-	vPos += (textSize + margin);
-	vPos += margin;
-	screen.setCursor(hPos, vPos);
-	screen.print("3456");
-	vPos += (textSize + margin);
-	vPos += margin;
-	screen.setCursor(hPos, vPos);
-	screen.print("78910");
-	vPos += (textSize + margin);
-	screen.setTextColor(ILI9488_BLACK);
-	hPos = 2 * (margin + textSize);
-	vPos = 0;
-	hPos += margin;
-	vPos += margin;
-	screen.setCursor(hPos, vPos);
-	screen.print("11.1");
-	vPos += (textSize + margin);
-	vPos += margin;
-	screen.setCursor(hPos, vPos);
-	screen.print("22.2");
-	vPos += (textSize + margin);
-	vPos += margin;
-	screen.setCursor(hPos, vPos);
-	screen.print("3456");
-	vPos += (textSize + margin);
-	vPos += margin;
-	screen.setCursor(hPos, vPos);
-	screen.print("78910");
-	vPos += (textSize + margin);
-	delay(1000);
-	Serial.print("CL print time: ");
-	Serial.println(micros() - prevMicros);
 
-	screen.fillScreen(ILI9488_BLACK);
-
-	prevMicros = micros();
-	screen.setTextColor(ILI9488_WHITE, ILI9488_BLACK);
-	screen.setTextSize(textSize / 6);
-	hPos = 2 * (margin + textSize);
-	vPos = 0;
-	hPos += margin;
-	vPos += margin;
-	screen.setCursor(hPos, vPos);
-	screen.print("50.0");
-	vPos += (textSize + margin);
-	vPos += margin;
-	screen.setCursor(hPos, vPos);
-	screen.print("10.5");
-	vPos += (textSize + margin);
-	vPos += margin;
-	screen.setCursor(hPos, vPos);
-	screen.print("2310");
-	vPos += (textSize + margin);
-	vPos += margin;
-	screen.setCursor(hPos, vPos);
-	screen.print("10000");
-	vPos += (textSize + margin);
-	delay(1000);
-	screen.setTextSize(textSize / 6);
-	hPos = 2 * (margin + textSize);
-	vPos = 0;
-	hPos += margin;
-	vPos += margin;
-	screen.setCursor(hPos, vPos);
-	screen.print("11.1");
-	vPos += (textSize + margin);
-	vPos += margin;
-	screen.setCursor(hPos, vPos);
-	screen.print("22.2");
-	vPos += (textSize + margin);
-	vPos += margin;
-	screen.setCursor(hPos, vPos);
-	screen.print("3456");
-	vPos += (textSize + margin);
-	vPos += margin;
-	screen.setCursor(hPos, vPos);
-	screen.print("78910");
-	vPos += (textSize + margin);
-	delay(1000);
-	Serial.print("BG print time: ");
-	Serial.println(micros() - prevMicros);
 }
 
 unsigned long testText(ILI9488& tft) {

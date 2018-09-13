@@ -16,13 +16,20 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="NV10_back.ino" />
+    <None Include="Back_Tasks.ino" />
     <None Include="Utilities.ino" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="__vm\.NV10_back.vsarduino.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Behaviour.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="build_options.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CAN_ID_protocol.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CurrentSensorLogger.h">
@@ -31,13 +38,7 @@
     <ClInclude Include="FuelCellLogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Globals.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="JoulemeterDisplay.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="__vm\.NV10_back.vsarduino.h">
+    <ClInclude Include="Speedometer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Wiring.h">
@@ -54,7 +55,7 @@
     <ClCompile Include="FuelCellLogger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="JoulemeterDisplay.cpp">
+    <ClCompile Include="Speedometer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

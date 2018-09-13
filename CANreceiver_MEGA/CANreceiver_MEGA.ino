@@ -3,7 +3,6 @@ Name:		ScratchPad.ino
 Created:	6/24/2018 11:37:49 PM
 Author:	MX
 */
-#include <mcp_can_dfs.h>
 #include <mcp_can.h>
 #include <Arduino_FreeRTOS.h>
 #include <Adafruit_GFX.h>
@@ -43,15 +42,16 @@ void loop() {
 
 void TaskQueueOutputData(void *pvParameters __attribute__((unused)))  // This is a Task.
 {
+	unsigned long ID;
 	uint8_t msgLength = 8;
 	byte inBuffer[8];
 	while (1) // A Task shall never return or exit.
 	{
-		if (CAN_incoming == 1)
+		if (CAN_incoming)
 		{
-			CAN0.readMsgBuf(&msgLength, inBuffer);
-			Serial.print("Received data from source ");
-			Serial.println(CAN0.getCanId());
+			CAN0.readMsgBufID(&ID, &msgLength, inBuffer);
+			//Serial.print("Received data from source ");
+			Serial.println(ID);
 			for (int i = 0; i < msgLength; i++)
 			{
 				Serial.print((char)inBuffer[i]);
@@ -62,7 +62,7 @@ void TaskQueueOutputData(void *pvParameters __attribute__((unused)))  // This is
 		else if (CAN_incoming == -1)
 		{
 			Serial.println("CAN receive error.");
-			vTaskDelay(50);
+			//vTaskDelay(50);
 		}
 	}
 }

@@ -9,14 +9,14 @@ Author:	MX
 
 #include <SPI.h>
 
-void TaskQueueOutputData(void *pvParameters __attribute__((unused)));
+void QueueOutputData(void *pvParameters __attribute__((unused)));
 MCP_CAN CAN0 = MCP_CAN(48);
 bool CAN_incoming = false;
 void CAN_ISR();
 void setup() {
 	Serial.begin(9600);
 	delay(1000);
-	if (CAN0.begin(CAN_250KBPS) == CAN_OK)
+	if (CAN0.begin(CAN_500KBPS) == CAN_OK)
 	{
 		Serial.println("CAN sender MEGA initialized.");
 	}
@@ -28,7 +28,7 @@ void setup() {
 	attachInterrupt(digitalPinToInterrupt(19), CAN_ISR, FALLING);
 
 	xTaskCreate(
-		TaskQueueOutputData
+		QueueOutputData
 		, (const portCHAR *)"Enqueue"  // A name just for humans
 		, 400  // This stack size can be checked & adjusted by reading the Stack Highwater
 		, NULL
@@ -41,7 +41,7 @@ void loop() {
 
 }
 
-void TaskQueueOutputData(void *pvParameters __attribute__((unused)))  // This is a Task.
+void QueueOutputData(void *pvParameters __attribute__((unused)))  // This is a Task.
 {
 	uint8_t msgLength = 8;
 	byte outBuffer[8];
@@ -49,7 +49,7 @@ void TaskQueueOutputData(void *pvParameters __attribute__((unused)))  // This is
 
 	while (1) // A Task shall never return or exit.
 	{
-		// send data:  ID = 0x100, Standard CAN Frame, Data length = 8 bytes, 'data' = array of data bytes to 
+		// send payload:  ID = 0x100, Standard CAN Frame, Data length = 8 bytes, 'payload' = array of payload bytes to 
 		for (int i = 0;i < 8;i++)
 		{
 			outBuffer[i] = data[i];
@@ -61,7 +61,7 @@ void TaskQueueOutputData(void *pvParameters __attribute__((unused)))  // This is
 		else {
 			Serial.println("Error Sending Message...");
 		}
-		delay(2000);   // send data per 2000ms
+		vTaskDelay(pdMS_TO_TICKS(150));   // send payload per 2000ms
 	}
 }
 void CAN_ISR()
