@@ -39,39 +39,37 @@ void _QueueItem::toString(char* putHere)
 	// \t: tab
 	// \0: null terminator
 }
+/*
+--- About Frame IDs ---
+"terminator status bits": 2 bits needed for indication of terminating frame
+00 -> start of stream, carries timestamp
+01 -> normal frame in middle of stream
+10 -> terminate transmission for one datapoint (soft termination)
+11 -> terminate transmission for one full string (hard termination)
+
+"message type bits": 3 bits needed for message type
+0 -> display FC
+1 -> display CS
+2 -> display SM (include throttle?)
+3 -> *reserved for display payload*
+4 -> buttons
+5 -> *reserved*
+6 -> *reserved*
+7 -> *reserved*
+
+--- About Frame Length ---
+length 4 means frame contains 1 float
+length 8 means frame contains 2 float
+*/
 void _QueueItem::toFrames(NV_CanFrames* putHere)
 {
 	uint8_t dataPoints = DATAPOINT_INSTANCES[ID];
 	uint8_t readValues = DATAPOINT_READVALUES[ID];
-	/*
-	--- About Frame IDs ---
-"terminator status bits": 2 bits needed for indication of terminating frame
-	00 -> start of stream, carries timestamp
-	01 -> normal frame in middle of stream
-	10 -> terminate transmission for one datapoint (soft termination)
-	11 -> terminate transmission for one full string (hard termination)
-
-"message type bits": 3 bits needed for message type
-	0 -> display FC
-	1 -> display CS
-	2 -> display SM (include throttle?)
-	3 -> *reserved for display payload*
-	4 -> buttons
-	5 -> *reserved*
-	6 -> *reserved*
-	7 -> *reserved*
-
-	--- About Frame Length ---
-	length 4 means frame contains 1 float
-	length 8 means frame contains 2 float
-	*/
 
 	// prepare timeStamp frame
-	char timeStamp_tmp[9];
-	ultoa(timeStamp, timeStamp_tmp, 16);
 	putHere->frames->id = (ID << 2) | HEADER_FRAME;
-	putHere->frames->length = 8;
-	memcpy(putHere->frames->payload, timeStamp_tmp, 8);
+	putHere->frames->length = sizeof(unsigned long);
+	memcpy(putHere->frames->payload, &timeStamp, putHere->frames->length);
 	(putHere->numFrames)++;
 	// prepare payload frames
 	uint8_t i,j;
@@ -92,34 +90,14 @@ void _QueueItem::toFrames(NV_CanFrames* putHere)
 				terminatorStatus = NORMAL_FRAME;
 			}
 			putHere->addItem(ID, terminatorStatus, data[i][j], data[i][j + 1]);
-			//-----------------------old code-------------------
-			//uint8_t thisFrameIndex = ceil(readValues * i / 2.0) + floor(j / 2.0) + 1;
-			//NV_CanFrame& thisFrame = putHere->frames[thisFrameIndex];
-			//// thisFrame.payload is a byte array (length 8), first 4 bytes for a float, last 4 bytes for another float
-			//// Breaking up byte 8*8bit structure into float 16*4bit structure
-
-			//// copy this float into upper half of payload byte array
-			//memcpy(thisFrame.payload, &payload[i][j], sizeof(float));
-			//// copy this float into lower half of payload byte array
-			//memcpy(thisFrame.payload+sizeof(float), &payload[i][j+1], sizeof(float));
-			//// 0th bit for indicating end
-			//// 1st, 2nd, 3rd bit for indicating purpose (ID is 2 bits, hence 4th bit is set to 0)
-			//thisFrame.id = (ID << 2) | terminatorStatus;
-			//thisFrame.length = 8;
 		}
 		if (j == readValues - 1)
 		{
 			terminatorStatus = HARD_TERMINATING_FRAME;
-			putHere->addItem(ID, terminatorStatus, data[i][j], 0, false);
-			//uint8_t thisFrameIndex = ceil(readValues * i / 2.0) + floor(j / 2.0) + 1;
-			//NV_CanFrame& thisFrame = putHere->frames[thisFrameIndex];
-			//// send an individual frame.?
-			//memcpy(thisFrame.payload, &payload[i][j], sizeof(float));
-			//thisFrame.id = (ID << 2) | terminatorStatus;
-			//thisFrame.length = 4;
+			putHere->addItem(ID, terminatorStatus, data[i][j]);
 		}
 	}
-	putHere->numFrames = 1 + dataPoints * ceil(readValues / 2.0);
+	//putHere->numFrames = 1 + dataPoints * ceil(readValues / 2.0);
 }
 
 bool _NV_CanFrames::toQueueItem(QueueItem* putHere)
@@ -149,8 +127,7 @@ bool _NV_CanFrames::toQueueItem(QueueItem* putHere)
 	numFrames = 0;
 	// append timestamp
 	char timeStamp_tmp[9];
-	memcpy(timeStamp_tmp, frames[0].payload, frames[0].length);
-	putHere->timeStamp = strtoul(timeStamp_tmp, NULL, 16);
+	memcpy(&(putHere->timeStamp), frames[0].payload, frames[0].length);
 	// append payload
 	int frameCounter = 1;
 	for (int i = 0; i < dataPoints; i++)
@@ -202,16 +179,24 @@ bool _NV_CanFrames::toQueueItem(QueueItem* putHere)
 	}
 	return true;
 }
-void NV_CanFrames::addItem(NV_CanFrame* newFrame)
+void NV_CanFrames::addItem(unsigned long id, byte length, byte* payload)
 {
-	frames[numFrames].id = newFrame->id;
-	frames[numFrames].length = newFrame->length;
-	memcpy(frames[numFrames].payload, newFrame->payload, sizeof(byte));
+	frames[numFrames].id = id;
+	frames[numFrames].length = length;
+	memcpy(frames[numFrames].payload, payload, length);
 	numFrames++;
 }
-void NV_CanFrames::addItem(uint8_t id, uint8_t terminatorStatus, float payload1, float payload2, bool using_payload2 = true)
+void NV_CanFrames::addItem(uint8_t messageType, uint8_t terminatorStatus, float payload1)
 {
-	frames[numFrames].id = (id << 2) | terminatorStatus;
+	addItem_(messageType, terminatorStatus, payload1, 0, false);
+}
+void NV_CanFrames::addItem(uint8_t messageType, uint8_t terminatorStatus, float payload1, float payload2)
+{
+	addItem_(messageType, terminatorStatus, payload1, payload2, true);
+}
+void NV_CanFrames::addItem_(uint8_t messageType, uint8_t terminatorStatus, float payload1, float payload2, bool using_payload2)
+{
+	frames[numFrames].id = (messageType << 2) | terminatorStatus;
 
 	// copy payload1 into upper half of payload byte array
 	memcpy(frames[numFrames].payload, &payload1, sizeof(float));
@@ -227,4 +212,12 @@ void NV_CanFrames::addItem(uint8_t id, uint8_t terminatorStatus, float payload1,
 		frames[numFrames].length = 1 * sizeof(float);
 	}
 	numFrames++;
+}
+void NV_CanFrames::clear()
+{
+	numFrames = 0;
+}
+uint8_t NV_CanFrames::getNumFrames()
+{
+	return numFrames;
 }

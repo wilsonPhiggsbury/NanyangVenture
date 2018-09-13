@@ -53,10 +53,10 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <ForcedIncludeFiles>%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <IgnoreStandardIncludePath>true</IgnoreStandardIncludePath>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\DashboardTest;$(ProjectDir)..\..\libraries\FreeRTOS_AVR\src;$(ProjectDir)..\..\libraries\FreeRTOS_AVR\src\utility;$(ProjectDir)..\..\libraries\FreeRTOS\src;$(ProjectDir)..\..\libraries\ILI9488;$(ProjectDir)..\..\..\ide\portable\packages\arduino\hardware\sam\1.6.11\libraries\SPI\src;$(ProjectDir)..\..\libraries\Adafruit_GFX_Library;$(ProjectDir)..\..\..\ide\libraries;$(ProjectDir)..\..\libraries;$(ProjectDir)..\..\..\ide\hardware\arduino\avr\libraries;$(ProjectDir)..\..\..\ide\hardware\arduino\avr\cores\arduino;$(ProjectDir)..\..\..\ide\hardware\arduino\avr\variants\mega;$(ProjectDir)..\..\..\ide\hardware\tools\avr\avr\include;$(ProjectDir)..\..\..\ide\hardware\tools\avr\avr\include\avr;$(ProjectDir)..\..\..\ide\hardware\tools\avr\lib\gcc\avr\4.8.1\include;$(ProjectDir)..\..\..\ide\hardware\tools\avr\lib\gcc\avr\4.9.2\include;$(ProjectDir)..\..\..\ide\hardware\tools\avr\lib\gcc\avr\4.9.3\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>$(ProjectDir)__vm\.DashboardTest.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
+      <PreprocessorDefinitions>__AVR_ATmega2560__;F_CPU=16000000L;ARDUINO=10805;ARDUINO_AVR_MEGA2560;ARDUINO_ARCH_AVR;__cplusplus=201103L;_VMICRO_INTELLISENSE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

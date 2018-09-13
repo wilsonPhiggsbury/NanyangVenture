@@ -4,10 +4,9 @@
  Author:	MX
 */
 
+#include <FreeRTOS_AVR.h>
 #include <mcp_can.h>
 #include "Behaviour.h"
-#include <Arduino_FreeRTOS.h>
-#include <queue.h>
 #include <SPI.h>
 #include <SD.h>
 
@@ -118,7 +117,7 @@ void setup() {
 		, NULL
 		, 1  // Priority
 		, NULL);
-	 //Now the Task scheduler, which takes over control of scheduling individual Tasks, is automatically started.
+	vTaskStartScheduler();
 
 }
 

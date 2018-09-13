@@ -10,7 +10,7 @@ Author:	MX
 #include <SPI.h>
 
 void QueueOutputData(void *pvParameters __attribute__((unused)));
-MCP_CAN CAN0 = MCP_CAN(7);
+MCP_CAN CAN0 = MCP_CAN(48);
 bool CAN_incoming = false;
 void CAN_ISR();
 void setup() {
@@ -25,7 +25,7 @@ void setup() {
 		Serial.println("CAN INIT fail");
 		while (1);
 	}
-	attachInterrupt(digitalPinToInterrupt(20), CAN_ISR, FALLING);
+	attachInterrupt(digitalPinToInterrupt(19), CAN_ISR, FALLING);
 
 	xTaskCreate(
 		QueueOutputData

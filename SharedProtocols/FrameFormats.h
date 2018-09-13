@@ -1,5 +1,7 @@
 #pragma once
 #include <Arduino.h>
+
+
 // Declare instances of every payload point
 // ATTR: payload point = where the payload comes from
 const uint8_t DATAPOINT_INSTANCES[] = {
@@ -39,6 +41,15 @@ struct _QueueItem;
 typedef _NV_CanFrame NV_CanFrame;
 typedef _NV_CanFrames NV_CanFrames;
 typedef _QueueItem QueueItem;
+// struct to pass payload between different tasks in same microcontroller
+struct _QueueItem {
+	friend struct _NV_CanFrames;
+	DataSource ID;
+	unsigned long timeStamp;
+	float data[QUEUEITEM_DATAPOINTS][QUEUEITEM_READVALUES];
+	void toString(char* putHere);
+	void toFrames(NV_CanFrames* putHere);
+};
 // struct to pass payload between different microcontrollers
 struct _NV_CanFrame
 {
@@ -48,20 +59,18 @@ struct _NV_CanFrame
 };
 struct _NV_CanFrames
 {
+	friend struct _QueueItem;
 	NV_CanFrame frames[1 + QUEUEITEM_DATAPOINTS * QUEUEITEM_READVALUES / 2 + 1 * QUEUEITEM_DATAPOINTS];
 	// 1 frame for timestamp, other frames for floats, +QUEUEITEM_DATAPOINTS frame for odd-number scenarios where one additional frame is needed for the lone float
-	uint8_t numFrames = 0;
 	bool toQueueItem(QueueItem* putHere);
-	void addItem(NV_CanFrame* newFrame);
-	void addItem(uint8_t id, uint8_t terminatorStatus, float payload1, float payload2, bool using_payload2 = true);
-};
-// struct to pass payload between different tasks in same microcontroller
-struct _QueueItem {
-	DataSource ID;
-	unsigned long timeStamp;
-	float data[QUEUEITEM_DATAPOINTS][QUEUEITEM_READVALUES];
-	void toString(char* putHere);
-	void toFrames(NV_CanFrames* putHere);
+	void addItem(unsigned long id, byte length, byte* payload);
+	void addItem(uint8_t messageType, uint8_t terminatorStatus, float payload1);
+	void addItem(uint8_t messageType, uint8_t terminatorStatus, float payload1, float payload2);
+	uint8_t getNumFrames();
+	void clear();
+private:
+	uint8_t numFrames = 0;
+	void addItem_(uint8_t messageType, uint8_t terminatorStatus, float payload1, float payload2, bool using_payload2);
 };
 /*	
 	--- About Frame IDs ---

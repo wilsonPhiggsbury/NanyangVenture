@@ -153,11 +153,12 @@ void LogSendData(void *pvParameters __attribute__((unused)))  // This is a Task.
 			{
 				// DO NOT SWITCH OUT THIS TASK IN THE MIDST OF WRITING A FILE ON SD CARD
 				// (consequence: some serial payload may be missed. Hang or miss payload? Tough choice...)
-				taskENTER_CRITICAL();
+				// ^^^^ this is probably fixed, if verified delete this line ^^^^
+				vTaskSuspendAll();
 				File writtenFile = SD.open(path, FILE_WRITE);
 				writtenFile.println(data);
 				writtenFile.close();
-				taskEXIT_CRITICAL();
+				xTaskResumeAll();
 			}
 			// *path should only remain as /LOG_****/
 			// clean up after use
@@ -191,67 +192,55 @@ void LogSendData(void *pvParameters __attribute__((unused)))  // This is a Task.
 void SendCANFrame(void *pvParameters __attribute__((unused)))  // This is a Task.
 {
 	QueueItem received;
-	TickType_t delay = pdMS_TO_TICKS(CAN_FRAME_INTERVAL*10); // delay 150 ms, shorter than reading/queueing tasks since this task has lower priority
+	TickType_t delay = pdMS_TO_TICKS(CAN_FRAME_INTERVAL*100); // delay 150 ms, shorter than reading/queueing tasks since this task has lower priority
 	
 	while (1)
 	{
-		BaseType_t success = xQueueReceive(queueForSendCAN, &received, 0);
+		BaseType_t success = pdPASS;// = xQueueReceive(queueForSendCAN, &received, 0);
+		//// -- test payload --
+		randomSeed(analogRead(A6));
+		received.ID = (DataSource)random(0, 3);
+		received.timeStamp = random();
+		for (int i = 0; i < 8; i++)
+		{
+			received.data[0][i] = (i + 11) / 10.0;
+		}
+		for (int i = 0; i < 8; i++)
+		{
+			received.data[1][i] = (i + 21) / 10.0;
+		}
+		for (int i = 0; i < 8; i++)
+		{
+			received.data[2][i] = (i + 31) / 10.0;
+		}
+		//// -- test payload --
 		// we are going to encode 2 floats into 1 frame (2*4bytes = 8bytes)
 		NV_CanFrames framesCollection;
 		if (success == pdPASS)
 		{
 			// ------------------------  convert to frames --------------------
 			received.toFrames(&framesCollection);
-			for (uint8_t i = 0; i < framesCollection.numFrames; i++)
+
+			for (uint8_t i = 0; i < framesCollection.getNumFrames(); i++)
 			{
 				NV_CanFrame& thisFrame = framesCollection.frames[i];
 				byte status = CANObj.sendMsgBuf(thisFrame.id, 0, thisFrame.length, thisFrame.payload);
+
 				if (status != CAN_OK)
 				{
 					// handle sending error
+					Serial.println("FAIL SEND");
 				}
+				else
+				{
+					//Serial.print("SENT");
+					//Serial.println(i);
+				}
+				//vTaskDelay(pdMS_TO_TICKS(5));
 			}
-
-
-
-		}
-		//Serial.print("ST: ");Serial.println(uxTaskGetStackHighWaterMark(NULL));
-		vTaskDelay(delay);
-
-			//// ------------------------------ covert back -----------------------------------
-			//bool convertSucess = framesCollection.toQueueItem(&received);
-			//if (!convertSucess)
-			//{
-			//	// handle error frame
-			//	Serial.println(F("Failed to convert!"));
-			//	vTaskSuspend(NULL);
-			//}
-			//else
-			//{
-			//	// pass on converted queue item to the display
-
-			//}
-
-
-			//// -- test payload --
-			//received.ID = CS;
-			//received.timeStamp = 0x89ABCDEF;
-			//for (int i = 0; i < 8; i++)
-			//{
-			//	received.payload[0][i] = (i + 11) / 10.0;
-			//}
-			//for (int i = 0; i < 8; i++)
-			//{
-			//	received.payload[1][i] = (i + 21) / 10.0;
-			//}
-			//for (int i = 0; i < 8; i++)
-			//{
-			//	received.payload[2][i] = (i + 31) / 10.0;
-			//}
-			//// -- test payload --
-			//// verify if toFrames is working well...
 			//// print raw frames
-			//while ((framesCollection.frames[i].id & B11) != B11)
+			//int i = 0;
+			//do
 			//{
 			//	Serial.print("Frame ");
 			//	Serial.print(i);
@@ -263,25 +252,28 @@ void SendCANFrame(void *pvParameters __attribute__((unused)))  // This is a Task
 			//	for (int j = 0;j<framesCollection.frames[i].length;j++)
 			//		Serial.println(framesCollection.frames[i].payload[j], 16);
 			//	i++;
-			//}
-			//Serial.print("Frame ");
-			//Serial.print(i);
-			//Serial.print(": ");
-			//Serial.print(framesCollection.frames[i].id);
-			//Serial.print(" ");
-			//Serial.print(framesCollection.frames[i].length);
-			//Serial.print("\n");
-			//for (int j = 0;j<framesCollection.frames[i].length;j++)
-			//	Serial.println(framesCollection.frames[i].payload[j], 16);
-			//// print converted results
-			//if (!convertSucess)
-			//{
-			//	Serial.println("CONVERSION ERROR...");
-			//	while (1);
-			//}
-			//char payload[3 + 9 + (FLOAT_TO_STRING_LEN + 1)*(QUEUEITEM_DATAPOINTS*QUEUEITEM_READVALUES) + QUEUEITEM_DATAPOINTS];
-			//received.toString(payload);
-			//Serial.println(payload);
+			//} while ((framesCollection.frames[i-1].id & B11) != B11);
+
+		}
+		vTaskDelay(500);
+		//Serial.print("ST: ");Serial.println(uxTaskGetStackHighWaterMark(NULL));
+		
+		//// ------------------------------ covert back -----------------------------------
+		//QueueItem received2;
+		//bool convertSucess = framesCollection.toQueueItem(&received);
+		//// print converted results
+		//if (!convertSucess)
+		//{
+		//	Serial.println("CONVERSION ERROR...");
+		//	while (1);
+		//}
+		//char payload[3 + 9 + (FLOAT_TO_STRING_LEN + 1)*(QUEUEITEM_DATAPOINTS*QUEUEITEM_READVALUES) + QUEUEITEM_DATAPOINTS];
+		//received.toString(payload);
+		//Serial.println(payload);
+			
+
+			
+			
 
 	}
 }

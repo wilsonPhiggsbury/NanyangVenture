@@ -3,6 +3,23 @@
  Created:	8/31/2018 2:34:05 AM
  Author:	MX
 */
+#include <FreeRTOS_AVR.h>
+#include <basic_io_avr.h>
+#include <timers.h>
+#include <task.h>
+#include <StackMacros.h>
+#include <semphr.h>
+#include <queue.h>
+#include <projdefs.h>
+#include <portmacro.h>
+#include <portable.h>
+#include <mpu_wrappers.h>
+#include <list.h>
+#include <FreeRTOSConfig.h>
+#include <FreeRTOS.h>
+#include <event_groups.h>
+#include <deprecated_definitions.h>
+#include <croutine.h>
 #include <ILI9488.h>>
 // the setup function runs once when you press reset or power the board
 ILI9488 screen = ILI9488(4, 5, 3);

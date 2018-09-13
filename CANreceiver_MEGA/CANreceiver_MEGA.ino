@@ -10,13 +10,13 @@ Author:	MX
 #include <SPI.h>
 
 void TaskQueueOutputData(void *pvParameters __attribute__((unused)));
-MCP_CAN CAN0 = MCP_CAN(48);
+MCP_CAN CAN0 = MCP_CAN(7);
 volatile int CAN_incoming = 0;
 void CAN_ISR();
 void setup() {
 	Serial.begin(9600);
 	delay(1000);
-	if (CAN0.begin(CAN_500KBPS) == CAN_OK)
+	if (CAN0.begin(CAN_1000KBPS) == CAN_OK)
 	{
 		Serial.println("CAN receiver MEGA initialized.");
 	}
@@ -24,7 +24,7 @@ void setup() {
 	{
 		Serial.println("CAN error.");
 	}
-	attachInterrupt(digitalPinToInterrupt(19), CAN_ISR, FALLING);
+	attachInterrupt(digitalPinToInterrupt(20), CAN_ISR, FALLING);
 
 	xTaskCreate(
 		TaskQueueOutputData
@@ -42,15 +42,16 @@ void loop() {
 
 void TaskQueueOutputData(void *pvParameters __attribute__((unused)))  // This is a Task.
 {
+	unsigned long ID;
 	uint8_t msgLength = 8;
 	byte inBuffer[8];
 	while (1) // A Task shall never return or exit.
 	{
-		if (CAN_incoming == 1)
+		if (CAN_incoming)
 		{
-			CAN0.readMsgBuf(&msgLength, inBuffer);
-			Serial.print("Received data from source ");
-			Serial.println(CAN0.getCanId());
+			CAN0.readMsgBufID(&ID, &msgLength, inBuffer);
+			//Serial.print("Received data from source ");
+			Serial.println(ID);
 			for (int i = 0; i < msgLength; i++)
 			{
 				Serial.print((char)inBuffer[i]);
@@ -61,7 +62,7 @@ void TaskQueueOutputData(void *pvParameters __attribute__((unused)))  // This is
 		else if (CAN_incoming == -1)
 		{
 			Serial.println("CAN receive error.");
-			vTaskDelay(50);
+			//vTaskDelay(50);
 		}
 	}
 }

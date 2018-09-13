@@ -6,15 +6,14 @@
 
 
 // the setup function runs once when you press reset or power the board
-#include <Arduino_FreeRTOS.h>
-#include <queue.h>
+#include <FreeRTOS_AVR.h>
 #include <mcp_can.h>
+#include <SPI.h>
 #include <ILI9488.h>
 
 #include "Wiring_Dashboard.h"
-#include "Behaviour_Dashboard.h"
 // dependent header files
-#include "CAN_ID_protocol.h"
+#include "FrameFormats.h"
 // ----------------------
 
 #include "DisplayContainer.h"
@@ -32,6 +31,8 @@ QueueHandle_t queueForDisplay = xQueueCreate(1, sizeof(QueueItem));
 MCP_CAN CANObj = MCP_CAN(CAN_CS_PIN);
 volatile bool incoming = false;
 void setup() {
+	Serial.begin(9600);
+	delay(100);
 	attachInterrupt(digitalPinToInterrupt(CAN_INTERRUPT_PIN), CAN_incoming, FALLING);
 	if (CANObj.begin(CAN_1000KBPS) != CAN_OK)
 	{
@@ -44,8 +45,6 @@ void setup() {
 	}
 	pinMode(screenLED, OUTPUT);
 	digitalWrite(screenLED, HIGH);
-	Serial.begin(9600);
-	delay(1000);
 	// 480 x 320 pixels
 	/*Dashboard Info
 		Fuel cell info x2
@@ -64,17 +63,17 @@ void setup() {
 		Handbrake light
 		Cylinder Pressure
 	*/
-	xTaskCreate(
-		TaskRefreshScreen
-		, (const portCHAR *)"Refresh"  // A name just for humans
-		, 250  // This stack size can be checked & adjusted by reading the Stack Highwater
-		, NULL // Any pointer to pass in
-		, 1  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
-		, NULL);
+	//xTaskCreate(
+	//	TaskRefreshScreen
+	//	, (const portCHAR *)"Refresh"  // A name just for humans
+	//	, 250  // This stack size can be checked & adjusted by reading the Stack Highwater
+	//	, NULL // Any pointer to pass in
+	//	, 1  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
+	//	, NULL);
 	xTaskCreate(
 		TaskReadCAN
 		, (const portCHAR *)"ReadCAN"  // A name just for humans
-		, 500  // This stack size can be checked & adjusted by reading the Stack Highwater
+		, 800  // This stack size can be checked & adjusted by reading the Stack Highwater
 		, NULL // Any pointer to pass in
 		, 2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
 		, &ReadCAN);
@@ -93,7 +92,8 @@ void loop() {
 }
 void CAN_incoming()
 {
-	incoming = true;
+	if (CANObj.checkError() == CAN_OK)
+		incoming = true;
 }
 void TaskRefreshScreen(void* pvParameters)
 {
@@ -171,48 +171,63 @@ void TaskReadCAN(void* pvParameters)
 	
 
 	byte buf[8];
-	uint32_t id;
+	unsigned long id;
 	byte len;
 
 	QueueItem outgoing;
 	uint8_t counter = 0;
+	NV_CanFrames framesCollection;
 	while (1)
 	{
-		Serial.println("ALIVE");
 		if (incoming)
 		{
 			incoming = false;
-			if (CANObj.checkError() != CAN_OK)
-			{
-				Serial.println("Data spoilt...");
-			}
-			byte status = CANObj.readMsgBuf(&len, buf);
-			if (status != CAN_OK)
-				Serial.println("No data...");
-			// Populate outgoing payload string. id's first bit is 1 means end of msg
-			while (status == CAN_OK && CANObj.getCanId() & 1 != 1)
-			{
-				strcpy(outgoing.data + counter, "\t");
-				counter += 1;
-				memcpy(outgoing.data + counter, buf, len);
-				counter += len;
-				CANObj.readMsgBuf(&len, buf);
-			}
-			strcpy(outgoing.data + counter, "\0");
 
-			// Populate outgoing payload type.
-			if (id & 2)
-				outgoing.ID = CS;
+			CANObj.readMsgBufID(&id, &len, buf);
+			framesCollection.addItem(id, len, buf);
+
+			if ((id & B11) == B11)
+			{
+				//Serial.println("Seg complete!");
+				bool convertSuccess = framesCollection.toQueueItem(&outgoing);
+				if (convertSuccess)
+				{
+					char payload[3 + 9 + (FLOAT_TO_STRING_LEN + 1)*(QUEUEITEM_DATAPOINTS*QUEUEITEM_READVALUES) + QUEUEITEM_DATAPOINTS];
+					outgoing.toString(payload);
+					Serial.println(payload);
+				}
+				else
+				{
+					//Serial.println("Conversion error...");
+				}
+				framesCollection.clear();
+			}
 			else
-				outgoing.ID = FC;
-			Serial.print("Recv ID:");
-			Serial.println(id);
-			Serial.print("Content:\n");
-			Serial.println(outgoing.data);
-			//xQueueSend(queueForDisplay, &outgoing, 100);
-			counter = 0;
+			{
+				//Serial.print("Saved ");
+				//Serial.println(id);
+			}
+
+			//if ((id & B11) == B11) {
+			//	// print raw frames
+			//	int i = 0;
+			//	do
+			//	{
+			//		Serial.print("Frame ");
+			//		Serial.print(i);
+			//		Serial.print(": ");
+			//		Serial.print(framesCollection.frames[i].id);
+			//		Serial.print(" ");
+			//		Serial.print(framesCollection.frames[i].length);
+			//		Serial.print("\n");
+			//		for (int j = 0;j < framesCollection.frames[i].length;j++)
+			//			Serial.println(framesCollection.frames[i].payload[j], 16);
+			//		i++;
+			//	}while ((framesCollection.frames[i-1].id & B11) != B11);
+			//	framesCollection.clear();
+			//}
 		}
 		
-		vTaskDelay(pdMS_TO_TICKS(150));
+		//vTaskDelay(pdMS_TO_TICKS(150));
 	}
 }
