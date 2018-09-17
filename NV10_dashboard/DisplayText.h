@@ -9,13 +9,13 @@ public:
 	~DisplayText();
 
 private:
-	uint8_t textSize = 0;
+	uint8_t textSize = 2;
 	uint16_t cursorX = 0;
 	uint16_t cursorY = 0;
-	String text;
-	uint8_t textCols = 1;
-	uint8_t textRows = 1;
-	uint8_t prevTextCols = 0;
+	char* text;
+	uint8_t textWidth = 1;
+	uint8_t textHeight = 1;
+	uint8_t prevTextWidth = 0;
 	uint8_t prevTextRows = 0;
 	void draw();
 	void refreshSettings();

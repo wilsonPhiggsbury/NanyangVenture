@@ -4,7 +4,9 @@
  Author:	MX
 */
 
-#include <FreeRTOS_AVR.h>
+#include <Arduino_FreeRTOS.h>
+#include <queue.h>
+//#include <FreeRTOS_AVR.h>
 #include <mcp_can.h>
 #include "Behaviour.h"
 #include <SPI.h>
@@ -82,42 +84,42 @@ void setup() {
 		Serial.println(F("NV10_back CAN init success!"));
 	}
 	// Now set up all Tasks to run independently. Task functions are found in Tasks.ino
-	//xTaskCreate(
-	//	ReadFuelCell
-	//	, (const portCHAR *)"Fuel"
-	//	, 725
-	//	, hydroCells
-	//	, 3
-	//	, NULL);
-	//xTaskCreate(
-	//	ReadMotorPower
-	//	, (const portCHAR *)"CSensor"
-	//	, 175
-	//	, motors
-	//	, 3
-	//	, NULL);
-	//xTaskCreate(
-	//	QueueOutputData
-	//	, (const portCHAR *)"Enqueue"  // A name just for humans
-	//	, 275  // This stack size can be checked & adjusted by reading the Stack Highwater
-	//	, NULL // Any pointer to pass in
-	//	, 2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
-	//	, NULL);
-	//xTaskCreate(
-	//	LogSendData
-	//	, (const portCHAR *) "LogSend"
-	//	, 800  // Stack size
-	//	, NULL
-	//	, 1  // Priority
-	//	, NULL);
 	xTaskCreate(
-		SendCANFrame
-		, (const portCHAR *) "CAN la!" // where got cannot?
+		ReadFuelCell
+		, (const portCHAR *)"Fuel"
+		, 725
+		, hydroCells
+		, 3
+		, NULL);
+	xTaskCreate(
+		ReadMotorPower
+		, (const portCHAR *)"CSensor"
+		, 175
+		, motors
+		, 3
+		, NULL);
+	xTaskCreate(
+		QueueOutputData
+		, (const portCHAR *)"Enqueue"  // A name just for humans
+		, 275  // This stack size can be checked & adjusted by reading the Stack Highwater
+		, NULL // Any pointer to pass in
+		, 2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
+		, NULL);
+	xTaskCreate(
+		LogSendData
+		, (const portCHAR *) "LogSend"
 		, 800  // Stack size
 		, NULL
 		, 1  // Priority
 		, NULL);
-	vTaskStartScheduler();
+	xTaskCreate(
+		SendCANFrame
+		, (const portCHAR *) "CAN la!" // where got cannot?
+		, 500  // Stack size
+		, NULL
+		, 1  // Priority
+		, NULL);
+	//vTaskStartScheduler();
 
 }
 

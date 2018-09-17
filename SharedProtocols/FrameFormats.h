@@ -1,6 +1,10 @@
 #pragma once
 #include <Arduino.h>
+#ifdef __AVR__
 
+#elif defined _SAM3XA_
+
+#endif
 
 // Declare instances of every payload point
 // ATTR: payload point = where the payload comes from

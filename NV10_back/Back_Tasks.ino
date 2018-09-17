@@ -78,7 +78,7 @@ void QueueOutputData(void *pvParameters)
 				}*/
 			}
 			xQueueSend(queueForLogSend, &outgoing, 100);
-			//xQueueSend(queueForDisplay, &outgoing, 100);
+			xQueueSend(queueForSendCAN, &outgoing, 0);
 		}
 
 
@@ -98,8 +98,7 @@ void QueueOutputData(void *pvParameters)
 				motors[i].dumpDataInto(outgoing.data);//len 5
 			}
 			xQueueSend(queueForLogSend, &outgoing, 100);
-			//xQueueSend(queueForDisplay, &outgoing, 100);
-			//xQueueSend(queueForSendCAN, &outgoing, 100);
+			xQueueSend(queueForSendCAN, &outgoing, 0);
 			//if (syncCounter % (back_lcd_refresh) == 0)
 			//{
 			//	for (int i = 0; i < NUM_CURRENTSENSORS; i++)
@@ -119,7 +118,8 @@ void QueueOutputData(void *pvParameters)
 			outgoing.ID = SM;
 			Speedometer::dumpTimestampInto(&outgoing.timeStamp);
 			speedo.dumpDataInto(outgoing.data);
-			//xQueueSend(queueForLogSend, &outgoing, 100);
+			xQueueSend(queueForLogSend, &outgoing, 100);
+			xQueueSend(queueForSendCAN, &outgoing, 100);
 		}
 		vTaskDelay(delay);
 	}
@@ -132,7 +132,7 @@ void LogSendData(void *pvParameters __attribute__((unused)))  // This is a Task.
 
 	while (1)
 	{
-		BaseType_t success = xQueueReceive(queueForLogSend, &received, 0);
+		BaseType_t success = xQueueReceive(queueForLogSend, &received, 100);
 		char shortFileName[3] = "";
 		if (success == pdPASS)
 		{
@@ -192,27 +192,27 @@ void LogSendData(void *pvParameters __attribute__((unused)))  // This is a Task.
 void SendCANFrame(void *pvParameters __attribute__((unused)))  // This is a Task.
 {
 	QueueItem received;
-	TickType_t delay = pdMS_TO_TICKS(CAN_FRAME_INTERVAL*100); // delay 150 ms, shorter than reading/queueing tasks since this task has lower priority
+	TickType_t delay = pdMS_TO_TICKS(CAN_FRAME_INTERVAL); // delay 150 ms, shorter than reading/queueing tasks since this task has lower priority
 	
 	while (1)
 	{
-		BaseType_t success = pdPASS;// = xQueueReceive(queueForSendCAN, &received, 0);
+		BaseType_t success = xQueueReceive(queueForSendCAN, &received, 0);
 		//// -- test payload --
-		randomSeed(analogRead(A6));
-		received.ID = (DataSource)random(0, 3);
-		received.timeStamp = random();
-		for (int i = 0; i < 8; i++)
-		{
-			received.data[0][i] = (i + 11) / 10.0;
-		}
-		for (int i = 0; i < 8; i++)
-		{
-			received.data[1][i] = (i + 21) / 10.0;
-		}
-		for (int i = 0; i < 8; i++)
-		{
-			received.data[2][i] = (i + 31) / 10.0;
-		}
+		//randomSeed(analogRead(A6));
+		//received.ID = (DataSource)random(0, 3);
+		//received.timeStamp = random();
+		//for (int i = 0; i < 8; i++)
+		//{
+		//	received.data[0][i] = (i + 11) / 10.0;
+		//}
+		//for (int i = 0; i < 8; i++)
+		//{
+		//	received.data[1][i] = (i + 21) / 10.0;
+		//}
+		//for (int i = 0; i < 8; i++)
+		//{
+		//	received.data[2][i] = (i + 31) / 10.0;
+		//}
 		//// -- test payload --
 		// we are going to encode 2 floats into 1 frame (2*4bytes = 8bytes)
 		NV_CanFrames framesCollection;
@@ -229,7 +229,7 @@ void SendCANFrame(void *pvParameters __attribute__((unused)))  // This is a Task
 				if (status != CAN_OK)
 				{
 					// handle sending error
-					Serial.println("FAIL SEND");
+					//Serial.println("FAIL SEND");
 				}
 				else
 				{
@@ -255,8 +255,7 @@ void SendCANFrame(void *pvParameters __attribute__((unused)))  // This is a Task
 			//} while ((framesCollection.frames[i-1].id & B11) != B11);
 
 		}
-		vTaskDelay(500);
-		//Serial.print("ST: ");Serial.println(uxTaskGetStackHighWaterMark(NULL));
+		vTaskDelay(delay);
 		
 		//// ------------------------------ covert back -----------------------------------
 		//QueueItem received2;

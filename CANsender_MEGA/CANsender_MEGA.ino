@@ -16,7 +16,7 @@ void CAN_ISR();
 void setup() {
 	Serial.begin(9600);
 	delay(1000);
-	if (CAN0.begin(CAN_500KBPS) == CAN_OK)
+	if (CAN0.begin(CAN_1000KBPS) == CAN_OK)
 	{
 		Serial.println("CAN sender MEGA initialized.");
 	}

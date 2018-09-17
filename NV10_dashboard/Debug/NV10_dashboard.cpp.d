@@ -24,10 +24,10 @@ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_dashboard\mega_atmega2560\Debug\NV1
  D:\Arduino\Projects\libraries\FreeRTOS_AVR\src/utility/queue.h \
  D:\Arduino\Projects\libraries\FreeRTOS_AVR\src/utility/semphr.h \
  D:\Arduino\Projects\libraries\FreeRTOS_AVR\src/utility/queue.h \
+ D:\Arduino\ide\hardware\arduino\avr\libraries\SPI\src/SPI.h \
+ D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Arduino.h \
  D:\Arduino\Projects\libraries\MCP_CAN_lib/mcp_can.h \
  D:\Arduino\Projects\libraries\MCP_CAN_lib/mcp_can_dfs.h \
- D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Arduino.h \
- D:\Arduino\ide\hardware\arduino\avr\libraries\SPI\src/SPI.h \
  D:\Arduino\Projects\libraries\ILI9488/ILI9488.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Print.h \
  D:\Arduino\Projects\libraries\Adafruit_GFX_Library/Adafruit_GFX.h \

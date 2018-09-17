@@ -5,10 +5,12 @@
 */
 
 
-// the setup function runs once when you press reset or power the board
-#include <FreeRTOS_AVR.h>
-#include <mcp_can.h>
+#include <Arduino_FreeRTOS.h>
+#include <queue.h>
+//#include <FreeRTOS_ARM.h>
 #include <SPI.h>
+
+#include <mcp_can.h>
 #include <ILI9488.h>
 
 #include "Wiring_Dashboard.h"
@@ -21,8 +23,6 @@
 #include "DisplayText.h"
 #include "DisplayGauge.h"
 //#include "Bitmaps.h"
-
-const int screenLED = 9;
 
 void TaskRefreshScreen(void* pvParameters);
 void TaskReadCAN(void* pvParameters);
@@ -43,8 +43,8 @@ void setup() {
 	{
 		Serial.println(F("NV10_dashboard CAN init success!"));
 	}
-	pinMode(screenLED, OUTPUT);
-	digitalWrite(screenLED, HIGH);
+	pinMode(CENTER_LCD_LED, OUTPUT);
+	digitalWrite(CENTER_LCD_LED, HIGH);
 	// 480 x 320 pixels
 	/*Dashboard Info
 		Fuel cell info x2
@@ -63,13 +63,13 @@ void setup() {
 		Handbrake light
 		Cylinder Pressure
 	*/
-	//xTaskCreate(
-	//	TaskRefreshScreen
-	//	, (const portCHAR *)"Refresh"  // A name just for humans
-	//	, 250  // This stack size can be checked & adjusted by reading the Stack Highwater
-	//	, NULL // Any pointer to pass in
-	//	, 1  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
-	//	, NULL);
+	xTaskCreate(
+		TaskRefreshScreen
+		, (const portCHAR *)"Refresh"  // A name just for humans
+		, 700  // This stack size can be checked & adjusted by reading the Stack Highwater
+		, NULL // Any pointer to pass in
+		, 3  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
+		, NULL);
 	xTaskCreate(
 		TaskReadCAN
 		, (const portCHAR *)"ReadCAN"  // A name just for humans
@@ -78,12 +78,7 @@ void setup() {
 		, 2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
 		, &ReadCAN);
 
-	vTaskStartScheduler();
-	while (1)
-	{
-		Serial.println(F("NV10_DASHBOARD IS SLEEPING BECAUSE CAN_INIT FAIL..."));
-		delay(2000);
-	}
+	//vTaskStartScheduler();
 }
 
 // the loop function runs over and over again until power down or reset
@@ -97,28 +92,22 @@ void CAN_incoming()
 }
 void TaskRefreshScreen(void* pvParameters)
 {
-	QueueItem received;
-	ILI9488 leftScreen = ILI9488(10, 7, 8);
-	leftScreen.begin();
-	leftScreen.setRotation(1);
-	leftScreen.fillScreen(ILI9488_BLACK);
-	//leftScreen.drawRGBBitmap(77, 0, image, 150, 150);
-	//leftScreen.setAddrWindow(120, 80, 240, 160);
-	//leftScreen.pushColors(image, 9600, true);
-	//leftScreen.fillRect(240, 80, 120, 80, ILI9488_RED);
-	Serial.println("Screen1 initialized.");
+	//centerLCD.drawRGBBitmap(77, 0, image, 150, 150);
+	//centerLCD.setAddrWindow(120, 80, 240, 160);
+	//centerLCD.pushColors(image, 9600, true);
+	//centerLCD.fillRect(240, 80, 120, 80, ILI9488_RED);
 	/*
 	// voltage is an indication of capacitor charge, goes right
-	DisplayBar capVolt = DisplayBar(&leftScreen, 240+0, 160+30, 240, 80);
+	DisplayBar capVolt = DisplayBar(&centerLCD, 240+0, 160+30, 240, 80);
 	// current flowing from Fuel Cell into Capacitor, goes right
-	DisplayBar capCurrent_charge = DisplayBar(&leftScreen, 240+0, 160-30-80, 240, 80);
+	DisplayBar capCurrent_charge = DisplayBar(&centerLCD, 240+0, 160-30-80, 240, 80);
 	// current drawn from capacitor, goes left
-	DisplayBar capCurrent_discharge = DisplayBar(&leftScreen, 240-240, 160-30-80, 240, 80);
+	DisplayBar capCurrent_discharge = DisplayBar(&centerLCD, 240-240, 160-30-80, 240, 80);
 	// current drawn from capacitor + FC, goes left
-	DisplayBar motorCurrent = DisplayBar(&leftScreen, 240-240, 160+30, 240, 80);
+	DisplayBar motorCurrent = DisplayBar(&centerLCD, 240-240, 160+30, 240, 80);
 
 	// dummy
-	DisplayText t = DisplayText(&leftScreen, 0, 0, 100, 40);
+	DisplayText t = DisplayText(&centerLCD, 0, 0, 100, 40);
 
 	t.setMargin(12);
 	t.setColors(ILI9488_WHITE, ILI9488_BLACK);
@@ -155,13 +144,43 @@ void TaskRefreshScreen(void* pvParameters)
 
 	}
 	*/
-	TickType_t delay = pdMS_TO_TICKS(300);
+	QueueItem received;
+	//ILI9488 centerLCD = ILI9488(CENTER_LCD_CS, CENTER_LCD_DC, CENTER_LCD_RST);
+	//centerLCD.begin();
+	//centerLCD.setRotation(1);
+	//centerLCD.fillScreen(ILI9488_PURPLE);
+	//centerLCD.setTextColor(ILI9488_WHITE);
+	//DisplayText speedDisplay = DisplayText(&centerLCD, (480-200)/2, (320-200)/2, 200, 200);
+	//speedDisplay.init();
+	//speedDisplay.setColors(ILI9488_WHITE, ILI9488_PURPLE);
+	TickType_t delay = pdMS_TO_TICKS(1200);
 	while (1)
 	{
-		BaseType_t success = xQueueReceive(queueForDisplay, &received, 0);
+		BaseType_t success = xQueueReceive(queueForDisplay, &received, 100);
 		if (success == pdPASS)
 		{
+			char payload[3 + 9 + (FLOAT_TO_STRING_LEN + 1)*(QUEUEITEM_DATAPOINTS*QUEUEITEM_READVALUES) + QUEUEITEM_DATAPOINTS];
+			switch (received.ID)
+			{
+			case FC:
 
+				break;
+			case CS:
+
+				break;
+			case SM:
+				dtostrf(received.data[0][0], 4, 1, payload);
+				Serial.print("Payload: ");
+				Serial.println(payload);
+				//speedDisplay.update(payload);
+				break;
+			}
+		}
+		else
+		{
+			Serial.println("NO!");
+			//char errorVal[] = "NO!!";
+			//speedDisplay.update(errorVal);
 		}
 		vTaskDelay(delay);
 	}
@@ -188,13 +207,14 @@ void TaskReadCAN(void* pvParameters)
 
 			if ((id & B11) == B11)
 			{
-				//Serial.println("Seg complete!");
 				bool convertSuccess = framesCollection.toQueueItem(&outgoing);
 				if (convertSuccess)
 				{
-					char payload[3 + 9 + (FLOAT_TO_STRING_LEN + 1)*(QUEUEITEM_DATAPOINTS*QUEUEITEM_READVALUES) + QUEUEITEM_DATAPOINTS];
-					outgoing.toString(payload);
-					Serial.println(payload);
+					// print data
+					//char payload[3 + 9 + (FLOAT_TO_STRING_LEN + 1)*(QUEUEITEM_DATAPOINTS*QUEUEITEM_READVALUES) + QUEUEITEM_DATAPOINTS];
+					//outgoing.toString(payload);
+					//Serial.println(payload);
+					xQueueSend(queueForDisplay, &outgoing, 100);
 				}
 				else
 				{
@@ -202,11 +222,11 @@ void TaskReadCAN(void* pvParameters)
 				}
 				framesCollection.clear();
 			}
-			else
-			{
-				//Serial.print("Saved ");
-				//Serial.println(id);
-			}
+			//else
+			//{
+			//	//Serial.print("Saved ");
+			//	//Serial.println(id);
+			//}
 
 			//if ((id & B11) == B11) {
 			//	// print raw frames
@@ -227,7 +247,6 @@ void TaskReadCAN(void* pvParameters)
 			//	framesCollection.clear();
 			//}
 		}
-		
 		//vTaskDelay(pdMS_TO_TICKS(150));
 	}
 }

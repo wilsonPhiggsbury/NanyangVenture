@@ -1,7 +1,6 @@
 #include "FuelCellLogger.h"
 #include <SPI.h>
 #include <SD.h>
-#include <FreeRTOS_AVR.h>
 
 uint32_t HESFuelCell::timeStamp;
 char* HESFuelCell::path;

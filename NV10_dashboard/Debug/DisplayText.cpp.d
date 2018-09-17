@@ -16,4 +16,5 @@ C:\Users\MX\AppData\Local\Temp\VMBuilds\NV10_dashboard\mega_atmega2560\Debug\Dis
  D:\Arduino\Projects\libraries\ILI9488/ILI9488.h \
  D:\Arduino\ide\hardware\arduino\avr\cores\arduino/Print.h \
  D:\Arduino\Projects\libraries\Adafruit_GFX_Library/Adafruit_GFX.h \
- D:\Arduino\Projects\libraries\Adafruit_GFX_Library/gfxfont.h
+ D:\Arduino\Projects\libraries\Adafruit_GFX_Library/gfxfont.h \
+ C:\Program\ Files\ (x86)\Microsoft\ Visual\ Studio\2017\Enterprise\Common7\IDE\Extensions\pd4xo3tv.r1p\Micro\ Platforms\default\debuggers\VM_DBG/VM_DBG.h

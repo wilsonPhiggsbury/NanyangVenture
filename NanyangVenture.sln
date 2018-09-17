@@ -49,19 +49,22 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NV10_back", "NV10_back\NV10
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FreeRTOS_AVR", "..\libraries\FreeRTOS_AVR\FreeRTOS_AVR.vcxitems", "{2E764FB8-A6C5-413E-BC90-5DD0D0DD1DB8}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FreeRTOS", "..\libraries\FreeRTOS\FreeRTOS.vcxitems", "{216D3E33-021A-4BD1-93E9-8EA99EE382AA}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\libraries\FreeRTOS_ARM\FreeRTOS_ARM.vcxitems*{1a2bb78a-9ab3-45b7-abfc-2430b4752132}*SharedItemsImports = 9
+		..\libraries\FreeRTOS\FreeRTOS.vcxitems*{216d3e33-021a-4bd1-93e9-8ea99ee382aa}*SharedItemsImports = 9
 		..\libraries\FreeRTOS_AVR\FreeRTOS_AVR.vcxitems*{2e764fb8-a6c5-413e-bc90-5dd0d0dd1db8}*SharedItemsImports = 9
 		..\..\ide\hardware\arduino\avr\libraries\SPI\SPI.vcxitems*{3313debc-fd6f-45c2-a323-b7f691565980}*SharedItemsImports = 4
 		..\libraries\Adafruit_GFX_Library\Adafruit_GFX_Library.vcxitems*{3313debc-fd6f-45c2-a323-b7f691565980}*SharedItemsImports = 4
-		..\libraries\FreeRTOS_AVR\FreeRTOS_AVR.vcxitems*{3313debc-fd6f-45c2-a323-b7f691565980}*SharedItemsImports = 4
+		..\libraries\FreeRTOS\FreeRTOS.vcxitems*{3313debc-fd6f-45c2-a323-b7f691565980}*SharedItemsImports = 4
 		..\libraries\ILI9488\ILI9488.vcxitems*{3313debc-fd6f-45c2-a323-b7f691565980}*SharedItemsImports = 4
 		SharedProtocols\SharedProtocols.vcxitems*{3313debc-fd6f-45c2-a323-b7f691565980}*SharedItemsImports = 4
 		..\..\ide\hardware\arduino\avr\libraries\Wire\Wire.vcxitems*{50699b74-4b7a-418a-bcd4-33d264bfe581}*SharedItemsImports = 9
 		..\libraries\ILI9488\ILI9488.vcxitems*{5c6172fd-ce53-4a19-9733-98b83addeef5}*SharedItemsImports = 9
 		SharedProtocols\SharedProtocols.vcxitems*{5e2b7db2-50a1-407f-8699-a791a8ccc920}*SharedItemsImports = 9
-		..\..\ide\portable\packages\arduino\hardware\sam\1.6.11\libraries\SPI\SPI.vcxitems*{6bf971b4-9758-41f0-a084-398e99c260f7}*SharedItemsImports = 4
+		..\..\ide\hardware\arduino\avr\libraries\SPI\SPI.vcxitems*{6bf971b4-9758-41f0-a084-398e99c260f7}*SharedItemsImports = 4
 		..\libraries\Adafruit_GFX_Library\Adafruit_GFX_Library.vcxitems*{6bf971b4-9758-41f0-a084-398e99c260f7}*SharedItemsImports = 4
 		..\libraries\ILI9488\ILI9488.vcxitems*{6bf971b4-9758-41f0-a084-398e99c260f7}*SharedItemsImports = 4
 		SharedProtocols\SharedProtocols.vcxitems*{6bf971b4-9758-41f0-a084-398e99c260f7}*SharedItemsImports = 4
@@ -70,7 +73,6 @@ Global
 		..\..\ide\portable\packages\arduino\hardware\sam\1.6.11\libraries\SPI\SPI.vcxitems*{7e88a9ac-293c-43d8-8aca-7d6b1f56531f}*SharedItemsImports = 9
 		..\..\ide\hardware\arduino\avr\libraries\SPI\SPI.vcxitems*{8b3a2447-325c-473e-a84c-45b578507bd3}*SharedItemsImports = 4
 		..\..\ide\libraries\SD\SD.vcxitems*{8b3a2447-325c-473e-a84c-45b578507bd3}*SharedItemsImports = 4
-		..\libraries\FreeRTOS_AVR\FreeRTOS_AVR.vcxitems*{8b3a2447-325c-473e-a84c-45b578507bd3}*SharedItemsImports = 4
 		SharedProtocols\SharedProtocols.vcxitems*{8b3a2447-325c-473e-a84c-45b578507bd3}*SharedItemsImports = 4
 		..\libraries\Adafruit_GFX_Library\Adafruit_GFX_Library.vcxitems*{8c1a22a5-7653-42a6-b3dd-80639fa902d1}*SharedItemsImports = 9
 		..\..\ide\portable\packages\arduino\hardware\sam\1.6.11\libraries\Wire\Wire.vcxitems*{a7192e66-f105-4569-885c-47923cd5f91a}*SharedItemsImports = 9
@@ -140,6 +142,7 @@ Global
 		{ADD6BEB0-3B62-49EC-B711-FDB9D43D7B9D} = {B731DFF7-A7B2-4F18-831B-D04250650B2F}
 		{A7192E66-F105-4569-885C-47923CD5F91A} = {B731DFF7-A7B2-4F18-831B-D04250650B2F}
 		{2E764FB8-A6C5-413E-BC90-5DD0D0DD1DB8} = {B731DFF7-A7B2-4F18-831B-D04250650B2F}
+		{216D3E33-021A-4BD1-93E9-8EA99EE382AA} = {B731DFF7-A7B2-4F18-831B-D04250650B2F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D50621B3-45DA-4D63-A156-3461EB4C4703}
