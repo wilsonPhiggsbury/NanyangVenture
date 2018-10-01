@@ -17,7 +17,7 @@ void CAN_ISR();
 void setup() {
 	Serial.begin(9600);
 	delay(1000);
-	if (CANObj.begin(CAN_250KBPS) == CAN_OK)
+	if (CANObj.begin(CAN_1000KBPS) == CAN_OK)
 	{
 		Serial.println("CAN receiver DUE initialized.");
 	}
@@ -66,12 +66,8 @@ void QueueOutputData(void *pvParameters __attribute__((unused)))  // This is a T
 		{
 			Serial.println("CAN receive error.");
 		}
-		else
-		{
-			Serial.println("Alive.");
-		}
 		CAN_incoming = 0;
-		vTaskDelay(pdMS_TO_TICKS(500));
+		vTaskDelay(pdMS_TO_TICKS(5));
 	}
 }
 void CAN_ISR()

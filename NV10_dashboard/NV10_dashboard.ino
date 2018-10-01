@@ -5,46 +5,31 @@
 */
 
 
-#include <Arduino_FreeRTOS.h>
-#include <queue.h>
-//#include <FreeRTOS_ARM.h>
+//#include <Arduino_FreeRTOS.h>
+//#include <queue.h>
+#include <FreeRTOS_ARM.h>
 #include <SPI.h>
 
-#include <mcp_can.h>
 #include <ILI9488.h>
-
 #include "Wiring_Dashboard.h"
 // dependent header files
 #include "FrameFormats.h"
 // ----------------------
 
 #include "DisplayContainer.h"
-#include "DisplayBar.h""
+#include "DisplayBar.h"
 #include "DisplayText.h"
 #include "DisplayGauge.h"
 //#include "Bitmaps.h"
 
 void TaskRefreshScreen(void* pvParameters);
-void TaskReadCAN(void* pvParameters);
-TaskHandle_t ReadCAN;
-QueueHandle_t queueForDisplay = xQueueCreate(1, sizeof(QueueItem));
-MCP_CAN CANObj = MCP_CAN(CAN_CS_PIN);
-volatile bool incoming = false;
+void TaskReadSerial(void* pvParameters);
+//QueueHandle_t queueForDisplay = xQueueCreate(1, sizeof(QueueItem));
 void setup() {
 	Serial.begin(9600);
+	Serial3.begin(9600);
+	Serial3.setTimeout(100);
 	delay(100);
-	attachInterrupt(digitalPinToInterrupt(CAN_INTERRUPT_PIN), CAN_incoming, FALLING);
-	if (CANObj.begin(CAN_1000KBPS) != CAN_OK)
-	{
-		Serial.println(F("NV10_dashboard CAN init fail!"));
-		while (1);
-	}
-	else
-	{
-		Serial.println(F("NV10_dashboard CAN init success!"));
-	}
-	pinMode(CENTER_LCD_LED, OUTPUT);
-	digitalWrite(CENTER_LCD_LED, HIGH);
 	// 480 x 320 pixels
 	/*Dashboard Info
 		Fuel cell info x2
@@ -63,32 +48,28 @@ void setup() {
 		Handbrake light
 		Cylinder Pressure
 	*/
+	//xTaskCreate(
+	//	TaskRefreshScreen
+	//	, (const portCHAR *)"Refresh"  // A name just for humans
+	//	, 1000 // This stack size can be checked & adjusted by reading the Stack Highwater
+	//	, NULL // Any pointer to pass in
+	//	, 3  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
+	//	, NULL);
+
 	xTaskCreate(
-		TaskRefreshScreen
-		, (const portCHAR *)"Refresh"  // A name just for humans
-		, 700  // This stack size can be checked & adjusted by reading the Stack Highwater
-		, NULL // Any pointer to pass in
-		, 3  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
-		, NULL);
-	xTaskCreate(
-		TaskReadCAN
-		, (const portCHAR *)"ReadCAN"  // A name just for humans
-		, 800  // This stack size can be checked & adjusted by reading the Stack Highwater
+		TaskReadSerial
+		, (const portCHAR *)"ReadS3"  // A name just for humans
+		, 1000  // This stack size can be checked & adjusted by reading the Stack Highwater
 		, NULL // Any pointer to pass in
 		, 2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
-		, &ReadCAN);
+		, NULL);
 
-	//vTaskStartScheduler();
+	vTaskStartScheduler();
 }
 
 // the loop function runs over and over again until power down or reset
 void loop() {
   
-}
-void CAN_incoming()
-{
-	if (CANObj.checkError() == CAN_OK)
-		incoming = true;
 }
 void TaskRefreshScreen(void* pvParameters)
 {
@@ -145,108 +126,113 @@ void TaskRefreshScreen(void* pvParameters)
 	}
 	*/
 	QueueItem received;
+	char data[MAX_STRING_LEN];
 	//ILI9488 centerLCD = ILI9488(CENTER_LCD_CS, CENTER_LCD_DC, CENTER_LCD_RST);
+	//ILI9488 leftLCD = ILI9488(LEFT_LCD_CS, LEFT_LCD_DC, LEFT_LCD_RST);
+	//pinMode(CENTER_LCD_LED, OUTPUT);
+	//digitalWrite(CENTER_LCD_LED, HIGH);
 	//centerLCD.begin();
-	//centerLCD.setRotation(1);
+	//leftLCD.begin();
+	//centerLCD.setRotation(3);
+	//leftLCD.setRotation(1);
 	//centerLCD.fillScreen(ILI9488_PURPLE);
 	//centerLCD.setTextColor(ILI9488_WHITE);
-	//DisplayText speedDisplay = DisplayText(&centerLCD, (480-200)/2, (320-200)/2, 200, 200);
+	//leftLCD.fillScreen(ILI9488_PURPLE);
+	//leftLCD.setTextColor(ILI9488_WHITE);
+	//DisplayText speedDisplay = DisplayText(&centerLCD, (480 - 200) / 2, (320 - 200) / 2, 200, 200);
+	//DisplayText speedDisplay2 = DisplayText(&leftLCD, (480 - 200) / 2, (320 - 200) / 2, 200, 200);
 	//speedDisplay.init();
 	//speedDisplay.setColors(ILI9488_WHITE, ILI9488_PURPLE);
-	TickType_t delay = pdMS_TO_TICKS(1200);
+	//speedDisplay2.init();
+	//speedDisplay2.setColors(ILI9488_WHITE, ILI9488_PURPLE);
+	TickType_t delay = pdMS_TO_TICKS(200);
+	uint32_t lastTick = 0; Serial.print("I AM READY!!");
 	while (1)
 	{
-		BaseType_t success = xQueueReceive(queueForDisplay, &received, 100);
-		if (success == pdPASS)
+		//uint8_t rNum = random(0, 99);
+		//char tmp[4];
+		//itoa(rNum, tmp, 10);
+		//lastTick = millis();
+		//speedDisplay.update(tmp);
+		//speedDisplay2.update(tmp);
+		//Serial.println(millis() - lastTick);
+		//BaseType_t success = xQueueReceive(queueForDisplay, &received, 0);
+		if (false)
 		{
-			char payload[3 + 9 + (FLOAT_TO_STRING_LEN + 1)*(QUEUEITEM_DATAPOINTS*QUEUEITEM_READVALUES) + QUEUEITEM_DATAPOINTS];
-			switch (received.ID)
-			{
-			case FC:
-
-				break;
-			case CS:
-
-				break;
-			case SM:
-				dtostrf(received.data[0][0], 4, 1, payload);
-				Serial.print("Payload: ");
-				Serial.println(payload);
-				//speedDisplay.update(payload);
-				break;
-			}
+			//sprintf(data, "%4.1f");
+			received.toString(data);
+			Serial.println(data);
+			//Serial.println(data);
 		}
 		else
 		{
-			Serial.println("NO!");
+			Serial.println("NUFFINK");
+		}
+		if (false)
+		{
+			//char payload[3 + 9 + (FLOAT_TO_STRING_LEN + 1)*(QUEUEITEM_DATAPOINTS*QUEUEITEM_READVALUES) + QUEUEITEM_DATAPOINTS];
+			//switch (received.ID)
+			//{
+			//case FC:
+
+			//	break;
+			//case CS:
+
+			//	break;
+			//case SM:
+			//	dtostrf(received.data[0][0], 4, 1, payload);
+			//	Serial.print("Payload: ");
+			//	Serial.println(payload);
+			//	//speedDisplay.update(payload);
+			//	break;
+			//}
+		}
+		else
+		{
+			//Serial.println("NO!");
 			//char errorVal[] = "NO!!";
 			//speedDisplay.update(errorVal);
 		}
 		vTaskDelay(delay);
 	}
 }
-void TaskReadCAN(void* pvParameters)
+void TaskReadSerial(void* pvParameters)
 {
-	
-
-	byte buf[8];
-	unsigned long id;
-	byte len;
-
+	Serial.println("Hi from Serial.");
 	QueueItem outgoing;
-	uint8_t counter = 0;
-	NV_CanFrames framesCollection;
+	char payload[MAX_STRING_LEN];
+	TickType_t delay = pdMS_TO_TICKS(200);
+	Serial.println("Ready to receive.");
 	while (1)
 	{
-		if (incoming)
+
+		if (Serial3.available())
 		{
-			incoming = false;
+			int bytesRead = Serial3.readBytesUntil('\n', payload, MAX_STRING_LEN);
+			if(bytesRead>0)
+				payload[bytesRead-1] = '\0';
+			QueueItem::toQueueItem(payload, &outgoing);
+			//xQueueSend(queueForDisplay, &outgoing, 100);
 
-			CANObj.readMsgBufID(&id, &len, buf);
-			framesCollection.addItem(id, len, buf);
-
-			if ((id & B11) == B11)
+			// DEBUG printing to find out println actually prints "\r\n"
+			int counter = 0;
+			while (counter < bytesRead)
 			{
-				bool convertSuccess = framesCollection.toQueueItem(&outgoing);
-				if (convertSuccess)
-				{
-					// print data
-					//char payload[3 + 9 + (FLOAT_TO_STRING_LEN + 1)*(QUEUEITEM_DATAPOINTS*QUEUEITEM_READVALUES) + QUEUEITEM_DATAPOINTS];
-					//outgoing.toString(payload);
-					//Serial.println(payload);
-					xQueueSend(queueForDisplay, &outgoing, 100);
-				}
+				char tmp = payload[counter++];
+				if (isPrintable(tmp))
+					Serial.print(tmp);
 				else
 				{
-					//Serial.println("Conversion error...");
+					Serial.print("<");
+					Serial.print((uint8_t)tmp);
+					Serial.print(">");
 				}
-				framesCollection.clear();
 			}
-			//else
-			//{
-			//	//Serial.print("Saved ");
-			//	//Serial.println(id);
-			//}
-
-			//if ((id & B11) == B11) {
-			//	// print raw frames
-			//	int i = 0;
-			//	do
-			//	{
-			//		Serial.print("Frame ");
-			//		Serial.print(i);
-			//		Serial.print(": ");
-			//		Serial.print(framesCollection.frames[i].id);
-			//		Serial.print(" ");
-			//		Serial.print(framesCollection.frames[i].length);
-			//		Serial.print("\n");
-			//		for (int j = 0;j < framesCollection.frames[i].length;j++)
-			//			Serial.println(framesCollection.frames[i].payload[j], 16);
-			//		i++;
-			//	}while ((framesCollection.frames[i-1].id & B11) != B11);
-			//	framesCollection.clear();
-			//}
+			Serial.print("[");
+			Serial.print(Serial.available());
+			Serial.print("]");
+			Serial.println("__");
 		}
-		//vTaskDelay(pdMS_TO_TICKS(150));
+		vTaskDelay(delay);
 	}
 }

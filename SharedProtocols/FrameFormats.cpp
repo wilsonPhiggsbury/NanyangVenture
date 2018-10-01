@@ -28,7 +28,11 @@ void _QueueItem::toString(char* putHere)
 		for (uint8_t j = 0; j < readValues; j++)
 		{
 			char data_tmp[5];
+#ifdef __AVR__
 			dtostrf(data[i][j], FLOAT_TO_STRING_LEN, 1, data_tmp);
+#elif defined _SAM3XA_
+			sprintf(data_tmp, "%4.1f");
+#endif
 			strcat(putHere, " ");
 			strcat(putHere, data_tmp);
 		}
@@ -38,6 +42,32 @@ void _QueueItem::toString(char* putHere)
 	// _ : spacebar
 	// \t: tab
 	// \0: null terminator
+}
+void _QueueItem::toQueueItem(char* str, _QueueItem* queueItem)
+{
+	char* cur = strtok(str, "\t");
+	int i, j = 0;
+	while(j<DATAPOINTS && strcmp(dataPoint_shortNames[j],cur))
+	{
+		j++;
+	}
+	queueItem->ID = (DataSource)i;
+	uint8_t dataPoints = DATAPOINT_INSTANCES[i];
+	uint8_t readValues = DATAPOINT_READVALUES[i];
+
+	cur = strtok(NULL, "\t");
+	queueItem->timeStamp = strtoul(cur, NULL, 16);
+
+	for (i = 0; i < dataPoints; i++)
+	{
+		for (j = 0; j < readValues; j++)
+		{
+			cur = strtok(NULL, " ");
+			queueItem->data[i][j] = atof(cur);
+		}
+		cur = strtok(NULL, "\t");
+
+	}
 }
 /*
 --- About Frame IDs ---
@@ -75,7 +105,7 @@ void _QueueItem::toFrames(NV_CanFrames* putHere)
 	uint8_t i,j;
 	for (i = 0; i < dataPoints; i++)
 	{
-		uint8_t terminatorStatus;
+		TerminatorStatus terminatorStatus;
 		for (j = 0; j < readValues - 1; j += 2)
 		{
 			if (j == readValues - 2)
@@ -179,18 +209,20 @@ bool _NV_CanFrames::toQueueItem(QueueItem* putHere)
 	}
 	return true;
 }
-void NV_CanFrames::addItem(unsigned long id, byte length, byte* payload)
+bool NV_CanFrames::addItem(unsigned long id, byte length, byte* payload)
 {
 	frames[numFrames].id = id;
 	frames[numFrames].length = length;
 	memcpy(frames[numFrames].payload, payload, length);
 	numFrames++;
+	// return true for HARD_TERMINATING_FRAME
+	return (id & HARD_TERMINATING_FRAME) == HARD_TERMINATING_FRAME;
 }
-void NV_CanFrames::addItem(uint8_t messageType, uint8_t terminatorStatus, float payload1)
+void NV_CanFrames::addItem(DataSource messageType, uint8_t terminatorStatus, float payload1)
 {
 	addItem_(messageType, terminatorStatus, payload1, 0, false);
 }
-void NV_CanFrames::addItem(uint8_t messageType, uint8_t terminatorStatus, float payload1, float payload2)
+void NV_CanFrames::addItem(DataSource messageType, uint8_t terminatorStatus, float payload1, float payload2)
 {
 	addItem_(messageType, terminatorStatus, payload1, payload2, true);
 }

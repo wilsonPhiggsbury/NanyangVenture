@@ -78,7 +78,7 @@ void QueueOutputData(void *pvParameters)
 				}*/
 			}
 			xQueueSend(queueForLogSend, &outgoing, 100);
-			xQueueSend(queueForSendCAN, &outgoing, 0);
+			//xQueueSend(queueForSendCAN, &outgoing, 0);
 		}
 
 
@@ -133,10 +133,9 @@ void LogSendData(void *pvParameters __attribute__((unused)))  // This is a Task.
 	while (1)
 	{
 		BaseType_t success = xQueueReceive(queueForLogSend, &received, 100);
-		char shortFileName[3] = "";
 		if (success == pdPASS)
 		{
-			strcat(shortFileName, dataPoint_shortNames[received.ID]);
+			// Set path char array to the document we want to save to, determined by a const array
 			strcpy(path + FILENAME_HEADER_LENGTH, dataPoint_shortNames[received.ID]);
 			strcat(path, ".txt");
 
@@ -145,8 +144,7 @@ void LogSendData(void *pvParameters __attribute__((unused)))  // This is a Task.
 
 			// Make container for string representation of queueItem payload
 			// 3 for short name, 9 for timestamp, remaining for all the floats and delimiters like \t " "
-			char data[3 + 9 + (FLOAT_TO_STRING_LEN + 1)*(QUEUEITEM_DATAPOINTS*QUEUEITEM_READVALUES) + QUEUEITEM_DATAPOINTS];
-			//					^^						floats and spacebar						^^^	  ^^	tabs		^^
+			char data[MAX_STRING_LEN];
 			received.toString(data);
 			// -------------- Store into SD -------------
 			if (SD_avail)
@@ -165,7 +163,7 @@ void LogSendData(void *pvParameters __attribute__((unused)))  // This is a Task.
 			strcpy(path + FILENAME_HEADER_LENGTH, "");
 
 			// finally print out the payload to be transmitted by XBee
-			Serial.println(data);
+			//Serial.println(data);
 		}
 
 		vTaskDelay(delay);
@@ -229,14 +227,9 @@ void SendCANFrame(void *pvParameters __attribute__((unused)))  // This is a Task
 				if (status != CAN_OK)
 				{
 					// handle sending error
-					//Serial.println("FAIL SEND");
+					Serial.println("FAIL SEND");
 				}
-				else
-				{
-					//Serial.print("SENT");
-					//Serial.println(i);
-				}
-				//vTaskDelay(pdMS_TO_TICKS(5));
+				vTaskDelay(pdMS_TO_TICKS(5));
 			}
 			//// print raw frames
 			//int i = 0;

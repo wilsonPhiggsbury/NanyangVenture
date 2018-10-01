@@ -23,8 +23,9 @@
 #include <ILI9488.h>
 #include <SPI.h>
 // the setup function runs once when you press reset or power the board
-ILI9488 screen = ILI9488(10, 7, 8);
-uint8_t screenLED = 7;
+ILI9488 screen = ILI9488(11, 12, 13);
+ILI9488 screen2 = ILI9488(10, 7, 8);
+uint8_t screenLED = 9;
 uint16_t vPos = 0;
 uint16_t hPos = 0;
 uint16_t margin = 12;
@@ -34,7 +35,10 @@ void setup() {
 	pinMode(screenLED, OUTPUT);
 	digitalWrite(screenLED, HIGH);
 	screen.begin();
+	screen2.begin();
 	screen.setRotation(1);
+	screen2.setRotation(3);
+	testText2(screen2);
 	testText(screen);
 }
 
@@ -57,6 +61,32 @@ unsigned long testText(ILI9488& tft) {
 	tft.setTextColor(ILI9488_GREEN);
 	tft.setTextSize(5);
 	tft.println("Groop");
+	tft.setTextSize(2);
+	tft.println("I implore thee,");
+	tft.setTextSize(1);
+	tft.println("my foonting turlingdromes.");
+	tft.println("And hooptiously drangle me");
+	tft.println("with crinkly bindlewurdles,");
+	tft.println("Or I will rend thee");
+	tft.println("in the gobberwarts");
+	tft.println("with my blurglecruncheon,");
+	tft.println("see if I don't!");
+	return micros() - start;
+}
+unsigned long testText2(ILI9488& tft) {
+	tft.fillScreen(ILI9488_PURPLE);
+	unsigned long start = micros();
+	tft.setCursor(0, 0);
+	tft.setTextColor(ILI9488_WHITE);  tft.setTextSize(1);
+	tft.println("Hello World!");
+	tft.setTextColor(ILI9488_YELLOW); tft.setTextSize(2);
+	tft.println(1234.56);
+	tft.setTextColor(ILI9488_RED);    tft.setTextSize(3);
+	tft.println(0xBEEFDEAD, HEX);
+	tft.println();
+	tft.setTextColor(ILI9488_GREEN);
+	tft.setTextSize(5);
+	tft.println("AXAXA");
 	tft.setTextSize(2);
 	tft.println("I implore thee,");
 	tft.setTextSize(1);

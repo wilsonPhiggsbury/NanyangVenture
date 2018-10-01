@@ -42,4 +42,5 @@ float Speedometer::calculateSpeed_MS()
 		return 0;
 	else
 		return PI * wheelDiameter / timeDiff;
+	// wheel perimeter / time = PI * diameter (mm) / timeDiff (ms)
 }

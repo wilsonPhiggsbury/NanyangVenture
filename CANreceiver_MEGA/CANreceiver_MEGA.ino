@@ -10,13 +10,13 @@ Author:	MX
 #include <SPI.h>
 
 void TaskQueueOutputData(void *pvParameters __attribute__((unused)));
-MCP_CAN CAN0 = MCP_CAN(22);
+MCP_CAN CANObj = MCP_CAN(22);
 volatile int CAN_incoming = 0;
 void CAN_ISR();
 void setup() {
 	Serial.begin(9600);
 	delay(1000);
-	if (CAN0.begin(CAN_1000KBPS) == CAN_OK)
+	if (CANObj.begin(CAN_1000KBPS) == CAN_OK)
 	{
 		Serial.println("CAN receiver MEGA initialized.");
 	}
@@ -49,7 +49,7 @@ void TaskQueueOutputData(void *pvParameters __attribute__((unused)))  // This is
 	{
 		if (CAN_incoming)
 		{
-			CAN0.readMsgBufID(&ID, &msgLength, inBuffer);
+			CANObj.readMsgBufID(&ID, &msgLength, inBuffer);
 			//Serial.print("Received data from source ");
 			Serial.println(ID);
 			for (int i = 0; i < msgLength; i++)
@@ -68,7 +68,7 @@ void TaskQueueOutputData(void *pvParameters __attribute__((unused)))  // This is
 }
 void CAN_ISR()
 {
-	if (CAN0.checkError() == CAN_OK)
+	if (CANObj.checkError() == CAN_OK)
 	{
 		CAN_incoming = 1;
 	}

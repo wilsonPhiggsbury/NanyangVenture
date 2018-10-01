@@ -74,7 +74,7 @@ void setup() {
 	// initialize speedometer
 	attachInterrupt(digitalPinToInterrupt(SPEEDOMETER_INTERRUPT_PIN), storeWheelInterval_ISR, FALLING);
 	// initialize CAN bus
-	if (CANObj.begin(CAN_1000KBPS) != CAN_OK)
+	if (CANObj.begin(NV_CANSPEED) != CAN_OK)
 	{
 		Serial.println(F("NV10_back CAN init fail!"));
 		while (1);

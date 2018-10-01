@@ -6,7 +6,7 @@
 #define MOTOR_LOGSEND_INTERVAL 300 // enables furious plotting on PC side, try not to overtax the XBee though
 #define BACK_LCD_REFRESH_INTERVAL 2*MOTOR_LOGSEND_INTERVAL // can be slower, won't look at it often
 #define SPEEDOMETER_REFRESH_INTERVAL 500 // 0.5s refresh rate
-#define CAN_FRAME_INTERVAL 300 // dashboard update interval, bottleneck estimated to be at the screen refresh rate
+#define CAN_FRAME_INTERVAL 150 // dashboard update interval, bottleneck estimated to be at the screen refresh rate
 
 // Declare task intervals
 #define READ_FC_INTERVAL 345 // do not anyhow change, fuel cell payload comes once per 1000ms, and faster read as sometimes need 2 reads to process

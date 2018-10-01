@@ -27,7 +27,7 @@ towrite_long[10] = "022.3C 029.3C 029.9C 033.1C 0.84B 53.6V 028.3C OP 41.4C 20 0
 # towrite_long[9] = ""
 # towrite_long[10] = ""
 
-rs = serial.Serial('COM23',19200)
+rs = serial.Serial('COM4',19200)
 counter = 0
 hits = 0
 while True:

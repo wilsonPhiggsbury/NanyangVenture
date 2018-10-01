@@ -6,6 +6,7 @@
 
 #endif
 
+#define NV_CANSPEED 18
 // Declare instances of every payload point
 // ATTR: payload point = where the payload comes from
 const uint8_t DATAPOINT_INSTANCES[] = {
@@ -29,7 +30,9 @@ const uint8_t DATAPOINT_READVALUES[] = {
 #define QUEUEITEM_READVALUES 8	// max of above
 
 #define FLOAT_TO_STRING_LEN 4
+const int MAX_STRING_LEN = 3 + 9 + (FLOAT_TO_STRING_LEN + 1)*(QUEUEITEM_DATAPOINTS*QUEUEITEM_READVALUES) + QUEUEITEM_DATAPOINTS;
 // declare enum to represent every type of payload points
+#define DATAPOINTS 3
 typedef enum
 {
 	// if these ever exceed 4, need to extend the frame ID "3 bits needed for message type" below into 4 bits
@@ -37,8 +40,7 @@ typedef enum
 	CS,
 	SM
 }DataSource;
-//						  v change this if we ever add more payload points
-const char dataPoint_shortNames[3][3] = { "FC", "CS", "SM" };
+const char dataPoint_shortNames[DATAPOINTS][3] = { "FC", "CS", "SM" };
 struct _NV_CanFrame;
 struct _NV_CanFrames;
 struct _QueueItem;
@@ -52,6 +54,7 @@ struct _QueueItem {
 	unsigned long timeStamp;
 	float data[QUEUEITEM_DATAPOINTS][QUEUEITEM_READVALUES];
 	void toString(char* putHere);
+	static void toQueueItem(char * str, _QueueItem * queueItem);
 	void toFrames(NV_CanFrames* putHere);
 };
 // struct to pass payload between different microcontrollers
@@ -67,9 +70,9 @@ struct _NV_CanFrames
 	NV_CanFrame frames[1 + QUEUEITEM_DATAPOINTS * QUEUEITEM_READVALUES / 2 + 1 * QUEUEITEM_DATAPOINTS];
 	// 1 frame for timestamp, other frames for floats, +QUEUEITEM_DATAPOINTS frame for odd-number scenarios where one additional frame is needed for the lone float
 	bool toQueueItem(QueueItem* putHere);
-	void addItem(unsigned long id, byte length, byte* payload);
-	void addItem(uint8_t messageType, uint8_t terminatorStatus, float payload1);
-	void addItem(uint8_t messageType, uint8_t terminatorStatus, float payload1, float payload2);
+	bool addItem(unsigned long id, byte length, byte* payload);
+	void addItem(DataSource messageType, uint8_t terminatorStatus, float payload1);
+	void addItem(DataSource messageType, uint8_t terminatorStatus, float payload1, float payload2);
 	uint8_t getNumFrames();
 	void clear();
 private:
