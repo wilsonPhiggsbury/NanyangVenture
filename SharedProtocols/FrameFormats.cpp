@@ -31,13 +31,13 @@ void _QueueItem::toString(char* putHere)
 #ifdef __AVR__
 			dtostrf(data[i][j], FLOAT_TO_STRING_LEN, 1, data_tmp);
 #elif defined _SAM3XA_
-			sprintf(data_tmp, "%4.1f");
+			sprintf(data_tmp, "%4.1f", data[i][j]);
 #endif
-			strcat(putHere, " ");
 			strcat(putHere, data_tmp);
+			strcat(putHere, " ");
 		}
 	}
-	// final string sample: CS \t timeStamp \t _ CS1V _ CS1A \t _ CS2V _ CS2A \t _ CS3V _ CS3A \0
+	// final string sample: CS \t timeStamp \t CS1V _ CS1A _ \t CS2V _ CS2A _ \t CS3V _ CS3A _ \0
 	// remove all whitespaces in the above format
 	// _ : spacebar
 	// \t: tab
@@ -51,9 +51,9 @@ void _QueueItem::toQueueItem(char* str, _QueueItem* queueItem)
 	{
 		j++;
 	}
-	queueItem->ID = (DataSource)i;
-	uint8_t dataPoints = DATAPOINT_INSTANCES[i];
-	uint8_t readValues = DATAPOINT_READVALUES[i];
+	queueItem->ID = (DataSource)j;
+	uint8_t dataPoints = DATAPOINT_INSTANCES[j];
+	uint8_t readValues = DATAPOINT_READVALUES[j];
 
 	cur = strtok(NULL, "\t");
 	queueItem->timeStamp = strtoul(cur, NULL, 16);
@@ -63,10 +63,16 @@ void _QueueItem::toQueueItem(char* str, _QueueItem* queueItem)
 		for (j = 0; j < readValues; j++)
 		{
 			cur = strtok(NULL, " ");
+			// for some reason the strtok below is not working, commented out and patched a HOTFIX to offset the pointer
+			if (i != 0 && j == 0)
+				cur++;
+#ifdef __AVR__
 			queueItem->data[i][j] = atof(cur);
+#elif defined _SAM3XA_
+			queueItem->data[i][j] = strtof(cur, NULL);
+#endif
 		}
-		cur = strtok(NULL, "\t");
-
+		//cur = strtok(NULL, "\t");
 	}
 }
 /*

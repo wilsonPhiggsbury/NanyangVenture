@@ -18,13 +18,13 @@ void CAN_ISR();
 void setup() {
 	Serial.begin(9600);
 	delay(1000);
-	if (CANObj.begin(18) == CAN_OK)
+	if (CANObj.begin(NV_CANSPEED) == CAN_OK)
 	{
-		Serial.println("CAN receiver UNO initialized.");
+		Serial.print("Y");
 	}
 	else
 	{
-		Serial.println("CAN error.");
+		Serial.print("N");
 	}
 	attachInterrupt(digitalPinToInterrupt(3), CAN_ISR, FALLING);
 
