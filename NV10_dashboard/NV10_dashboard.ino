@@ -77,24 +77,17 @@ void TaskRefreshScreen(void* pvParameters)
 	
 	QueueItem received;
 	char data[MAX_STRING_LEN];
+	char content[FLOAT_TO_STRING_LEN + 1];
 	ILI9488 centerLCD = ILI9488(CENTER_LCD_CS, CENTER_LCD_DC, CENTER_LCD_RST);
-	ILI9488 leftLCD = ILI9488(LEFT_LCD_CS, LEFT_LCD_DC, LEFT_LCD_RST);
 	pinMode(CENTER_LCD_LED, OUTPUT);
 	digitalWrite(CENTER_LCD_LED, HIGH);
 	centerLCD.begin();
-	leftLCD.begin();
 	centerLCD.setRotation(3);
-	leftLCD.setRotation(1);
 	centerLCD.fillScreen(ILI9488_PURPLE);
 	centerLCD.setTextColor(ILI9488_WHITE);
-	leftLCD.fillScreen(ILI9488_PURPLE);
-	leftLCD.setTextColor(ILI9488_WHITE);
 	DisplayText speedDisplay = DisplayText(&centerLCD, (480 - 200) / 2, (320 - 200) / 2, 200, 200);
-	DisplayText speedDisplay2 = DisplayText(&leftLCD, (480 - 200) / 2, (320 - 200) / 2, 200, 200);
 	speedDisplay.init();
 	speedDisplay.setColors(ILI9488_WHITE, ILI9488_PURPLE);
-	speedDisplay2.init();
-	speedDisplay2.setColors(ILI9488_WHITE, ILI9488_PURPLE);
 	TickType_t delay = pdMS_TO_TICKS(200);
 	uint32_t lastTick = 0;
 	while (1)
@@ -111,32 +104,20 @@ void TaskRefreshScreen(void* pvParameters)
 		{
 			received.toString(data);
 			Serial.println(data);
-			//Serial.println(data);
-		}
-		if (false)
-		{
-			//char payload[3 + 9 + (FLOAT_TO_STRING_LEN + 1)*(QUEUEITEM_DATAPOINTS*QUEUEITEM_READVALUES) + QUEUEITEM_DATAPOINTS];
-			//switch (received.ID)
-			//{
-			//case FC:
 
-			//	break;
-			//case CS:
+			switch (received.ID)
+			{
+			case FC:
 
-			//	break;
-			//case SM:
-			//	dtostrf(received.data[0][0], 4, 1, payload);
-			//	Serial.print("Payload: ");
-			//	Serial.println(payload);
-			//	//speedDisplay.update(payload);
-			//	break;
-			//}
-		}
-		else
-		{
-			//Serial.println("NO!");
-			//char errorVal[] = "NO!!";
-			//speedDisplay.update(errorVal);
+				break;
+			case CS:
+
+				break;
+			case SM:
+				sprintf(content, "%4.1f", received.data[0][0]);
+				speedDisplay.update(content);
+				break;
+			}
 		}
 		vTaskDelay(delay);
 	}

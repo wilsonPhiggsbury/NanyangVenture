@@ -16,6 +16,7 @@ MCP_CAN CANObj = MCP_CAN(4);
 volatile int CAN_incoming = 0;
 void CAN_ISR();
 void setup() {
+	delay(3000);
 	Serial.begin(9600);
 	delay(1000);
 	if (CANObj.begin(NV_CANSPEED) == CAN_OK)
@@ -46,9 +47,8 @@ void TaskQueueOutputData(void *pvParameters __attribute__((unused)))  // This is
 {
 	unsigned long id;
 	byte len;
-	byte outBuffer[8];
-	char data[8] = "UNO_YO";
 	byte inBuffer[8];
+
 	QueueItem incoming;
 	NV_CanFrames frames;
 	while (1) // A Task shall never return or exit.

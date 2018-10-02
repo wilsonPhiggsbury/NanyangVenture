@@ -135,20 +135,17 @@ void LogSendData(void *pvParameters __attribute__((unused)))  // This is a Task.
 		BaseType_t success = xQueueReceive(queueForLogSend, &received, 100);
 		if (success == pdPASS)
 		{
-			// Set path char array to the document we want to save to, determined by a const array
-			strcpy(path + FILENAME_HEADER_LENGTH, dataPoint_shortNames[received.ID]);
-			strcat(path, ".txt");
-
-			//strncpy(shortFileName, CURRENTSENSOR_FILENAME, 2);
-			//strcpy(path + FILENAME_HEADER_LENGTH, CURRENTSENSOR_FILENAME);
-
 			// Make container for string representation of queueItem payload
 			// 3 for short name, 9 for timestamp, remaining for all the floats and delimiters like \t " "
 			char data[MAX_STRING_LEN];
 			received.toString(data);
+
 			// -------------- Store into SD -------------
 			if (SD_avail)
 			{
+				// Set path char array to the document we want to save to, determined by a const array
+				strcpy(path + FILENAME_HEADER_LENGTH, dataPoint_shortNames[received.ID]);
+				strcat(path, ".txt");
 				// DO NOT SWITCH OUT THIS TASK IN THE MIDST OF WRITING A FILE ON SD CARD
 				// (consequence: some serial payload may be missed. Hang or miss payload? Tough choice...)
 				// ^^^^ this is probably fixed, if verified delete this line ^^^^
@@ -157,13 +154,13 @@ void LogSendData(void *pvParameters __attribute__((unused)))  // This is a Task.
 				writtenFile.println(data);
 				writtenFile.close();
 				xTaskResumeAll();
+				// *path should only remain as /LOG_****/
+				// clean up after use
+				strcpy(path + FILENAME_HEADER_LENGTH, "");
 			}
-			// *path should only remain as /LOG_****/
-			// clean up after use
-			strcpy(path + FILENAME_HEADER_LENGTH, "");
 
 			// finally print out the payload to be transmitted by XBee
-			//Serial.println(data);
+			Serial.println(data);
 		}
 
 		vTaskDelay(delay);
@@ -227,7 +224,7 @@ void SendCANFrame(void *pvParameters __attribute__((unused)))  // This is a Task
 				if (status != CAN_OK)
 				{
 					// handle sending error
-					Serial.println("FAIL SEND");
+					//Serial.println("FAIL SEND");
 				}
 				vTaskDelay(pdMS_TO_TICKS(5));
 			}
