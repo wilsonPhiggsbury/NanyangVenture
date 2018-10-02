@@ -16,9 +16,8 @@ MCP_CAN CANObj = MCP_CAN(4);
 volatile int CAN_incoming = 0;
 void CAN_ISR();
 void setup() {
-	delay(3000);
 	Serial.begin(9600);
-	delay(1000);
+	delay(100);
 	if (CANObj.begin(NV_CANSPEED) == CAN_OK)
 	{
 		Serial.print("Y");

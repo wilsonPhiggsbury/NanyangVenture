@@ -127,11 +127,16 @@ void TaskReadSerial(void* pvParameters)
 	QueueItem outgoing;
 	char payload[MAX_STRING_LEN];
 	TickType_t delay = pdMS_TO_TICKS(200);
+	const uint8_t CAN_resetThreshold = 30;
+	uint8_t CAN_resetCounter = 0;
+	pinMode(CAN_RST_PIN, OUTPUT);
+	digitalWrite(CAN_RST_PIN, HIGH);
 	while (1)
 	{
 
 		if (Serial3.available())
 		{
+			CAN_resetCounter = 0;
 			int bytesRead = Serial3.readBytesUntil('\n', payload, MAX_STRING_LEN);
 			if(bytesRead>0)
 				payload[bytesRead-1] = '\0';
@@ -156,6 +161,17 @@ void TaskReadSerial(void* pvParameters)
 			//Serial.print(Serial.available());
 			//Serial.print("]");
 			//Serial.println("__");
+		}
+		else
+		{
+			if (CAN_resetCounter++ >= CAN_resetThreshold)
+			{
+
+				digitalWrite(CAN_RST_PIN, LOW);
+				vTaskDelay(delay);
+				digitalWrite(CAN_RST_PIN, HIGH);
+				CAN_resetCounter = 0;
+			}
 		}
 		vTaskDelay(delay);
 	}

@@ -98,7 +98,7 @@ void QueueOutputData(void *pvParameters)
 				motors[i].dumpDataInto(outgoing.data);//len 5
 			}
 			xQueueSend(queueForLogSend, &outgoing, 100);
-			xQueueSend(queueForSendCAN, &outgoing, 0);
+			//xQueueSend(queueForSendCAN, &outgoing, 0);
 			//if (syncCounter % (back_lcd_refresh) == 0)
 			//{
 			//	for (int i = 0; i < NUM_CURRENTSENSORS; i++)
