@@ -30,7 +30,9 @@ const uint8_t DATAPOINT_READVALUES[] = {
 #define QUEUEITEM_READVALUES 8	// max of above
 
 #define FLOAT_TO_STRING_LEN 4
-const int MAX_STRING_LEN = 3 + 9 + (FLOAT_TO_STRING_LEN + 1)*(QUEUEITEM_DATAPOINTS*QUEUEITEM_READVALUES) + QUEUEITEM_DATAPOINTS;
+#define SHORTNAME_LEN 3
+const int MAX_STRING_LEN = SHORTNAME_LEN + 9 + (FLOAT_TO_STRING_LEN + 1)*(QUEUEITEM_DATAPOINTS*QUEUEITEM_READVALUES) + QUEUEITEM_DATAPOINTS;
+//										^^ 9 bits for timeStamp + '\t'
 // declare enum to represent every type of payload points
 #define DATAPOINTS 3
 typedef enum
@@ -40,7 +42,7 @@ typedef enum
 	CS,
 	SM
 }DataSource;
-const char dataPoint_shortNames[DATAPOINTS][3] = { "FC", "CS", "SM" };
+const char dataPoint_shortNames[DATAPOINTS][SHORTNAME_LEN] = { "FC", "CS", "SM" };
 struct _NV_CanFrame;
 struct _NV_CanFrames;
 struct _QueueItem;
@@ -54,7 +56,7 @@ struct _QueueItem {
 	unsigned long timeStamp;
 	float data[QUEUEITEM_DATAPOINTS][QUEUEITEM_READVALUES];
 	void toString(char* putHere);
-	static void toQueueItem(char * str, _QueueItem * queueItem);
+	static bool toQueueItem(char * str, _QueueItem * queueItem); //		<--- *NOT YET verified if it works on AVR chips*
 	void toFrames(NV_CanFrames* putHere);
 };
 // struct to pass payload between different microcontrollers
@@ -79,24 +81,29 @@ private:
 	uint8_t numFrames = 0;
 	void addItem_(uint8_t messageType, uint8_t terminatorStatus, float payload1, float payload2, bool using_payload2);
 };
-/*	
-	--- About Frame IDs ---
-2 bits needed for indication of terminating frame
-	00 -> start of stream, carries timestamp
-	01 -> normal frame in middle of stream
-	10 -> terminate transmission for one datapoint
-	11 -> terminate transmission for one full string
-3 bits needed for message type
-	0 -> display FC
-	1 -> display CS
-	2 -> display SM (include throttle?)
-	3 -> *reserved for display payload*
-	4 -> buttons
-	5 -> *reserved*
-	6 -> *reserved*
-	7 -> *reserved*
+/*
+--- About Frame IDs ---															ID[10:0]
+"terminator status bits": 2 bits needed for indication of terminating frame.	ID[1:0]
+00 -> start of stream, carries timestamp
+01 -> normal frame in middle of stream
+10 -> terminate transmission for one datapoint (soft termination)
+11 -> terminate transmission for one full string (hard termination)
 
-	--- About Frame Length ---
+"message type bits": 3 bits needed for message type.							ID[4:2], shift left by 2
+0 -> display FC
+1 -> display CS
+2 -> display SM (include throttle?)
+3 -> *reserved for display payload*
+4 -> buttons
+5 -> *reserved*
+6 -> *reserved*
+7 -> *reserved*
+
+--- About Frame Length ---
+From NV10_dashboard:
+length 4 for headlights, wiper, Lsig, Rsig
+From NV10_back:
 length 4 means frame contains 1 float
 length 8 means frame contains 2 float
+
 */

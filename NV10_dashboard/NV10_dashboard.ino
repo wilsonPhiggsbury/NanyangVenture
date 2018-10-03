@@ -4,12 +4,8 @@
  Author:	MX
 */
 
-
-//#include <Arduino_FreeRTOS.h>
-//#include <queue.h>
 #include <FreeRTOS_ARM.h>
 #include <SPI.h>
-
 #include <ILI9488.h>
 #include "Wiring_Dashboard.h"
 // dependent header files
@@ -27,8 +23,8 @@ void TaskReadSerial(void* pvParameters);
 QueueHandle_t queueForDisplay;
 void setup() {
 	Serial.begin(9600);
-	Serial3.begin(9600);
-	Serial3.setTimeout(100);
+	Serial1.begin(9600);
+	Serial1.setTimeout(100);
 	delay(100);
 	queueForDisplay = xQueueCreate(1, sizeof(QueueItem));
 	// 480 x 320 pixels
@@ -74,6 +70,8 @@ void loop() {
 }
 void TaskRefreshScreen(void* pvParameters)
 {
+	const uint8_t CAN_resetThreshold = 10;
+	uint8_t CAN_resetCounter = 0;
 	
 	QueueItem received;
 	char data[MAX_STRING_LEN];
@@ -83,7 +81,7 @@ void TaskRefreshScreen(void* pvParameters)
 	digitalWrite(CENTER_LCD_LED, HIGH);
 	centerLCD.begin();
 	centerLCD.setRotation(3);
-	centerLCD.fillScreen(ILI9488_PURPLE);
+	centerLCD.fillScreen(ILI9488_BLACK);
 	centerLCD.setTextColor(ILI9488_WHITE);
 	DisplayText speedDisplay = DisplayText(&centerLCD, (480 - 200) / 2, (320 - 200) / 2, 200, 200);
 	speedDisplay.init();
@@ -92,16 +90,10 @@ void TaskRefreshScreen(void* pvParameters)
 	uint32_t lastTick = 0;
 	while (1)
 	{
-		//uint8_t rNum = random(0, 99);
-		//char tmp[4];
-		//itoa(rNum, tmp, 10);
-		//lastTick = millis();
-		//speedDisplay.update(tmp);
-		//speedDisplay2.update(tmp);
-		//Serial.println(millis() - lastTick);
 		BaseType_t success = xQueueReceive(queueForDisplay, &received, 0);
 		if (success)
 		{
+			CAN_resetCounter = 0;
 			received.toString(data);
 			Serial.println(data);
 
@@ -119,6 +111,17 @@ void TaskRefreshScreen(void* pvParameters)
 				break;
 			}
 		}
+		else
+		{
+			if (CAN_resetCounter++ >= CAN_resetThreshold)
+			{
+				speedDisplay.update("---");
+				digitalWrite(CAN_RST_PIN, LOW);
+				vTaskDelay(delay);
+				digitalWrite(CAN_RST_PIN, HIGH);
+				CAN_resetCounter = 0;
+			}
+		}
 		vTaskDelay(delay);
 	}
 }
@@ -127,23 +130,22 @@ void TaskReadSerial(void* pvParameters)
 	QueueItem outgoing;
 	char payload[MAX_STRING_LEN];
 	TickType_t delay = pdMS_TO_TICKS(200);
-	const uint8_t CAN_resetThreshold = 30;
-	uint8_t CAN_resetCounter = 0;
 	pinMode(CAN_RST_PIN, OUTPUT);
 	digitalWrite(CAN_RST_PIN, HIGH);
 	while (1)
 	{
 
-		if (Serial3.available())
+		if (Serial1.available())
 		{
-			CAN_resetCounter = 0;
-			int bytesRead = Serial3.readBytesUntil('\n', payload, MAX_STRING_LEN);
+			int bytesRead = Serial1.readBytesUntil('\n', payload, MAX_STRING_LEN);
 			if(bytesRead>0)
 				payload[bytesRead-1] = '\0';
-			QueueItem::toQueueItem(payload, &outgoing);
-			xQueueSend(queueForDisplay, &outgoing, 100);
+			//// ------------------------------ covert back -----------------------------------
+			bool convertSuccess = QueueItem::toQueueItem(payload, &outgoing);
+			if(convertSuccess)
+				xQueueSend(queueForDisplay, &outgoing, 100);
 
-			// DEBUG printing to find out println actually prints "\r\n"
+			// DEBUG printing that prints out special bytes as uint
 			//int counter = 0;
 			//while (counter < bytesRead)
 			//{
@@ -161,17 +163,6 @@ void TaskReadSerial(void* pvParameters)
 			//Serial.print(Serial.available());
 			//Serial.print("]");
 			//Serial.println("__");
-		}
-		else
-		{
-			if (CAN_resetCounter++ >= CAN_resetThreshold)
-			{
-
-				digitalWrite(CAN_RST_PIN, LOW);
-				vTaskDelay(delay);
-				digitalWrite(CAN_RST_PIN, HIGH);
-				CAN_resetCounter = 0;
-			}
 		}
 		vTaskDelay(delay);
 	}

@@ -8,4 +8,4 @@
 #define LEFT_LCD_CS 11
 #define LEFT_LCD_DC 12
 #define LEFT_LCD_RST 13
-#define CAN_RST_PIN 16
+#define CAN_RST_PIN 28

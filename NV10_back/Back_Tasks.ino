@@ -78,7 +78,7 @@ void QueueOutputData(void *pvParameters)
 				}*/
 			}
 			xQueueSend(queueForLogSend, &outgoing, 100);
-			//xQueueSend(queueForSendCAN, &outgoing, 0);
+			xQueueSend(queueForSendCAN, &outgoing, 0);
 		}
 
 
@@ -98,7 +98,7 @@ void QueueOutputData(void *pvParameters)
 				motors[i].dumpDataInto(outgoing.data);//len 5
 			}
 			xQueueSend(queueForLogSend, &outgoing, 100);
-			//xQueueSend(queueForSendCAN, &outgoing, 0);
+			xQueueSend(queueForSendCAN, &outgoing, 0);
 			//if (syncCounter % (back_lcd_refresh) == 0)
 			//{
 			//	for (int i = 0; i < NUM_CURRENTSENSORS; i++)
@@ -160,7 +160,7 @@ void LogSendData(void *pvParameters __attribute__((unused)))  // This is a Task.
 			}
 
 			// finally print out the payload to be transmitted by XBee
-			Serial.println(data);
+			//Serial.println(data);
 		}
 
 		vTaskDelay(delay);
@@ -192,23 +192,7 @@ void SendCANFrame(void *pvParameters __attribute__((unused)))  // This is a Task
 	while (1)
 	{
 		BaseType_t success = xQueueReceive(queueForSendCAN, &received, 0);
-		//// -- test payload --
-		//randomSeed(analogRead(A6));
-		//received.ID = (DataSource)random(0, 3);
-		//received.timeStamp = random();
-		//for (int i = 0; i < 8; i++)
-		//{
-		//	received.data[0][i] = (i + 11) / 10.0;
-		//}
-		//for (int i = 0; i < 8; i++)
-		//{
-		//	received.data[1][i] = (i + 21) / 10.0;
-		//}
-		//for (int i = 0; i < 8; i++)
-		//{
-		//	received.data[2][i] = (i + 31) / 10.0;
-		//}
-		//// -- test payload --
+
 		// we are going to encode 2 floats into 1 frame (2*4bytes = 8bytes)
 		NV_CanFrames framesCollection;
 		if (success == pdPASS)
@@ -228,26 +212,10 @@ void SendCANFrame(void *pvParameters __attribute__((unused)))  // This is a Task
 				}
 				vTaskDelay(pdMS_TO_TICKS(5));
 			}
-			//// print raw frames
-			//int i = 0;
-			//do
-			//{
-			//	Serial.print("Frame ");
-			//	Serial.print(i);
-			//	Serial.print(": ");
-			//	Serial.print(framesCollection.frames[i].id);
-			//	Serial.print(" ");
-			//	Serial.print(framesCollection.frames[i].length);
-			//	Serial.print("\n");
-			//	for (int j = 0;j<framesCollection.frames[i].length;j++)
-			//		Serial.println(framesCollection.frames[i].payload[j], 16);
-			//	i++;
-			//} while ((framesCollection.frames[i-1].id & B11) != B11);
 
 		}
 		vTaskDelay(delay);
 		
-		//// ------------------------------ covert back -----------------------------------
 		//QueueItem received2;
 		//bool convertSucess = framesCollection.toQueueItem(&received);
 		//// print converted results

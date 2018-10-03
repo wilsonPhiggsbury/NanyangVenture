@@ -9,7 +9,7 @@ DisplayBar::DisplayBar(ILI9488* screen, uint16_t xPos, uint16_t yPos, uint16_t w
 void DisplayBar::update(char* value)
 {
 	prevValue = thisValue;
-	thisValue = atof(value);
+	thisValue = strtof(value, NULL);
 	draw();
 }
 void DisplayBar::draw()
@@ -96,7 +96,6 @@ void DisplayBar::refreshSettings()
 	{
 		screen->fillRect(xPos + margin, yPos + margin, \
 			ceil(toWidthScale(thisValue)), actualHeight, foreground);
-
 	}
 }
 float DisplayBar::toWidthScale(float value)

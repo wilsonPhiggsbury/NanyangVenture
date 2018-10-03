@@ -5,7 +5,7 @@
 			all non-arduino files created by visual micro and all visual studio project or solution files can be freely deleted and are not required to compile a sketch (do not delete your own code!).
 			note: debugger breakpoints are stored in '.sln' or '.asln' files, knowledge of last uploaded breakpoints is stored in the upload.vmps.xml file. Both files are required to continue a previous debug session without needing to compile and upload again
 	
-	Hardware: Arduino/Genuino Uno, Platform=avr, Package=arduino
+	Hardware: ATmega328 on a breadboard (8 MHz internal clock), Platform=avr, Package=breadboard
 */
 
 #if defined(_VMICRO_INTELLISENSE)
@@ -14,9 +14,9 @@
 #define _VSARDUINO_H_
 #define __AVR_ATmega328p__
 #define __AVR_ATmega328P__
-#define F_CPU 16000000L
+#define F_CPU 8000000L
 #define ARDUINO 10805
-#define ARDUINO_AVR_UNO
+#define ARDUINO_AVR_BREADBOARD_BREADBOARD_AVR_ATMEGA328BB
 #define ARDUINO_ARCH_AVR
 #define __cplusplus 201103L
 #define __AVR__
@@ -75,6 +75,6 @@ typedef void *__builtin_va_list;
 #define pgm_read_float(address_short) float()
 #define pgm_read_ptr(address_short)   short()
 
-#include "CANreceiver_UNO.ino"
+#include "CANtoSerial_UNO.ino"
 #endif
 #endif
