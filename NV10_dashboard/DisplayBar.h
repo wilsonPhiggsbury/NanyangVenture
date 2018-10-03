@@ -17,8 +17,7 @@ public:
 	void setOrientation(Orientation o);
 	~DisplayBar();
 private:
-	uint16_t minVal = 0;
-	uint16_t maxVal = 100;
+	uint16_t minVal = 0, maxVal = 100;
 	uint16_t actualWidth, actualHeight;
 	float prevValue = 0;
 	float thisValue = 0;

@@ -1,4 +1,30 @@
 #include "FrameFormats.h"
+/*
+--- About Frame IDs ---															ID[10:0]
+"terminator status bits": 2 bits needed for indication of terminating frame.	ID[1:0]
+00 -> start of stream, carries timestamp
+01 -> normal frame in middle of stream
+10 -> terminate transmission for one datapoint (soft termination)
+11 -> terminate transmission for one full string (hard termination)
+
+"message type bits": 3 bits needed for message type.							ID[4:2], shift left by 2
+0 -> display FC
+1 -> display CS
+2 -> display SM (include throttle?)
+3 -> *reserved for display payload*
+4 -> buttons
+5 -> *reserved*
+6 -> *reserved*
+7 -> *reserved*
+
+--- About Frame Length ---
+From NV10_dashboard:
+length 4 for headlights, wiper, Lsig, Rsig
+From NV10_back:
+length 4 means frame contains 1 float
+length 8 means frame contains 2 float
+
+*/
 typedef enum
 {
 	HEADER_FRAME,
@@ -43,13 +69,17 @@ void _QueueItem::toString(char* putHere)
 	// \t: tab
 	// \0: null terminator
 }
-void _QueueItem::toQueueItem(char* str, _QueueItem* queueItem)
+bool _QueueItem::toQueueItem(char* str, _QueueItem* queueItem)
 {
 	char* cur = strtok(str, "\t");
 	int i, j = 0;
 	while(j<DATAPOINTS && strcmp(dataPoint_shortNames[j],cur))
 	{
 		j++;
+	}
+	if (j >= DATAPOINTS)
+	{
+		return false;
 	}
 	queueItem->ID = (DataSource)j;
 	uint8_t dataPoints = DATAPOINT_INSTANCES[j];
@@ -74,29 +104,8 @@ void _QueueItem::toQueueItem(char* str, _QueueItem* queueItem)
 		}
 		//cur = strtok(NULL, "\t");
 	}
+	return true;
 }
-/*
---- About Frame IDs ---
-"terminator status bits": 2 bits needed for indication of terminating frame
-00 -> start of stream, carries timestamp
-01 -> normal frame in middle of stream
-10 -> terminate transmission for one datapoint (soft termination)
-11 -> terminate transmission for one full string (hard termination)
-
-"message type bits": 3 bits needed for message type
-0 -> display FC
-1 -> display CS
-2 -> display SM (include throttle?)
-3 -> *reserved for display payload*
-4 -> buttons
-5 -> *reserved*
-6 -> *reserved*
-7 -> *reserved*
-
---- About Frame Length ---
-length 4 means frame contains 1 float
-length 8 means frame contains 2 float
-*/
 void _QueueItem::toFrames(NV_CanFrames* putHere)
 {
 	uint8_t dataPoints = DATAPOINT_INSTANCES[ID];
@@ -150,7 +159,7 @@ bool _NV_CanFrames::toQueueItem(QueueItem* putHere)
 	putHere->ID = DataSource((frames[0].id >> 2) & B111);
 	uint8_t dataPoints = DATAPOINT_INSTANCES[putHere->ID];
 	uint8_t readValues = DATAPOINT_READVALUES[putHere->ID];
-	// spot-check whether frame number is as anticipated. Two floats per frame + 1 frame for timestamp
+	// spot-check whether frame number is as anticipated. 1/2 frame per float + 1 frame for timestamp
 	if (numFrames != dataPoints * ceil(readValues / 2.0) + 1)
 	{
 		Serial.print("NUMFRAMES incorrect. Expecting: ");
@@ -179,14 +188,12 @@ bool _NV_CanFrames::toQueueItem(QueueItem* putHere)
 				if (i == dataPoints - 1) {
 					if (terminatorStatus != HARD_TERMINATING_FRAME)
 					{
-
 						return false;
 					}
 				}
 				else {
 					if (terminatorStatus != SOFT_TERMINATING_FRAME)
 					{
-
 						return false;
 					}
 				}
@@ -195,7 +202,6 @@ bool _NV_CanFrames::toQueueItem(QueueItem* putHere)
 			{
 				if (terminatorStatus != NORMAL_FRAME)
 				{
-
 					return false;
 				}
 			}

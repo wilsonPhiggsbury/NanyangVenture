@@ -1,5 +1,5 @@
 /*
-Name:		ScratchPad.ino
+Name:		CANtoSerial_UNO.ino
 Created:	6/24/2018 11:37:49 PM
 Author:	MX
 */
@@ -11,7 +11,13 @@ Author:	MX
 
 #include <SPI.h>
 
-void TaskQueueOutputData(void *pvParameters __attribute__((unused)));
+// This sketch is meant for ATmega328P on breadboard, see "files for Arduino IDE" for the "ATmega328 on a breadboard (8 MHz internal clock)" board option
+// Also useable on a normal Arduino UNO if the board option not found
+// extended fuse:	0x05
+// low fuse:		0xE2
+// high fuse:		0xDA
+
+void TaskReceiveCAN(void *pvParameters __attribute__((unused)));
 MCP_CAN CANObj = MCP_CAN(4);
 volatile int CAN_incoming = 0;
 void CAN_ISR();
@@ -29,7 +35,7 @@ void setup() {
 	attachInterrupt(digitalPinToInterrupt(3), CAN_ISR, FALLING);
 
 	xTaskCreate(
-		TaskQueueOutputData
+		TaskReceiveCAN
 		, (const portCHAR *)"Enqueue"  // A name just for humans
 		, 800  // This stack size can be checked & adjusted by reading the Stack Highwater
 		, NULL
@@ -42,7 +48,7 @@ void loop() {
 
 }
 
-void TaskQueueOutputData(void *pvParameters __attribute__((unused)))  // This is a Task.
+void TaskReceiveCAN(void *pvParameters __attribute__((unused)))  // This is a Task.
 {
 	unsigned long id;
 	byte len;
@@ -54,6 +60,7 @@ void TaskQueueOutputData(void *pvParameters __attribute__((unused)))  // This is
 	{
 		if (CAN_incoming == 1)
 		{
+			// ------------------------------ covert CAN frames into String for Serial -----------------------------------
 			CANObj.readMsgBufID(&id, &len, inBuffer);
 			bool isLastFrame = frames.addItem(id, len, inBuffer);
 			if (isLastFrame)
@@ -65,41 +72,15 @@ void TaskQueueOutputData(void *pvParameters __attribute__((unused)))  // This is
 					char payload[MAX_STRING_LEN];
 					incoming.toString(payload);
 					Serial.println(payload);
-					//xQueueSend(queueForDisplay, &outgoing, 100);
 				}
 				frames.clear();
 			}
-			//Serial.print("ID = ");
-			//Serial.println(CANObj.getCanId());
-			//for (int i = 0; i < len; i++)
-			//{
-			//	char tmp = inBuffer[i];
-			//	if (isAlphaNumeric(tmp))
-			//		Serial.print(tmp);
-			//	else
-			//	{
-			//		Serial.print("<");
-			//		Serial.print((uint8_t)tmp);
-			//		Serial.print(">");
-			//	}
-			//}
-			//Serial.println();
-			//Serial.println("_______");
 
-			//for (int i = 0;i < 8;i++)
-			//{
-			//	outBuffer[i] = data[i];
-			//}
-			//byte sentStat = CAN0.sendMsgBuf(0x001, 0, 8, outBuffer);
-			//if (sentStat == CAN_OK)
-			//	Serial.println("Response Sent.");
-			//else
-			//	Serial.println("Response NOT sent.");
 			CAN_incoming = false;
 		}
 		else if (CAN_incoming == -1)
 		{
-			Serial.println("CAN receive error.");
+			Serial.println("~");
 			vTaskDelay(50);
 		}
 	}

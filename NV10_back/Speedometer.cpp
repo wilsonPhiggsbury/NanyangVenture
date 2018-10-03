@@ -24,6 +24,7 @@ void Speedometer::dumpDataInto(float location[QUEUEITEM_DATAPOINTS][QUEUEITEM_RE
 	processData();
 	// expect QueueItem.payload to come in
 	float* thisSlot = location[id];
+	//loggedParams[0] = random(1, 100) / 10.0;
 	for (int i = 0; i < SPEEDOMETER_READVALUES; i++)
 	{
 		thisSlot[i] = loggedParams[i];
