@@ -80,7 +80,7 @@ void TaskRefreshScreen(void* pvParameters)
 	pinMode(CENTER_LCD_LED, OUTPUT);
 	digitalWrite(CENTER_LCD_LED, HIGH);
 	centerLCD.begin();
-	centerLCD.setRotation(3);
+	centerLCD.setRotation(1);
 	centerLCD.fillScreen(ILI9488_BLACK);
 	centerLCD.setTextColor(ILI9488_WHITE);
 	DisplayText speedDisplay = DisplayText(&centerLCD, (480 - 200) / 2, (320 - 200) / 2, 200, 200);
