@@ -338,7 +338,3 @@ ASALocalRun/
 # End of https://www.gitignore.io/api/visualstudio
 
 # ___SPECIFIC TO VISUAL MICRO___
-*.d
-*.o
-*.hex
-*.elf
