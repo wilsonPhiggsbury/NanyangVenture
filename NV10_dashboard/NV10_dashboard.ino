@@ -12,10 +12,7 @@
 #include "FrameFormats.h"
 // ----------------------
 
-#include "DisplayContainer.h"
-#include "DisplayBar.h"
-#include "DisplayText.h"
-#include "DisplayGauge.h"
+#include "DashboardScreenManager.h"
 //#include "Bitmaps.h"
 
 void TaskRefreshScreen(void* pvParameters);
@@ -74,18 +71,13 @@ void TaskRefreshScreen(void* pvParameters)
 	uint8_t CAN_resetCounter = 0;
 	
 	QueueItem received;
-	char data[MAX_STRING_LEN];
 	char content[FLOAT_TO_STRING_LEN + 1];
-	ILI9488 centerLCD = ILI9488(CENTER_LCD_CS, CENTER_LCD_DC, CENTER_LCD_RST);
+
 	pinMode(CENTER_LCD_LED, OUTPUT);
 	digitalWrite(CENTER_LCD_LED, HIGH);
-	centerLCD.begin();
-	centerLCD.setRotation(1);
-	centerLCD.fillScreen(ILI9488_BLACK);
-	centerLCD.setTextColor(ILI9488_WHITE);
-	DisplayText speedDisplay = DisplayText(&centerLCD, (480 - 200) / 2, (320 - 200) / 2, 200, 200);
-	speedDisplay.init();
-	speedDisplay.setColors(ILI9488_WHITE, ILI9488_PURPLE);
+
+	DashboardScreenManager screens = DashboardScreenManager(); // Singleton Facade pattern probably?
+
 	TickType_t delay = pdMS_TO_TICKS(200);
 	uint32_t lastTick = 0;
 	while (1)
@@ -94,28 +86,17 @@ void TaskRefreshScreen(void* pvParameters)
 		if (success)
 		{
 			CAN_resetCounter = 0;
-			received.toString(data);
-			Serial.println(data);
-
-			switch (received.ID)
-			{
-			case FC:
-
-				break;
-			case CS:
-
-				break;
-			case SM:
-				sprintf(content, "%4.1f", received.data[0][0]);
-				speedDisplay.update(content);
-				break;
-			}
+			screens.refreshScreens(received);
+			//char data[MAX_STRING_LEN];
+			//received.toString(data);
+			//Serial.println(data);
+			
 		}
 		else
 		{
 			if (CAN_resetCounter++ >= CAN_resetThreshold)
 			{
-				speedDisplay.update("---");
+				screens.refreshScreens();
 				digitalWrite(CAN_RST_PIN, LOW);
 				vTaskDelay(delay);
 				digitalWrite(CAN_RST_PIN, HIGH);

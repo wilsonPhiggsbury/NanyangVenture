@@ -1,9 +1,9 @@
 #include "DisplayText.h"
-
+#include "dtostrf.h"
 const int textWidthPerSize = 6;
 const int textHeightPerSize = 8;
 
-DisplayText::DisplayText(ILI9488* screen, uint16_t xPos, uint16_t yPos, uint16_t width, uint16_t height):DisplayElement(screen, xPos, yPos, width, height)
+DisplayText::DisplayText(ILI9488* screen, uint16_t xPos, uint16_t yPos, uint16_t width, uint16_t height, Alignment xAlign, Alignment yAlign, DisplayElement* next):DisplayElement(screen, xPos, yPos, width, height, xAlign, yAlign, next)
 {
 	// use superclass constructor to assign all basic values
 	// fill these with rubbish before calling refreshSettings(), which acts as the real initializing function
@@ -15,6 +15,24 @@ void DisplayText::draw()
 	screen->setCursor(cursorX, cursorY);
 	screen->setTextColor(foreground, background); // set BG color so that BG can wipe out the old text
 	screen->println(text);
+}
+void DisplayText::update(float value, char* addOn)
+{
+	if (strlen(addOn) > 3)
+	{
+		Serial.println("AddOn string length > 3 is NOT allowed!");
+		return;
+	}
+	char tmp[8];
+	dtostrf(value, 4, 1, tmp);
+	strcpy(tmp + 4, addOn);
+	update(tmp);
+}
+void DisplayText::update(float value)
+{
+	char tmp[8];
+	dtostrf(value, 4, 1, tmp);
+	update(tmp);
 }
 void DisplayText::update(char* value)
 {

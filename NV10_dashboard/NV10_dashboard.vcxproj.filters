@@ -46,6 +46,9 @@
     <ClInclude Include="Wiring_Dashboard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DashboardScreenManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DisplayBar.cpp">
@@ -61,6 +64,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DisplayText.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DashboardScreenManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

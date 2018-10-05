@@ -1,7 +1,25 @@
 #include "DisplayElement.h"
 
-DisplayElement::DisplayElement(ILI9488* screen, uint16_t xPos, uint16_t yPos, uint16_t width, uint16_t height):screen(screen),xPos(xPos),yPos(yPos),width(width),height(height)
+DisplayElement::DisplayElement(ILI9488* screen, uint16_t xPos, uint16_t yPos, uint16_t width, uint16_t height, Alignment xAlign, Alignment yAlign, DisplayElement* next) :screen(screen), xPos(xPos), yPos(yPos), width(width), height(height), next(next)
 {
+	switch (xAlign)
+	{
+	case alignCenter:
+		this->xPos -= width / 2;
+		break;
+	case alignRight:
+		this->xPos -= width;
+		break;
+	}
+	switch (yAlign)
+	{
+	case alignCenter:
+		this->yPos -= height / 2;
+		break;
+	case alignBtm:
+		this->yPos -= height;
+		break;
+	}
 }
 
 DisplayElement::~DisplayElement()
@@ -11,6 +29,8 @@ DisplayElement::~DisplayElement()
 void DisplayElement::init()
 {
 	drawBorder(borderStroke, borderFill);
+	if (next != NULL)
+		next->init();
 }
 void DisplayElement::drawBorder(uint8_t stroke, uint16_t fill)
 {

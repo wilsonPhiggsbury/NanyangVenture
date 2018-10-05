@@ -54,11 +54,11 @@ void _QueueItem::toString(char* putHere)
 		for (uint8_t j = 0; j < readValues; j++)
 		{
 			char data_tmp[5];
-#ifdef __AVR__
 			dtostrf(data[i][j], FLOAT_TO_STRING_LEN, 1, data_tmp);
-#elif defined _SAM3XA_
-			sprintf(data_tmp, "%4.1f", data[i][j]);
-#endif
+//#ifdef __AVR__
+//#elif defined _SAM3XA_
+//			sprintf(data_tmp, "%4.1f", data[i][j]);
+//#endif
 			strcat(putHere, data_tmp);
 			strcat(putHere, " ");
 		}

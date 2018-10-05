@@ -96,6 +96,7 @@
   <ItemGroup>
     <ClInclude Include="..\NV10_back\CAN_ID_protocol.h" />
     <ClInclude Include="Bitmaps.h" />
+    <ClInclude Include="DashboardScreenManager.h" />
     <ClInclude Include="DisplayBar.h" />
     <ClInclude Include="DisplayContainer.h" />
     <ClInclude Include="DisplayElement.h" />
@@ -105,6 +106,7 @@
     <ClInclude Include="__vm\.NV10_dashboard.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DashboardScreenManager.cpp" />
     <ClCompile Include="DisplayBar.cpp" />
     <ClCompile Include="DisplayContainer.cpp" />
     <ClCompile Include="DisplayElement.cpp" />
