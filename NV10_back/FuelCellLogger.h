@@ -15,8 +15,9 @@
 class HESFuelCell
 {
  private:
+	 float predictableCounter = 0;
 	 static uint32_t timeStamp;
-
+	 
 	 static bool SD_avail;
 	 static char* path;
 	 static const uint8_t FILENAME_HEADER_LENGTH = 10;

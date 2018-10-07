@@ -1,12 +1,13 @@
 #pragma once
 #include <Arduino.h>
+#include <mcp_can_dfs.h>
+#include <mcp_can.h>
 #ifdef __AVR__
 
 #elif defined _SAM3XA_
-
 #endif
 
-#define NV_CANSPEED 18
+#define NV_CANSPEED CAN_1000KBPS
 // Declare instances of every payload point
 // ATTR: payload point = where the payload comes from
 const uint8_t DATAPOINT_INSTANCES[] = {
@@ -70,6 +71,7 @@ struct _NV_CanFrames
 {
 	friend struct _QueueItem;
 	NV_CanFrame frames[1 + QUEUEITEM_DATAPOINTS * QUEUEITEM_READVALUES / 2 + 1 * QUEUEITEM_DATAPOINTS];
+	//void setCANObj(MCP_CAN& CANObj);
 	// 1 frame for timestamp, other frames for floats, +QUEUEITEM_DATAPOINTS frame for odd-number scenarios where one additional frame is needed for the lone float
 	bool toQueueItem(QueueItem* putHere);
 	bool addItem(unsigned long id, byte length, byte* payload);
@@ -79,6 +81,7 @@ struct _NV_CanFrames
 	void clear();
 private:
 	uint8_t numFrames = 0;
+	//MCP_CAN* CANObj;
 	void addItem_(uint8_t messageType, uint8_t terminatorStatus, float payload1, float payload2, bool using_payload2);
 };
 /*

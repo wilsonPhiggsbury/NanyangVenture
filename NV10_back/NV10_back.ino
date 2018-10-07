@@ -77,24 +77,30 @@ void setup() {
 	if (CANObj.begin(NV_CANSPEED) != CAN_OK)
 	{
 		Serial.println(F("NV10_back CAN init fail!"));
-		while (1);
 	}
 	else
 	{
 		Serial.println(F("NV10_back CAN init success!"));
+		xTaskCreate(
+			SendCANFrame
+			, (const portCHAR *) "CAN la!" // where got cannot?
+			, 500  // Stack size
+			, NULL
+			, 1  // Priority
+			, NULL);
 	}
 	// Now set up all Tasks to run independently. Task functions are found in Tasks.ino
 	xTaskCreate(
 		ReadFuelCell
 		, (const portCHAR *)"Fuel"
-		, 725
+		, 750
 		, hydroCells
 		, 3
 		, NULL);
 	xTaskCreate(
 		ReadMotorPower
 		, (const portCHAR *)"CSensor"
-		, 175
+		, 200
 		, motors
 		, 3
 		, NULL);
@@ -109,13 +115,6 @@ void setup() {
 		LogSendData
 		, (const portCHAR *) "LogSend"
 		, 800  // Stack size
-		, NULL
-		, 1  // Priority
-		, NULL);
-	xTaskCreate(
-		SendCANFrame
-		, (const portCHAR *) "CAN la!" // where got cannot?
-		, 500  // Stack size
 		, NULL
 		, 1  // Priority
 		, NULL);

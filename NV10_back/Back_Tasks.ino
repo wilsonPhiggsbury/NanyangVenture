@@ -68,7 +68,7 @@ void QueueOutputData(void *pvParameters)
 			HESFuelCell::dumpTimestampInto(&outgoing.timeStamp);
 			for (int i = 0; i < NUM_FUELCELLS; i++)
 			{
-				if (hydroCells[i].hasUpdated())
+				if (true)
 				{
 					hydroCells[i].dumpDataInto(outgoing.data);
 				}

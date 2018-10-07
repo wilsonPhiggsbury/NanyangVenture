@@ -88,9 +88,10 @@ void HESFuelCell::dumpDataInto(float location[QUEUEITEM_DATAPOINTS][QUEUEITEM_RE
 {
 	// expect QueueItem.payload to come in
 	float* thisSlot = location[id];
+	predictableCounter = predictableCounter < 60 ? predictableCounter + 5 : 0;
 	for (int i = 0; i < FUELCELL_READVALUES; i++)
 	{
-		thisSlot[i] = loggedParams[i];
+		thisSlot[i] = predictableCounter;
 	}
 }
 bool HESFuelCell::hasUpdated()
