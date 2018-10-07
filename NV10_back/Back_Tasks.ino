@@ -119,7 +119,7 @@ void QueueOutputData(void *pvParameters)
 			Speedometer::dumpTimestampInto(&outgoing.timeStamp);
 			speedo.dumpDataInto(outgoing.data);
 			xQueueSend(queueForLogSend, &outgoing, 100);
-			xQueueSend(queueForSendCAN, &outgoing, 100);
+			xQueueSend(queueForSendCAN, &outgoing, 0);
 		}
 		vTaskDelay(delay);
 	}
@@ -160,7 +160,7 @@ void LogSendData(void *pvParameters __attribute__((unused)))  // This is a Task.
 			}
 
 			// finally print out the payload to be transmitted by XBee
-			//Serial.println(data);
+			Serial.println(data);
 		}
 
 		vTaskDelay(delay);

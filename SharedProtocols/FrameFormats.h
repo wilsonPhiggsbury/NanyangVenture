@@ -1,6 +1,5 @@
 #pragma once
 #include <Arduino.h>
-#include "dtostrf.h"
 #ifdef __AVR__
 
 #elif defined _SAM3XA_

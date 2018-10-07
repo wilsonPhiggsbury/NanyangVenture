@@ -17,11 +17,9 @@
     <Text Include="$(MSBuildThisFileDirectory)readme.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)dtostrf.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)FrameFormats.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="$(MSBuildThisFileDirectory)dtostrf.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)FrameFormats.h" />
   </ItemGroup>
 </Project>
