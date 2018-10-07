@@ -5,10 +5,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)FrameFormats.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)dtostrf.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)FrameFormats.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)dtostrf.c" />
   </ItemGroup>
 </Project>

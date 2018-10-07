@@ -33,9 +33,10 @@ void AttopilotCurrentSensor::dumpDataInto(float location[QUEUEITEM_DATAPOINTS][Q
 	// only convert to Volt/Amp during send, don't convert during logging as logging happens mroe frequently
 	processData();
 	float* thisSlot = location[id];
+	predictableCounter = predictableCounter < 40 ? predictableCounter + 2 : 0;
 	for (int i = 0; i < CURRENTSENSOR_READVALUES; i++)
 	{
-		thisSlot[i] = loggedParams[i];
+		thisSlot[i] = predictableCounter;
 	}
 }
 void AttopilotCurrentSensor::processData()

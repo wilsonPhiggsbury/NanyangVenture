@@ -155,6 +155,7 @@ const uint16_t A_TABLE[][A_ENTRIES] PROGMEM = {
 class AttopilotCurrentSensor
 {
 private:
+	float predictableCounter = 0;
 	static uint32_t timeStamp;
 
 	uint8_t id;

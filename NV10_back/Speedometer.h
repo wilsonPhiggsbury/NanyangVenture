@@ -18,6 +18,7 @@ public:
 	void dumpDataInto(float location[QUEUEITEM_DATAPOINTS][QUEUEITEM_READVALUES]);
 	float calculateSpeed_MS();
 private:
+	float predictableCounter = 0;
 	uint16_t wheelDiameter; // in millimeters
 	uint16_t timeDiff = 0;
 	unsigned long lastTime = 0;

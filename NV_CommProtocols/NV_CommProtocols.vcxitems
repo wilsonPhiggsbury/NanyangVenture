@@ -3,7 +3,7 @@
   <PropertyGroup Label="Globals">
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
     <HasSharedItems>true</HasSharedItems>
-    <ItemsProjectGuid>{5e2b7db2-50a1-407f-8699-a791a8ccc920}</ItemsProjectGuid>
+    <ItemsProjectGuid>{70f368fc-dc3e-4ca6-87f0-2ba08fa8f6ba}</ItemsProjectGuid>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
@@ -15,11 +15,18 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="$(MSBuildThisFileDirectory)readme.txt" />
+    <Text Include="$(MSBuildThisFileDirectory)library.properties" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)FrameFormats.cpp" />
-  </ItemGroup>
-  <ItemGroup>
+    <!-- <ClInclude Include="$(MSBuildThisFileDirectory)NV_CommProtocols.h" /> -->
+    <ClInclude Include="$(MSBuildThisFileDirectory)CanFrames.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)dtostrf.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)FrameFormats.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)QueueItem.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)CanFrames.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)dtostrf.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)QueueItem.cpp" />
   </ItemGroup>
 </Project>
