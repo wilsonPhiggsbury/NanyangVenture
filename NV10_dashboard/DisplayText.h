@@ -12,13 +12,13 @@ public:
 
 private:
 	uint8_t textSize = 2;
-	uint16_t cursorX = 0;
-	uint16_t cursorY = 0;
+	int16_t cursorX = 0;
+	int16_t cursorY = 0;
 	char* text;
 	uint8_t textWidth = 1;
 	uint8_t textHeight = 1;
 	uint8_t prevTextWidth = 0;
-	uint8_t prevTextRows = 0;
+	uint8_t prevTextHeight = 0;
 	void draw();
 	void refreshSettings();
 };

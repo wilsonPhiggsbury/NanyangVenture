@@ -112,7 +112,7 @@ void HESFuelCell::writeAsRawData(char* toWrite)
 		// higher priority task does not need critical section eh?
 		File rawFCdata = SD.open(path, FILE_WRITE);
 		rawFCdata.print(toWrite);
-		rawFCdata.print("\r\n");
+		rawFCdata.print("\n");
 		rawFCdata.close();
 
 		strcpy(path + FILENAME_HEADER_LENGTH, "");

@@ -1,5 +1,5 @@
 #include "DisplayElement.h"
-
+void __cxa_pure_virtual(void) {};
 DisplayElement::DisplayElement(ILI9488* screen, uint16_t xPos, uint16_t yPos, uint16_t width, uint16_t height, Alignment xAlign, Alignment yAlign, DisplayElement* next) :screen(screen), xPos(xPos), yPos(yPos), width(width), height(height), next(next)
 {
 	switch (xAlign)
@@ -20,6 +20,9 @@ DisplayElement::DisplayElement(ILI9488* screen, uint16_t xPos, uint16_t yPos, ui
 		this->yPos -= height;
 		break;
 	}
+	xPos = constrain(xPos, 0, 480);
+	yPos = constrain(yPos, 0, 320);
+
 }
 
 DisplayElement::~DisplayElement()

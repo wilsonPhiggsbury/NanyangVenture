@@ -13,10 +13,13 @@
 // ----------------------
 
 #include "DashboardScreenManager.h"
+#include "DisplayBar.h"
+#include "DisplayText.h"
 //#include "Bitmaps.h"
 
 void TaskRefreshScreen(void* pvParameters);
 void TaskReadSerial(void* pvParameters);
+void TaskTest(void* pvParameters);
 QueueHandle_t queueForDisplay;
 void setup() {
 	Serial.begin(9600);
@@ -45,18 +48,18 @@ void setup() {
 	xTaskCreate(
 		TaskRefreshScreen
 		, (const portCHAR *)"Refresh"  // A name just for humans
-		, 1000 // This stack size can be checked & adjusted by reading the Stack Highwater
+		, 2000 // This stack size can be checked & adjusted by reading the Stack Highwater
 		, NULL // Any pointer to pass in
 		, 3  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
 		, NULL);
 
-	xTaskCreate(
-		TaskReadSerial
-		, (const portCHAR *)"ReadS3"  // A name just for humans
-		, 1000  // This stack size can be checked & adjusted by reading the Stack Highwater
-		, NULL // Any pointer to pass in
-		, 2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
-		, NULL);
+	//xTaskCreate(
+	//	TaskReadSerial
+	//	, (const portCHAR *)"ReadS1"  // A name just for humans
+	//	, 1000  // This stack size can be checked & adjusted by reading the Stack Highwater
+	//	, NULL // Any pointer to pass in
+	//	, 2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
+	//	, NULL);
 
 	vTaskStartScheduler();
 }
@@ -64,6 +67,23 @@ void setup() {
 // the loop function runs over and over again until power down or reset
 void loop() {
   
+}
+void TaskTest(void* pvParameters)
+{
+	pinMode(CENTER_LCD_LED, OUTPUT);
+	digitalWrite(CENTER_LCD_LED, HIGH);
+	ILI9488 scr = ILI9488(LEFT_LCD_CS, LEFT_LCD_DC, RIGHT_LCD_RST);
+	scr.begin();
+	scr.setRotation(1);
+	scr.fillScreen(ILI9488_PURPLE);
+	DisplayBar b = DisplayBar(&scr, 200, 100, 200, 100, DisplayBar::BOTTOM_TO_TOP, NULL);
+	DisplayElement*e = &b;
+	DisplayBar* t = (DisplayBar*)e;
+	t->init();
+	t->setColors(ILI9488_WHITE, ILI9488_BLUE);
+	t->setRange(0, 100);
+	t->update(50.0);
+	while (1);
 }
 void TaskRefreshScreen(void* pvParameters)
 {
@@ -80,12 +100,25 @@ void TaskRefreshScreen(void* pvParameters)
 
 	TickType_t delay = pdMS_TO_TICKS(200);
 	uint32_t lastTick = 0;
+
+	uint8_t tstVal = 0;
 	while (1)
 	{
-		BaseType_t success = xQueueReceive(queueForDisplay, &received, 0);
+		BaseType_t success = true;// xQueueReceive(queueForDisplay, &received, 0);
 		if (success)
 		{
 			CAN_resetCounter = 0;
+			received.ID = CS;
+			for (int i = 0; i < 3; i++)
+			{
+				for (int j = 0; j < 2; j++)
+				{
+					received.data[i][j] = random(50, 500) / 10.0;
+					Serial.println(received.data[i][j]);
+				}
+				Serial.println();
+			}
+			Serial.println("______");
 			screens.refreshScreens(received);
 			//char data[MAX_STRING_LEN];
 			//received.toString(data);
@@ -106,48 +139,48 @@ void TaskRefreshScreen(void* pvParameters)
 		vTaskDelay(delay);
 	}
 }
-void TaskReadSerial(void* pvParameters)
-{
-	QueueItem outgoing;
-	char payload[MAX_STRING_LEN];
-	TickType_t delay = pdMS_TO_TICKS(200);
-	pinMode(CAN_RST_PIN, OUTPUT);
-	digitalWrite(CAN_RST_PIN, HIGH);
-	while (1)
-	{
-
-		if (Serial1.available())
-		{
-			int bytesRead = Serial1.readBytesUntil('\n', payload, MAX_STRING_LEN);
-			if(bytesRead>0)
-				payload[bytesRead-1] = '\0';
-			//// ------------------------------ covert back -----------------------------------
-			bool convertSuccess = QueueItem::toQueueItem(payload, &outgoing);
-			if(convertSuccess)
-				xQueueSend(queueForDisplay, &outgoing, 100);
-
-			// DEBUG printing that prints out special bytes as uint
-			//int counter = 0;
-			//while (counter < bytesRead)
-			//{
-			//	char tmp = payload[counter++];
-			//	if (isPrintable(tmp))
-			//		Serial.print(tmp);
-			//	else
-			//	{
-			//		Serial.print("<");
-			//		Serial.print((uint8_t)tmp);
-			//		Serial.print(">");
-			//	}
-			//}
-			//Serial.print("[");
-			//Serial.print(Serial.available());
-			//Serial.print("]");
-			//Serial.println("__");
-		}
-		vTaskDelay(delay);
-	}
-}
+//void TaskReadSerial(void* pvParameters)
+//{
+//	QueueItem outgoing;
+//	char payload[MAX_STRING_LEN];
+//	TickType_t delay = pdMS_TO_TICKS(200);
+//	pinMode(CAN_RST_PIN, OUTPUT);
+//	digitalWrite(CAN_RST_PIN, HIGH);
+//	while (1)
+//	{
+//
+//		if (Serial1.available())
+//		{
+//			int bytesRead = Serial1.readBytesUntil('\n', payload, MAX_STRING_LEN);
+//			if(bytesRead>0)
+//				payload[bytesRead-1] = '\0';
+//			//// ------------------------------ covert back -----------------------------------
+//			bool convertSuccess = QueueItem::toQueueItem(payload, &outgoing);
+//			if(convertSuccess)
+//				xQueueSend(queueForDisplay, &outgoing, 100);
+//
+//			// DEBUG printing that prints out special bytes as uint
+//			//int counter = 0;
+//			//while (counter < bytesRead)
+//			//{
+//			//	char tmp = payload[counter++];
+//			//	if (isPrintable(tmp))
+//			//		Serial.print(tmp);
+//			//	else
+//			//	{
+//			//		Serial.print("<");
+//			//		Serial.print((uint8_t)tmp);
+//			//		Serial.print(">");
+//			//	}
+//			//}
+//			//Serial.print("[");
+//			//Serial.print(Serial.available());
+//			//Serial.print("]");
+//			//Serial.println("__");
+//		}
+//		vTaskDelay(delay);
+//	}
+//}
 //centerLCD.drawRGBBitmap(77, 0, image, 150, 150);
 //centerLCD.setAddrWindow(120, 80, 240, 160);
 //centerLCD.pushColors(image, 9600, true);

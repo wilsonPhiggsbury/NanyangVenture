@@ -10,6 +10,6 @@
 #define CENTER_LCD_CS 10
 #define CENTER_LCD_DC 7
 #define CENTER_LCD_RST 8
-#define RIGHT_LCD_CS 11
-#define RIGHT_LCD_DC 12
-#define RIGHT_LCD_RST 13
+#define RIGHT_LCD_CS 2
+#define RIGHT_LCD_DC 3
+#define RIGHT_LCD_RST 4

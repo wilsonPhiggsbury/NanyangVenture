@@ -40,9 +40,6 @@
     <ClInclude Include="DisplayText.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\NV10_back\CAN_ID_protocol.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Wiring_Dashboard.h">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -1,5 +1,4 @@
 #include "DisplayText.h"
-#include "dtostrf.h"
 const int textWidthPerSize = 6;
 const int textHeightPerSize = 8;
 
@@ -24,14 +23,14 @@ void DisplayText::update(float value, char* addOn)
 		return;
 	}
 	char tmp[8];
-	dtostrf(value, 4, 1, tmp);
+	sprintf(tmp, "%4.1f", value);
 	strcpy(tmp + 4, addOn);
 	update(tmp);
 }
 void DisplayText::update(float value)
 {
 	char tmp[8];
-	dtostrf(value, 4, 1, tmp);
+	sprintf(tmp, "%4.1f", value);
 	update(tmp);
 }
 void DisplayText::update(char* value)
@@ -75,8 +74,8 @@ void DisplayText::refreshSettings()
 	//Serial.print("Text size: ");
 	//Serial.println(textSize);
 
-	cursorX = xPos + width / 2 - textWidth * textSize * textWidthPerSize / 2;
-	cursorY = yPos + height / 2 - textHeight * textSize * textHeightPerSize / 2;
+	cursorX = constrain(xPos + width / 2 - textWidth * textSize * textWidthPerSize / 2, 0, 480);
+	cursorY = constrain(yPos + height / 2 - textHeight * textSize * textHeightPerSize / 2, 0, 320);
 }
 
 DisplayText::~DisplayText()

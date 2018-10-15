@@ -42,11 +42,19 @@ DashboardScreenManager::DashboardScreenManager()
 	capInAmp_bar.setRange(0, 20);
 	motorAmp_bar.setRange(0, 20);
 	motorVolt_bar.setRange(40, 60);
+	capOutAmp_bar.setColors(ILI9488_CYAN, ILI9488_BLUE);
+	capInAmp_bar.setColors(ILI9488_CYAN, ILI9488_BLUE);
+	motorAmp_bar.setColors(ILI9488_CYAN, ILI9488_BLUE);
+	motorVolt_bar.setColors(ILI9488_CYAN, ILI9488_RED);
 	// tie up references for future use
 	screenContents[lScreen][0] = &motorVolt_txt;
 	screenContents[lScreen][1] = &motorVolt_bar;
 	screenContents[lScreen][0]->init();
 	screenContents[lScreen][1]->init();
+	motorVolt_bar.update(50);
+	motorAmp_bar.update(10);
+	capInAmp_bar.update(10);
+	capOutAmp_bar.update(10);
 
 	// initialize widgets
 	DisplayText speedDisplay = DisplayText(&centerScreen, screenWidth/2, screenHeight/2, 200, 200, alignCenter, alignCenter, NULL);
@@ -92,22 +100,22 @@ void DashboardScreenManager::refreshScreens(QueueItem& info)
 											^		v
 										Motor	<  Volt 
 		*/
-		txt = (DisplayText*)screenContents[lScreen][0];
+		txt = (DisplayText*)(screenContents[lScreen][0]);
 		txt->update(info.data[2][0]);	// motor volt
-		txt = (DisplayText*)txt->next;
+		txt = (DisplayText*)(txt->next);
 		txt->update(info.data[2][1]);	// motor amp
-		txt = (DisplayText*)txt->next;
+		txt = (DisplayText*)(txt->next);
 		txt->update(info.data[0][1]);	// capIn amp
-		txt = (DisplayText*)txt->next;
+		txt = (DisplayText*)(txt->next);
 		txt->update(info.data[1][1]);	// capOut amp
 
-		bar = (DisplayBar*)screenContents[lScreen][1];
+		bar = (DisplayBar*)(screenContents[lScreen][1]);
 		bar->update(info.data[2][0]);	// motor volt
-		bar = (DisplayBar*)bar->next;
+		bar = (DisplayBar*)(bar->next);
 		bar->update(info.data[2][1]);	// motor amp
-		bar = (DisplayBar*)bar->next;
+		bar = (DisplayBar*)(bar->next);
 		bar->update(info.data[0][1]);	// capIn amp
-		bar = (DisplayBar*)bar->next;
+		bar = (DisplayBar*)(bar->next);
 		bar->update(info.data[1][1]);	// capOut amp
 
 		break;

@@ -1,7 +1,8 @@
 #pragma once
 
-#include <Arduino.h>>
+#include <Arduino.h>
 #include "ILI9488.h"
+extern "C" void __cxa_pure_virtual(void);
 typedef enum {
 	alignLeft,
 	alignCenter,
@@ -14,7 +15,8 @@ class DisplayElement
 {
 protected:
 	ILI9488* screen;
-	uint16_t xPos, yPos, width, height;
+	int16_t xPos, yPos;
+	uint16_t width, height;
 	uint16_t margin = 12;
 	uint8_t borderStroke = 3;
 	uint16_t borderFill = ILI9488_WHITE;
