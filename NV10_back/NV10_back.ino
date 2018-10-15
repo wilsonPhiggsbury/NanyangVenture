@@ -46,6 +46,7 @@ Speedometer speedo = Speedometer(0, 545);
 MCP_CAN CANObj = MCP_CAN(CAN_CS_PIN);
 // define globals
 bool SD_avail;
+bool CAN_avail;
 char path[FILENAME_HEADER_LENGTH + 8 + 4 + 1]; // +8 for filename, +4 for '.txt', +1 for '\0'
 
 // define tasks, types are: input, control, output
@@ -74,10 +75,10 @@ void setup() {
 	// initialize speedometer
 	attachInterrupt(digitalPinToInterrupt(SPEEDOMETER_INTERRUPT_PIN), storeWheelInterval_ISR, FALLING);
 	// initialize CAN bus
-	if (CANObj.begin(NV_CANSPEED) != CAN_OK)
+	CAN_avail = CANObj.begin(NV_CANSPEED) == CAN_OK;
+	if (!CAN_avail)
 	{
 		Serial.println(F("NV10_back CAN init fail!"));
-		while (1);
 	}
 	else
 	{
@@ -112,14 +113,17 @@ void setup() {
 		, NULL
 		, 1  // Priority
 		, NULL);
-	xTaskCreate(
-		SendCANFrame
-		, (const portCHAR *) "CAN la!" // where got cannot?
-		, 500  // Stack size
-		, NULL
-		, 1  // Priority
-		, NULL);
-	//vTaskStartScheduler();
+	if (CAN_avail)
+	{
+		xTaskCreate(
+			SendCANFrame
+			, (const portCHAR *) "CAN la!" // where got cannot?
+			, 500  // Stack size
+			, NULL
+			, 1  // Priority
+			, NULL);
+	}
+	vTaskStartScheduler();
 
 }
 

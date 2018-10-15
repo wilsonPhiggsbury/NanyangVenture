@@ -78,7 +78,8 @@ void QueueOutputData(void *pvParameters)
 				}*/
 			}
 			xQueueSend(queueForLogSend, &outgoing, 100);
-			xQueueSend(queueForSendCAN, &outgoing, 0);
+			if(CAN_avail)
+				xQueueSend(queueForSendCAN, &outgoing, 0);
 		}
 
 
@@ -98,7 +99,8 @@ void QueueOutputData(void *pvParameters)
 				motors[i].dumpDataInto(outgoing.data);//len 5
 			}
 			xQueueSend(queueForLogSend, &outgoing, 100);
-			xQueueSend(queueForSendCAN, &outgoing, 0);
+			if(CAN_avail)
+				xQueueSend(queueForSendCAN, &outgoing, 0);
 			//if (syncCounter % (back_lcd_refresh) == 0)
 			//{
 			//	for (int i = 0; i < NUM_CURRENTSENSORS; i++)
@@ -119,7 +121,8 @@ void QueueOutputData(void *pvParameters)
 			Speedometer::dumpTimestampInto(&outgoing.timeStamp);
 			speedo.dumpDataInto(outgoing.data);
 			xQueueSend(queueForLogSend, &outgoing, 100);
-			xQueueSend(queueForSendCAN, &outgoing, 100);
+			if(CAN_avail)
+				xQueueSend(queueForSendCAN, &outgoing, 100);
 		}
 		vTaskDelay(delay);
 	}
@@ -160,7 +163,7 @@ void LogSendData(void *pvParameters __attribute__((unused)))  // This is a Task.
 			}
 
 			// finally print out the payload to be transmitted by XBee
-			//Serial.println(data);
+			Serial.println(data);
 		}
 
 		vTaskDelay(delay);
