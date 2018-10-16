@@ -16,6 +16,7 @@ def viewGraph(fileType):
     plt.show()
 
 def _animate(i, ax, fileType, fileTypeData, readStreamData):
+    # Temporarily here. Remove when data source update is called by receiver
     readStreamData()
 
     # Setup plot for each data

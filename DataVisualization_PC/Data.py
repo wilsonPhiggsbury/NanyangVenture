@@ -1,5 +1,6 @@
 from collections import deque
 
+# Call update everytime data is received
 def updateData(stream):
     # parse data stream
     dataList = _parseData(stream)
