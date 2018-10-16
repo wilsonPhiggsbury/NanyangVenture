@@ -3,8 +3,6 @@ from matplotlib import animation
 import matplotlib.pyplot as plt
 from Data import getData
 from MockDataSource import readStreamData
-import time
-import sys
 
 def viewGraph(fileType):
     fileTypeData = getData()[fileType]
@@ -30,5 +28,3 @@ def _animate(i, ax, fileType, fileTypeData, readStreamData):
     # Format plot
     plt.xticks(rotation=45, ha='right')
     plt.subplots_adjust(bottom=0.30)
-
-viewGraph("CS")
