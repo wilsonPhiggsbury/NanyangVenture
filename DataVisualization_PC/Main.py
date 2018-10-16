@@ -4,10 +4,11 @@ from PlotData import viewGraph
 
 if len(sys.argv) != 2:
     print("Invalid number of inputs! Only include 1 file type.")
+    sys.exit()
 else:
+    input = sys.argv[1]
     for header in getData():
-        if sys.argv[1] == header:
-            viewGraph(sys.argv[1])
-            break
-        else:
-            print("Wrong file type! Check input.")
+        if input == header:
+            viewGraph(input)
+            sys.exit()
+    print("Wrong file type! Check input.")
