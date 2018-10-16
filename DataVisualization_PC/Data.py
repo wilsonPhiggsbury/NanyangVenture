@@ -61,5 +61,6 @@ data = {
     },
     "SM": {
         "Millis": deque([0]* 20),
+        "?": deque([0]* 20)
     }
 }
