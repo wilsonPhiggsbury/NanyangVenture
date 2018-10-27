@@ -1,6 +1,6 @@
 #include "DisplayElement.h"
 void __cxa_pure_virtual(void) {};
-DisplayElement::DisplayElement(ILI9488* screen, uint16_t xPos, uint16_t yPos, uint16_t width, uint16_t height, Alignment xAlign, Alignment yAlign, DisplayElement* next) :screen(screen), xPos(xPos), yPos(yPos), width(width), height(height), next(next)
+DisplayElement::DisplayElement(ILI9488* screen, uint16_t xPos, uint16_t yPos, uint16_t width, uint16_t height, Alignment xAlign, Alignment yAlign) :screen(screen), xPos(xPos), yPos(yPos), width(width), height(height)
 {
 	switch (xAlign)
 	{
@@ -29,11 +29,13 @@ DisplayElement::~DisplayElement()
 {
 	
 }
-void DisplayElement::init()
+void DisplayElement::init(DataSource targetSource, DataSource* varSource, float* value)
 {
 	drawBorder(borderStroke, borderFill);
-	if (next != NULL)
-		next->init();
+	this->targetSource = targetSource;
+	trackedSource = varSource;
+	trackedValue = value;
+
 }
 void DisplayElement::drawBorder(uint8_t stroke, uint16_t fill)
 {
@@ -63,7 +65,28 @@ void DisplayElement::setColors(uint16_t foreground, uint16_t background)
 		drawBorder(borderStroke, borderFill);
 	}
 }
+void DisplayElement::update()
+{
+	if (*trackedSource == targetSource)
+	{
+		updateFloat(*trackedValue);
+	}
+}
 void DisplayElement::wipe()
 {
 	screen->fillRect(xPos, yPos, width, height, background);
 }
+
+// th
+/*// .h
+extern "C" void __cxa_pure_virtual(void);
+__extension__ typedef int __guard __attribute__((mode(__DI__)));
+
+extern "C" int __cxa_guard_acquire(__guard *);
+extern "C" void __cxa_guard_release(__guard *);
+extern "C" void __cxa_guard_abort(__guard *);
+// .cpp
+void __cxa_pure_virtual(void) {};
+int __cxa_guard_acquire(__guard *g) { return !*(char *)(g); };
+void __cxa_guard_release(__guard *g) { *(char *)g = 1; };
+void __cxa_guard_abort(__guard *) {};*/

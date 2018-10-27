@@ -3,6 +3,9 @@
  Created:	8/15/2018 1:35:26 PM
  Author:	MX
 */
+// 3 Female to Male for SCK, MISO, MOSI	SHARED
+// 3 Male to Male for 3.3V, GND, LED	SHARED
+// 3x3 Male to Male for CS, DC, RST
 
 #include <FreeRTOS_ARM.h>
 #include <SPI.h>
@@ -76,13 +79,12 @@ void TaskTest(void* pvParameters)
 	scr.begin();
 	scr.setRotation(1);
 	scr.fillScreen(ILI9488_PURPLE);
-	DisplayBar b = DisplayBar(&scr, 200, 100, 200, 100, DisplayBar::BOTTOM_TO_TOP, NULL);
+	DisplayBar b = DisplayBar(&scr, 200, 100, 200, 100, DisplayBar::BOTTOM_TO_TOP);
 	DisplayElement*e = &b;
 	DisplayBar* t = (DisplayBar*)e;
-	t->init();
 	t->setColors(ILI9488_WHITE, ILI9488_BLUE);
 	t->setRange(0, 100);
-	t->update(50.0);
+	t->updateFloat(50.0);
 	while (1);
 }
 void TaskRefreshScreen(void* pvParameters)
@@ -90,13 +92,13 @@ void TaskRefreshScreen(void* pvParameters)
 	const uint8_t CAN_resetThreshold = 10;
 	uint8_t CAN_resetCounter = 0;
 	
-	QueueItem received;
-	char content[FLOAT_TO_STRING_LEN + 1];
 
 	pinMode(CENTER_LCD_LED, OUTPUT);
 	digitalWrite(CENTER_LCD_LED, HIGH);
 
-	DashboardScreenManager screens = DashboardScreenManager(); // Singleton Facade pattern probably?
+	QueueItem received;
+	char content[FLOAT_TO_STRING_LEN + 1];
+	DashboardScreenManager screens = DashboardScreenManager(&received); // Singleton Facade pattern probably?
 
 	TickType_t delay = pdMS_TO_TICKS(200);
 	uint32_t lastTick = 0;
@@ -108,18 +110,16 @@ void TaskRefreshScreen(void* pvParameters)
 		if (success)
 		{
 			CAN_resetCounter = 0;
+			// dummy data
 			received.ID = CS;
 			for (int i = 0; i < 3; i++)
 			{
 				for (int j = 0; j < 2; j++)
 				{
-					received.data[i][j] = random(50, 500) / 10.0;
-					Serial.println(received.data[i][j]);
+					received.data[i][j] = random(0, 20);
 				}
-				Serial.println();
 			}
-			Serial.println("______");
-			screens.refreshScreens(received);
+			screens.refreshScreens();
 			//char data[MAX_STRING_LEN];
 			//received.toString(data);
 			//Serial.println(data);

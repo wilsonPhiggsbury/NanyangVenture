@@ -4,9 +4,9 @@ class DisplayText :
 	public DisplayElement
 {
 public:
-	DisplayText(ILI9488 * screen, uint16_t xPos, uint16_t yPos, uint16_t width, uint16_t height, Alignment xAlign, Alignment yAlign, DisplayElement * next);
+	DisplayText(ILI9488 * screen, uint16_t xPos, uint16_t yPos, uint16_t width, uint16_t height, Alignment xAlign, Alignment yAlign);
 	void update(float value, char * addOn);
-	void update(float value);
+	void updateFloat(float value);
 	void update(char * value);
 	~DisplayText();
 

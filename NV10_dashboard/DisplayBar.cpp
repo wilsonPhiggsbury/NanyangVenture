@@ -2,11 +2,12 @@
 
 
 
-DisplayBar::DisplayBar(ILI9488* screen, uint16_t xPos, uint16_t yPos, uint16_t width, uint16_t height, Orientation orientation, DisplayElement* next):\
-DisplayElement(screen, xPos, yPos, width, height, orientation==LEFT_TO_RIGHT?alignLeft:alignRight, alignCenter,next)
+DisplayBar::DisplayBar(ILI9488* screen, uint16_t xPos, uint16_t yPos, uint16_t width, uint16_t height, Orientation orientation):\
+DisplayElement(screen, xPos, yPos, width, height, orientation==LEFT_TO_RIGHT?alignLeft:alignRight, alignCenter)
 {
+	setOrientation(orientation);
 }
-void DisplayBar::update(float value)
+void DisplayBar::updateFloat(float value)
 {
 	prevValue = thisValue;
 	thisValue = value;

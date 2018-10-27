@@ -2,7 +2,7 @@
 const int textWidthPerSize = 6;
 const int textHeightPerSize = 8;
 
-DisplayText::DisplayText(ILI9488* screen, uint16_t xPos, uint16_t yPos, uint16_t width, uint16_t height, Alignment xAlign, Alignment yAlign, DisplayElement* next):DisplayElement(screen, xPos, yPos, width, height, xAlign, yAlign, next)
+DisplayText::DisplayText(ILI9488* screen, uint16_t xPos, uint16_t yPos, uint16_t width, uint16_t height, Alignment xAlign, Alignment yAlign):DisplayElement(screen, xPos, yPos, width, height, xAlign, yAlign)
 {
 	// use superclass constructor to assign all basic values
 	// fill these with rubbish before calling refreshSettings(), which acts as the real initializing function
@@ -27,7 +27,7 @@ void DisplayText::update(float value, char* addOn)
 	strcpy(tmp + 4, addOn);
 	update(tmp);
 }
-void DisplayText::update(float value)
+void DisplayText::updateFloat(float value)
 {
 	char tmp[8];
 	sprintf(tmp, "%4.1f", value);

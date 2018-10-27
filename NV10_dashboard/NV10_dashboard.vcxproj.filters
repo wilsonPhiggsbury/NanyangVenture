@@ -28,9 +28,6 @@
     <ClInclude Include="DisplayBar.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DisplayContainer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DisplayElement.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -49,9 +46,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DisplayBar.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DisplayContainer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DisplayElement.cpp">

@@ -11,8 +11,8 @@ public:
 		LEFT_TO_RIGHT,RIGHT_TO_LEFT,
 		TOP_TO_BOTTOM,BOTTOM_TO_TOP
 	}Orientation;
-	DisplayBar(ILI9488 * screen, uint16_t xPos, uint16_t yPos, uint16_t width, uint16_t height, Orientation orientation, DisplayElement * next);
-	void update(float value);
+	DisplayBar(ILI9488 * screen, uint16_t xPos, uint16_t yPos, uint16_t width, uint16_t height, Orientation orientation);
+	void updateFloat(float value);
 	void draw();
 	void setRange(uint16_t minVal, uint16_t maxVal);
 	void setOrientation(Orientation o);

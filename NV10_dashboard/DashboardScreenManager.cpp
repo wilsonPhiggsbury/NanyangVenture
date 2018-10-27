@@ -6,129 +6,108 @@
 
 static const int screenWidth = 480;
 static const int screenHeight = 320;
-DashboardScreenManager::DashboardScreenManager()
+DashboardScreenManager::DashboardScreenManager(QueueItem* queueItem)
 {
+	DataSource* trackIDaddr = &(queueItem->ID);
 	// initialize screens
-	ILI9488 leftScreen = ILI9488(LEFT_LCD_CS, LEFT_LCD_DC, LEFT_LCD_RST);
-	leftScreen.begin();
-	leftScreen.setRotation(1);
-	leftScreen.fillScreen(ILI9488_BLACK);
-	leftScreen.setTextColor(ILI9488_WHITE);
-	ILI9488 centerScreen = ILI9488(CENTER_LCD_CS, CENTER_LCD_DC, CENTER_LCD_RST);
-	centerScreen.begin();
-	centerScreen.setRotation(1);
-	centerScreen.fillScreen(ILI9488_BLACK);
-	centerScreen.setTextColor(ILI9488_WHITE);
-	ILI9488 rightScreen = ILI9488(RIGHT_LCD_CS, RIGHT_LCD_DC, RIGHT_LCD_RST);
-	rightScreen.begin();
-	rightScreen.setRotation(1);
-	rightScreen.fillScreen(ILI9488_BLACK);
-	rightScreen.setTextColor(ILI9488_WHITE);
-	// tie up references for future use
-	screens[lScreen] = &leftScreen;
-	screens[cScreen] = &centerScreen;
-	screens[rScreen] = &rightScreen;
-
+	ILI9488* leftScreen = new ILI9488(LEFT_LCD_CS, LEFT_LCD_DC, LEFT_LCD_RST);
+	leftScreen->begin();
+	leftScreen->setRotation(1);
+	leftScreen->fillScreen(ILI9488_BLACK);
+	leftScreen->setTextColor(ILI9488_WHITE);
+	ILI9488* centerScreen = new ILI9488(CENTER_LCD_CS, CENTER_LCD_DC, CENTER_LCD_RST);
+	centerScreen->begin();
+	centerScreen->setRotation(1);
+	centerScreen->fillScreen(ILI9488_BLACK);
+	centerScreen->setTextColor(ILI9488_WHITE);
+	ILI9488* rightScreen = new ILI9488(RIGHT_LCD_CS, RIGHT_LCD_DC, RIGHT_LCD_RST);
+	rightScreen->begin();
+	rightScreen->setRotation(1);
+	rightScreen->fillScreen(ILI9488_BLACK);
+	rightScreen->setTextColor(ILI9488_WHITE);
+	// ---------------------------- LEFT SCREEN -----------------------------
 	// initialize widgets
-	DisplayText capOutAmp_txt = DisplayText(&leftScreen, 0, 0, 90, 30, alignLeft, alignTop, NULL);
-	DisplayText capInAmp_txt = DisplayText(&leftScreen, 0, 0, 90, 30, alignRight, alignTop, &capOutAmp_txt);
-	DisplayText motorAmp_txt = DisplayText(&leftScreen, 0, 0, 90, 30, alignLeft, alignBtm, &capInAmp_txt);
-	DisplayText motorVolt_txt = DisplayText(&leftScreen, 0, 0, 90, 30, alignRight, alignBtm, &motorAmp_txt);
-	DisplayBar capOutAmp_bar = DisplayBar(&leftScreen, 480/2-10, 120, 220, 35, DisplayBar::RIGHT_TO_LEFT, NULL);
-	DisplayBar capInAmp_bar = DisplayBar(&leftScreen, 480/2+10, 120, 220, 35, DisplayBar::LEFT_TO_RIGHT, &capOutAmp_bar);
-	DisplayBar motorAmp_bar = DisplayBar(&leftScreen, 480/2-10, 200, 220, 35, DisplayBar::RIGHT_TO_LEFT, &capInAmp_bar);
-	DisplayBar motorVolt_bar = DisplayBar(&leftScreen, 480/2+10, 200, 220, 35, DisplayBar::LEFT_TO_RIGHT, &motorAmp_bar);
-	capOutAmp_bar.setRange(0, 20);
-	capInAmp_bar.setRange(0, 20);
-	motorAmp_bar.setRange(0, 20);
-	motorVolt_bar.setRange(40, 60);
-	capOutAmp_bar.setColors(ILI9488_CYAN, ILI9488_BLUE);
-	capInAmp_bar.setColors(ILI9488_CYAN, ILI9488_BLUE);
-	motorAmp_bar.setColors(ILI9488_CYAN, ILI9488_BLUE);
-	motorVolt_bar.setColors(ILI9488_CYAN, ILI9488_RED);
-	// tie up references for future use
-	screenContents[lScreen][0] = &motorVolt_txt;
-	screenContents[lScreen][1] = &motorVolt_bar;
-	screenContents[lScreen][0]->init();
-	screenContents[lScreen][1]->init();
-	motorVolt_bar.update(50);
-	motorAmp_bar.update(10);
-	capInAmp_bar.update(10);
-	capOutAmp_bar.update(10);
+	DisplayText* capOutAmp_txt = new DisplayText(leftScreen, 0, 0, 90, 30, alignLeft, alignTop);
+	DisplayText* capInAmp_txt = new DisplayText(leftScreen, screenWidth, 0, 90, 30, alignRight, alignTop);
+	DisplayText* motorAmp_txt = new DisplayText(leftScreen, 0, screenHeight, 90, 30, alignLeft, alignBtm);
+	DisplayText* motorVolt_txt = new DisplayText(leftScreen, screenWidth, screenHeight, 90, 30, alignRight, alignBtm);
+	DisplayBar* capOutAmp_bar = new DisplayBar(leftScreen, 480/2-10, 100, 220, 35, DisplayBar::RIGHT_TO_LEFT);
+	DisplayBar* capInAmp_bar = new DisplayBar(leftScreen, 480/2+10, 100, 220, 35, DisplayBar::LEFT_TO_RIGHT);
+	DisplayBar* motorAmp_bar = new DisplayBar(leftScreen, 480/2-10, 180, 220, 70, DisplayBar::RIGHT_TO_LEFT);
+	DisplayBar* motorVolt_bar = new DisplayBar(leftScreen, 480/2+10, 180, 220, 70, DisplayBar::LEFT_TO_RIGHT);
+	// listen to data on a pointer
+	capInAmp_txt->init(CS, trackIDaddr, &(queueItem->data[0][1]));
+	capInAmp_bar->init(CS, trackIDaddr, &(queueItem->data[0][1]));
+	capOutAmp_txt->init(CS, trackIDaddr, &(queueItem->data[1][1]));
+	capOutAmp_bar->init(CS, trackIDaddr, &(queueItem->data[1][1]));
+	motorVolt_txt->init(CS, trackIDaddr, &(queueItem->data[2][0]));
+	motorVolt_bar->init(CS, trackIDaddr, &(queueItem->data[2][0]));
+	motorAmp_txt->init(CS, trackIDaddr, &(queueItem->data[2][1]));
+	motorAmp_bar->init(CS, trackIDaddr, &(queueItem->data[2][1]));
+	// customize each widget
+	capInAmp_txt->setMargin(8);
+	capOutAmp_bar->setRange(0, 10);
+	capInAmp_bar->setRange(0, 10);
+	motorAmp_bar->setRange(0, 40);
+	motorVolt_bar->setRange(45, 60);
+	capOutAmp_bar->setColors(ILI9488_RED, ILI9488_MAROON);
+	capInAmp_bar->setColors(ILI9488_CYAN, ILI9488_DARKCYAN);
+	motorAmp_bar->setColors(ILI9488_RED, ILI9488_MAROON);
+	motorVolt_bar->setColors(ILI9488_CYAN, ILI9488_DARKCYAN);
 
+	// ---------------------------- CENTER SCREEN -----------------------------
 	// initialize widgets
-	DisplayText speedDisplay = DisplayText(&centerScreen, screenWidth/2, screenHeight/2, 200, 200, alignCenter, alignCenter, NULL);
-	speedDisplay.setColors(ILI9488_WHITE, ILI9488_PURPLE);
-	// tie up references for future use
-	screenContents[cScreen][0] = &speedDisplay;
-	screenContents[cScreen][0]->init();
+	DisplayText* speedDisplay = new DisplayText(centerScreen, screenWidth/2, screenHeight/2, 200, 200, alignCenter, alignCenter);
+	// listen to data on a pointer
+	speedDisplay->init(SM, trackIDaddr, &(queueItem->data[0][0]));
+	// customize each widget
+	speedDisplay->setColors(ILI9488_WHITE, ILI9488_DARKGREEN);
 
+	// ---------------------------- RIGHT SCREEN -----------------------------
 	// initialize widgets
-	DisplayText stackTemperature_txt = DisplayText(&rightScreen, 0, 0, 140, 50, alignLeft, alignTop, NULL);
-	DisplayText pressure_txt = DisplayText(&rightScreen, screenWidth, 0, 140, 50, alignRight, alignTop, &stackTemperature_txt);
-	DisplayText status_txt = DisplayText(&rightScreen, screenWidth / 2, 0, 200, 50, alignCenter, alignTop, &pressure_txt);
-	DisplayText energy_txt = DisplayText(&rightScreen, screenWidth / 2, screenHeight / 2 - 25, 400, 50, alignCenter, alignCenter, &status_txt);
-	DisplayBar energy_bar = DisplayBar(&rightScreen, screenWidth / 2, screenHeight / 2, 400, 50, DisplayBar::LEFT_TO_RIGHT, NULL);
-	energy_bar.setRange(0, 100);
-	// tie up references for future use
-	screenContents[rScreen][0] = &energy_txt;
-	screenContents[rScreen][1] = &energy_bar;
+	DisplayText* stackTemperature_txt = new DisplayText(rightScreen, 0, 0, 140, 50, alignLeft, alignTop);
+	DisplayText* pressure_txt = new DisplayText(rightScreen, screenWidth, 0, 140, 50, alignRight, alignTop);
+	DisplayText* status_txt = new DisplayText(rightScreen, screenWidth / 2, 0, 200, 50, alignCenter, alignTop);
+	DisplayText* energy_txt = new DisplayText(rightScreen, screenWidth / 2, screenHeight / 2 - 25, 400, 50, alignCenter, alignCenter);
+	DisplayBar* energy_bar = new DisplayBar(rightScreen, screenWidth / 2, screenHeight / 2, 400, 50, DisplayBar::LEFT_TO_RIGHT);
+	// listen to data on a pointer
+	stackTemperature_txt->init(FC, trackIDaddr, &(queueItem->data[0][4]));
+	pressure_txt->init(FC, trackIDaddr, &(queueItem->data[0][5]));
+	status_txt->init(FC, trackIDaddr, &(queueItem->data[0][7]));
+	energy_txt->init(FC, trackIDaddr, &(queueItem->data[0][3]));
+	energy_bar->init(FC, trackIDaddr, &(queueItem->data[0][3]));
+	energy_bar->setRange(0, 100);
+	// customize each widget
+	pressure_txt->setColors(ILI9488_WHITE, ILI9488_BLUE);
+	status_txt->setColors(ILI9488_WHITE, ILI9488_BLUE);
+	energy_txt->setColors(ILI9488_WHITE, ILI9488_BLUE);
+	energy_bar->setColors(ILI9488_YELLOW, ILI9488_BLACK);
 
 
-}
-void DashboardScreenManager::refreshScreens(QueueItem& info)
-{
-	DisplayText* txt;
-	DisplayBar* bar;
-	switch (info.ID)
-	{
-	case FC:
-		// FC data goes to right screen: temp, state, pressure, Wh
-		bar = (DisplayBar*)screenContents[rScreen][1];
-		bar->update(info.data[0][3]);
-		txt = (DisplayText*)screenContents[rScreen][0];	// energy
-		txt->update(info.data[0][3]);
-		txt = (DisplayText*)txt->next;	// status
-		txt->update(info.data[0][7]);
-		txt = (DisplayText*)txt->next;	// pressure
-		txt->update(info.data[0][5]);
-		txt = (DisplayText*)txt->next;	// temperature
-		txt->update(info.data[0][4]);
-		break;
-	case CS:
-		/* CS data goes to left screen: CapOut  >  CapIn 
-											^		v
-										Motor	<  Volt 
-		*/
-		txt = (DisplayText*)(screenContents[lScreen][0]);
-		txt->update(info.data[2][0]);	// motor volt
-		txt = (DisplayText*)(txt->next);
-		txt->update(info.data[2][1]);	// motor amp
-		txt = (DisplayText*)(txt->next);
-		txt->update(info.data[0][1]);	// capIn amp
-		txt = (DisplayText*)(txt->next);
-		txt->update(info.data[1][1]);	// capOut amp
+	// ---------------------------- tie up references for updating later -----------------------------
+	allWidgets[0] = capInAmp_txt;
+	allWidgets[1] = capInAmp_bar;
+	allWidgets[2] = capOutAmp_txt;
+	allWidgets[3] = capOutAmp_bar;
+	allWidgets[4] = motorAmp_txt;
+	allWidgets[5] = motorAmp_bar;
+	allWidgets[6] = motorVolt_txt;
+	allWidgets[7] = motorVolt_bar;
 
-		bar = (DisplayBar*)(screenContents[lScreen][1]);
-		bar->update(info.data[2][0]);	// motor volt
-		bar = (DisplayBar*)(bar->next);
-		bar->update(info.data[2][1]);	// motor amp
-		bar = (DisplayBar*)(bar->next);
-		bar->update(info.data[0][1]);	// capIn amp
-		bar = (DisplayBar*)(bar->next);
-		bar->update(info.data[1][1]);	// capOut amp
+	allWidgets[8] = speedDisplay;
 
-		break;
-	case SM:
-		// SM data goes to center screen
-		txt = (DisplayText*)screenContents[cScreen][0];
-		txt->update(info.data[0][0]);
-		break;
-	}
+	allWidgets[9] = stackTemperature_txt;
+	allWidgets[10] = pressure_txt;
+	allWidgets[11] = status_txt;
+	allWidgets[12] = energy_txt;
+	allWidgets[13] = energy_bar;
+
+
 }
 void DashboardScreenManager::refreshScreens()
 {
-	//speedDisplay->update("---");
+	for (int i = 0; i < 14; i++)
+		allWidgets[i]->update();
 }
 
 DashboardScreenManager::~DashboardScreenManager()

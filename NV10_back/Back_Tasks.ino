@@ -41,6 +41,7 @@ void QueueOutputData(void *pvParameters)
 	const uint16_t speedo_refresh_interval = SPEEDOMETER_REFRESH_INTERVAL / QUEUE_DATA_INTERVAL;
 
 	QueueItem outgoing;
+	outgoing.
 	uint8_t syncCounter = 0;
 	//HESFuelCell* masterCell = (HESFuelCell*)pvParameters;
 	//HESFuelCell* slaveCell = ((HESFuelCell*)pvParameters) + 1;
