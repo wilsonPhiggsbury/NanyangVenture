@@ -104,6 +104,7 @@ void HESFuelCell::writeAsRawData(char* toWrite)
 {
 	if (SD_avail)
 	{
+		// set path to FC*RAW.txt
 		// outcome: path = /LOG****/FC*raw.txt
 		strcpy(path + FILENAME_HEADER_LENGTH, dataPoint_shortNames[FC]);
 		itoa(id, path + FILENAME_HEADER_LENGTH + 2, 10);
@@ -115,6 +116,7 @@ void HESFuelCell::writeAsRawData(char* toWrite)
 		rawFCdata.print("\n");
 		rawFCdata.close();
 
+		// revert path back to original
 		strcpy(path + FILENAME_HEADER_LENGTH, "");
 	}
 }

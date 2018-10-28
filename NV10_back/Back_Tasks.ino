@@ -41,7 +41,6 @@ void QueueOutputData(void *pvParameters)
 	const uint16_t speedo_refresh_interval = SPEEDOMETER_REFRESH_INTERVAL / QUEUE_DATA_INTERVAL;
 
 	QueueItem outgoing;
-	outgoing.
 	uint8_t syncCounter = 0;
 	//HESFuelCell* masterCell = (HESFuelCell*)pvParameters;
 	//HESFuelCell* slaveCell = ((HESFuelCell*)pvParameters) + 1;
@@ -69,7 +68,7 @@ void QueueOutputData(void *pvParameters)
 			HESFuelCell::dumpTimestampInto(&outgoing.timeStamp);
 			for (int i = 0; i < NUM_FUELCELLS; i++)
 			{
-				if (true)
+				if (hydroCells[i].hasUpdated())
 				{
 					hydroCells[i].dumpDataInto(outgoing.data);
 				}
@@ -79,7 +78,8 @@ void QueueOutputData(void *pvParameters)
 				}*/
 			}
 			xQueueSend(queueForLogSend, &outgoing, 100);
-			xQueueSend(queueForSendCAN, &outgoing, 0);
+			if(CAN_avail)
+				xQueueSend(queueForSendCAN, &outgoing, 0);
 		}
 
 
@@ -99,7 +99,8 @@ void QueueOutputData(void *pvParameters)
 				motors[i].dumpDataInto(outgoing.data);//len 5
 			}
 			xQueueSend(queueForLogSend, &outgoing, 100);
-			xQueueSend(queueForSendCAN, &outgoing, 0);
+			if(CAN_avail)
+				xQueueSend(queueForSendCAN, &outgoing, 0);
 			//if (syncCounter % (back_lcd_refresh) == 0)
 			//{
 			//	for (int i = 0; i < NUM_CURRENTSENSORS; i++)
@@ -120,7 +121,8 @@ void QueueOutputData(void *pvParameters)
 			Speedometer::dumpTimestampInto(&outgoing.timeStamp);
 			speedo.dumpDataInto(outgoing.data);
 			xQueueSend(queueForLogSend, &outgoing, 100);
-			xQueueSend(queueForSendCAN, &outgoing, 0);
+			if(CAN_avail)
+				xQueueSend(queueForSendCAN, &outgoing, 100);
 		}
 		vTaskDelay(delay);
 	}
