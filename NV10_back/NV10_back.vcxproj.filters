@@ -29,9 +29,6 @@
     <ClInclude Include="build_options.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CAN_ID_protocol.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="CurrentSensorLogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>

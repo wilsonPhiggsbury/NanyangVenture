@@ -46,7 +46,6 @@ Speedometer speedo = Speedometer(0, 545);
 MCP_CAN CANObj = MCP_CAN(CAN_CS_PIN);
 // define globals
 bool SD_avail;
-bool CAN_avail;
 char path[FILENAME_HEADER_LENGTH + 8 + 4 + 1]; // +8 for filename, +4 for '.txt', +1 for '\0'
 
 // define tasks, types are: input, control, output
@@ -75,27 +74,33 @@ void setup() {
 	// initialize speedometer
 	attachInterrupt(digitalPinToInterrupt(SPEEDOMETER_INTERRUPT_PIN), storeWheelInterval_ISR, FALLING);
 	// initialize CAN bus
-	CAN_avail = CANObj.begin(NV_CANSPEED) == CAN_OK;
-	if (!CAN_avail)
+	if (CANObj.begin(NV_CANSPEED) != CAN_OK)
 	{
 		Serial.println(F("NV10_back CAN init fail!"));
 	}
 	else
 	{
 		Serial.println(F("NV10_back CAN init success!"));
+		xTaskCreate(
+			SendCANFrame
+			, (const portCHAR *) "CAN la!" // where got cannot?
+			, 500  // Stack size
+			, NULL
+			, 1  // Priority
+			, NULL);
 	}
 	// Now set up all Tasks to run independently. Task functions are found in Tasks.ino
 	xTaskCreate(
 		ReadFuelCell
 		, (const portCHAR *)"Fuel"
-		, 725
+		, 750
 		, hydroCells
 		, 3
 		, NULL);
 	xTaskCreate(
 		ReadMotorPower
 		, (const portCHAR *)"CSensor"
-		, 175
+		, 200
 		, motors
 		, 3
 		, NULL);
@@ -113,17 +118,7 @@ void setup() {
 		, NULL
 		, 1  // Priority
 		, NULL);
-	if (CAN_avail)
-	{
-		xTaskCreate(
-			SendCANFrame
-			, (const portCHAR *) "CAN la!" // where got cannot?
-			, 500  // Stack size
-			, NULL
-			, 1  // Priority
-			, NULL);
-	}
-	vTaskStartScheduler();
+	//vTaskStartScheduler();
 
 }
 
