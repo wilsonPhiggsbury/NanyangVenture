@@ -83,9 +83,16 @@ void TaskTest(void* pvParameters)
 	DisplayElement*e = &b;
 	DisplayBar* t = (DisplayBar*)e;
 	t->setColors(ILI9488_WHITE, ILI9488_BLUE);
-	t->setRange(0, 100);
-	t->updateFloat(50.0);
-	while (1);
+	t->setRange(50, 100);
+	int i = 0;
+	while (1)
+	{
+		i += 10;
+		if (i > 100)
+			i = 0;
+		t->updateFloat(i);
+		vTaskDelay(40);
+	};
 }
 void TaskRefreshScreen(void* pvParameters)
 {
@@ -111,14 +118,11 @@ void TaskRefreshScreen(void* pvParameters)
 		{
 			CAN_resetCounter = 0;
 			// dummy data
-			received.ID = CS;
-			for (int i = 0; i < 3; i++)
-			{
-				for (int j = 0; j < 2; j++)
-				{
-					received.data[i][j] = random(0, 20);
-				}
-			}
+			dummyData(&received, FC);
+			screens.refreshScreens();
+			dummyData(&received, CS);
+			screens.refreshScreens();
+			dummyData(&received, SM);
 			screens.refreshScreens();
 			//char data[MAX_STRING_LEN];
 			//received.toString(data);
@@ -233,3 +237,41 @@ vTaskDelay(pdMS_TO_TICKS(300));
 
 }
 */
+void dummyData(QueueItem* q, DataSource id) {
+	q->ID = id;
+	int i, j;
+	switch (id)
+	{
+	case FC:
+		i = 2; j = 8;
+		break;
+	case CS:
+		i = 3; j = 2;
+		break;
+	case SM:
+		i = 1; j = 1;
+		break;
+	}
+	for (int _i = 0; _i < i; _i++)
+	{
+		for (int _j = 0; _j < j; _j++)
+		{
+			q->data[_i][_j] = random(0, 10);
+		}
+	}
+	switch (id)
+	{
+	case FC:
+		q->data[0][7] = random(0, 1);
+		q->data[0][3] = random(0, 100);
+		break;
+	case CS:
+		q->data[2][1] = random(0, 40);
+		q->data[2][0] = random(45, 60);
+		break;
+	case SM:
+		
+		break;
+	}
+
+}
