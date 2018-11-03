@@ -37,7 +37,7 @@ void _QueueItem::toString(char* putHere)
 	// assume what pointer's passed in is not properly null-terminated
 	*putHere = '\0';
 	// append frame name
-	strcat(putHere, dataPoint_shortNames[ID]);
+	strcat(putHere, frameType_shortNames[ID]);
 	strcat(putHere, "\t");
 	// append time stamp
 	char timeStamp_tmp[9];
@@ -45,8 +45,8 @@ void _QueueItem::toString(char* putHere)
 	strcat(putHere, timeStamp_tmp);
 
 	// append all parameters of each payload point
-	uint8_t dataPoints = DATAPOINT_INSTANCES[ID];
-	uint8_t readValues = DATAPOINT_READVALUES[ID];
+	uint8_t dataPoints = FRAME_INFO_SETS[ID];
+	uint8_t readValues = FRAME_INFO_QUANTITY_PER_SET[ID];
 
 	for (uint8_t i = 0; i < dataPoints; i++)
 	{
@@ -73,17 +73,17 @@ bool _QueueItem::toQueueItem(char* str, _QueueItem* queueItem)
 {
 	char* cur = strtok(str, "\t");
 	int i, j = 0;
-	while(j<DATAPOINTS && strcmp(dataPoint_shortNames[j],cur))
+	while(j<FRAMETYPES && strcmp(frameType_shortNames[j],cur))
 	{
 		j++;
 	}
-	if (j >= DATAPOINTS)
+	if (j >= FRAMETYPES)
 	{
 		return false;
 	}
 	queueItem->ID = (DataSource)j;
-	uint8_t dataPoints = DATAPOINT_INSTANCES[j];
-	uint8_t readValues = DATAPOINT_READVALUES[j];
+	uint8_t dataPoints = FRAME_INFO_SETS[j];
+	uint8_t readValues = FRAME_INFO_QUANTITY_PER_SET[j];
 
 	cur = strtok(NULL, "\t");
 	queueItem->timeStamp = strtoul(cur, NULL, 16);
@@ -108,14 +108,15 @@ bool _QueueItem::toQueueItem(char* str, _QueueItem* queueItem)
 }
 void _QueueItem::toFrames(NV_CanFrames* putHere)
 {
-	uint8_t dataPoints = DATAPOINT_INSTANCES[ID];
-	uint8_t readValues = DATAPOINT_READVALUES[ID];
+	uint8_t dataPoints = FRAME_INFO_SETS[ID];
+	uint8_t readValues = FRAME_INFO_QUANTITY_PER_SET[ID];
 
 	// prepare timeStamp frame
-	putHere->frames->id = (ID << 2) | HEADER_FRAME;
-	putHere->frames->length = sizeof(unsigned long);
-	memcpy(putHere->frames->payload, &timeStamp, putHere->frames->length);
-	(putHere->numFrames)++;
+	//putHere->frames->id = (ID << 2) | HEADER_FRAME;
+	//putHere->frames->length = sizeof(unsigned long);
+	//memcpy(putHere->frames->payload, &timeStamp, putHere->frames->length);
+	//(putHere->numFrames)++;
+	putHere->addItem((ID << 2) | HEADER_FRAME, sizeof(unsigned long), (byte*)&timeStamp);
 	// prepare payload frames
 	uint8_t i,j;
 	for (i = 0; i < dataPoints; i++)
@@ -142,12 +143,7 @@ void _QueueItem::toFrames(NV_CanFrames* putHere)
 			putHere->addItem(ID, terminatorStatus, data[i][j]);
 		}
 	}
-	//putHere->numFrames = 1 + dataPoints * ceil(readValues / 2.0);
 }
-//void _NV_CanFrames::setCANObj(MCP_CAN& CANObj)
-//{
-//	this->CANObj = &CANObj;
-//}
 bool _NV_CanFrames::toQueueItem(QueueItem* putHere)
 {
 
@@ -160,8 +156,8 @@ bool _NV_CanFrames::toQueueItem(QueueItem* putHere)
 	}
 	// append ID
 	putHere->ID = DataSource((frames[0].id >> 2) & B111);
-	uint8_t dataPoints = DATAPOINT_INSTANCES[putHere->ID];
-	uint8_t readValues = DATAPOINT_READVALUES[putHere->ID];
+	uint8_t dataPoints = FRAME_INFO_SETS[putHere->ID];
+	uint8_t readValues = FRAME_INFO_QUANTITY_PER_SET[putHere->ID];
 	// spot-check whether frame number is as anticipated. 1/2 frame per float + 1 frame for timestamp
 	if (numFrames != dataPoints * ceil(readValues / 2.0) + 1)
 	{

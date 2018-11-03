@@ -147,7 +147,7 @@ void LogSendData(void *pvParameters __attribute__((unused)))  // This is a Task.
 			if (SD_avail)
 			{
 				// Set path char array to the document we want to save to, determined by a const array
-				strcpy(path + FILENAME_HEADER_LENGTH, dataPoint_shortNames[received.ID]);
+				strcpy(path + FILENAME_HEADER_LENGTH, frameType_shortNames[received.ID]);
 				strcat(path, ".txt");
 				// DO NOT SWITCH OUT THIS TASK IN THE MIDST OF WRITING A FILE ON SD CARD
 				// (consequence: some serial payload may be missed. Hang or miss payload? Tough choice...)

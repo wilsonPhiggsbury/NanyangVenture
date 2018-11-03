@@ -106,7 +106,7 @@ void HESFuelCell::writeAsRawData(char* toWrite)
 	{
 		// set path to FC*RAW.txt
 		// outcome: path = /LOG****/FC*raw.txt
-		strcpy(path + FILENAME_HEADER_LENGTH, dataPoint_shortNames[FC]);
+		strcpy(path + FILENAME_HEADER_LENGTH, frameType_shortNames[FC]);
 		itoa(id, path + FILENAME_HEADER_LENGTH + 2, 10);
 		strcpy(path + FILENAME_HEADER_LENGTH + 2 + 1, "raw.txt");
 

@@ -78,6 +78,7 @@ Global
 		..\..\ide\portable\packages\arduino\hardware\sam\1.6.11\libraries\SPI\SPI.vcxitems*{cdca65f1-80ec-465d-91ff-e25112f2bfbc}*SharedItemsImports = 4
 		..\libraries\FreeRTOS_ARM\FreeRTOS_ARM.vcxitems*{cdca65f1-80ec-465d-91ff-e25112f2bfbc}*SharedItemsImports = 4
 		..\libraries\FreeRTOS\FreeRTOS.vcxitems*{e0f75ac7-15bb-4c7a-98cd-37a96c9641a3}*SharedItemsImports = 4
+		SharedProtocols\SharedProtocols.vcxitems*{e0f75ac7-15bb-4c7a-98cd-37a96c9641a3}*SharedItemsImports = 4
 		..\..\ide\libraries\SD\SD.vcxitems*{fa968cf9-c643-4453-a136-bded4e20b71a}*SharedItemsImports = 9
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
