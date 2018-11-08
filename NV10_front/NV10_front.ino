@@ -20,14 +20,6 @@ volatile int CAN_incoming = 0;
 
 #define NUMSTATES 6
 float states[NUMSTATES] = { 0,0,0,0,0,0 };
-typedef enum {
-	Headlights,
-	Horn,
-	Lsig,
-	Rsig,
-	Wiper,
-	Hazard
-}State;
 /*
 states:
 	Headlights
@@ -51,36 +43,45 @@ void TaskMoveWiper(void* pvParameters);
 TaskHandle_t taskFlashSignals, taskMoveWiper;
 void setup() {
 	Serial.begin(9600);
+	// mask 9 bits, check if ID == BT
+	unsigned long filter = BT << 2;
+	if (CANObj.begin(NV_CANSPEED) != CAN_OK)
+		Serial.println("CAN Init fail!");
+	//CANObj.init_Mask(0, 0, 0x07FF << 16);
+	//CANObj.init_Filt(0, 0, 0x0010 << 16);
+	//CANObj.init_Filt(1, 0, 0x0011 << 16);
+	//CANObj.init_Filt(2, 0, 0x0012 << 16);
+	//CANObj.init_Filt(3, 0, 0x0013 << 16);
 	attachInterrupt(digitalPinToInterrupt(CAN_INT_PIN), CAN_ISR, FALLING);
 	
 	queueToggleAccessories = xQueueCreate(1, sizeof(QueueItem));
 	xTaskCreate(
 		TaskToggleAccessories
 		, (const portCHAR *)"HEAD"
-		, 300
+		, 300 // -25
 		, NULL
-		, 1
+		, 2
 		, NULL);
 	xTaskCreate(
 		TaskReceiveCAN
 		, (const portCHAR *)"CAN la"
-		, 400
+		, 500 // -25
 		, NULL
 		, 1
 		, NULL);
 	xTaskCreate(
 		TaskFlashSignals
 		, (const portCHAR *)"SIG"
-		, 200
+		, 150 // -25
 		, NULL
-		, 2
+		, 3
 		, &taskFlashSignals);
 	xTaskCreate(
 		TaskMoveWiper
-		, (const portCHAR *)"SIG"
-		, 100
+		, (const portCHAR *)"WIPE"
+		, 150 // -25
 		, NULL
-		, 2
+		, 3
 		, &taskMoveWiper);
 	
 }
@@ -101,19 +102,23 @@ void TaskToggleAccessories(void* pvParameters)
 		{
 			if (states[Horn] == STATE_EN)
 			{
+				Serial.println(F("HORN ON"));
 				digitalWrite(HORN_PIN, HIGH);
 			}
 			else if (states[Horn] == STATE_DS)
 			{
+				Serial.println(F("HORN OFF"));
 				digitalWrite(HORN_PIN, LOW);
 			}
 
 			if (states[Headlights] == STATE_EN)
 			{
+				Serial.println(F("LIGHTS ON"));
 				digitalWrite(HEADLIGHTS_PIN, HIGH);
 			}
 			else if (states[Headlights] == STATE_DS)
 			{
+				Serial.println(F("LIGHTS OFF"));
 				digitalWrite(HEADLIGHTS_PIN, LOW);
 			}
 		}
@@ -122,14 +127,14 @@ void TaskToggleAccessories(void* pvParameters)
 }
 void TaskFlashSignals(void* pvParameters)
 {
-	bool lsigOn, rsigOn;
+	bool lsigOn = false, rsigOn = false;
 	//pinMode(LSIG_PIN, OUTPUT);
 	//pinMode(RSIG_PIN, OUTPUT);
 	lstrip.begin();
 	rstrip.begin();
 	lstrip.setBrightness(64);
 	rstrip.setBrightness(64);
-
+	//pinMode(LED_BUILTIN, OUTPUT);
 	while (1)
 	{
 		for (int i = 0; i < 7; i++)
@@ -141,12 +146,14 @@ void TaskFlashSignals(void* pvParameters)
 					lsigOn = false;
 					lstrip.setPixelColor(i, 0, 0, 0);
 					lstrip.show();
+					//digitalWrite(LED_BUILTIN, LOW);
 				}
 				else
 				{
 					lsigOn = true;
 					lstrip.setPixelColor(i, 255, 165, 0);
 					lstrip.show();
+					//digitalWrite(LED_BUILTIN, HIGH);
 				}
 			}
 			else
@@ -154,10 +161,12 @@ void TaskFlashSignals(void* pvParameters)
 				lsigOn = false;
 				lstrip.setPixelColor(i, 0, 0, 0);
 				lstrip.show();
+				//digitalWrite(LED_BUILTIN, LOW);
 			}
 
 			if (states[Hazard] == STATE_EN || states[Rsig] == STATE_EN)
 			{
+				//Serial.println("RSIG ON");
 				if (rsigOn)
 				{
 					rsigOn = false;
@@ -173,6 +182,7 @@ void TaskFlashSignals(void* pvParameters)
 			}
 			else
 			{
+				//Serial.println("RSIG OFF");
 				rsigOn = false;
 				rstrip.setPixelColor(i, 0, 0, 0);
 				rstrip.show();
@@ -215,9 +225,11 @@ void TaskReceiveCAN(void* pvParameters)
 	{
 		if (CAN_incoming == 1)
 		{
+			vTaskSuspendAll();
 			// ------------------------------ covert CAN frames into String for Serial -----------------------------------
 			CANObj.readMsgBufID(&id, &len, inBuffer);
 			bool isLastFrame = frames.addItem(id, len, inBuffer);
+			Serial.print(id);
 			if (isLastFrame)
 			{
 				bool convertSuccess = frames.toQueueItem(&incoming);
@@ -227,25 +239,27 @@ void TaskReceiveCAN(void* pvParameters)
 					for (int i = 0; i < NUMSTATES; i++)
 					{
 						states[i] = incoming.data[0][i];
-						// kick up task to toggle accessories such as Headlights Horn etc
-						xQueueSend(queueToggleAccessories, &incoming, 100);
-						// unblock time-controlled tasks such as blinking signal lights
 					}
+					// kick up task to toggle accessories such as Headlights Horn etc
+					xQueueSend(queueToggleAccessories, &incoming, 100);
+					// unblock time-controlled tasks such as blinking signal lights
+					xTaskAbortDelay(taskFlashSignals);
 					//// print data
 					//char payload[MAX_STRING_LEN];
 					//incoming.toString(payload);
 					//Serial.println(payload);
 				}
-				frames.clear();
+				frames.clear(); Serial.println();
 			}
 
-			CAN_incoming = false;
+			CAN_incoming = 0;
+			xTaskResumeAll();
 		}
 		else if (CAN_incoming == -1)
 		{
 			Serial.println("~");
-			vTaskDelay(50);
 		}
+		vTaskDelay(pdMS_TO_TICKS(5));
 	}
 
 }

@@ -155,7 +155,7 @@ bool _NV_CanFrames::toQueueItem(QueueItem* putHere)
 		return false;
 	}
 	// append ID
-	putHere->ID = DataSource((frames[0].id >> 2) & B111);
+	putHere->ID = DataSource((frames[0].id >> 2) & B1111);
 	uint8_t dataPoints = FRAME_INFO_SETS[putHere->ID];
 	uint8_t readValues = FRAME_INFO_QUANTITY_PER_SET[putHere->ID];
 	// spot-check whether frame number is as anticipated. 1/2 frame per float + 1 frame for timestamp

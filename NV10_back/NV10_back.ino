@@ -45,7 +45,7 @@ AttopilotCurrentSensor motors[NUM_CURRENTSENSORS] = {
 Speedometer speedo = Speedometer(0, 545);
 MCP_CAN CANObj = MCP_CAN(CAN_CS_PIN);
 // define globals
-bool SD_avail;
+bool SD_avail, CAN_avail;
 char path[FILENAME_HEADER_LENGTH + 8 + 4 + 1]; // +8 for filename, +4 for '.txt', +1 for '\0'
 
 // define tasks, types are: input, control, output
@@ -77,6 +77,7 @@ void setup() {
 	if (CANObj.begin(NV_CANSPEED) != CAN_OK)
 	{
 		Serial.println(F("NV10_back CAN init fail!"));
+		CAN_avail = false;
 	}
 	else
 	{
@@ -88,6 +89,7 @@ void setup() {
 			, NULL
 			, 1  // Priority
 			, NULL);
+		CAN_avail = true;
 	}
 	// Now set up all Tasks to run independently. Task functions are found in Tasks.ino
 	xTaskCreate(

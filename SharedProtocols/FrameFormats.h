@@ -49,6 +49,14 @@ typedef enum
 	N1,
 	BT
 }DataSource;
+typedef enum {
+	Headlights,
+	Horn,
+	Lsig,
+	Rsig,
+	Wiper,
+	Hazard
+}Peripheral;
 const char frameType_shortNames[FRAMETYPES][SHORTNAME_LEN] = {"FC", "CS", "SM", "??", "BT"};
 struct _NV_CanFrame;
 struct _NV_CanFrames;
