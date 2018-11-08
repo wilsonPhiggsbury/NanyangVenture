@@ -339,3 +339,4 @@ ASALocalRun/
 
 # ___SPECIFIC TO VISUAL MICRO___
 DataVisualization_PC/.vscode/*
+__vm/
