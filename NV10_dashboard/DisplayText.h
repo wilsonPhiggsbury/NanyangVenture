@@ -8,6 +8,7 @@ public:
 	void update(float value, char * addOn);
 	void updateFloat(float value);
 	void update(char * value);
+	void updateNull();
 	~DisplayText();
 
 private:

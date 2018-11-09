@@ -10,6 +10,7 @@ public:
 	void draw();
 	void setRange(uint16_t minVal, uint16_t maxVal);
 	void updateFloat(float value);
+	void updateNull();
 private:
 	uint16_t minVal, maxVal;
 	uint16_t radInner = 10, radOuter = 20;

@@ -88,10 +88,9 @@ void HESFuelCell::dumpDataInto(float location[QUEUEITEM_DATAPOINTS][QUEUEITEM_RE
 {
 	// expect QueueItem.payload to come in
 	float* thisSlot = location[id];
-	predictableCounter = predictableCounter < 60 ? predictableCounter + 5 : 0;
 	for (int i = 0; i < FUELCELL_READVALUES; i++)
 	{
-		thisSlot[i] = predictableCounter;
+		thisSlot[i] = loggedParams[i];
 	}
 }
 bool HESFuelCell::hasUpdated()
@@ -106,7 +105,7 @@ void HESFuelCell::writeAsRawData(char* toWrite)
 	{
 		// set path to FC*RAW.txt
 		// outcome: path = /LOG****/FC*raw.txt
-		strcpy(path + FILENAME_HEADER_LENGTH, dataPoint_shortNames[FC]);
+		strcpy(path + FILENAME_HEADER_LENGTH, frameType_shortNames[FC]);
 		itoa(id, path + FILENAME_HEADER_LENGTH + 2, 10);
 		strcpy(path + FILENAME_HEADER_LENGTH + 2 + 1, "raw.txt");
 

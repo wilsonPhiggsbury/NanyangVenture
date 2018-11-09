@@ -2,16 +2,46 @@
 
 
 
-DisplayBar::DisplayBar(ILI9488* screen, uint16_t xPos, uint16_t yPos, uint16_t width, uint16_t height, Orientation orientation):\
-DisplayElement(screen, xPos, yPos, width, height, orientation==LEFT_TO_RIGHT?alignLeft:alignRight, alignCenter)
+DisplayBar::DisplayBar(ILI9488* screen, uint16_t xPos, uint16_t yPos, uint16_t width, uint16_t height, Orientation orientation) :\
+DisplayElement(screen, xPos, yPos, width, height, orientation == LEFT_TO_RIGHT ? alignLeft : alignRight, alignCenter)
 {
 	setOrientation(orientation);
 }
+DisplayBar::DisplayBar(ILI9488* screen, uint16_t xPos, uint16_t yPos, uint16_t width, uint16_t height, Alignment xAlign, Alignment yAlign) :\
+DisplayElement(screen, xPos, yPos, width, height, xAlign, yAlign)
+{
+	setOrientation(LEFT_TO_RIGHT);
+}
 void DisplayBar::updateFloat(float value)
 {
+	if (stuck)
+	{
+		// re-paint rectangles
+		if (facing == -1)
+		{
+			screen->fillRect(xPos + width - margin - ceil(toWidthScale(thisValue)), yPos + margin, \
+					ceil(toWidthScale(thisValue)), actualHeight, \
+					foreground);
+		}
+		else if (facing == 1)
+		{
+			screen->fillRect(xPos + margin, yPos + margin, \
+				ceil(toWidthScale(thisValue)), actualHeight, \
+				foreground);
+		}
+		stuck = false;
+	}
 	prevValue = thisValue;
-	thisValue = value;
+	thisValue = constrain(value, minVal, maxVal);
 	draw();
+}
+void DisplayBar::updateNull()
+{
+	if (!stuck)
+	{
+		drawLines(ILI9488_GREEN);
+		stuck = true;
+	}
 }
 void DisplayBar::draw()
 {
@@ -27,20 +57,23 @@ void DisplayBar::draw()
 	//Serial.print("HEIGHT: ");
 	//Serial.print(actualHeight);
 	//Serial.println();
+	float thisWidth = toWidthScale(thisValue);
+	float prevWidth = toWidthScale(prevValue);
+	float diff = abs(thisWidth - prevWidth);
 	if (facing == -1)
 	{
 		if (thisValue > prevValue)
 		{
 			// bigger: draw foreground color, from old value to new value
-			screen->fillRect(xPos + width - margin - ceil(toWidthScale(thisValue)), yPos + margin, \
-				ceil(toWidthScale(thisValue - prevValue)), actualHeight, \
+			screen->fillRect(xPos + width - margin - ceil(thisWidth), yPos + margin, \
+				ceil(diff), actualHeight, \
 				foreground);
 		}
-		else
+		else if (prevValue > thisValue)
 		{
 			// smaller: draw background color, from new value to old value
-			screen->fillRect(xPos + width - margin - ceil(toWidthScale(prevValue)), yPos + margin, \
-				ceil(toWidthScale(prevValue - thisValue)), actualHeight, \
+			screen->fillRect(xPos + width - margin - ceil(prevWidth), yPos + margin, \
+				ceil(diff), actualHeight, \
 				background);
 		}
 	}
@@ -49,21 +82,36 @@ void DisplayBar::draw()
 		if (thisValue > prevValue)
 		{
 			// bigger: draw foreground color, from old value to new value
-			screen->fillRect(xPos + margin + floor(toWidthScale(prevValue)), yPos + margin, \
-				ceil(toWidthScale(thisValue-prevValue)), actualHeight, \
+			screen->fillRect(xPos + margin + floor(prevWidth), yPos + margin, \
+				ceil(diff), actualHeight, \
 				foreground);
 		}
-		else
+		else if (prevValue > thisValue)
 		{
 			// smaller: draw background color, from new value to old value
-			screen->fillRect(xPos + margin + floor(toWidthScale(thisValue)), yPos + margin,\
-				ceil(toWidthScale(prevValue - thisValue)), actualHeight, \
+			screen->fillRect(xPos + margin + floor(thisWidth), yPos + margin,\
+				ceil(diff), actualHeight, \
 				background);
 		}
 
 	}
 }
+void DisplayBar::drawLines(uint16_t color)
+{
+	if (facing == 1)
+	{
+		screen->drawFastHLine(xPos + margin, yPos + (height / 4), toWidthScale(thisValue), color);
+		screen->drawFastHLine(xPos + margin, yPos + (height / 2), toWidthScale(thisValue), color);
+		screen->drawFastHLine(xPos + margin, yPos + (height * 3 / 4), toWidthScale(thisValue), color);
+	}
+	else if (facing == -1)
+	{
+		screen->drawFastHLine(xPos + width - margin - toWidthScale(thisValue), yPos + (height / 4), toWidthScale(thisValue), color);
+		screen->drawFastHLine(xPos + width - margin - toWidthScale(thisValue), yPos + (height / 2), toWidthScale(thisValue), color);
+		screen->drawFastHLine(xPos + width - margin - toWidthScale(thisValue), yPos + (height * 3 / 4), toWidthScale(thisValue), color);
+	}
 
+}
 DisplayBar::~DisplayBar()
 {
 }
@@ -71,6 +119,8 @@ void DisplayBar::setRange(uint16_t minVal, uint16_t maxVal)
 {
 	this->minVal = minVal;
 	this->maxVal = maxVal;
+	// synchronize history to avoid jumps 
+	thisValue = prevValue = minVal;
 }
 void DisplayBar::setOrientation(Orientation o)
 {
@@ -101,5 +151,5 @@ void DisplayBar::refreshSettings()
 }
 float DisplayBar::toWidthScale(float value)
 {
-	return value / maxVal * actualWidth;
+	return map(value, minVal, maxVal, 0, actualWidth);// (value - minVal) / (maxVal - minVal) * actualWidth + minVal;
 }
