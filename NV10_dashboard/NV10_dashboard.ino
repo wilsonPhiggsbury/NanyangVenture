@@ -56,13 +56,13 @@ void setup() {
 		, 3  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
 		, NULL);
 
-	//xTaskCreate(
-	//	TaskReadSerial
-	//	, (const portCHAR *)"ReadS1"  // A name just for humans
-	//	, 1000  // This stack size can be checked & adjusted by reading the Stack Highwater
-	//	, NULL // Any pointer to pass in
-	//	, 2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
-	//	, NULL);
+	xTaskCreate(
+		TaskReadSerial
+		, (const portCHAR *)"ReadS1"  // A name just for humans
+		, 1000  // This stack size can be checked & adjusted by reading the Stack Highwater
+		, NULL // Any pointer to pass in
+		, 2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
+		, NULL);
 
 	vTaskStartScheduler();
 }
@@ -73,24 +73,22 @@ void loop() {
 }
 void TaskTest(void* pvParameters)
 {
-	pinMode(CENTER_LCD_LED, OUTPUT);
-	digitalWrite(CENTER_LCD_LED, HIGH);
-	ILI9488 scr = ILI9488(LEFT_LCD_CS, LEFT_LCD_DC, RIGHT_LCD_RST);
+	pinMode(LCD_BACKLIGHT, OUTPUT);
+	digitalWrite(LCD_BACKLIGHT, HIGH);
+	ILI9488 scr = ILI9488(LCD_LEFT_CS, LCD_LEFT_DC, LCD_RIGHT_RST);
 	scr.begin();
 	scr.setRotation(1);
 	scr.fillScreen(ILI9488_PURPLE);
-	DisplayBar b = DisplayBar(&scr, 200, 100, 200, 100, DisplayBar::BOTTOM_TO_TOP);
-	DisplayElement*e = &b;
-	DisplayBar* t = (DisplayBar*)e;
-	t->setColors(ILI9488_WHITE, ILI9488_BLUE);
-	t->setRange(50, 100);
+	DisplayBar t = DisplayBar(&scr, 200, 100, 200, 100, DisplayBar::BOTTOM_TO_TOP);
+	t.setColors(ILI9488_WHITE, ILI9488_BLUE);
+	t.setRange(50, 100);
 	int i = 0;
 	while (1)
 	{
 		i += 10;
 		if (i > 100)
 			i = 0;
-		t->updateFloat(i);
+		t.updateFloat(i);
 		vTaskDelay(40);
 	};
 }
@@ -100,8 +98,8 @@ void TaskRefreshScreen(void* pvParameters)
 	uint8_t CAN_resetCounter = 0;
 	
 
-	pinMode(CENTER_LCD_LED, OUTPUT);
-	digitalWrite(CENTER_LCD_LED, HIGH);
+	pinMode(LCD_BACKLIGHT, OUTPUT);
+	digitalWrite(LCD_BACKLIGHT, HIGH);
 
 	QueueItem received;
 	char content[FLOAT_TO_STRING_LEN + 1];
@@ -143,48 +141,33 @@ void TaskRefreshScreen(void* pvParameters)
 		vTaskDelay(delay);
 	}
 }
-//void TaskReadSerial(void* pvParameters)
-//{
-//	QueueItem outgoing;
-//	char payload[MAX_STRING_LEN];
-//	TickType_t delay = pdMS_TO_TICKS(200);
-//	pinMode(CAN_RST_PIN, OUTPUT);
-//	digitalWrite(CAN_RST_PIN, HIGH);
-//	while (1)
-//	{
-//
-//		if (Serial1.available())
-//		{
-//			int bytesRead = Serial1.readBytesUntil('\n', payload, MAX_STRING_LEN);
-//			if(bytesRead>0)
-//				payload[bytesRead-1] = '\0';
-//			//// ------------------------------ covert back -----------------------------------
-//			bool convertSuccess = QueueItem::toQueueItem(payload, &outgoing);
-//			if(convertSuccess)
-//				xQueueSend(queueForDisplay, &outgoing, 100);
-//
-//			// DEBUG printing that prints out special bytes as uint
-//			//int counter = 0;
-//			//while (counter < bytesRead)
-//			//{
-//			//	char tmp = payload[counter++];
-//			//	if (isPrintable(tmp))
-//			//		Serial.print(tmp);
-//			//	else
-//			//	{
-//			//		Serial.print("<");
-//			//		Serial.print((uint8_t)tmp);
-//			//		Serial.print(">");
-//			//	}
-//			//}
-//			//Serial.print("[");
-//			//Serial.print(Serial.available());
-//			//Serial.print("]");
-//			//Serial.println("__");
-//		}
-//		vTaskDelay(delay);
-//	}
-//}
+void TaskReadSerial(void* pvParameters)
+{
+	unsigned int buttonPins[] = { BTN_HAZARD,BTN_HEADLIGHT,BTN_HORN,BTN_LSIG,BTN_RSIG,BTN_WIPER,BTN_RADIO };
+	setDebounce(buttonPins, 7, 0xff);
+	QueueItem outgoing;
+	char payload[MAX_STRING_LEN];
+	TickType_t delay = pdMS_TO_TICKS(200);
+	pinMode(CAN_RST_PIN, OUTPUT);
+	digitalWrite(CAN_RST_PIN, HIGH);
+	while (1)
+	{
+
+		if (Serial1.available())
+		{
+			int bytesRead = Serial1.readBytesUntil('\n', payload, MAX_STRING_LEN);
+			if(bytesRead>0)
+				payload[bytesRead-1] = '\0';
+			// ------------------------------ covert back -----------------------------------
+			bool convertSuccess = QueueItem::toQueueItem(payload, &outgoing);
+			if(convertSuccess)
+				xQueueSend(queueForDisplay, &outgoing, 100);
+			//debugPrint(payload, bytesRead);
+		}
+
+		vTaskDelay(delay);
+	}
+}
 //centerLCD.drawRGBBitmap(77, 0, image, 150, 150);
 //centerLCD.setAddrWindow(120, 80, 240, 160);
 //centerLCD.pushColors(image, 9600, true);
@@ -274,4 +257,74 @@ void dummyData(QueueItem* q, DataSource id) {
 		break;
 	}
 
+}
+void debugPrint(char* toPrint, int len)
+{
+	// DEBUG printing that prints out special bytes as uint
+	int counter = 0;
+	while (counter < len)
+	{
+		char tmp = toPrint[counter++];
+		if (isPrintable(tmp))
+			Serial.print(tmp);
+		else
+		{
+			Serial.print("<");
+			Serial.print((uint8_t)tmp);
+			Serial.print(">");
+		}
+	}
+	Serial.print("[");
+	Serial.print(Serial.available());
+	Serial.print("]");
+	Serial.println("__");
+
+}
+void setDebounce(unsigned int pins[], uint8_t numPins, uint16_t waitTimeMultiplier)
+{	
+	/*
+	http://ww1.microchip.com/downloads/en/devicedoc/atmel-11057-32-bit-cortex-m3-microcontroller-sam3x-sam3a_datasheet.pdf
+	page 630 lists help on which PIO registers to fiddle to enable debouncing
+	need to find out clock divider value, max value is 2^14 (PIO_SCDR)
+	https://www.arduino.cc/en/Hacking/PinMappingSAM3X
+	to help convert pins into PIOxyy (x = A, B, C, D) (y = a number in range [0, 31])
+	*/
+	uint32_t pinsBitMask_A = 0, pinsBitMask_B = 0, pinsBitMask_C = 0, pinsBitMask_D = 0;
+	for (uint8_t i = 0; i < numPins; i++)
+	{
+		switch (digitalPinToPort(pins[i]))
+		{
+		case PIOA:
+			pinsBitMask_A |= digitalPinToBitMask(pins[i]);
+			break;
+		case PIOB:
+			pinsBitMask_B |= digitalPinToBitMask(pins[i]);
+			break;
+		case PIOC:
+			pinsBitMask_C |= digitalPinToBitMask(pins[i]);
+			break;
+		case PIOD:
+			pinsBitMask_D |= digitalPinToBitMask(pins[i]);
+			break;
+		}
+	}
+	/*REG_PIOB_IFER |= 1 << 26; 
+	PIOB->PIO_DIFSR |= 1 << 26;
+	PIOB->PIO_SCDR |= 0xff;
+	*/
+	// Input Filter Enable Register:				Enables these bits to enable inupt filtering
+	PIOA->PIO_IFER = pinsBitMask_A;
+	PIOB->PIO_IFER = pinsBitMask_B;
+	PIOC->PIO_IFER = pinsBitMask_C;
+	PIOD->PIO_IFER = pinsBitMask_D;
+	// Debouncing Input Filter Select Register:		We want Debounce filter, not Glitch filter! Debounce = 1, Glitch = 0
+	PIOA->PIO_DIFSR = pinsBitMask_A;
+	PIOB->PIO_DIFSR = pinsBitMask_B;
+	PIOC->PIO_DIFSR = pinsBitMask_C;
+	PIOD->PIO_DIFSR = pinsBitMask_D;
+	// Slow Clock Divider Register:					Too big = unreponsive, Too small = can't feel the debounce
+	PIOA->PIO_SCDR = 0xff;
+	PIOB->PIO_SCDR = 0xff;
+	PIOC->PIO_SCDR = 0xff;
+	PIOD->PIO_SCDR = 0xff;
 }

@@ -24,15 +24,14 @@ void Speedometer::dumpDataInto(float location[QUEUEITEM_DATAPOINTS][QUEUEITEM_RE
 	processData();
 	// expect QueueItem.payload to come in
 	float* thisSlot = location[id];
-	predictableCounter = predictableCounter < 40 ? predictableCounter + 1 : 0;
 	for (int i = 0; i < SPEEDOMETER_READVALUES; i++)
 	{
-		thisSlot[i] = predictableCounter;
+		thisSlot[i] = loggedParams[i];
 	}
 }
 void Speedometer::processData()
 {
-	loggedParams[kmh] = calculateSpeed_MS() * 3.6;
+	loggedParams[kmh] = calculateSpeed_MS() * 3.6 * 9.82437920381238;
 }
 float Speedometer::calculateSpeed_MS()
 {
