@@ -29,6 +29,10 @@ void DisplayText::update(float value, char* addOn)
 }
 void DisplayText::updateFloat(float value)
 {
+	if (stuck)
+	{
+		stuck = false;
+	}
 	char tmp[8];
 	sprintf(tmp, "%4.1f", value);
 	update(tmp);
@@ -43,6 +47,14 @@ void DisplayText::update(char* value)
 	}
 	prevTextWidth = textWidth;
 	draw();
+}
+void DisplayText::updateNull()
+{
+	if (!stuck)
+	{
+		update("---");
+		stuck = true;
+	}
 }
 //void DisplayText::setTextLength(uint8_t length)
 //{

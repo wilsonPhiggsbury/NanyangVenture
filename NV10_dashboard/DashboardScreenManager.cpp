@@ -8,6 +8,7 @@ static const int screenWidth = 480;
 static const int screenHeight = 320;
 DashboardScreenManager::DashboardScreenManager(QueueItem* queueItem)
 {
+	q = queueItem;
 	DataSource* trackIDaddr = &(queueItem->ID);
 	// initialize screens
 	ILI9488* leftScreen = new ILI9488(LCD_LEFT_CS, LCD_LEFT_DC, LCD_LEFT_RST);
@@ -110,7 +111,35 @@ DashboardScreenManager::DashboardScreenManager(QueueItem* queueItem)
 void DashboardScreenManager::refreshScreens()
 {
 	for (int i = 0; i < 14; i++)
-		allWidgets[i]->update();
+	{
+		if (i == 11)
+		{
+			if (q->ID == FC)
+			{
+				DisplayText* statusBox = (DisplayText*)allWidgets[i];
+				if (q->data[0][7] == 1.0)
+				{
+					statusBox->setColors(ILI9488_GREEN, ILI9488_DARKGREEN);
+					statusBox->update("ON");
+				}
+				else
+				{
+					statusBox->setColors(ILI9488_RED, ILI9488_MAROON);
+					statusBox->update("OFF");
+				}
+			}
+		}
+		else
+		{
+			allWidgets[i]->update();
+		}
+	}
+}
+void DashboardScreenManager::refreshScreens(void* null)
+{
+	for (int i = 0; i < 14; i++)
+		allWidgets[i]->updateNull();
+
 }
 
 DashboardScreenManager::~DashboardScreenManager()

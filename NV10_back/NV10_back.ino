@@ -73,6 +73,7 @@ void setup() {
 		HESFuelCell::setPath(path);
 	// initialize speedometer
 	attachInterrupt(digitalPinToInterrupt(SPEEDOMETER_INTERRUPT_PIN), storeWheelInterval_ISR, FALLING);
+	digitalWrite(SPEEDOMETER_INTERRUPT_PIN, HIGH);
 	// initialize CAN bus
 	if (CANObj.begin(NV_CANSPEED) != CAN_OK)
 	{

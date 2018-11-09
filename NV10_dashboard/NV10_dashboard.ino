@@ -106,32 +106,30 @@ void TaskRefreshScreen(void* pvParameters)
 	DashboardScreenManager screens = DashboardScreenManager(&received); // Singleton Facade pattern probably?
 
 	TickType_t delay = pdMS_TO_TICKS(200);
-	uint32_t lastTick = 0;
-
-	uint8_t tstVal = 0;
 	while (1)
 	{
-		BaseType_t success = true;// xQueueReceive(queueForDisplay, &received, 0);
+		BaseType_t success = xQueueReceive(queueForDisplay, &received, 0);
 		if (success)
 		{
 			CAN_resetCounter = 0;
-			// dummy data
-			dummyData(&received, FC);
+			//// dummy data
+			//dummyData(&received, FC);
+			//screens.refreshScreens();
+			//dummyData(&received, CS);
+			//screens.refreshScreens();
+			//dummyData(&received, SM);
+			//screens.refreshScreens();
 			screens.refreshScreens();
-			dummyData(&received, CS);
-			screens.refreshScreens();
-			dummyData(&received, SM);
-			screens.refreshScreens();
-			//char data[MAX_STRING_LEN];
-			//received.toString(data);
-			//Serial.println(data);
+			char data[MAX_STRING_LEN];
+			received.toString(data);
+			Serial.println(data);
 			
 		}
 		else
 		{
 			if (CAN_resetCounter++ >= CAN_resetThreshold)
 			{
-				screens.refreshScreens();
+				screens.refreshScreens(NULL);
 				digitalWrite(CAN_RST_PIN, LOW);
 				vTaskDelay(delay);
 				digitalWrite(CAN_RST_PIN, HIGH);
@@ -144,7 +142,7 @@ void TaskRefreshScreen(void* pvParameters)
 void TaskReadSerial(void* pvParameters)
 {
 	unsigned int buttonPins[] = { BTN_HAZARD,BTN_HEADLIGHT,BTN_HORN,BTN_LSIG,BTN_RSIG,BTN_WIPER,BTN_RADIO };
-	setDebounce(buttonPins, 7, 0xff);
+	//setDebounce(buttonPins, 7, 0xff);
 	QueueItem outgoing;
 	char payload[MAX_STRING_LEN];
 	TickType_t delay = pdMS_TO_TICKS(200);
@@ -292,18 +290,18 @@ void setDebounce(unsigned int pins[], uint8_t numPins, uint16_t waitTimeMultipli
 	uint32_t pinsBitMask_A = 0, pinsBitMask_B = 0, pinsBitMask_C = 0, pinsBitMask_D = 0;
 	for (uint8_t i = 0; i < numPins; i++)
 	{
-		switch (digitalPinToPort(pins[i]))
+		switch ((uint32_t)digitalPinToPort(pins[i]))
 		{
-		case PIOA:
+		case (uint32_t)PIOA:
 			pinsBitMask_A |= digitalPinToBitMask(pins[i]);
 			break;
-		case PIOB:
+		case (uint32_t)PIOB:
 			pinsBitMask_B |= digitalPinToBitMask(pins[i]);
 			break;
-		case PIOC:
+		case (uint32_t)PIOC:
 			pinsBitMask_C |= digitalPinToBitMask(pins[i]);
 			break;
-		case PIOD:
+		case (uint32_t)PIOD:
 			pinsBitMask_D |= digitalPinToBitMask(pins[i]);
 			break;
 		}

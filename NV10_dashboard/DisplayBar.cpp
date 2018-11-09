@@ -14,9 +14,34 @@ DisplayElement(screen, xPos, yPos, width, height, xAlign, yAlign)
 }
 void DisplayBar::updateFloat(float value)
 {
+	if (stuck)
+	{
+		// re-paint rectangles
+		if (facing == -1)
+		{
+			screen->fillRect(xPos + width - margin - ceil(toWidthScale(thisValue)), yPos + margin, \
+					ceil(toWidthScale(thisValue)), actualHeight, \
+					foreground);
+		}
+		else if (facing == 1)
+		{
+			screen->fillRect(xPos + margin, yPos + margin, \
+				ceil(toWidthScale(thisValue)), actualHeight, \
+				foreground);
+		}
+		stuck = false;
+	}
 	prevValue = thisValue;
 	thisValue = constrain(value, minVal, maxVal);
 	draw();
+}
+void DisplayBar::updateNull()
+{
+	if (!stuck)
+	{
+		drawLines(ILI9488_GREEN);
+		stuck = true;
+	}
 }
 void DisplayBar::draw()
 {
@@ -71,7 +96,22 @@ void DisplayBar::draw()
 
 	}
 }
+void DisplayBar::drawLines(uint16_t color)
+{
+	if (facing == 1)
+	{
+		screen->drawFastHLine(xPos + margin, yPos + (height / 4), toWidthScale(thisValue), color);
+		screen->drawFastHLine(xPos + margin, yPos + (height / 2), toWidthScale(thisValue), color);
+		screen->drawFastHLine(xPos + margin, yPos + (height * 3 / 4), toWidthScale(thisValue), color);
+	}
+	else if (facing == -1)
+	{
+		screen->drawFastHLine(xPos + width - margin - toWidthScale(thisValue), yPos + (height / 4), toWidthScale(thisValue), color);
+		screen->drawFastHLine(xPos + width - margin - toWidthScale(thisValue), yPos + (height / 2), toWidthScale(thisValue), color);
+		screen->drawFastHLine(xPos + width - margin - toWidthScale(thisValue), yPos + (height * 3 / 4), toWidthScale(thisValue), color);
+	}
 
+}
 DisplayBar::~DisplayBar()
 {
 }

@@ -31,7 +31,7 @@ void Speedometer::dumpDataInto(float location[QUEUEITEM_DATAPOINTS][QUEUEITEM_RE
 }
 void Speedometer::processData()
 {
-	loggedParams[kmh] = calculateSpeed_MS() * 3.6 * 9.82437920381238;
+	loggedParams[kmh] = calculateSpeed_MS() * 3.6;// *9.82437920381238;
 }
 float Speedometer::calculateSpeed_MS()
 {
