@@ -13,7 +13,7 @@ DashboardScreenManager::DashboardScreenManager(QueueItem* queueItem)
 	// initialize screens
 	ILI9488* leftScreen = new ILI9488(LCD_LEFT_CS, LCD_LEFT_DC, LCD_LEFT_RST);
 	leftScreen->begin();
-	leftScreen->setRotation(1);
+	leftScreen->setRotation(3);
 	leftScreen->fillScreen(ILI9488_BLACK);
 	leftScreen->setTextColor(ILI9488_WHITE);
 	ILI9488* centerScreen = new ILI9488(LCD_CENTER_CS, LCD_CENTER_DC, LCD_CENTER_RST);
@@ -23,7 +23,7 @@ DashboardScreenManager::DashboardScreenManager(QueueItem* queueItem)
 	centerScreen->setTextColor(ILI9488_WHITE);
 	ILI9488* rightScreen = new ILI9488(LCD_RIGHT_CS, LCD_RIGHT_DC, LCD_RIGHT_RST);
 	rightScreen->begin();
-	rightScreen->setRotation(1);
+	rightScreen->setRotation(3);
 	rightScreen->fillScreen(ILI9488_BLACK);
 	rightScreen->setTextColor(ILI9488_WHITE);
 	// ---------------------------- LEFT SCREEN -----------------------------
