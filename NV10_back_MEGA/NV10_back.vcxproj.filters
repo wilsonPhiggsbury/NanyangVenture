@@ -15,14 +15,11 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="NV10_back.ino" />
     <None Include="Back_Tasks.ino" />
     <None Include="Utilities.ino" />
+    <None Include="NV10_back_MEGA.ino" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="__vm\.NV10_back.vsarduino.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Behaviour.h">
       <Filter>Header Files</Filter>
     </ClInclude>

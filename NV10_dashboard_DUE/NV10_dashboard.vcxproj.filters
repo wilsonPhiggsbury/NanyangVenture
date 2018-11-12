@@ -15,13 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="NV10_dashboard.ino" />
     <None Include="Dashboard_Tasks.ino" />
+    <None Include="NV10_dashboard_DUE.ino" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="__vm\.NV10_dashboard.vsarduino.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Bitmaps.h">
       <Filter>Header Files</Filter>
     </ClInclude>
