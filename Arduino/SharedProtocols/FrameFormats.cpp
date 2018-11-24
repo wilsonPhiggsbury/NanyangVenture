@@ -7,7 +7,7 @@
 10 -> terminate transmission for one datapoint (soft termination)
 11 -> terminate transmission for one full string (hard termination)
 
-"message type bits": 3 bits needed for message type.							ID[4:2], shift left by 2
+"message type bits": 4 bits needed for message type.							ID[4:2], shift left by 2
 0 -> display FC
 1 -> display CS
 2 -> display SM (include throttle?)

@@ -9,26 +9,28 @@ Author:	MX
 
 #include <SPI.h>
 
-void QueueOutputData(void *pvParameters __attribute__((unused)));
-MCP_CAN CANObj = MCP_CAN(48);
+unsigned long id = 0xFF;
+void TaskSend(void *pvParameters __attribute__((unused)));
+MCP_CAN CAN0 = MCP_CAN(4);
 bool CAN_incoming = false;
 void CAN_ISR();
 void setup() {
 	Serial.begin(9600);
 	delay(1000);
-	if (CANObj.begin(CAN_1000KBPS) == CAN_OK)
+	if (CAN0.begin(MCP_STDEXT, CAN_500KBPS, MCP_16MHZ) == CAN_OK)
 	{
 		Serial.println("CAN sender MEGA initialized.");
+		CAN0.setMode(MCP_NORMAL);
 	}
 	else
 	{
 		Serial.println("CAN INIT fail");
 		while (1);
 	}
-	attachInterrupt(digitalPinToInterrupt(19), CAN_ISR, FALLING);
+	attachInterrupt(digitalPinToInterrupt(3), CAN_ISR, FALLING);
 
 	xTaskCreate(
-		QueueOutputData
+		TaskSend
 		, (const portCHAR *)"Enqueue"  // A name just for humans
 		, 400  // This stack size can be checked & adjusted by reading the Stack Highwater
 		, NULL
@@ -41,9 +43,9 @@ void loop() {
 
 }
 
-void QueueOutputData(void *pvParameters __attribute__((unused)))  // This is a Task.
+void TaskSend(void *pvParameters __attribute__((unused)))  // This is a Task.
 {
-	uint8_t msgLength = 8;
+	byte msgLength = 8;
 	byte outBuffer[8];
 	char data[8] = "MEGA_YO";
 
@@ -54,19 +56,21 @@ void QueueOutputData(void *pvParameters __attribute__((unused)))  // This is a T
 		{
 			outBuffer[i] = data[i];
 		}
-		byte sndStat = CANObj.sendMsgBuf(0x004, 0, 8, outBuffer);
+		byte sndStat = CAN0.sendMsgBuf(id++, 0, 8, outBuffer);
+		if (id > 0x1E0)id = 0xF0;
 		if (sndStat == CAN_OK) {
-			Serial.println("Message Sent Successfully!");
+			Serial.print("ID: ");
+			Serial.println(id, HEX);
 		}
 		else {
 			Serial.println("Error Sending Message...");
 		}
-		vTaskDelay(pdMS_TO_TICKS(150));   // send payload per 2000ms
+		vTaskDelay(pdMS_TO_TICKS(5));   // send payload per 2000ms
 	}
 }
 void CAN_ISR()
 {
-	if (CANObj.checkError() == CAN_OK)
+	if (CAN0.checkError() == CAN_OK)
 	{
 		CAN_incoming = true;
 	}

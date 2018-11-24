@@ -98,29 +98,3 @@ private:
 	//MCP_CAN* CANObj;
 	void addItem_(uint8_t messageType, uint8_t terminatorStatus, float payload1, float payload2, bool using_payload2);
 };
-/*
---- About Frame IDs ---															ID[10:0]
-"terminator status bits": 2 bits needed for indication of terminating frame.	ID[1:0]
-00 -> start of stream, carries timestamp
-01 -> normal frame in middle of stream
-10 -> terminate transmission for one datapoint (soft termination)
-11 -> terminate transmission for one full string (hard termination)
-
-"message type bits": 3 bits needed for message type.							ID[4:2], shift left by 2
-0 -> display FC
-1 -> display CS
-2 -> display SM (include throttle?)
-3 -> *reserved for display payload*
-4 -> buttons
-5 -> *reserved*
-6 -> *reserved*
-7 -> *reserved*
-
---- About Frame Length ---
-From NV10_dashboard:
-length 4 for headlights, wiper, Lsig, Rsig
-From NV10_back:
-length 4 means frame contains 1 float
-length 8 means frame contains 2 float
-
-*/
