@@ -3,13 +3,8 @@ Name:		CANtoSerial_UNO.ino
 Created:	6/24/2018 11:37:49 PM
 Author:	MX
 */
-#include <mcp_can_dfs.h>
-#include <mcp_can.h>
-#include <Arduino_FreeRTOS.h>
 #include <Adafruit_GFX.h>
-#include "FrameFormats.h"
-
-#include <SPI.h>
+#include <CAN_Serializer.h>
 
 // This sketch is meant for ATmega328P on breadboard, see "files for Arduino IDE" for the "ATmega328 on a breadboard (8 MHz internal clock)" board option
 // Also useable on a normal Arduino UNO if the board option not found
@@ -17,82 +12,52 @@ Author:	MX
 // low fuse:		0xE2
 // high fuse:		0xDA
 
-void TaskReceiveCAN(void *pvParameters __attribute__((unused)));
-MCP_CAN CANObj = MCP_CAN(4);
-volatile int CAN_incoming = 0;
+CAN_Serializer serializer = CAN_Serializer(7);//4
+QueueItem out, in;
+char str[MAX_STRING_LEN];
+
 void CAN_ISR();
 void setup() {
 	Serial.begin(9600);
 	delay(100);
-	if (CANObj.begin(NV_CANSPEED) == CAN_OK)
-	{
-		Serial.print("Y");
-	}
-	else
-	{
-		Serial.print("N");
-	}
-	attachInterrupt(digitalPinToInterrupt(3), CAN_ISR, FALLING);
-
-	xTaskCreate(
-		TaskReceiveCAN
-		, (const portCHAR *)"Enqueue"  // A name just for humans
-		, 800  // This stack size can be checked & adjusted by reading the Stack Highwater
-		, NULL
-		, 1  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
-		, NULL);
-
+	serializer.init();
+	serializer.onlyListenFor(BT);
+	attachInterrupt(digitalPinToInterrupt(20), CAN_ISR, FALLING);//3
 }
 
 void loop() {
-
-}
-
-void TaskReceiveCAN(void *pvParameters __attribute__((unused)))  // This is a Task.
-{
-	unsigned long id;
-	byte len;
-	byte inBuffer[8];
-
-	QueueItem incoming;
-	NV_CanFrames frames;
-	while (1) // A Task shall never return or exit.
+	// anything to send?
+	if (Serial.available())
 	{
-		if (CAN_incoming == 1)
+		int bytesRead = Serial.readBytesUntil('\n', str, MAX_STRING_LEN);
+		if (bytesRead > 0)
+			str[bytesRead - 1] = '\0';
+		// --------------------------- covert to intermediate representation "QueueItem" --------------------------------
+		bool convertSuccess = QueueItem::toQueueItem(str, &out);
+		if (convertSuccess)
 		{
-			// ------------------------------ covert CAN frames into String for Serial -----------------------------------
-			CANObj.readMsgBufID(&id, &len, inBuffer);
-			bool isLastFrame = frames.addItem(id, len, inBuffer);
-			if (isLastFrame)
+			if (!serializer.send(&out))
 			{
-				bool convertSuccess = frames.toQueueItem(&incoming);
-				if (convertSuccess)
-				{
-					// print data
-					char payload[MAX_STRING_LEN];
-					incoming.toString(payload);
-					Serial.println(payload);
-				}
-				frames.clear();
+				Serial.println(F("!!"));
 			}
-
-			CAN_incoming = false;
 		}
-		else if (CAN_incoming == -1)
+		else
 		{
-			Serial.println("~");
-			vTaskDelay(50);
+			//Serial.println(F("Can't convert to queueitem."));
 		}
 	}
+	// anything to receive?
+	bool received = serializer.recv(&in);
+	if (received)
+	{
+		in.toString(str);
+		Serial.println(str);
+	}
+	// pulse one frame out
+	serializer.sendOneFrame();
 }
 void CAN_ISR()
 {
-	if (CANObj.checkError() == CAN_OK)
-	{
-		CAN_incoming = 1;
-	}
-	else
-	{
-		CAN_incoming = -1;
-	}
+	// pulse one frame in
+	serializer.recvOneFrame();
 }

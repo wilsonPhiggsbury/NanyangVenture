@@ -51,12 +51,12 @@ void TaskGenerate(void *pvParameters __attribute__((unused)))
 		dummyData(&out, CS);
 		xQueueSend(queueForCAN, &out, 100);
 		vTaskDelay(10);
-		dummyData(&out, CS);
+		dummyData(&out, SM);
 		xQueueSend(queueForCAN, &out, 100);
 		vTaskDelay(10);
-		dummyData(&out, CS);
+		dummyData(&out, BT);
 		xQueueSend(queueForCAN, &out, 100);
-		vTaskDelay(10);
+		vTaskDelay(80);
 	}
 }
 

@@ -8,7 +8,6 @@ Author:	MX
 #include <Arduino_FreeRTOS.h>
 #include <queue.h>
 #include <CAN_Serializer.h>
-#include <SPI.h>
 
 void TaskGenerate(void *pvParameters __attribute__((unused)));
 void TaskSend(void *pvParameters __attribute__((unused)));
@@ -26,7 +25,7 @@ void setup() {
 	xTaskCreate(
 		TaskGenerate
 		, (const portCHAR *)"Enqueue"  // A name just for humans
-		, 600  // This stack size can be checked & adjusted by reading the Stack Highwater
+		, 200  // This stack size can be checked & adjusted by reading the Stack Highwater
 		, NULL
 		, 2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
 		, NULL);
@@ -50,13 +49,13 @@ void TaskGenerate(void *pvParameters __attribute__((unused)))
 	{
 		dummyData(&out, CS);
 		xQueueSend(queueForCAN, &out, 100);
-		vTaskDelay(100);
-		dummyData(&out, CS);
+		vTaskDelay(5);
+		dummyData(&out, BT);
 		xQueueSend(queueForCAN, &out, 100);
-		vTaskDelay(100);
-		dummyData(&out, CS);
+		vTaskDelay(5);
+		dummyData(&out, SM);
 		xQueueSend(queueForCAN, &out, 100);
-		vTaskDelay(100);
+		vTaskDelay(50);
 	}
 }
 
