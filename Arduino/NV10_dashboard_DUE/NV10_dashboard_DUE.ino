@@ -10,7 +10,7 @@
 #include <FreeRTOS_ARM.h>
 #include <SPI.h>
 #include <ILI9488.h>
-#include "Wiring_Dashboard.h"
+#include "Pins_Dashboard.h"
 // dependent header files
 #include "FrameFormats.h"
 // ----------------------
@@ -221,18 +221,8 @@ vTaskDelay(pdMS_TO_TICKS(300));
 void dummyData(QueueItem* q, DataSource id) {
 	q->ID = id;
 	int i, j;
-	switch (id)
-	{
-	case FC:
-		i = 2; j = 8;
-		break;
-	case CS:
-		i = 3; j = 2;
-		break;
-	case SM:
-		i = 1; j = 1;
-		break;
-	}
+	i = FRAME_INFO_SETS[id];
+	j = FRAME_INFO_SUBSETS[id];
 	for (int _i = 0; _i < i; _i++)
 	{
 		for (int _j = 0; _j < j; _j++)
@@ -251,7 +241,7 @@ void dummyData(QueueItem* q, DataSource id) {
 		q->data[2][0] = random(45, 60);
 		break;
 	case SM:
-		
+
 		break;
 	}
 

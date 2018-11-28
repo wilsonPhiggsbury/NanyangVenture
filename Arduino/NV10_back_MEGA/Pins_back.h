@@ -6,8 +6,8 @@
 
 // internal use, no exterior connections should be made to these pins
 #define SD_SPI_CS_PIN 4			// used by shield for SD card
-#define CAN_CS_PIN 48			// used by CAN shield
-#define CAN_INTERRUPT_PIN 19
+#define CAN_CS_PIN 48			// used by CAN shield48
+#define CAN_INT_PIN 19
 //#define TFT1_SPI_RS 23
 //#define TFT1_SPI_RST 25
 //#define TFT1_SPI_CS 27
@@ -17,8 +17,8 @@
 // rear peripherals
 #define SPEEDOMETER_INTERRUPT_PIN 18
 #define BRAKE_PIN 45
-#define L_SIGNAL_PIN 46
-#define R_SIGNAL_PIN 47
+#define LSIG_PIN 46
+#define RSIG_PIN 47
 
 // current sensor inputs
 #define CAP_IN_VPIN A0

@@ -8,14 +8,14 @@
 #else
 	#include "WProgram.h"
 #endif
-#include "FrameFormats.h"
+#include <Constants.h>
 class Speedometer
 {
 public:
 	Speedometer(uint8_t id, uint16_t diameter);
 	void storeWheelInterval();
 	static void dumpTimestampInto(unsigned long * location);
-	void dumpDataInto(float location[QUEUEITEM_DATAPOINTS][QUEUEITEM_READVALUES]);
+	void dumpDataInto(float location[NUM_DATASETS][NUM_DATASUBSETS]);
 	float calculateSpeed_MS();
 private:
 	float predictableCounter = 0;

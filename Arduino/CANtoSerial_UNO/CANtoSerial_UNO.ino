@@ -3,7 +3,6 @@ Name:		CANtoSerial_UNO.ino
 Created:	6/24/2018 11:37:49 PM
 Author:	MX
 */
-#include <Adafruit_GFX.h>
 #include <CAN_Serializer.h>
 
 // This sketch is meant for ATmega328P on breadboard, see "files for Arduino IDE" for the "ATmega328 on a breadboard (8 MHz internal clock)" board option
@@ -21,7 +20,7 @@ void setup() {
 	Serial.begin(9600);
 	delay(100);
 	serializer.init();
-	serializer.onlyListenFor(BT);
+	//serializer.onlyListenFor(BT);
 	attachInterrupt(digitalPinToInterrupt(20), CAN_ISR, FALLING);//3
 }
 

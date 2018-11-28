@@ -1,6 +1,6 @@
 #pragma once
 #define CAN_CS_PIN 4
-#define CAN_INTERRUPT_PIN 3
+#define CAN_INT_PIN 3
 #define CAN_RST_PIN 28
 
 #define LCD_LEFT_CS 10

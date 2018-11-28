@@ -19,7 +19,7 @@ void Speedometer::dumpTimestampInto(unsigned long* location)
 {
 	*location = timeStamp;
 }
-void Speedometer::dumpDataInto(float location[QUEUEITEM_DATAPOINTS][QUEUEITEM_READVALUES])
+void Speedometer::dumpDataInto(float location[NUM_DATASETS][NUM_DATASUBSETS])
 {
 	processData();
 	// expect QueueItem.payload to come in

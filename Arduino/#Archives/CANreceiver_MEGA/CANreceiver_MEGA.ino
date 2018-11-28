@@ -12,7 +12,7 @@ Author:	MX
 void TaskGenerate(void *pvParameters __attribute__((unused)));
 void TaskSend(void *pvParameters __attribute__((unused)));
 QueueHandle_t queueForCAN = xQueueCreate(1, sizeof(QueueItem));
-CAN_Serializer serializer = CAN_Serializer(7);
+CAN_Serializer serializer = CAN_Serializer(48);
 bool CAN_incoming = false;
 void CAN_ISR();
 void setup() {
@@ -20,7 +20,7 @@ void setup() {
 	delay(1000);
 	serializer.init();
 	Serial.println("CAN Sender.");
-	attachInterrupt(digitalPinToInterrupt(20), CAN_ISR, FALLING);
+	attachInterrupt(digitalPinToInterrupt(19), CAN_ISR, FALLING);
 
 	xTaskCreate(
 		TaskGenerate
@@ -53,7 +53,7 @@ void TaskGenerate(void *pvParameters __attribute__((unused)))
 		dummyData(&out, BT);
 		xQueueSend(queueForCAN, &out, 100);
 		vTaskDelay(5);
-		dummyData(&out, SM);
+		dummyData(&out, FC);
 		xQueueSend(queueForCAN, &out, 100);
 		vTaskDelay(50);
 	}

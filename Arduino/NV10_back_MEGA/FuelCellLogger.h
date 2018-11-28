@@ -10,7 +10,7 @@
 
 #define RX_BUFFER_LEN 100
 
-#include "FrameFormats.h"
+#include <Constants.h>
 
 class HESFuelCell
 {
@@ -47,7 +47,7 @@ class HESFuelCell
 	 static void setPath(char* thePath);
 	 void logData();
 	 static void dumpTimestampInto(unsigned long * location);
-	 void dumpDataInto(float location[QUEUEITEM_DATAPOINTS][QUEUEITEM_READVALUES]);
+	 void dumpDataInto(float location[NUM_DATASETS][NUM_DATASUBSETS]);
 	 bool hasUpdated();
 };
 

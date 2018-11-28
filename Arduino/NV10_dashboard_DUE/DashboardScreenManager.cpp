@@ -2,7 +2,7 @@
 #include "DisplayBar.h"
 #include "DisplayText.h"
 #include "DisplayGauge.h"
-#include "Wiring_Dashboard.h"
+#include "Pins_Dashboard.h"
 
 static const int screenWidth = 480;
 static const int screenHeight = 320;

@@ -79,7 +79,7 @@ void QueueOutputData(void *pvParameters)
 			}
 			xQueueSend(queueForLogSend, &outgoing, 100);
 			if(CAN_avail)
-				xQueueSend(queueForSendCAN, &outgoing, 0);
+				xQueueSend(queueForCAN, &outgoing, 100);
 		}
 
 
@@ -100,7 +100,7 @@ void QueueOutputData(void *pvParameters)
 			}
 			xQueueSend(queueForLogSend, &outgoing, 100);
 			if(CAN_avail)
-				xQueueSend(queueForSendCAN, &outgoing, 0);
+				xQueueSend(queueForCAN, &outgoing, 100);
 			//if (syncCounter % (back_lcd_refresh) == 0)
 			//{
 			//	for (int i = 0; i < NUM_CURRENTSENSORS; i++)
@@ -122,7 +122,7 @@ void QueueOutputData(void *pvParameters)
 			speedo.dumpDataInto(outgoing.data);
 			xQueueSend(queueForLogSend, &outgoing, 100);
 			if(CAN_avail)
-				xQueueSend(queueForSendCAN, &outgoing, 100);
+				xQueueSend(queueForCAN, &outgoing, 100);
 		}
 		vTaskDelay(delay);
 	}
@@ -131,6 +131,7 @@ void QueueOutputData(void *pvParameters)
 void LogSendData(void *pvParameters __attribute__((unused)))  // This is a Task.
 {
 	QueueItem received;
+	char data[MAX_STRING_LEN];
 	TickType_t delay = pdMS_TO_TICKS(LOGSEND_INTERVAL); // delay 300 ms, shorter than reading/queueing tasks since this task has lower priority
 
 	while (1)
@@ -138,9 +139,6 @@ void LogSendData(void *pvParameters __attribute__((unused)))  // This is a Task.
 		BaseType_t success = xQueueReceive(queueForLogSend, &received, 100);
 		if (success == pdPASS)
 		{
-			// Make container for string representation of queueItem payload
-			// 3 for short name, 9 for timestamp, remaining for all the floats and delimiters like \t " "
-			char data[MAX_STRING_LEN];
 			received.toString(data);
 
 			// -------------- Store into SD -------------
@@ -150,15 +148,12 @@ void LogSendData(void *pvParameters __attribute__((unused)))  // This is a Task.
 				strcpy(path + FILENAME_HEADER_LENGTH, frameType_shortNames[received.ID]);
 				strcat(path, ".txt");
 				// DO NOT SWITCH OUT THIS TASK IN THE MIDST OF WRITING A FILE ON SD CARD
-				// (consequence: some serial payload may be missed. Hang or miss payload? Tough choice...)
-				// ^^^^ this is probably fixed, if verified delete this line ^^^^
 				vTaskSuspendAll();
 				File writtenFile = SD.open(path, FILE_WRITE);
 				writtenFile.println(data);
 				writtenFile.close();
 				xTaskResumeAll();
-				// *path should only remain as /LOG_****/
-				// clean up after use
+				// *path should only remain as /LOG_****/, clean up after use
 				strcpy(path + FILENAME_HEADER_LENGTH, "");
 			}
 
@@ -169,71 +164,79 @@ void LogSendData(void *pvParameters __attribute__((unused)))  // This is a Task.
 		vTaskDelay(delay);
 	}
 }
-//void DisplayData(void *pvParameters)
-//{
-//	QueueItem received;
-//	LiquidCrystal_I2C lcdScreen = LiquidCrystal_I2C(LCD1_I2C_ADDR, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);
-//	DisplayLCD lcdManager = DisplayLCD(lcdScreen);
-//
-//	TickType_t delay = pdMS_TO_TICKS(DISPLAY_INTERVAL);
-//
-//	while (1)
-//	{
-//		BaseType_t success;
-//		while (xQueueReceive(queueForDisplay, &received, 0) == pdPASS)
-//		{
-//			lcdManager.printData(received);
-//		}
-//		vTaskDelay(delay);
-//	}
-//}
-void SendCANFrame(void *pvParameters __attribute__((unused)))  // This is a Task.
+void TaskBlink(void* pvParameters)
 {
-	QueueItem received;
-	TickType_t delay = pdMS_TO_TICKS(CAN_FRAME_INTERVAL); // delay 150 ms, shorter than reading/queueing tasks since this task has lower priority
-	
+	bool lsigOn = false, rsigOn = false;
+	//pinMode(LSIG_PIN, OUTPUT);
+	//pinMode(RSIG_PIN, OUTPUT);
+	lstrip.begin();
+	rstrip.begin();
+	lstrip.setBrightness(64);
+	rstrip.setBrightness(64);
 	while (1)
 	{
-		BaseType_t success = xQueueReceive(queueForSendCAN, &received, 0);
-
-		// we are going to encode 2 floats into 1 frame (2*4bytes = 8bytes)
-		NV_CanFrames framesCollection;
-		if (success == pdPASS)
+		for (int i = 0; i < 7; i++)
 		{
-			// ------------------------  convert to frames --------------------
-			received.toFrames(&framesCollection);
-
-			for (uint8_t i = 0; i < framesCollection.getNumFrames(); i++)
+			if (peripheralStates[Hazard] == STATE_EN || peripheralStates[Lsig] == STATE_EN)
 			{
-				NV_CanFrame& thisFrame = framesCollection.frames[i];
-				byte status = CANObj.sendMsgBuf(thisFrame.id, 0, thisFrame.length, thisFrame.payload);
-
-				if (status != CAN_OK)
+				if (lsigOn)
 				{
-					// handle sending error
-					//Serial.println("FAIL SEND");
+					lsigOn = false;
+					lstrip.setPixelColor(i, 0, 0, 0);
+					lstrip.show();
 				}
-				vTaskDelay(pdMS_TO_TICKS(5));
+				else
+				{
+					lsigOn = true;
+					lstrip.setPixelColor(i, 255, 165, 0);
+					lstrip.show();
+				}
+			}
+			else
+			{
+				lsigOn = false;
+				lstrip.setPixelColor(i, 0, 0, 0);
+				lstrip.show();
 			}
 
+			if (peripheralStates[Hazard] == STATE_EN || peripheralStates[Rsig] == STATE_EN)
+			{
+				//Serial.println("RSIG ON");
+				if (rsigOn)
+				{
+					rsigOn = false;
+					rstrip.setPixelColor(i, 0, 0, 0);
+					rstrip.show();
+				}
+				else
+				{
+					rsigOn = true;
+					rstrip.setPixelColor(i, 255, 165, 0);
+					rstrip.show();
+				}
+			}
+			else
+			{
+				//Serial.println("RSIG OFF");
+				rsigOn = false;
+				rstrip.setPixelColor(i, 0, 0, 0);
+				rstrip.show();
+			}
 		}
-		vTaskDelay(delay);
-		
-		//QueueItem received2;
-		//bool convertSucess = framesCollection.toQueueItem(&received);
-		//// print converted results
-		//if (!convertSucess)
-		//{
-		//	Serial.println("CONVERSION ERROR...");
-		//	while (1);
-		//}
-		//char payload[3 + 9 + (FLOAT_TO_STRING_LEN + 1)*(QUEUEITEM_DATAPOINTS*QUEUEITEM_READVALUES) + QUEUEITEM_DATAPOINTS];
-		//received.toString(payload);
-		//Serial.println(payload);
-			
-
-			
-			
-
+		vTaskDelay(pdMS_TO_TICKS(500));
+	}
+}
+void doReceiveAction(QueueItem* q)
+{
+	// ************************* Code for signal lights ****************************
+	// similar to TaskRespond in NV10_back_MEGA.ino, without really opening a new task
+	// (since only the only thing to control is signal lights)
+	if (q->ID == BT)
+	{
+		for (int i = 0; i < NUMSTATES; i++)
+		{
+			peripheralStates[i] = q->data[0][i];
+		}
+		xTaskAbortDelay(taskBlink);
 	}
 }

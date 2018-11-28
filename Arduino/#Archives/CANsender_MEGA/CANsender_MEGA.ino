@@ -13,15 +13,15 @@ Author:	MX
 void TaskGenerate(void *pvParameters __attribute__((unused)));
 void TaskSend(void *pvParameters __attribute__((unused)));
 QueueHandle_t queueForCAN = xQueueCreate(1, sizeof(QueueItem));
-CAN_Serializer serializer = CAN_Serializer(4);
+CAN_Serializer serializer = CAN_Serializer(7);
 bool CAN_incoming = false;
 void CAN_ISR();
 void setup() {
 	Serial.begin(9600);
 	delay(1000);
 	serializer.init();
-	Serial.println("CAN Sender.");
-	attachInterrupt(digitalPinToInterrupt(3), CAN_ISR, FALLING);
+	Serial.println("CAN Full Duplex terminal COM3.");
+	attachInterrupt(digitalPinToInterrupt(20), CAN_ISR, FALLING);
 
 	xTaskCreate(
 		TaskGenerate
@@ -33,7 +33,7 @@ void setup() {
 	xTaskCreate(
 		TaskSend
 		, (const portCHAR *)"Enqueue"  // A name just for humans
-		, 1000  // This stack size can be checked & adjusted by reading the Stack Highwater
+		, 1200  // This stack size can be checked & adjusted by reading the Stack Highwater
 		, NULL
 		, 1  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
 		, NULL);
@@ -48,15 +48,14 @@ void TaskGenerate(void *pvParameters __attribute__((unused)))
 	QueueItem out;
 	while (1)
 	{
-		dummyData(&out, CS);
-		xQueueSend(queueForCAN, &out, 100);
-		vTaskDelay(10);
-		dummyData(&out, SM);
-		xQueueSend(queueForCAN, &out, 100);
-		vTaskDelay(10);
 		dummyData(&out, BT);
+		out.data[0][Lsig] = STATE_EN;
 		xQueueSend(queueForCAN, &out, 100);
-		vTaskDelay(80);
+		vTaskDelay(500);
+		dummyData(&out, BT);
+		out.data[0][Lsig] = STATE_DS;
+		xQueueSend(queueForCAN, &out, 100);
+		vTaskDelay(500);
 	}
 }
 
@@ -82,7 +81,7 @@ void TaskSend(void *pvParameters __attribute__((unused)))  // This is a Task.
 		bool received = serializer.recv(&in);
 		if (received)
 		{
-			Serial.print("RECV ");
+			//Serial.print("RECV ");
 			printQ(&in);
 		}
 		serializer.sendOneFrame();

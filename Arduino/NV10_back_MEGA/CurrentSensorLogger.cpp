@@ -28,7 +28,7 @@ void AttopilotCurrentSensor::dumpTimestampInto(unsigned long* location)
 {
 	*location = timeStamp;
 }
-void AttopilotCurrentSensor::dumpDataInto(float location[QUEUEITEM_DATAPOINTS][QUEUEITEM_READVALUES])
+void AttopilotCurrentSensor::dumpDataInto(float location[NUM_DATASETS][NUM_DATASUBSETS])
 {
 	// only convert to Volt/Amp during send, don't convert during logging as logging happens mroe frequently
 	processData();
