@@ -33,7 +33,7 @@ void setup() {
 	xTaskCreate(
 		TaskSend
 		, (const portCHAR *)"Enqueue"  // A name just for humans
-		, 600  // This stack size can be checked & adjusted by reading the Stack Highwater
+		, 1000  // This stack size can be checked & adjusted by reading the Stack Highwater
 		, NULL
 		, 1  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
 		, NULL);
@@ -50,19 +50,19 @@ void TaskGenerate(void *pvParameters __attribute__((unused)))
 	{
 		dummyData(&out, CS);
 		xQueueSend(queueForCAN, &out, 100);
-		vTaskDelay(100);
-		dummyData(&out, BT);
+		vTaskDelay(10);
+		dummyData(&out, CS);
 		xQueueSend(queueForCAN, &out, 100);
-		vTaskDelay(100);
-		dummyData(&out, SM);
+		vTaskDelay(10);
+		dummyData(&out, CS);
 		xQueueSend(queueForCAN, &out, 100);
-		vTaskDelay(100);
+		vTaskDelay(10);
 	}
 }
 
 void TaskSend(void *pvParameters __attribute__((unused)))  // This is a Task.
 {
-	QueueItem out;
+	QueueItem out, in;
 
 	while (1) // A Task shall never return or exit.
 	{
@@ -73,6 +73,17 @@ void TaskSend(void *pvParameters __attribute__((unused)))  // This is a Task.
 			{
 				Serial.println(F("Dropped frame!"));
 			}
+			else
+			{
+				Serial.print("SENT ");
+				printQ(&out);
+			}
+		}
+		bool received = serializer.recv(&in);
+		if (received)
+		{
+			Serial.print("RECV ");
+			printQ(&in);
 		}
 		serializer.sendOneFrame();
 		vTaskDelay(pdMS_TO_TICKS(5));   // send payload per 5ms
