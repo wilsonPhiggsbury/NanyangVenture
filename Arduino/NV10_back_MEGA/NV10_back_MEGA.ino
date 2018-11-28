@@ -17,7 +17,7 @@
 #include "FuelCellLogger.h"
 #include "Speedometer.h"
 
-#include "Wiring.h"
+#include "Pins_back.h"
 
 // file names
 const char FUELCELL_FILENAME[] = "FC.txt";

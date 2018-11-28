@@ -6,33 +6,34 @@ Author:	MX
 #include <mcp_can_dfs.h>
 #include <mcp_can.h>
 #include <Arduino_FreeRTOS.h>
-
+#include <queue.h>
+#include <CAN_Serializer.h>
 #include <SPI.h>
 
-unsigned long id = 0xFF;
+void TaskGenerate(void *pvParameters __attribute__((unused)));
 void TaskSend(void *pvParameters __attribute__((unused)));
-MCP_CAN CAN0 = MCP_CAN(4);
+QueueHandle_t queueForCAN = xQueueCreate(1, sizeof(QueueItem));
+CAN_Serializer serializer = CAN_Serializer(4);
 bool CAN_incoming = false;
 void CAN_ISR();
 void setup() {
 	Serial.begin(9600);
 	delay(1000);
-	if (CAN0.begin(MCP_STDEXT, CAN_500KBPS, MCP_16MHZ) == CAN_OK)
-	{
-		Serial.println("CAN sender MEGA initialized.");
-		CAN0.setMode(MCP_NORMAL);
-	}
-	else
-	{
-		Serial.println("CAN INIT fail");
-		while (1);
-	}
+	serializer.init();
+	Serial.println("CAN Sender.");
 	attachInterrupt(digitalPinToInterrupt(3), CAN_ISR, FALLING);
 
 	xTaskCreate(
+		TaskGenerate
+		, (const portCHAR *)"Enqueue"  // A name just for humans
+		, 600  // This stack size can be checked & adjusted by reading the Stack Highwater
+		, NULL
+		, 2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
+		, NULL);
+	xTaskCreate(
 		TaskSend
 		, (const portCHAR *)"Enqueue"  // A name just for humans
-		, 400  // This stack size can be checked & adjusted by reading the Stack Highwater
+		, 600  // This stack size can be checked & adjusted by reading the Stack Highwater
 		, NULL
 		, 1  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
 		, NULL);
@@ -42,36 +43,77 @@ void setup() {
 void loop() {
 
 }
+void TaskGenerate(void *pvParameters __attribute__((unused)))
+{
+	QueueItem out;
+	while (1)
+	{
+		dummyData(&out, CS);
+		xQueueSend(queueForCAN, &out, 100);
+		vTaskDelay(100);
+		dummyData(&out, BT);
+		xQueueSend(queueForCAN, &out, 100);
+		vTaskDelay(100);
+		dummyData(&out, SM);
+		xQueueSend(queueForCAN, &out, 100);
+		vTaskDelay(100);
+	}
+}
 
 void TaskSend(void *pvParameters __attribute__((unused)))  // This is a Task.
 {
-	byte msgLength = 8;
-	byte outBuffer[8];
-	char data[8] = "MEGA_YO";
+	QueueItem out;
 
 	while (1) // A Task shall never return or exit.
 	{
-		// send payload:  ID = 0x100, Standard CAN Frame, Data length = 8 bytes, 'payload' = array of payload bytes to 
-		for (int i = 0;i < 8;i++)
+		BaseType_t success = xQueueReceive(queueForCAN, &out, 0);
+		if (success)
 		{
-			outBuffer[i] = data[i];
+			if (!serializer.send(&out))
+			{
+				Serial.println(F("Dropped frame!"));
+			}
 		}
-		byte sndStat = CAN0.sendMsgBuf(id++, 0, 8, outBuffer);
-		if (id > 0x1E0)id = 0xF0;
-		if (sndStat == CAN_OK) {
-			Serial.print("ID: ");
-			Serial.println(id, HEX);
-		}
-		else {
-			Serial.println("Error Sending Message...");
-		}
-		vTaskDelay(pdMS_TO_TICKS(5));   // send payload per 2000ms
+		serializer.sendOneFrame();
+		vTaskDelay(pdMS_TO_TICKS(5));   // send payload per 5ms
 	}
 }
 void CAN_ISR()
 {
-	if (CAN0.checkError() == CAN_OK)
+	serializer.recvOneFrame();
+}
+
+void dummyData(QueueItem* q, DataSource id) {
+	q->ID = id;
+	int i, j;
+	i = FRAME_INFO_SETS[id];
+	j = FRAME_INFO_SUBSETS[id];
+	for (int _i = 0; _i < i; _i++)
 	{
-		CAN_incoming = true;
+		for (int _j = 0; _j < j; _j++)
+		{
+			q->data[_i][_j] = random(0, 10);
+		}
 	}
+	switch (id)
+	{
+	case FC:
+		q->data[0][7] = random(0, 1);
+		q->data[0][3] = random(0, 100);
+		break;
+	case CS:
+		q->data[2][1] = random(0, 40);
+		q->data[2][0] = random(45, 60);
+		break;
+	case SM:
+
+		break;
+	}
+
+}
+void printQ(QueueItem *q)
+{
+	char str[MAX_STRING_LEN];
+	q->toString(str);
+	Serial.println(str);
 }

@@ -51,7 +51,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DashboardTest", "Arduino\#T
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CANreceiver_DUE", "Arduino\#Archives\CANreceiver_DUE\CANreceiver_DUE.vcxproj", "{E68944C2-F63A-4773-B592-8415FDA8D4BE}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SharedProtocols", "Arduino\SharedProtocols\SharedProtocols.vcxitems", "{5E2B7DB2-50A1-407F-8699-A791A8CCC920}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CAN_Serializer", "..\libraries\CAN_Serializer\CAN_Serializer.vcxitems", "{D0053034-7EF4-451E-B6FA-BB852A3B0799}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MCP_CAN_lib", "..\libraries\MCP_CAN_lib\MCP_CAN_lib.vcxitems", "{BF888B28-EEF3-4922-A68F-36A1FD54B965}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -65,7 +67,6 @@ Global
 		Arduino\SharedProtocols\SharedProtocols.vcxitems*{3313debc-fd6f-45c2-a323-b7f691565980}*SharedItemsImports = 4
 		..\..\ide\hardware\arduino\avr\libraries\Wire\Wire.vcxitems*{50699b74-4b7a-418a-bcd4-33d264bfe581}*SharedItemsImports = 9
 		..\libraries\ILI9488\ILI9488.vcxitems*{5c6172fd-ce53-4a19-9733-98b83addeef5}*SharedItemsImports = 9
-		Arduino\SharedProtocols\SharedProtocols.vcxitems*{5e2b7db2-50a1-407f-8699-a791a8ccc920}*SharedItemsImports = 9
 		..\libraries\FreeRTOS\FreeRTOS.vcxitems*{606a1460-864b-450d-ba10-221513a5b956}*SharedItemsImports = 4
 		Arduino\SharedProtocols\SharedProtocols.vcxitems*{606a1460-864b-450d-ba10-221513a5b956}*SharedItemsImports = 4
 		..\..\ide\portable\packages\arduino\hardware\sam\1.6.11\libraries\SPI\SPI.vcxitems*{6bf971b4-9758-41f0-a084-398e99c260f7}*SharedItemsImports = 4
@@ -78,11 +79,15 @@ Global
 		Arduino\SharedProtocols\SharedProtocols.vcxitems*{7ed24bf0-127d-4fc9-843e-85d8ba0529c7}*SharedItemsImports = 4
 		..\..\ide\hardware\arduino\avr\libraries\SPI\SPI.vcxitems*{8b3a2447-325c-473e-a84c-45b578507bd3}*SharedItemsImports = 4
 		..\..\ide\libraries\SD\SD.vcxitems*{8b3a2447-325c-473e-a84c-45b578507bd3}*SharedItemsImports = 4
-		Arduino\SharedProtocols\SharedProtocols.vcxitems*{8b3a2447-325c-473e-a84c-45b578507bd3}*SharedItemsImports = 4
+		..\libraries\CAN_Serializer\CAN_Serializer.vcxitems*{8b3a2447-325c-473e-a84c-45b578507bd3}*SharedItemsImports = 4
 		..\libraries\Adafruit_GFX_Library\Adafruit_GFX_Library.vcxitems*{8c1a22a5-7653-42a6-b3dd-80639fa902d1}*SharedItemsImports = 9
+		..\libraries\CAN_Serializer\CAN_Serializer.vcxitems*{8d011ae1-9a38-4688-b43b-08794e403492}*SharedItemsImports = 4
 		..\..\ide\portable\packages\arduino\hardware\sam\1.6.11\libraries\Wire\Wire.vcxitems*{a7192e66-f105-4569-885c-47923cd5f91a}*SharedItemsImports = 9
+		..\libraries\MCP_CAN_lib\MCP_CAN_lib.vcxitems*{bf888b28-eef3-4922-a68f-36a1fd54b965}*SharedItemsImports = 9
+		..\libraries\CAN_Serializer\CAN_Serializer.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		..\libraries\CAN_Serializer\CAN_Serializer.vcxitems*{d0053034-7ef4-451e-b6fa-bb852a3b0799}*SharedItemsImports = 9
+		..\libraries\CAN_Serializer\CAN_Serializer.vcxitems*{e0f75ac7-15bb-4c7a-98cd-37a96c9641a3}*SharedItemsImports = 4
 		..\libraries\FreeRTOS\FreeRTOS.vcxitems*{e0f75ac7-15bb-4c7a-98cd-37a96c9641a3}*SharedItemsImports = 4
-		Arduino\SharedProtocols\SharedProtocols.vcxitems*{e0f75ac7-15bb-4c7a-98cd-37a96c9641a3}*SharedItemsImports = 4
 		..\..\ide\libraries\SD\SD.vcxitems*{fa968cf9-c643-4453-a136-bded4e20b71a}*SharedItemsImports = 9
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -152,6 +157,8 @@ Global
 		{606A1460-864B-450D-BA10-221513A5B956} = {D73944EA-C027-4B9A-B26C-CF8857527539}
 		{6BF971B4-9758-41F0-A084-398E99C260F7} = {D73944EA-C027-4B9A-B26C-CF8857527539}
 		{E68944C2-F63A-4773-B592-8415FDA8D4BE} = {1FB7B7BF-5932-4D7F-AD43-1C2487269B5E}
+		{D0053034-7EF4-451E-B6FA-BB852A3B0799} = {B731DFF7-A7B2-4F18-831B-D04250650B2F}
+		{BF888B28-EEF3-4922-A68F-36A1FD54B965} = {B731DFF7-A7B2-4F18-831B-D04250650B2F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D50621B3-45DA-4D63-A156-3461EB4C4703}
