@@ -1,7 +1,7 @@
 
 bool initSD(char* path)
 {
-	const uint8_t FILENAME_INDEX = 4;
+	const uint8_t FILENAME_DIGITS = 4;
 	if (!SD.begin(SD_SPI_CS_PIN))
 	{
 		return false;
@@ -13,8 +13,7 @@ bool initSD(char* path)
 	// Comb through existing files in SD card to obtain the latest index. Use it to name our new folder.
 	File f = SD.open("/");
 	File sub;
-	char index[FILENAME_INDEX + 1] = "";
-	int existingIndex = atoi(index);
+	int existingIndex = 0; // start from index 0
 	while (sub = f.openNextFile())
 	{
 		if (sub.isDirectory())
@@ -23,20 +22,22 @@ bool initSD(char* path)
 			existingIndex = max(thisIndex, existingIndex);
 		}
 	}
-	
-	// pad '0' on the front if number contains less than 4 digits
-	uint8_t paddingZeroCounter = FILENAME_INDEX;
-	int existingIndex_tmp = existingIndex + 1;
-	while (existingIndex_tmp > 0)
-	{
-		existingIndex_tmp /= 10;
-		paddingZeroCounter--;
-	}
 
-	for (uint8_t i = 0; i < paddingZeroCounter; i++)
-		index[i] = '0';
-	if(paddingZeroCounter != FILENAME_INDEX)
-		itoa(existingIndex+1, index+paddingZeroCounter, DEC);
+	// pad '0' on the front if number contains less than 4 digits
+	char index[FILENAME_DIGITS + 1];
+	sprintf(index, "%04d", existingIndex + 1);
+	//uint8_t paddingZeroCounter = FILENAME_DIGITS;
+	//int existingIndex_tmp = existingIndex + 1;
+	//while (existingIndex_tmp > 0)
+	//{
+	//	existingIndex_tmp /= 10;
+	//	paddingZeroCounter--;
+	//}
+
+	//for (uint8_t i = 0; i < paddingZeroCounter; i++)
+	//	index[i] = '0';
+	//if(paddingZeroCounter != FILENAME_DIGITS)
+	//	itoa(existingIndex+1, index+paddingZeroCounter, DEC);
 
 	f.close();
 	sub.close();

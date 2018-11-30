@@ -1,12 +1,10 @@
 #pragma once
 
-#define LCD1_I2C_ADDR 0x27
-
 // Wiring naming convention: DEVICE_PINTYPE_PINNAME
 
 // internal use, no exterior connections should be made to these pins
 #define SD_SPI_CS_PIN 4			// used by shield for SD card
-#define CAN_CS_PIN 48			// used by CAN shield48
+#define CAN_CS_PIN 48			// used by CAN shield
 #define CAN_INT_PIN 19
 //#define TFT1_SPI_RS 23
 //#define TFT1_SPI_RST 25

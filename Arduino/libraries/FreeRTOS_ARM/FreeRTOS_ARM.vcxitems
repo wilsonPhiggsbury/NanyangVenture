@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding ="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" >
+  <PropertyGroup Label="Globals" >
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <ItemsProjectGuid>{1a2bb78a-9ab3-45b7-abfc-2430b4752132}</ItemsProjectGuid>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\assertMsg.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\basic_io_arm.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\FreeRTOS_ARM.c" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\utility\croutine.c" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\utility\event_groups.c" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\utility\heap_3.c" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\utility\list.c" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\utility\port.c" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\utility\queue.c" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\utility\tasks.c" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\utility\timers.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\basic_io_arm.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\FreeRTOS_ARM.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\utility\croutine.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\utility\deprecated_definitions.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\utility\event_groups.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\utility\FreeRTOS.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\utility\FreeRTOSConfig.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\utility\list.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\utility\mpu_wrappers.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\utility\portable.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\utility\portmacro.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\utility\projdefs.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\utility\queue.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\utility\semphr.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\utility\StackMacros.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\utility\task.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\utility\timers.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="$(MSBuildThisFileDirectory)library.properties" />
+<Text Include="$(MSBuildThisFileDirectory)src\utility\readme.txt" />
+<Text Include="$(MSBuildThisFileDirectory)vs-readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)src\utility\stdint.readme" />
+  </ItemGroup>
+</Project>

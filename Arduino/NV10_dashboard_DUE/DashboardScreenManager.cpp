@@ -112,6 +112,7 @@ void DashboardScreenManager::refreshScreens()
 {
 	for (int i = 0; i < 14; i++)
 	{
+		// handle fuel cell status text box 
 		if (i == 11)
 		{
 			if (q->ID == FC)

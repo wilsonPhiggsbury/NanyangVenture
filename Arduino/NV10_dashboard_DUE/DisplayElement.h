@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 #include "ILI9488.h"
-#include "FrameFormats.h"
+#include <CAN_Serializer.h>
 extern "C" void __cxa_pure_virtual(void);
 typedef enum {
 	alignLeft,

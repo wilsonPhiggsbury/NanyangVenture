@@ -11,7 +11,7 @@
 #include "Pins_front.h"
 Adafruit_NeoPixel lstrip = Adafruit_NeoPixel(7, LSIG_PIN, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel rstrip = Adafruit_NeoPixel(7, RSIG_PIN, NEO_GRB + NEO_KHZ800);
-CAN_Serializer serializer = CAN_Serializer(CAN_CS_PIN);
+CAN_Serializer serializer;
 
 /*
 peripheralStates:
@@ -37,8 +37,8 @@ QueueHandle_t queueForCAN = xQueueCreate(1, sizeof(QueueItem));
 TaskHandle_t taskBlink, taskMoveWiper, taskToggle;
 void setup() {
 	Serial.begin(9600);
-	serializer.init();
 
+	serializer.init(CAN_CS_PIN);
 	attachInterrupt(digitalPinToInterrupt(CAN_INT_PIN), CAN_ISR, FALLING);
 	
 	xTaskCreate(

@@ -201,7 +201,6 @@ void TaskBlink(void* pvParameters)
 
 			if (peripheralStates[Hazard] == STATE_EN || peripheralStates[Rsig] == STATE_EN)
 			{
-				//Serial.println("RSIG ON");
 				if (rsigOn)
 				{
 					rsigOn = false;
@@ -217,7 +216,6 @@ void TaskBlink(void* pvParameters)
 			}
 			else
 			{
-				//Serial.println("RSIG OFF");
 				rsigOn = false;
 				rstrip.setPixelColor(i, 0, 0, 0);
 				rstrip.show();
@@ -229,8 +227,7 @@ void TaskBlink(void* pvParameters)
 void doReceiveAction(QueueItem* q)
 {
 	// ************************* Code for signal lights ****************************
-	// similar to TaskRespond in NV10_back_MEGA.ino, without really opening a new task
-	// (since only the only thing to control is signal lights)
+	// kick up the blinking task and tell it to start or stop rightaway
 	if (q->ID == BT)
 	{
 		for (int i = 0; i < NUMSTATES; i++)

@@ -45,8 +45,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CANsender_MEGA", "Arduino\#
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LookupTable", "Arduino\#Archives\LookupTable\LookupTable.vcxproj", "{BDC82998-34FD-4847-9807-8AB2DBE47408}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CANsender", "Arduino\#TestSuites\CANsender\CANsender.vcxproj", "{606A1460-864B-450D-BA10-221513A5B956}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DashboardTest", "Arduino\#TestSuites\DashboardTest\DashboardTest.vcxproj", "{6BF971B4-9758-41F0-A084-398E99C260F7}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CANreceiver_DUE", "Arduino\#Archives\CANreceiver_DUE\CANreceiver_DUE.vcxproj", "{E68944C2-F63A-4773-B592-8415FDA8D4BE}"
@@ -59,6 +57,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MemoryFree", "..\libraries\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Adafruit_NeoPixel", "..\libraries\Adafruit_NeoPixel\Adafruit_NeoPixel.vcxitems", "{34BA6DAD-9412-4277-92F0-C1477FF871D3}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DUE_comms_test", "Arduino\#TestSuites\DUE_comms_test\DUE_comms_test.vcxproj", "{D8187EE3-2CA8-4B1B-92E4-CCB0901F1F40}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\libraries\FreeRTOS_ARM\FreeRTOS_ARM.vcxitems*{1a2bb78a-9ab3-45b7-abfc-2430b4752132}*SharedItemsImports = 9
@@ -66,14 +66,12 @@ Global
 		..\libraries\FreeRTOS_AVR\FreeRTOS_AVR.vcxitems*{2e764fb8-a6c5-413e-bc90-5dd0d0dd1db8}*SharedItemsImports = 9
 		..\..\ide\portable\packages\arduino\hardware\sam\1.6.11\libraries\SPI\SPI.vcxitems*{3313debc-fd6f-45c2-a323-b7f691565980}*SharedItemsImports = 4
 		..\libraries\Adafruit_GFX_Library\Adafruit_GFX_Library.vcxitems*{3313debc-fd6f-45c2-a323-b7f691565980}*SharedItemsImports = 4
+		..\libraries\CAN_Serializer\CAN_Serializer.vcxitems*{3313debc-fd6f-45c2-a323-b7f691565980}*SharedItemsImports = 4
 		..\libraries\FreeRTOS_ARM\FreeRTOS_ARM.vcxitems*{3313debc-fd6f-45c2-a323-b7f691565980}*SharedItemsImports = 4
 		..\libraries\ILI9488\ILI9488.vcxitems*{3313debc-fd6f-45c2-a323-b7f691565980}*SharedItemsImports = 4
-		Arduino\SharedProtocols\SharedProtocols.vcxitems*{3313debc-fd6f-45c2-a323-b7f691565980}*SharedItemsImports = 4
 		..\libraries\Adafruit_NeoPixel\Adafruit_NeoPixel.vcxitems*{34ba6dad-9412-4277-92f0-c1477ff871d3}*SharedItemsImports = 9
 		..\..\ide\hardware\arduino\avr\libraries\Wire\Wire.vcxitems*{50699b74-4b7a-418a-bcd4-33d264bfe581}*SharedItemsImports = 9
 		..\libraries\ILI9488\ILI9488.vcxitems*{5c6172fd-ce53-4a19-9733-98b83addeef5}*SharedItemsImports = 9
-		..\libraries\FreeRTOS\FreeRTOS.vcxitems*{606a1460-864b-450d-ba10-221513a5b956}*SharedItemsImports = 4
-		Arduino\SharedProtocols\SharedProtocols.vcxitems*{606a1460-864b-450d-ba10-221513a5b956}*SharedItemsImports = 4
 		..\..\ide\portable\packages\arduino\hardware\sam\1.6.11\libraries\SPI\SPI.vcxitems*{6bf971b4-9758-41f0-a084-398e99c260f7}*SharedItemsImports = 4
 		..\libraries\Adafruit_GFX_Library\Adafruit_GFX_Library.vcxitems*{6bf971b4-9758-41f0-a084-398e99c260f7}*SharedItemsImports = 4
 		..\libraries\ILI9488\ILI9488.vcxitems*{6bf971b4-9758-41f0-a084-398e99c260f7}*SharedItemsImports = 4
@@ -82,7 +80,7 @@ Global
 		..\libraries\LiquidCrystal\LiquidCrystal.vcxitems*{71c8833b-db48-45fc-bf91-791068c94fb0}*SharedItemsImports = 9
 		..\..\ide\portable\packages\arduino\hardware\sam\1.6.11\libraries\SPI\SPI.vcxitems*{7e88a9ac-293c-43d8-8aca-7d6b1f56531f}*SharedItemsImports = 9
 		..\libraries\CAN_Serializer\CAN_Serializer.vcxitems*{7ed24bf0-127d-4fc9-843e-85d8ba0529c7}*SharedItemsImports = 4
-		Arduino\SharedProtocols\SharedProtocols.vcxitems*{7ed24bf0-127d-4fc9-843e-85d8ba0529c7}*SharedItemsImports = 4
+		..\libraries\MemoryFree\MemoryFree.vcxitems*{7ed24bf0-127d-4fc9-843e-85d8ba0529c7}*SharedItemsImports = 4
 		..\libraries\MemoryFree\MemoryFree.vcxitems*{86486ce1-3d43-4d25-8616-4e6372ac1896}*SharedItemsImports = 9
 		..\..\ide\hardware\arduino\avr\libraries\SPI\SPI.vcxitems*{8b3a2447-325c-473e-a84c-45b578507bd3}*SharedItemsImports = 4
 		..\..\ide\libraries\SD\SD.vcxitems*{8b3a2447-325c-473e-a84c-45b578507bd3}*SharedItemsImports = 4
@@ -131,10 +129,6 @@ Global
 		{BDC82998-34FD-4847-9807-8AB2DBE47408}.Debug|x86.Build.0 = Debug|Win32
 		{BDC82998-34FD-4847-9807-8AB2DBE47408}.Release|x86.ActiveCfg = Release|Win32
 		{BDC82998-34FD-4847-9807-8AB2DBE47408}.Release|x86.Build.0 = Release|Win32
-		{606A1460-864B-450D-BA10-221513A5B956}.Debug|x86.ActiveCfg = Debug|Win32
-		{606A1460-864B-450D-BA10-221513A5B956}.Debug|x86.Build.0 = Debug|Win32
-		{606A1460-864B-450D-BA10-221513A5B956}.Release|x86.ActiveCfg = Release|Win32
-		{606A1460-864B-450D-BA10-221513A5B956}.Release|x86.Build.0 = Release|Win32
 		{6BF971B4-9758-41F0-A084-398E99C260F7}.Debug|x86.ActiveCfg = Debug|Win32
 		{6BF971B4-9758-41F0-A084-398E99C260F7}.Debug|x86.Build.0 = Debug|Win32
 		{6BF971B4-9758-41F0-A084-398E99C260F7}.Release|x86.ActiveCfg = Release|Win32
@@ -143,6 +137,10 @@ Global
 		{E68944C2-F63A-4773-B592-8415FDA8D4BE}.Debug|x86.Build.0 = Debug|Win32
 		{E68944C2-F63A-4773-B592-8415FDA8D4BE}.Release|x86.ActiveCfg = Release|Win32
 		{E68944C2-F63A-4773-B592-8415FDA8D4BE}.Release|x86.Build.0 = Release|Win32
+		{D8187EE3-2CA8-4B1B-92E4-CCB0901F1F40}.Debug|x86.ActiveCfg = Debug|Win32
+		{D8187EE3-2CA8-4B1B-92E4-CCB0901F1F40}.Debug|x86.Build.0 = Debug|Win32
+		{D8187EE3-2CA8-4B1B-92E4-CCB0901F1F40}.Release|x86.ActiveCfg = Release|Win32
+		{D8187EE3-2CA8-4B1B-92E4-CCB0901F1F40}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -162,12 +160,13 @@ Global
 		{8D011AE1-9A38-4688-B43B-08794E403492} = {1FB7B7BF-5932-4D7F-AD43-1C2487269B5E}
 		{C5F80730-F44F-4478-BDAE-6634EFC2CA88} = {1FB7B7BF-5932-4D7F-AD43-1C2487269B5E}
 		{BDC82998-34FD-4847-9807-8AB2DBE47408} = {1FB7B7BF-5932-4D7F-AD43-1C2487269B5E}
-		{606A1460-864B-450D-BA10-221513A5B956} = {D73944EA-C027-4B9A-B26C-CF8857527539}
 		{6BF971B4-9758-41F0-A084-398E99C260F7} = {D73944EA-C027-4B9A-B26C-CF8857527539}
 		{E68944C2-F63A-4773-B592-8415FDA8D4BE} = {1FB7B7BF-5932-4D7F-AD43-1C2487269B5E}
 		{D0053034-7EF4-451E-B6FA-BB852A3B0799} = {B731DFF7-A7B2-4F18-831B-D04250650B2F}
 		{BF888B28-EEF3-4922-A68F-36A1FD54B965} = {B731DFF7-A7B2-4F18-831B-D04250650B2F}
+		{86486CE1-3D43-4D25-8616-4E6372AC1896} = {B731DFF7-A7B2-4F18-831B-D04250650B2F}
 		{34BA6DAD-9412-4277-92F0-C1477FF871D3} = {B731DFF7-A7B2-4F18-831B-D04250650B2F}
+		{D8187EE3-2CA8-4B1B-92E4-CCB0901F1F40} = {D73944EA-C027-4B9A-B26C-CF8857527539}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D50621B3-45DA-4D63-A156-3461EB4C4703}

@@ -68,7 +68,7 @@ void TaskSend(void *pvParameters __attribute__((unused)))  // This is a Task.
 		BaseType_t success = xQueueReceive(queueForCAN, &out, 0);
 		if (success)
 		{
-			if (!serializer.send(&out))
+			if (!serializer.sendCAN(&out))
 			{
 				Serial.println(F("Dropped frame!"));
 			}
@@ -78,19 +78,19 @@ void TaskSend(void *pvParameters __attribute__((unused)))  // This is a Task.
 				printQ(&out);
 			}
 		}
-		bool received = serializer.recv(&in);
+		bool received = serializer.recvCAN(&in);
 		if (received)
 		{
 			//Serial.print("RECV ");
 			printQ(&in);
 		}
-		serializer.sendOneFrame();
+		serializer.sendCAN_OneFrame();
 		vTaskDelay(pdMS_TO_TICKS(5));   // send payload per 5ms
 	}
 }
 void CAN_ISR()
 {
-	serializer.recvOneFrame();
+	serializer.recvCAN_OneFrame();
 }
 
 void dummyData(QueueItem* q, DataSource id) {

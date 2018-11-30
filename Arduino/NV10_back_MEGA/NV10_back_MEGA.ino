@@ -10,9 +10,9 @@
 //#include <FreeRTOS_AVR.h>
 #include <Adafruit_NeoPixel.h>
 #include <CAN_Serializer.h>
-#include "Behaviour.h"
 #include <SPI.h>
 #include <SD.h>
+#include "Behaviour.h"
 
 //#include "JoulemeterDisplay.h"	
 #include "CurrentSensorLogger.h"
@@ -48,7 +48,7 @@ AttopilotCurrentSensor motors[NUM_CURRENTSENSORS] = {
 Speedometer speedo = Speedometer(0, 545);
 Adafruit_NeoPixel lstrip = Adafruit_NeoPixel(7, LSIG_PIN, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel rstrip = Adafruit_NeoPixel(7, RSIG_PIN, NEO_GRB + NEO_KHZ800);
-CAN_Serializer serializer = CAN_Serializer(CAN_CS_PIN);
+CAN_Serializer serializer;
 // define globals
 bool SD_avail = false, CAN_avail = false;
 char path[FILENAME_HEADER_LENGTH + 8 + 4 + 1]; // +8 for filename, +4 for '.txt', +1 for '\0'
@@ -72,27 +72,19 @@ void setup() {
 	Serial.begin(9600);
 	delay(100);
 
-
-	CAN_avail = serializer.init();
+	CAN_avail = serializer.init(CAN_CS_PIN);
 	// create all files in a new directory
 	SD_avail = initSD(path);
 	if (SD_avail)
 		HESFuelCell::setPath(path);
-	Serial.print("SD avail: ");
-	Serial.println(SD_avail);
-	Serial.print("CAN avail: ");
-	Serial.println(CAN_avail);
+	debug_("SD avail: ");
+	debug(SD_avail);
+	debug_("CAN avail: ");
+	debug(CAN_avail);
 	// initialize speedometer
+	pinMode(SPEEDOMETER_INTERRUPT_PIN, INPUT_PULLUP);
 	attachInterrupt(digitalPinToInterrupt(SPEEDOMETER_INTERRUPT_PIN), storeWheelInterval_ISR, FALLING);
-	digitalWrite(SPEEDOMETER_INTERRUPT_PIN, HIGH);
 
-	xTaskCreate(
-		TaskCAN
-		, (const portCHAR *) "CAN la!" // where got cannot?
-		, 1200  // Stack size
-		, NULL
-		, 0  // Priority
-		, NULL);
 	// Now set up all Tasks to run independently. Task functions are found in Tasks.ino
 	xTaskCreate(
 		ReadFuelCell
@@ -129,9 +121,16 @@ void setup() {
 		, NULL
 		, 1
 		, &taskBlink);
+	xTaskCreate(
+		TaskCAN
+		, (const portCHAR *) "CAN la!" // where got cannot?
+		, 1200  // Stack size
+		, NULL
+		, 0  // Priority
+		, NULL);
 	//vTaskStartScheduler();
-	Serial.print(F("Free Memory in Bytes: "));
-	Serial.println(freeMemory());
+	debug_(F("Free Memory in Bytes: "));
+	debug(freeMemory());
 }
 
 void loop()

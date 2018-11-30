@@ -10,14 +10,14 @@
 #include <FreeRTOS_ARM.h>
 #include <SPI.h>
 #include <ILI9488.h>
+#include <CAN_Serializer.h>
 #include "Pins_Dashboard.h"
-// dependent header files
-#include "FrameFormats.h"
 // ----------------------
 
 #include "DashboardScreenManager.h"
 #include "DisplayBar.h"
 #include "DisplayText.h"
+//#include "DisplayDrawing.h"
 //#include "Bitmaps.h"
 
 void TaskRefreshScreen(void* pvParameters);
@@ -100,6 +100,8 @@ void TaskRefreshScreen(void* pvParameters)
 
 	pinMode(LCD_BACKLIGHT, OUTPUT);
 	digitalWrite(LCD_BACKLIGHT, HIGH);
+	pinMode(CAN_RST_PIN, OUTPUT);
+	digitalWrite(CAN_RST_PIN, HIGH);
 
 	QueueItem received;
 	char content[FLOAT_TO_STRING_LEN + 1];
@@ -146,22 +148,21 @@ void TaskReadSerial(void* pvParameters)
 	QueueItem outgoing;
 	char payload[MAX_STRING_LEN];
 	TickType_t delay = pdMS_TO_TICKS(200);
-	pinMode(CAN_RST_PIN, OUTPUT);
-	digitalWrite(CAN_RST_PIN, HIGH);
 	while (1)
 	{
-
-		if (Serial1.available())
-		{
-			int bytesRead = Serial1.readBytesUntil('\n', payload, MAX_STRING_LEN);
-			if(bytesRead>0)
-				payload[bytesRead-1] = '\0';
-			// ------------------------------ covert back -----------------------------------
-			bool convertSuccess = QueueItem::toQueueItem(payload, &outgoing);
-			if(convertSuccess)
-				xQueueSend(queueForDisplay, &outgoing, 100);
-			//debugPrint(payload, bytesRead);
-		}
+		if(CAN_Serializer::recvSerial(Serial1, &outgoing))
+			xQueueSend(queueForDisplay, &outgoing, 100);
+		//if (Serial1.available())
+		//{
+		//	int bytesRead = Serial1.readBytesUntil('\n', payload, MAX_STRING_LEN);
+		//	if(bytesRead>0)
+		//		payload[bytesRead-1] = '\0';
+		//	// ------------------------------ covert back -----------------------------------
+		//	bool convertSuccess = QueueItem::toQueueItem(payload, &outgoing);
+		//	if(convertSuccess)
+		//		xQueueSend(queueForDisplay, &outgoing, 100);
+		//	//debugPrint(payload, bytesRead);
+		//}
 
 		vTaskDelay(delay);
 	}

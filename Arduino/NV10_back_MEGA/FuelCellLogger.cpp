@@ -105,9 +105,10 @@ void HESFuelCell::writeAsRawData(char* toWrite)
 	{
 		// set path to FC*RAW.txt
 		// outcome: path = /LOG****/FC*raw.txt
-		strcpy(path + FILENAME_HEADER_LENGTH, frameType_shortNames[FC]);
-		itoa(id, path + FILENAME_HEADER_LENGTH + 2, 10);
-		strcpy(path + FILENAME_HEADER_LENGTH + 2 + 1, "raw.txt");
+		char* pathTail = path + FILENAME_HEADER_LENGTH;
+		strcpy(pathTail, frameType_shortNames[FC]);
+		itoa(id, pathTail + 2, 10);
+		strcpy(pathTail + 2 + 1, "raw.txt");
 
 		// higher priority task does not need critical section eh?
 		File rawFCdata = SD.open(path, FILE_WRITE);
@@ -116,7 +117,7 @@ void HESFuelCell::writeAsRawData(char* toWrite)
 		rawFCdata.close();
 
 		// revert path back to original
-		strcpy(path + FILENAME_HEADER_LENGTH, "");
+		strcpy(pathTail, "");
 	}
 }
 
