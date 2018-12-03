@@ -35,7 +35,6 @@
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="Shared">
-    <Import Project="..\..\..\libraries\CAN_Serializer\CAN_Serializer.vcxitems" Label="Shared" />
     <Import Project="..\..\..\libraries\MemoryFree\MemoryFree.vcxitems" Label="Shared" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

@@ -8,7 +8,6 @@
 // 3x3 Male to Male for CS, DC, RST
 
 #include <FreeRTOS_ARM.h>
-#include <SPI.h>
 #include <ILI9488.h>
 #include <CAN_Serializer.h>
 #include "Pins_Dashboard.h"
@@ -20,16 +19,67 @@
 //#include "DisplayDrawing.h"
 //#include "Bitmaps.h"
 
+const unsigned int buttonPins[] = { BTN_HAZARD,BTN_HEADLIGHT,BTN_HORN,BTN_LSIG,BTN_RSIG,BTN_WIPER };
 void TaskRefreshScreen(void* pvParameters);
 void TaskReadSerial(void* pvParameters);
+void TaskCaptureButtons(void* pvParameters);
 void TaskTest(void* pvParameters);
 QueueHandle_t queueForDisplay;
 void setup() {
 	Serial.begin(9600);
 	Serial1.begin(9600);
-	Serial1.setTimeout(100);
+	//Serial1.setTimeout(100);
 	delay(100);
-	queueForDisplay = xQueueCreate(1, sizeof(QueueItem));
+	queueForDisplay = xQueueCreate(1, sizeof(Packet));
+	// setup buttons
+	for (int i = 0; i < NUM_BUTTONS; i++)
+	{
+		unsigned int thisPin = buttonPins[i];
+		pinMode(thisPin, INPUT_PULLUP);
+	}
+	// I tried putting attachinterrupt in the for loop above but failed. Lambda functions complain.
+	// So here, have some wall text.
+	attachInterrupt(digitalPinToInterrupt(BTN_HAZARD), [] {
+		if (peripheralStates[Hazard] == STATE_EN)
+			peripheralStates[Hazard] = STATE_DS;
+		else
+			peripheralStates[Hazard] = STATE_EN;
+	}, FALLING);
+	attachInterrupt(digitalPinToInterrupt(BTN_HEADLIGHT), [] {
+		if (peripheralStates[Headlights] == STATE_EN)
+			peripheralStates[Headlights] = STATE_DS;
+		else
+			peripheralStates[Headlights] = STATE_EN;
+	}, FALLING);
+	attachInterrupt(digitalPinToInterrupt(BTN_HORN), [] {
+		if (peripheralStates[Horn] == STATE_EN)
+			peripheralStates[Horn] = STATE_DS;
+		else
+			peripheralStates[Horn] = STATE_EN;
+	}, FALLING);
+	attachInterrupt(digitalPinToInterrupt(BTN_LSIG), [] {
+		if (peripheralStates[Lsig] == STATE_EN)
+			peripheralStates[Lsig] = STATE_DS;
+		else
+			peripheralStates[Lsig] = STATE_EN;
+	}, FALLING);
+	attachInterrupt(digitalPinToInterrupt(BTN_RSIG), [] {
+		if (peripheralStates[Rsig] == STATE_EN)
+			peripheralStates[Rsig] = STATE_DS;
+		else
+			peripheralStates[Rsig] = STATE_EN;
+	}, FALLING);
+	attachInterrupt(digitalPinToInterrupt(BTN_WIPER), [] {
+		if (peripheralStates[Wiper] == STATE_EN)
+			peripheralStates[Wiper] = STATE_DS;
+		else
+			peripheralStates[Wiper] = STATE_EN;
+	}, FALLING);
+	//attachInterrupt(digitalPinToInterrupt(BTN_RADIO), [] {
+	//	peripheralStates[Radio] = STATE_EN;
+	//}, FALLING);
+	// ^^^^^ button logic (toggle), free to substitute with other logics if appropriate ^^^^^
+
 	// 480 x 320 pixels
 	/*Dashboard Info
 		Fuel cell info x2
@@ -63,6 +113,13 @@ void setup() {
 		, NULL // Any pointer to pass in
 		, 2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
 		, NULL);
+	xTaskCreate(
+		TaskCaptureButtons
+		, (const portCHAR *)"ReadS1"  // A name just for humans
+		, 600  
+		, NULL 
+		, 2  
+		, NULL);
 
 	vTaskStartScheduler();
 }
@@ -71,39 +128,17 @@ void setup() {
 void loop() {
   
 }
-void TaskTest(void* pvParameters)
-{
-	pinMode(LCD_BACKLIGHT, OUTPUT);
-	digitalWrite(LCD_BACKLIGHT, HIGH);
-	ILI9488 scr = ILI9488(LCD_LEFT_CS, LCD_LEFT_DC, LCD_RIGHT_RST);
-	scr.begin();
-	scr.setRotation(1);
-	scr.fillScreen(ILI9488_PURPLE);
-	DisplayBar t = DisplayBar(&scr, 200, 100, 200, 100, DisplayBar::BOTTOM_TO_TOP);
-	t.setColors(ILI9488_WHITE, ILI9488_BLUE);
-	t.setRange(50, 100);
-	int i = 0;
-	while (1)
-	{
-		i += 10;
-		if (i > 100)
-			i = 0;
-		t.updateFloat(i);
-		vTaskDelay(40);
-	};
-}
 void TaskRefreshScreen(void* pvParameters)
 {
 	const uint8_t CAN_resetThreshold = 10;
 	uint8_t CAN_resetCounter = 0;
-	
 
 	pinMode(LCD_BACKLIGHT, OUTPUT);
 	digitalWrite(LCD_BACKLIGHT, HIGH);
 	pinMode(CAN_RST_PIN, OUTPUT);
 	digitalWrite(CAN_RST_PIN, HIGH);
 
-	QueueItem received;
+	Packet received;
 	char content[FLOAT_TO_STRING_LEN + 1];
 	DashboardScreenManager screens = DashboardScreenManager(&received); // Singleton Facade pattern probably?
 
@@ -143,177 +178,51 @@ void TaskRefreshScreen(void* pvParameters)
 }
 void TaskReadSerial(void* pvParameters)
 {
-	unsigned int buttonPins[] = { BTN_HAZARD,BTN_HEADLIGHT,BTN_HORN,BTN_LSIG,BTN_RSIG,BTN_WIPER,BTN_RADIO };
-	//setDebounce(buttonPins, 7, 0xff);
-	QueueItem outgoing;
+	Packet outgoing;
 	char payload[MAX_STRING_LEN];
 	TickType_t delay = pdMS_TO_TICKS(200);
 	while (1)
 	{
 		if(CAN_Serializer::recvSerial(Serial1, &outgoing))
 			xQueueSend(queueForDisplay, &outgoing, 100);
-		//if (Serial1.available())
-		//{
-		//	int bytesRead = Serial1.readBytesUntil('\n', payload, MAX_STRING_LEN);
-		//	if(bytesRead>0)
-		//		payload[bytesRead-1] = '\0';
-		//	// ------------------------------ covert back -----------------------------------
-		//	bool convertSuccess = QueueItem::toQueueItem(payload, &outgoing);
-		//	if(convertSuccess)
-		//		xQueueSend(queueForDisplay, &outgoing, 100);
-		//	//debugPrint(payload, bytesRead);
-		//}
 
 		vTaskDelay(delay);
 	}
 }
-//centerLCD.drawRGBBitmap(77, 0, image, 150, 150);
-//centerLCD.setAddrWindow(120, 80, 240, 160);
-//centerLCD.pushColors(image, 9600, true);
-//centerLCD.fillRect(240, 80, 120, 80, ILI9488_RED);
-/*
-// voltage is an indication of capacitor charge, goes right
-DisplayBar capVolt = DisplayBar(&centerLCD, 240+0, 160+30, 240, 80);
-// current flowing from Fuel Cell into Capacitor, goes right
-DisplayBar capCurrent_charge = DisplayBar(&centerLCD, 240+0, 160-30-80, 240, 80);
-// current drawn from capacitor, goes left
-DisplayBar capCurrent_discharge = DisplayBar(&centerLCD, 240-240, 160-30-80, 240, 80);
-// current drawn from capacitor + FC, goes left
-DisplayBar motorCurrent = DisplayBar(&centerLCD, 240-240, 160+30, 240, 80);
-
-// dummy
-DisplayText t = DisplayText(&centerLCD, 0, 0, 100, 40);
-
-t.setMargin(12);
-t.setColors(ILI9488_WHITE, ILI9488_BLACK);
-capVolt.setMargin(6);
-capCurrent_charge.setMargin(6);
-capCurrent_discharge.setMargin(6);
-motorCurrent.setMargin(6);
-
-capVolt.setRange(45, 60);
-capVolt.setOrientation(DisplayBar::LEFT_TO_RIGHT);
-capVolt.setColors(ILI9488_CYAN, ILI9488_BLACK);
-capCurrent_charge.setRange(0, 20);
-capCurrent_charge.setOrientation(DisplayBar::LEFT_TO_RIGHT);
-capCurrent_charge.setColors(ILI9488_DARKCYAN, ILI9488_BLACK);
-capCurrent_discharge.setRange(0, 20);
-capCurrent_discharge.setOrientation(DisplayBar::RIGHT_TO_LEFT);
-capCurrent_discharge.setColors(ILI9488_MAROON, ILI9488_BLACK);
-motorCurrent.setRange(0, 20);
-motorCurrent.setOrientation(DisplayBar::RIGHT_TO_LEFT);
-motorCurrent.setColors(ILI9488_RED, ILI9488_BLACK);
-
-while (1)
+void TaskCaptureButtons(void* pvParameters)
 {
-char randStr[4];
-itoa(random(45, 60), randStr, 10);
-capVolt.update(randStr);
-itoa(random(0, 20), randStr, 10);
-capCurrent_charge.update(randStr);
-itoa(random(0, 20), randStr, 10);
-capCurrent_discharge.update(randStr);
-itoa(random(0, 20), randStr, 10);
-motorCurrent.update(randStr);
-vTaskDelay(pdMS_TO_TICKS(300));
-
-}
-*/
-void dummyData(QueueItem* q, DataSource id) {
-	q->ID = id;
-	int i, j;
-	i = FRAME_INFO_SETS[id];
-	j = FRAME_INFO_SUBSETS[id];
-	for (int _i = 0; _i < i; _i++)
+	Packet buttonCommand;
+	buttonCommand.ID = BT;
+	uint32_t syncTime = 0;
+	const uint32_t syncInterval = 2000;
+	TickType_t delay = pdMS_TO_TICKS(200);
+	setDebounce(buttonPins, NUM_BUTTONS, 500); // for some reason, setDebounce() if called in setup() seems to have no effect
+	while (1)
 	{
-		for (int _j = 0; _j < j; _j++)
+		bool stateChanged = false;
+		for (int i = 0; i < NUM_BUTTONS; i++)
 		{
-			q->data[_i][_j] = random(0, 10);
+			buttonCommand.timeStamp = millis();
+			if (buttonCommand.data[0][i] != peripheralStates[i])
+			{
+				stateChanged = true;
+				buttonCommand.data[0][i] = peripheralStates[i];
+			}
 		}
-	}
-	switch (id)
-	{
-	case FC:
-		q->data[0][7] = random(0, 1);
-		q->data[0][3] = random(0, 100);
-		break;
-	case CS:
-		q->data[2][1] = random(0, 40);
-		q->data[2][0] = random(45, 60);
-		break;
-	case SM:
-
-		break;
-	}
-
-}
-void debugPrint(char* toPrint, int len)
-{
-	// DEBUG printing that prints out special bytes as uint
-	int counter = 0;
-	while (counter < len)
-	{
-		char tmp = toPrint[counter++];
-		if (isPrintable(tmp))
-			Serial.print(tmp);
-		else
+		// broadcast a regular syncing frame every now and then to avoid 
+		// random microcontroller resets from throwing off the peripheral states
+		// broadcast immediately if there are updates
+		if (millis()-syncTime > syncInterval || stateChanged)
 		{
-			Serial.print("<");
-			Serial.print((uint8_t)tmp);
-			Serial.print(">");
+			syncTime = millis();
+			CAN_Serializer::sendSerial(Serial1, &buttonCommand);
+			for (int i = 0; i < NUM_BUTTONS; i++)
+			{
+				debug_(buttonCommand.data[0][i]);
+				debug_("\t");
+			}
+			debug();
 		}
+		vTaskDelay(delay);
 	}
-	Serial.print("[");
-	Serial.print(Serial.available());
-	Serial.print("]");
-	Serial.println("__");
-
-}
-void setDebounce(unsigned int pins[], uint8_t numPins, uint16_t waitTimeMultiplier)
-{	
-	/*
-	http://ww1.microchip.com/downloads/en/devicedoc/atmel-11057-32-bit-cortex-m3-microcontroller-sam3x-sam3a_datasheet.pdf
-	page 630 lists help on which PIO registers to fiddle to enable debouncing
-	need to find out clock divider value, max value is 2^14 (PIO_SCDR)
-	https://www.arduino.cc/en/Hacking/PinMappingSAM3X
-	to help convert pins into PIOxyy (x = A, B, C, D) (y = a number in range [0, 31])
-	*/
-	uint32_t pinsBitMask_A = 0, pinsBitMask_B = 0, pinsBitMask_C = 0, pinsBitMask_D = 0;
-	for (uint8_t i = 0; i < numPins; i++)
-	{
-		switch ((uint32_t)digitalPinToPort(pins[i]))
-		{
-		case (uint32_t)PIOA:
-			pinsBitMask_A |= digitalPinToBitMask(pins[i]);
-			break;
-		case (uint32_t)PIOB:
-			pinsBitMask_B |= digitalPinToBitMask(pins[i]);
-			break;
-		case (uint32_t)PIOC:
-			pinsBitMask_C |= digitalPinToBitMask(pins[i]);
-			break;
-		case (uint32_t)PIOD:
-			pinsBitMask_D |= digitalPinToBitMask(pins[i]);
-			break;
-		}
-	}
-	/*REG_PIOB_IFER |= 1 << 26; 
-	PIOB->PIO_DIFSR |= 1 << 26;
-	PIOB->PIO_SCDR |= 0xff;
-	*/
-	// Input Filter Enable Register:				Enables these bits to enable inupt filtering
-	PIOA->PIO_IFER = pinsBitMask_A;
-	PIOB->PIO_IFER = pinsBitMask_B;
-	PIOC->PIO_IFER = pinsBitMask_C;
-	PIOD->PIO_IFER = pinsBitMask_D;
-	// Debouncing Input Filter Select Register:		We want Debounce filter, not Glitch filter! Debounce = 1, Glitch = 0
-	PIOA->PIO_DIFSR = pinsBitMask_A;
-	PIOB->PIO_DIFSR = pinsBitMask_B;
-	PIOC->PIO_DIFSR = pinsBitMask_C;
-	PIOD->PIO_DIFSR = pinsBitMask_D;
-	// Slow Clock Divider Register:					Too big = unreponsive, Too small = can't feel the debounce
-	PIOA->PIO_SCDR = 0xff;
-	PIOB->PIO_SCDR = 0xff;
-	PIOC->PIO_SCDR = 0xff;
-	PIOD->PIO_SCDR = 0xff;
 }

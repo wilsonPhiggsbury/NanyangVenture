@@ -1,5 +1,5 @@
 #include "Constants.h"
-class QueueItem;
+class Packet;
 typedef enum
 {
 	HEADER_FRAME,
@@ -14,17 +14,17 @@ struct NV_CanFrame
 	byte length;
 	byte payload[8];
 };
-class NV_CanFrames
+class Frames
 {
-	friend class QueueItem;
+	friend class Packet;
 	friend class CAN_Serializer;
 	NV_CanFrame frames[1 + NUM_DATASETS * NUM_DATASUBSETS / 2 + 1 * NUM_DATASETS];
 	//void setCANObj(MCP_CAN& CANObj);
 	// 1 frame for timestamp, other frames for floats, +QUEUEITEM_DATAPOINTS frame for odd-number scenarios where one additional frame is needed for the lone float
-	bool toQueueItem(QueueItem* putHere);
+	bool toPacket(Packet* putHere);
 	bool addItem(unsigned long id, byte length, byte* payload);
-	void addItem(DataSource messageType, uint8_t terminatorStatus, float payload1);
-	void addItem(DataSource messageType, uint8_t terminatorStatus, float payload1, float payload2);
+	void addItem(PacketID messageType, uint8_t terminatorStatus, float payload1);
+	void addItem(PacketID messageType, uint8_t terminatorStatus, float payload1, float payload2);
 	uint8_t getNumFrames();
 	void clear();
 private:

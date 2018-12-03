@@ -27,7 +27,7 @@ length 4 means frame contains 1 float
 length 8 means frame contains 2 float
 
 */
-void QueueItem::toString(char* putHere)
+void Packet::toString(char* putHere)
 {
 	// assume what pointer's passed in is not properly null-terminated
 	*putHere = '\0';
@@ -64,7 +64,7 @@ void QueueItem::toString(char* putHere)
 	// \t: tab
 	// \0: null terminator
 }
-bool QueueItem::toQueueItem(char* str, QueueItem* queueItem)
+bool Packet::toPacket(char* str, Packet* queueItem)
 {
 	char* cur = strtok(str, "\t");
 	int i, j = 0;
@@ -77,7 +77,7 @@ bool QueueItem::toQueueItem(char* str, QueueItem* queueItem)
 	{
 		return false;
 	}
-	queueItem->ID = (DataSource)j;
+	queueItem->ID = (PacketID)j;
 	uint8_t sets = FRAME_INFO_SETS[j];
 	uint8_t subsets = FRAME_INFO_SUBSETS[j];
 
@@ -102,7 +102,7 @@ bool QueueItem::toQueueItem(char* str, QueueItem* queueItem)
 	}
 	return true;
 }
-void QueueItem::toFrames(NV_CanFrames* putHere)
+void Packet::toFrames(Frames* putHere)
 {
 	uint8_t dataPoints = FRAME_INFO_SETS[ID];
 	uint8_t readValues = FRAME_INFO_SUBSETS[ID];

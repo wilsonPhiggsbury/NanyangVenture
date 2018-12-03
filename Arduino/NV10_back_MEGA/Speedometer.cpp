@@ -22,7 +22,7 @@ void Speedometer::dumpTimestampInto(unsigned long* location)
 void Speedometer::dumpDataInto(float location[NUM_DATASETS][NUM_DATASUBSETS])
 {
 	processData();
-	// expect QueueItem.payload to come in
+	// expect Packet.payload to come in
 	float* thisSlot = location[id];
 	for (int i = 0; i < SPEEDOMETER_READVALUES; i++)
 	{

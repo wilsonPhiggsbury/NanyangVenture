@@ -4,7 +4,7 @@
  Author:	MX
 */
 #include <CAN_Serializer.h>
-QueueItem q;
+Packet q;
 // the setup function runs once when you press reset or power the board
 void setup() {
 	Serial.begin(9600);

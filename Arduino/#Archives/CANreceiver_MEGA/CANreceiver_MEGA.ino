@@ -11,7 +11,7 @@ Author:	MX
 
 void TaskGenerate(void *pvParameters __attribute__((unused)));
 void TaskSend(void *pvParameters __attribute__((unused)));
-QueueHandle_t queueForCAN = xQueueCreate(1, sizeof(QueueItem));
+QueueHandle_t queueForCAN = xQueueCreate(1, sizeof(Packet));
 CAN_Serializer serializer = CAN_Serializer(48);
 bool CAN_incoming = false;
 void CAN_ISR();
@@ -44,7 +44,7 @@ void loop() {
 }
 void TaskGenerate(void *pvParameters __attribute__((unused)))
 {
-	QueueItem out;
+	Packet out;
 	while (1)
 	{
 		dummyData(&out, CS);
@@ -61,7 +61,7 @@ void TaskGenerate(void *pvParameters __attribute__((unused)))
 
 void TaskSend(void *pvParameters __attribute__((unused)))  // This is a Task.
 {
-	QueueItem out, in;
+	Packet out, in;
 
 	while (1) // A Task shall never return or exit.
 	{
@@ -93,7 +93,7 @@ void CAN_ISR()
 	serializer.recvCAN_OneFrame();
 }
 
-void dummyData(QueueItem* q, DataSource id) {
+void dummyData(Packet* q, PacketID id) {
 	q->ID = id;
 	int i, j;
 	i = FRAME_INFO_SETS[id];
@@ -121,7 +121,7 @@ void dummyData(QueueItem* q, DataSource id) {
 	}
 
 }
-void printQ(QueueItem *q)
+void printQ(Packet *q)
 {
 	char str[MAX_STRING_LEN];
 	q->toString(str);

@@ -37,8 +37,8 @@
   <ImportGroup Label="Shared">
     <Import Project="..\..\..\..\ide\libraries\SD\SD.vcxitems" Label="Shared" />
     <Import Project="..\..\..\..\ide\hardware\arduino\avr\libraries\SPI\SPI.vcxitems" Label="Shared" />
-    <Import Project="..\..\..\libraries\CAN_Serializer\CAN_Serializer.vcxitems" Label="Shared" />
     <Import Project="..\..\..\libraries\Adafruit_NeoPixel\Adafruit_NeoPixel.vcxitems" Label="Shared" />
+    <Import Project="..\libraries\CAN_Serializer\CAN_Serializer.vcxitems" Label="Shared" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -69,7 +69,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\NV10_back_MEGA;$(ProjectDir)..\..\..\..\ide\libraries\SD\src;$(ProjectDir)..\..\..\..\ide\hardware\arduino\avr\libraries\SPI\src;$(ProjectDir)..\..\..\libraries\CAN_Serializer;$(ProjectDir)..\..\..\libraries\Adafruit_NeoPixel;$(ProjectDir)..\..\..\libraries\MemoryFree;$(ProjectDir)..\..\..\libraries\FreeRTOS\src;$(ProjectDir)..\..\..\libraries\MCP_CAN_lib;$(ProjectDir)..\..\..\..\ide\libraries\SD\src\utility;$(ProjectDir)..\..\..\..\ide\libraries;$(ProjectDir)..\..\..\..\ide\hardware\arduino\avr\libraries;$(ProjectDir)..\..\..\libraries;$(ProjectDir)..\..\..\..\ide\hardware\arduino\avr\cores\arduino;$(ProjectDir)..\..\..\..\ide\hardware\arduino\avr\variants\mega;$(ProjectDir)..\NV10_front_MEGA;$(ProjectDir)..\..\..\..\ide\hardware\tools\avr\avr\include;$(ProjectDir)..\..\..\..\ide\hardware\tools\avr\avr\include\avr;$(ProjectDir)..\..\..\..\ide\hardware\tools\avr\lib\gcc\avr\4.8.1\include;$(ProjectDir)..\..\..\..\ide\hardware\tools\avr\lib\gcc\avr\4.9.2\include;$(ProjectDir)..\..\..\..\ide\hardware\tools\avr\lib\gcc\avr\4.9.3\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\NV10_back_MEGA;$(ProjectDir)..\..\..\..\ide\libraries\SD\src;$(ProjectDir)..\..\..\..\ide\hardware\arduino\avr\libraries\SPI\src;$(ProjectDir)..\..\..\libraries\Adafruit_NeoPixel;$(ProjectDir)..\libraries\CAN_Serializer;$(ProjectDir)..\..\..\libraries\MemoryFree;$(ProjectDir)..\..\..\libraries\FreeRTOS\src;$(ProjectDir)..\..\..\libraries\MCP_CAN_lib;$(ProjectDir)..\..\..\..\ide\libraries\SD\src\utility;$(ProjectDir)..\..\..\..\ide\libraries;$(ProjectDir)..\..\..\..\ide\hardware\arduino\avr\libraries;$(ProjectDir)..\..\..\libraries;$(ProjectDir)..\..\..\..\ide\hardware\arduino\avr\cores\arduino;$(ProjectDir)..\..\..\..\ide\hardware\arduino\avr\variants\mega;$(ProjectDir)..\NV10_front_MEGA;$(ProjectDir)..\..\..\..\ide\hardware\tools\avr\avr\include;$(ProjectDir)..\..\..\..\ide\hardware\tools\avr\avr\include\avr;$(ProjectDir)..\..\..\..\ide\hardware\tools\avr\lib\gcc\avr\4.8.1\include;$(ProjectDir)..\..\..\..\ide\hardware\tools\avr\lib\gcc\avr\4.9.2\include;$(ProjectDir)..\..\..\..\ide\hardware\tools\avr\lib\gcc\avr\4.9.3\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>$(ProjectDir)__vm\.NV10_back_MEGA.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <PreprocessorDefinitions>__AVR_ATmega2560__;F_CPU=16000000L;ARDUINO=10805;ARDUINO_AVR_MEGA2560;ARDUINO_ARCH_AVR;__cplusplus=201103L;_VMICRO_INTELLISENSE;%(PreprocessorDefinitions)</PreprocessorDefinitions>

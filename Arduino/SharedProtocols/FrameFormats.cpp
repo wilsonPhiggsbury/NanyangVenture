@@ -69,7 +69,7 @@ void _QueueItem::toString(char* putHere)
 	// \t: tab
 	// \0: null terminator
 }
-bool _QueueItem::toQueueItem(char* str, _QueueItem* queueItem)
+bool _QueueItem::toPacket(char* str, _QueueItem* queueItem)
 {
 	char* cur = strtok(str, "\t");
 	int i, j = 0;
@@ -81,7 +81,7 @@ bool _QueueItem::toQueueItem(char* str, _QueueItem* queueItem)
 	{
 		return false;
 	}
-	queueItem->ID = (DataSource)j;
+	queueItem->ID = (PacketID)j;
 	uint8_t dataPoints = FRAME_INFO_SETS[j];
 	uint8_t readValues = FRAME_INFO_SUBSETS[j];
 
@@ -106,7 +106,7 @@ bool _QueueItem::toQueueItem(char* str, _QueueItem* queueItem)
 	}
 	return true;
 }
-void _QueueItem::toFrames(NV_CanFrames* putHere)
+void _QueueItem::toFrames(Frames* putHere)
 {
 	uint8_t dataPoints = FRAME_INFO_SETS[ID];
 	uint8_t readValues = FRAME_INFO_SUBSETS[ID];
@@ -144,7 +144,7 @@ void _QueueItem::toFrames(NV_CanFrames* putHere)
 		}
 	}
 }
-bool _NV_CanFrames::toQueueItem(QueueItem* putHere)
+bool _NV_CanFrames::toPacket(Packet* putHere)
 {
 
 	uint8_t terminatorStatus = (frames[0].id & B11);
@@ -155,7 +155,7 @@ bool _NV_CanFrames::toQueueItem(QueueItem* putHere)
 		return false;
 	}
 	// append ID
-	putHere->ID = DataSource((frames[0].id >> 2) & B1111);
+	putHere->ID = PacketID((frames[0].id >> 2) & B1111);
 	uint8_t dataPoints = FRAME_INFO_SETS[putHere->ID];
 	uint8_t readValues = FRAME_INFO_SUBSETS[putHere->ID];
 	// spot-check whether frame number is as anticipated. 1/2 frame per float + 1 frame for timestamp
@@ -220,7 +220,7 @@ bool _NV_CanFrames::toQueueItem(QueueItem* putHere)
 	}
 	return true;
 }
-bool NV_CanFrames::addItem(unsigned long id, byte length, byte* payload)
+bool Frames::addItem(unsigned long id, byte length, byte* payload)
 {
 	frames[numFrames].id = id;
 	frames[numFrames].length = length;
@@ -229,15 +229,15 @@ bool NV_CanFrames::addItem(unsigned long id, byte length, byte* payload)
 	// return true for HARD_TERMINATING_FRAME
 	return (id & HARD_TERMINATING_FRAME) == HARD_TERMINATING_FRAME;
 }
-void NV_CanFrames::addItem(DataSource messageType, uint8_t terminatorStatus, float payload1)
+void Frames::addItem(PacketID messageType, uint8_t terminatorStatus, float payload1)
 {
 	addItem_(messageType, terminatorStatus, payload1, 0, false);
 }
-void NV_CanFrames::addItem(DataSource messageType, uint8_t terminatorStatus, float payload1, float payload2)
+void Frames::addItem(PacketID messageType, uint8_t terminatorStatus, float payload1, float payload2)
 {
 	addItem_(messageType, terminatorStatus, payload1, payload2, true);
 }
-void NV_CanFrames::addItem_(uint8_t messageType, uint8_t terminatorStatus, float payload1, float payload2, bool using_payload2)
+void Frames::addItem_(uint8_t messageType, uint8_t terminatorStatus, float payload1, float payload2, bool using_payload2)
 {
 	frames[numFrames].id = (messageType << 2) | terminatorStatus;
 
@@ -256,11 +256,11 @@ void NV_CanFrames::addItem_(uint8_t messageType, uint8_t terminatorStatus, float
 	}
 	numFrames++;
 }
-void NV_CanFrames::clear()
+void Frames::clear()
 {
 	numFrames = 0;
 }
-uint8_t NV_CanFrames::getNumFrames()
+uint8_t Frames::getNumFrames()
 {
 	return numFrames;
 }

@@ -48,7 +48,7 @@ typedef enum
 	SM,
 	N1,
 	BT
-}DataSource;
+}PacketID;
 typedef enum {
 	Headlights,
 	Horn,
@@ -62,17 +62,17 @@ struct _NV_CanFrame;
 struct _NV_CanFrames;
 struct _QueueItem;
 typedef _NV_CanFrame NV_CanFrame;
-typedef _NV_CanFrames NV_CanFrames;
-typedef _QueueItem QueueItem;
+typedef _NV_CanFrames Frames;
+typedef _QueueItem Packet;
 // struct to pass payload between different tasks in same microcontroller
 struct _QueueItem {
 	friend struct _NV_CanFrames;
-	DataSource ID;
+	PacketID ID;
 	unsigned long timeStamp;
 	float data[NUM_DATASETS][NUM_DATASUBSETS];
 	void toString(char* putHere);
-	static bool toQueueItem(char * str, _QueueItem * queueItem); //		<--- *NOT YET verified if it works on AVR chips*
-	void toFrames(NV_CanFrames* putHere);
+	static bool toPacket(char * str, _QueueItem * queueItem); //		<--- *NOT YET verified if it works on AVR chips*
+	void toFrames(Frames* putHere);
 };
 // struct to pass payload between different microcontrollers
 struct _NV_CanFrame
@@ -87,10 +87,10 @@ struct _NV_CanFrames
 	NV_CanFrame frames[1 + NUM_DATASETS * NUM_DATASUBSETS / 2 + 1 * NUM_DATASETS];
 	//void setCANObj(MCP_CAN& CANObj);
 	// 1 frame for timestamp, other frames for floats, +QUEUEITEM_DATAPOINTS frame for odd-number scenarios where one additional frame is needed for the lone float
-	bool toQueueItem(QueueItem* putHere);
+	bool toPacket(Packet* putHere);
 	bool addItem(unsigned long id, byte length, byte* payload);
-	void addItem(DataSource messageType, uint8_t terminatorStatus, float payload1);
-	void addItem(DataSource messageType, uint8_t terminatorStatus, float payload1, float payload2);
+	void addItem(PacketID messageType, uint8_t terminatorStatus, float payload1);
+	void addItem(PacketID messageType, uint8_t terminatorStatus, float payload1, float payload2);
 	uint8_t getNumFrames();
 	void clear();
 private:

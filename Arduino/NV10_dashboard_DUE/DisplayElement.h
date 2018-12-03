@@ -16,8 +16,10 @@ class DisplayElement
 {
 protected:
 	ILI9488* screen;
-	DataSource targetSource;
-	DataSource* trackedSource;
+	// the ID this widget is assigned to, remains constant once assigned
+	PacketID targetID;
+	// the ID this widget sees whenever update() is called from outside. Compared with above to see if really need to update.
+	PacketID* trackedID;
 	float* trackedValue;
 	int16_t xPos, yPos;
 	uint16_t width, height;
@@ -34,7 +36,7 @@ protected:
 public:
 	DisplayElement(ILI9488 * screen, uint16_t xPos, uint16_t yPos, uint16_t width, uint16_t height, Alignment xAlign, Alignment yAlign);
 	~DisplayElement();
-	void init(DataSource listeningTo, DataSource* varSource, float* value);
+	void init(PacketID listeningTo, PacketID* varSource, float* value);
 	virtual void setMargin(uint8_t margin);
 	virtual void setColors(uint16_t foreground, uint16_t background);
 	virtual void updateFloat(float value) = 0;

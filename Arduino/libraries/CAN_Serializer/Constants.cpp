@@ -1,2 +1,2 @@
 #include <Constants.h>
-float peripheralStates[NUMSTATES] = { 0 };
+uint8_t peripheralStates[NUMSTATES] = { 0 };

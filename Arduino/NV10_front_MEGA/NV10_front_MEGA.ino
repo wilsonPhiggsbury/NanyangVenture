@@ -33,7 +33,7 @@ void TaskToggle(void* pvParameters);
 void TaskBlink(void* pvParameters);
 void TaskMoveWiper(void* pvParameters);
 void TaskCAN(void* pvParameters);
-QueueHandle_t queueForCAN = xQueueCreate(1, sizeof(QueueItem));
+QueueHandle_t queueForCAN = xQueueCreate(1, sizeof(Packet));
 TaskHandle_t taskBlink, taskMoveWiper, taskToggle;
 void setup() {
 	Serial.begin(9600);
@@ -62,13 +62,13 @@ void setup() {
 		, NULL
 		, 3
 		, &taskBlink);
-	xTaskCreate(
-		TaskMoveWiper
-		, (const portCHAR *)"WIPE"
-		, 150 // -25
-		, NULL
-		, 3
-		, &taskMoveWiper);
+	//xTaskCreate(
+	//	TaskMoveWiper
+	//	, (const portCHAR *)"WIPE"
+	//	, 150 // -25
+	//	, NULL
+	//	, 3
+	//	, &taskMoveWiper);
 	
 }
 
@@ -78,30 +78,30 @@ void loop() {
 }
 void TaskToggle(void* pvParameters)
 {
-	QueueItem incoming;
+	Packet incoming;
 	pinMode(HORN_PIN, OUTPUT);
 	pinMode(HEADLIGHTS_PIN, OUTPUT);
 	while (1)
 	{
 		if (peripheralStates[Horn] == STATE_EN)
 		{
-			Serial.println(F("HORN ON"));
+			debug(F("HORN ON"));
 			digitalWrite(HORN_PIN, HIGH);
 		}
 		else if (peripheralStates[Horn] == STATE_DS)
 		{
-			Serial.println(F("HORN OFF"));
+			debug(F("HORN OFF"));
 			digitalWrite(HORN_PIN, LOW);
 		}
 
 		if (peripheralStates[Headlights] == STATE_EN)
 		{
-			Serial.println(F("LIGHTS ON"));
+			debug(F("LIGHTS ON"));
 			digitalWrite(HEADLIGHTS_PIN, HIGH);
 		}
 		else if (peripheralStates[Headlights] == STATE_DS)
 		{
-			Serial.println(F("LIGHTS OFF"));
+			debug(F("LIGHTS OFF"));
 			digitalWrite(HEADLIGHTS_PIN, LOW);
 		}
 		vTaskSuspend(taskToggle);
@@ -148,7 +148,7 @@ void TaskBlink(void* pvParameters)
 
 			if (peripheralStates[Hazard] == STATE_EN || peripheralStates[Rsig] == STATE_EN)
 			{
-				//Serial.println("RSIG ON");
+				//debug("RSIG ON");
 				if (rsigOn)
 				{
 					rsigOn = false;
@@ -164,7 +164,7 @@ void TaskBlink(void* pvParameters)
 			}
 			else
 			{
-				//Serial.println("RSIG OFF");
+				//debug("RSIG OFF");
 				rsigOn = false;
 				rstrip.setPixelColor(i, 0, 0, 0);
 				rstrip.show();
@@ -195,7 +195,7 @@ void TaskMoveWiper(void* pvParameters)
 		vTaskDelay(pdMS_TO_TICKS(1000));
 	}
 }
-void doReceiveAction(QueueItem* q)
+void doReceiveAction(Packet* q)
 {
 	if (q->ID == BT)
 	{

@@ -29,11 +29,11 @@ DisplayElement::~DisplayElement()
 {
 	
 }
-void DisplayElement::init(DataSource targetSource, DataSource* varSource, float* value)
+void DisplayElement::init(PacketID targetID, PacketID* varID, float* value)
 {
 	drawBorder(borderStroke, borderFill);
-	this->targetSource = targetSource;
-	trackedSource = varSource;
+	this->targetID = targetID;
+	trackedID = varID;
 	trackedValue = value;
 
 }
@@ -67,7 +67,7 @@ void DisplayElement::setColors(uint16_t foreground, uint16_t background)
 }
 void DisplayElement::update()
 {
-	if (*trackedSource == targetSource)
+	if (*trackedID == targetID)
 	{
 		updateFloat(*trackedValue);
 	}

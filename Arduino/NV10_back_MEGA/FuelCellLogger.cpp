@@ -86,7 +86,7 @@ void HESFuelCell::dumpTimestampInto(unsigned long* location)
 }
 void HESFuelCell::dumpDataInto(float location[NUM_DATASETS][NUM_DATASUBSETS])
 {
-	// expect QueueItem.payload to come in
+	// expect Packet.payload to come in
 	float* thisSlot = location[id];
 	for (int i = 0; i < FUELCELL_READVALUES; i++)
 	{

@@ -40,7 +40,7 @@ void QueueOutputData(void *pvParameters)
 	const uint16_t CAN_frame_interval = CAN_FRAME_INTERVAL / QUEUE_DATA_INTERVAL;
 	const uint16_t speedo_refresh_interval = SPEEDOMETER_REFRESH_INTERVAL / QUEUE_DATA_INTERVAL;
 
-	QueueItem outgoing;
+	Packet outgoing;
 	uint8_t syncCounter = 0;
 	//HESFuelCell* masterCell = (HESFuelCell*)pvParameters;
 	//HESFuelCell* slaveCell = ((HESFuelCell*)pvParameters) + 1;
@@ -130,7 +130,7 @@ void QueueOutputData(void *pvParameters)
 
 void LogSendData(void *pvParameters __attribute__((unused)))  // This is a Task.
 {
-	QueueItem received;
+	Packet received;
 	char data[MAX_STRING_LEN];
 	TickType_t delay = pdMS_TO_TICKS(LOGSEND_INTERVAL); // delay 300 ms, shorter than reading/queueing tasks since this task has lower priority
 
@@ -224,7 +224,7 @@ void TaskBlink(void* pvParameters)
 		vTaskDelay(pdMS_TO_TICKS(500));
 	}
 }
-void doReceiveAction(QueueItem* q)
+void doReceiveAction(Packet* q)
 {
 	// ************************* Code for signal lights ****************************
 	// kick up the blinking task and tell it to start or stop rightaway

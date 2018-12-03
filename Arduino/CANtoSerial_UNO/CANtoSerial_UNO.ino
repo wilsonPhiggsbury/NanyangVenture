@@ -13,7 +13,7 @@ Author:	MX
 // high fuse:		0xDA
 
 CAN_Serializer serializer;
-QueueItem out, in;
+Packet out, in;
 char str[MAX_STRING_LEN];
 
 void CAN_ISR();

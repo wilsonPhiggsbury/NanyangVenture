@@ -1,6 +1,6 @@
 // put this at the top of the script
 
-//QueueHandle_t queueForCAN = xQueueCreate(1, sizeof(QueueItem));
+//QueueHandle_t queueForCAN = xQueueCreate(1, sizeof(Packet));
 //CAN_Serializer serializer;
 //void TaskCAN(void* pvParameters);			// In/Out task:		Manages 2-way CAN bus comms
 
@@ -17,13 +17,13 @@ xTaskCreate(
 */
 
 // implement this function as handler for receiving QueueItems from CAN
-//void doReceiveAction(QueueItem* q)
+//void doReceiveAction(Packet* q)
 //{
 //	// do your stuff here
 //}
 
 void TaskCAN(void *pvParameters){
-	QueueItem in, out;
+	Packet in, out;
 	bool sent, received;
 	attachInterrupt(digitalPinToInterrupt(CAN_INT_PIN), CAN_ISR, FALLING);
 	debug(F("CAN started."));

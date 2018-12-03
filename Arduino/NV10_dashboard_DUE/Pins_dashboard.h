@@ -14,10 +14,12 @@
 #define LCD_RIGHT_DC 3
 #define LCD_RIGHT_RST 4
 
-#define BTN_LSIG 30
-#define BTN_RSIG 31
-#define BTN_HAZARD 32
-#define BTN_HORN 33
-#define BTN_HEADLIGHT 34
-#define BTN_WIPER 35
-#define BTN_RADIO 36
+#define BTN_LSIG 48
+#define BTN_RSIG 49
+#define BTN_HAZARD 50
+#define BTN_HORN 51
+#define BTN_HEADLIGHT 52
+#define BTN_WIPER 53
+//#define BTN_RADIO 54
+
+#define NUM_BUTTONS NUMSTATES

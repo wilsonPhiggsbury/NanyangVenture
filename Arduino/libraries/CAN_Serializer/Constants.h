@@ -53,7 +53,7 @@ typedef enum
 	SM,
 	N1,
 	BT
-}DataSource;
+}PacketID;
 typedef enum {
 	Headlights,
 	Horn,
@@ -62,10 +62,10 @@ typedef enum {
 	Wiper,
 	Hazard
 }Peripheral;
-#define STATE_EN 1.0
-#define STATE_DS 0.0
+#define STATE_EN 1
+#define STATE_DS 0
 #define NUMSTATES 6
-extern float peripheralStates[NUMSTATES];
+extern uint8_t peripheralStates[NUMSTATES];
 const char frameType_shortNames[FRAMETYPES][SHORTNAME_LEN] = {"FC", "CS", "SM", "??", "BT"};
 
 #endif

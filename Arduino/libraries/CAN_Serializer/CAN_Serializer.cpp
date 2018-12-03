@@ -13,7 +13,7 @@ bool CAN_Serializer::init(byte pin)
 		return false;
 	}
 }
-void CAN_Serializer::onlyListenFor(DataSource ID)
+void CAN_Serializer::onlyListenFor(PacketID ID)
 {
 	unsigned long id = ID;
 	unsigned long maskVal = (unsigned long)B1111 << 18;
@@ -29,7 +29,7 @@ void CAN_Serializer::onlyListenFor(DataSource ID)
 	CAN->init_Filt(4, 0, filterVal | 2 << 16);                // Init filter:  XX01 0010 <--- they are explicit commands to accept termination bits
 	CAN->init_Filt(5, 0, filterVal | 3 << 16);                // Init filter:  XX01 0011 <--- could've done without, but MCP_CAN needs these to work properly
 }
-bool CAN_Serializer::sendCAN(QueueItem* q)
+bool CAN_Serializer::sendCAN(Packet* q)
 {
 	// only accept the queueItem when available
 	if (!pendingSend)
@@ -44,11 +44,11 @@ bool CAN_Serializer::sendCAN(QueueItem* q)
 		return false;
 	}
 }
-bool CAN_Serializer::recvCAN(QueueItem* q)
+bool CAN_Serializer::recvCAN(Packet* q)
 {
 	if (readyRecv)
 	{
-		bool status = framesI.toQueueItem(q);
+		bool status = framesI.toPacket(q);
 		framesI.clear();
 		readyRecv = false;
 		return status;
@@ -58,14 +58,14 @@ bool CAN_Serializer::recvCAN(QueueItem* q)
 		return false;
 	}
 }
-bool CAN_Serializer::sendSerial(HardwareSerial& serial, QueueItem* q)
+bool CAN_Serializer::sendSerial(HardwareSerial& serial, Packet* q)
 {
 	char payload[MAX_STRING_LEN];
 	q->toString(payload);
 	serial.println(payload);
 	return true;
 }
-bool CAN_Serializer::recvSerial(HardwareSerial& serial, QueueItem* q)
+bool CAN_Serializer::recvSerial(HardwareSerial& serial, Packet* q)
 {
 	char payload[MAX_STRING_LEN];
 	if (serial.available())
@@ -73,7 +73,7 @@ bool CAN_Serializer::recvSerial(HardwareSerial& serial, QueueItem* q)
 		int bytesRead = serial.readBytesUntil('\n', payload, MAX_STRING_LEN);
 		if (bytesRead > 0)
 			payload[bytesRead - 1] = '\0';
-		bool convertSuccess = QueueItem::toQueueItem(payload, q);
+		bool convertSuccess = Packet::toPacket(payload, q);
 		return convertSuccess;
 	}
 	else
@@ -114,7 +114,7 @@ void CAN_Serializer::recvCAN_OneFrame()
 	}
 
 }
-void CAN_Serializer::printFrames(NV_CanFrames& frames)
+void CAN_Serializer::printFrames(Frames& frames)
 {
 	for (uint8_t i = 0; i < frames.getNumFrames(); i++)
 	{
@@ -130,7 +130,7 @@ void CAN_Serializer::printFrames(NV_CanFrames& frames)
 	}
 	Serial.println("---------");
 }
-void CAN_Serializer::printQueue(QueueItem& q)
+void CAN_Serializer::printPacket(Packet& q)
 {
 	char qstr[MAX_STRING_LEN];
 	q.toString(qstr);

@@ -30,9 +30,9 @@ const uint8_t FILENAME_HEADER_LENGTH = 1 + 8 + 1;
 //										   HEADER | FILENAME
 
 // define queues
-QueueHandle_t queueForLogSend = xQueueCreate(1, sizeof(QueueItem));
-QueueHandle_t queueForCAN = xQueueCreate(1, sizeof(QueueItem));
-//QueueHandle_t queueForDisplay = xQueueCreate(1, sizeof(QueueItem));
+QueueHandle_t queueForLogSend = xQueueCreate(1, sizeof(Packet));
+QueueHandle_t queueForCAN = xQueueCreate(1, sizeof(Packet));
+//QueueHandle_t queueForDisplay = xQueueCreate(1, sizeof(Packet));
 TaskHandle_t taskBlink;
 // define instances of main modules
 HESFuelCell hydroCells[NUM_FUELCELLS] = {

@@ -6,10 +6,10 @@
 
 static const int screenWidth = 480;
 static const int screenHeight = 320;
-DashboardScreenManager::DashboardScreenManager(QueueItem* queueItem)
+DashboardScreenManager::DashboardScreenManager(Packet* queueItem)
 {
 	q = queueItem;
-	DataSource* trackIDaddr = &(queueItem->ID);
+	PacketID* trackIDaddr = &(queueItem->ID);
 	// initialize screens
 	ILI9488* leftScreen = new ILI9488(LCD_LEFT_CS, LCD_LEFT_DC, LCD_LEFT_RST);
 	leftScreen->begin();
