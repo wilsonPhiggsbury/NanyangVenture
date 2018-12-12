@@ -11,18 +11,19 @@ DashboardScreenManager::DashboardScreenManager(Packet* queueItem)
 	q = queueItem;
 	PacketID* trackIDaddr = &(queueItem->ID);
 	// initialize screens
-	ILI9488* leftScreen = new ILI9488(LCD_LEFT_CS, LCD_LEFT_DC, LCD_LEFT_RST);
+	ILI9488* leftScreen = new ILI9488(LCD_LEFT_CS, LCD_DC, LCD_RST);
+	ILI9488* centerScreen = new ILI9488(LCD_CENTER_CS, LCD_DC);
+	ILI9488* rightScreen = new ILI9488(LCD_RIGHT_CS, LCD_DC);
 	leftScreen->begin();
+	centerScreen->begin();
+	rightScreen->begin();
+
 	leftScreen->setRotation(3);
 	leftScreen->fillScreen(ILI9488_BLACK);
 	leftScreen->setTextColor(ILI9488_WHITE);
-	ILI9488* centerScreen = new ILI9488(LCD_CENTER_CS, LCD_CENTER_DC, LCD_CENTER_RST);
-	centerScreen->begin();
 	centerScreen->setRotation(1);
 	centerScreen->fillScreen(ILI9488_BLACK);
 	centerScreen->setTextColor(ILI9488_WHITE);
-	ILI9488* rightScreen = new ILI9488(LCD_RIGHT_CS, LCD_RIGHT_DC, LCD_RIGHT_RST);
-	rightScreen->begin();
 	rightScreen->setRotation(3);
 	rightScreen->fillScreen(ILI9488_BLACK);
 	rightScreen->setTextColor(ILI9488_WHITE);

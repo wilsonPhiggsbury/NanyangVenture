@@ -59,7 +59,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DUE_comms_test", "Arduino\#
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DUE_button_test", "Arduino\#TestSuites\DUE_button_test\DUE_button_test.vcxproj", "{A14D819E-53C2-47DD-844C-67D7860BA1FA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CAN_Serializer", "Arduino\libraries\CAN_Serializer\CAN_Serializer.vcxitems", "{C7301C86-89F0-4F3E-B379-774FC2AA6A56}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CAN_Serializer", "Arduino\libraries\CAN_Serializer\CAN_Serializer.vcxitems", "{D0053034-7EF4-451E-B6FA-BB852A3B0799}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -88,10 +88,11 @@ Global
 		..\libraries\Adafruit_NeoPixel\Adafruit_NeoPixel.vcxitems*{8b3a2447-325c-473e-a84c-45b578507bd3}*SharedItemsImports = 4
 		Arduino\libraries\CAN_Serializer\CAN_Serializer.vcxitems*{8b3a2447-325c-473e-a84c-45b578507bd3}*SharedItemsImports = 4
 		..\libraries\Adafruit_GFX_Library\Adafruit_GFX_Library.vcxitems*{8c1a22a5-7653-42a6-b3dd-80639fa902d1}*SharedItemsImports = 9
-		Arduino\libraries\FreeRTOS_ARM\FreeRTOS_ARM.vcxitems*{a14d819e-53c2-47dd-844c-67d7860ba1fa}*SharedItemsImports = 4
+		Arduino\libraries\CAN_Serializer\CAN_Serializer.vcxitems*{a14d819e-53c2-47dd-844c-67d7860ba1fa}*SharedItemsImports = 4
 		..\..\ide\portable\packages\arduino\hardware\sam\1.6.11\libraries\Wire\Wire.vcxitems*{a7192e66-f105-4569-885c-47923cd5f91a}*SharedItemsImports = 9
 		..\libraries\MCP_CAN_lib\MCP_CAN_lib.vcxitems*{bf888b28-eef3-4922-a68f-36a1fd54b965}*SharedItemsImports = 9
-		Arduino\libraries\CAN_Serializer\CAN_Serializer.vcxitems*{c7301c86-89f0-4f3e-b379-774fc2aa6a56}*SharedItemsImports = 9
+		Arduino\libraries\CAN_Serializer\CAN_Serializer.vcxitems*{d0053034-7ef4-451e-b6fa-bb852a3b0799}*SharedItemsImports = 9
+		Arduino\libraries\CAN_Serializer\CAN_Serializer.vcxitems*{d8187ee3-2ca8-4b1b-92e4-ccb0901f1f40}*SharedItemsImports = 4
 		..\libraries\FreeRTOS\FreeRTOS.vcxitems*{e0f75ac7-15bb-4c7a-98cd-37a96c9641a3}*SharedItemsImports = 4
 		Arduino\libraries\CAN_Serializer\CAN_Serializer.vcxitems*{e0f75ac7-15bb-4c7a-98cd-37a96c9641a3}*SharedItemsImports = 4
 		..\..\ide\libraries\SD\SD.vcxitems*{fa968cf9-c643-4453-a136-bded4e20b71a}*SharedItemsImports = 9
@@ -171,7 +172,7 @@ Global
 		{34BA6DAD-9412-4277-92F0-C1477FF871D3} = {B731DFF7-A7B2-4F18-831B-D04250650B2F}
 		{D8187EE3-2CA8-4B1B-92E4-CCB0901F1F40} = {D73944EA-C027-4B9A-B26C-CF8857527539}
 		{A14D819E-53C2-47DD-844C-67D7860BA1FA} = {D73944EA-C027-4B9A-B26C-CF8857527539}
-		{C7301C86-89F0-4F3E-B379-774FC2AA6A56} = {B731DFF7-A7B2-4F18-831B-D04250650B2F}
+		{D0053034-7EF4-451E-B6FA-BB852A3B0799} = {B731DFF7-A7B2-4F18-831B-D04250650B2F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D50621B3-45DA-4D63-A156-3461EB4C4703}

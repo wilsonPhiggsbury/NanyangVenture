@@ -3,16 +3,12 @@
 #define CAN_INT_PIN 3
 #define CAN_RST_PIN 28
 
+#define LCD_DC 7
+#define LCD_RST 8
+#define LCD_BACKLIGHT 9
 #define LCD_LEFT_CS 10
-#define LCD_LEFT_DC 7
-#define LCD_LEFT_RST 8
-#define LCD_BACKLIGHT A3
-#define LCD_CENTER_CS A0
-#define LCD_CENTER_DC A2
-#define LCD_CENTER_RST A1
-#define LCD_RIGHT_CS 2
-#define LCD_RIGHT_DC 3
-#define LCD_RIGHT_RST 4
+#define LCD_CENTER_CS 11
+#define LCD_RIGHT_CS 12
 
 #define BTN_LSIG 48
 #define BTN_RSIG 49

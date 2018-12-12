@@ -205,7 +205,8 @@ void doReceiveAction(Packet* q)
 		}
 		// kick up taskToggle to toggle accessories such as Headlights Horn etc
 		xTaskAbortDelay(taskToggle);
-		// kick up time-controlled tasks so they respond immediately such as "turn off blinking signal lights"
+		// kick up time-controlled tasks so they respond immediately.
+		// Example: "turn off blinking signal lights" should apply immediately instead of happening at the end of a blink cycle
 		xTaskAbortDelay(taskBlink);
 	}
 }

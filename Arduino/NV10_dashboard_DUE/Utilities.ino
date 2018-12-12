@@ -103,7 +103,7 @@ void setDebounce(const unsigned int pins[], uint8_t numPins, uint16_t waitTimeMu
 //{
 //	pinMode(LCD_BACKLIGHT, OUTPUT);
 //	digitalWrite(LCD_BACKLIGHT, HIGH);
-//	ILI9488 scr = ILI9488(LCD_LEFT_CS, LCD_LEFT_DC, LCD_RIGHT_RST);
+//	ILI9488 scr = ILI9488(LCD_LEFT_CS, LCD_DC, LCD_RIGHT_RST);
 //	scr.begin();
 //	scr.setRotation(1);
 //	scr.fillScreen(ILI9488_PURPLE);

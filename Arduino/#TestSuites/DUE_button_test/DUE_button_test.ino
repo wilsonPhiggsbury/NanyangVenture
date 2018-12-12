@@ -13,6 +13,7 @@ void TaskTest(void*);
 // the setup function runs once when you press reset or power the board
 void setup() {
 	Serial.begin(9600);
+	Serial.println("YO HI");
 	setDebounce(buttonPins, NUM_BUTTONS, 900); // PROBLEMATIC
 	pinMode(BTN_HEADLIGHT, INPUT_PULLUP);
 	attachInterrupt(BTN_HEADLIGHT, [] {
