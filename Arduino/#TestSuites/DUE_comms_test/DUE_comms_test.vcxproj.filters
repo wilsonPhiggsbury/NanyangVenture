@@ -21,5 +21,8 @@
     <ClInclude Include="__vm\.DUE_comms_test.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\NV10_dashboard_DUE\Pins_dashboard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
