@@ -120,7 +120,7 @@ void setup() {
 		, NULL 
 		, 2  
 		, NULL);
-
+	debug("ALL tasks initialized.");
 	vTaskStartScheduler();
 }
 
@@ -140,7 +140,7 @@ void TaskRefreshScreen(void* pvParameters)
 
 	Packet received;
 	char content[FLOAT_TO_STRING_LEN + 1];
-	DashboardScreenManager screens = DashboardScreenManager(&received); // Singleton Facade pattern probably?
+	//DashboardScreenManager screens = DashboardScreenManager(&received); // Singleton Facade pattern probably?
 
 	TickType_t delay = pdMS_TO_TICKS(200);
 	while (1)
@@ -156,21 +156,21 @@ void TaskRefreshScreen(void* pvParameters)
 			//screens.refreshScreens();
 			//dummyData(&received, SM);
 			//screens.refreshScreens();
-			screens.refreshScreens();
+			//screens.refreshScreens();
 			char data[MAX_STRING_LEN];
 			received.toString(data);
-			Serial.println(data);
+			debug(data);
 			
 		}
 		else
 		{
 			if (CAN_resetCounter++ >= CAN_resetThreshold)
 			{
-				screens.refreshScreens(NULL);
+				//screens.refreshScreens(NULL);
 				digitalWrite(CAN_RST_PIN, LOW);
 				vTaskDelay(delay);
 				digitalWrite(CAN_RST_PIN, HIGH);
-				CAN_resetCounter = 0;
+				CAN_resetCounter = 0; debug("GG");
 			}
 		}
 		vTaskDelay(delay);
@@ -185,6 +185,8 @@ void TaskReadSerial(void* pvParameters)
 	{
 		if(CAN_Serializer::recvSerial(Serial1, &outgoing))
 			xQueueSend(queueForDisplay, &outgoing, 100);
+		outgoing.toString(payload);
+		debug(payload);
 
 		vTaskDelay(delay);
 	}
@@ -216,12 +218,12 @@ void TaskCaptureButtons(void* pvParameters)
 		{
 			syncTime = millis();
 			CAN_Serializer::sendSerial(Serial1, &buttonCommand);
-			for (int i = 0; i < NUM_BUTTONS; i++)
-			{
-				debug_(buttonCommand.data[0][i]);
-				debug_("\t");
-			}
-			debug();
+			//for (int i = 0; i < NUM_BUTTONS; i++)
+			//{
+			//	debug_(buttonCommand.data[0][i]);
+			//	debug_("\t");
+			//}
+			//debug();
 		}
 		vTaskDelay(delay);
 	}
