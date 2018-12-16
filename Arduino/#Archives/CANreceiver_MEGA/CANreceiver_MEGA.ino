@@ -12,14 +12,18 @@ Author:	MX
 void TaskGenerate(void *pvParameters __attribute__((unused)));
 void TaskSend(void *pvParameters __attribute__((unused)));
 QueueHandle_t queueForCAN = xQueueCreate(1, sizeof(Packet));
-CAN_Serializer serializer = CAN_Serializer(48);
+CAN_Serializer serializer = CAN_Serializer();
 bool CAN_incoming = false;
 void CAN_ISR();
 void setup() {
 	Serial.begin(9600);
 	delay(1000);
-	serializer.init();
-	Serial.println("CAN Sender.");
+	if (!serializer.init(48))
+	{
+		Serial.print("CAN FAIL");
+		while (1);
+	}
+	Serial.println("CAN Receiver.");
 	attachInterrupt(digitalPinToInterrupt(19), CAN_ISR, FALLING);
 
 	xTaskCreate(

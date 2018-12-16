@@ -13,16 +13,15 @@ void setup() {
 
 // the loop function runs over and over again until power down or reset
 void loop() {
-	char str[MAX_STRING_LEN];
-	size_t readBytes;
 	if (CAN_Serializer::recvSerial(Serial1, &q))
 	{
+		debug("RECV from outside!");
 		CAN_Serializer::sendSerial(Serial, &q);
 	}
 	if (CAN_Serializer::recvSerial(Serial, &q))
 	{
 		CAN_Serializer::sendSerial(Serial1, &q);
 	}
-	delay(100);
+	delay(5);
 
 }

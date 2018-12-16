@@ -21,6 +21,7 @@ void setup() {
 	Serial.begin(9600);
 	delay(100);
 	serializer.init(CAN_CS_PIN);
+	pinMode(CAN_INT_PIN, INPUT_PULLUP);
 	attachInterrupt(digitalPinToInterrupt(CAN_INT_PIN), CAN_ISR, FALLING);
 }
 
@@ -28,9 +29,7 @@ void loop() {
 	// anything to send?
 	if (serializer.recvSerial(Serial, &out))
 	{
-		bool sentCAN = serializer.sendCAN(&out);
-		if(!sentCAN)
-			debug("!");
+		serializer.sendCAN(&out);
 	}
 	// anything to receive?
 	if (serializer.recvCAN(&in))

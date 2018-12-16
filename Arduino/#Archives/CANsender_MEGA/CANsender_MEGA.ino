@@ -13,15 +13,19 @@ Author:	MX
 void TaskGenerate(void *pvParameters __attribute__((unused)));
 void TaskSend(void *pvParameters __attribute__((unused)));
 QueueHandle_t queueForCAN = xQueueCreate(1, sizeof(Packet));
-CAN_Serializer serializer = CAN_Serializer(7);
+CAN_Serializer serializer = CAN_Serializer();
 bool CAN_incoming = false;
 void CAN_ISR();
 void setup() {
 	Serial.begin(9600);
 	delay(1000);
-	serializer.init();
+	if (!serializer.init(18))
+	{
+		Serial.print("CAN FAIL");
+		while (1);
+	}
 	Serial.println("CAN Full Duplex terminal COM3.");
-	attachInterrupt(digitalPinToInterrupt(20), CAN_ISR, FALLING);
+	attachInterrupt(digitalPinToInterrupt(19), CAN_ISR, FALLING);
 
 	xTaskCreate(
 		TaskGenerate
@@ -51,11 +55,20 @@ void TaskGenerate(void *pvParameters __attribute__((unused)))
 		dummyData(&out, BT);
 		out.data[0][Lsig] = STATE_EN;
 		xQueueSend(queueForCAN, &out, 100);
-		vTaskDelay(500);
+		vTaskDelay(50);
 		dummyData(&out, BT);
 		out.data[0][Lsig] = STATE_DS;
 		xQueueSend(queueForCAN, &out, 100);
-		vTaskDelay(500);
+		vTaskDelay(50);
+		dummyData(&out, SM);
+		xQueueSend(queueForCAN, &out, 100);
+		vTaskDelay(50);
+		dummyData(&out, CS);
+		xQueueSend(queueForCAN, &out, 100);
+		vTaskDelay(50);
+		dummyData(&out, FC);
+		xQueueSend(queueForCAN, &out, 100);
+		vTaskDelay(50);
 	}
 }
 

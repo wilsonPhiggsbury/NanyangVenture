@@ -39,6 +39,7 @@ void setup() {
 	Serial.begin(9600);
 
 	serializer.init(CAN_CS_PIN);
+	//serializer.onlyListenFor(BT);
 	attachInterrupt(digitalPinToInterrupt(CAN_INT_PIN), CAN_ISR, FALLING);
 	
 	xTaskCreate(
@@ -116,7 +117,7 @@ void TaskBlink(void* pvParameters)
 	rstrip.begin();
 	lstrip.setBrightness(64);
 	rstrip.setBrightness(64);
-	//pinMode(LED_BUILTIN, OUTPUT);
+	pinMode(LED_BUILTIN, OUTPUT);
 	while (1)
 	{
 		for (int i = 0; i < 7; i++)
@@ -128,14 +129,14 @@ void TaskBlink(void* pvParameters)
 					lsigOn = false;
 					lstrip.setPixelColor(i, 0, 0, 0);
 					lstrip.show();
-					//digitalWrite(LED_BUILTIN, LOW);
+					digitalWrite(LED_BUILTIN, LOW);
 				}
 				else
 				{
 					lsigOn = true;
 					lstrip.setPixelColor(i, 255, 165, 0);
 					lstrip.show();
-					//digitalWrite(LED_BUILTIN, HIGH);
+					digitalWrite(LED_BUILTIN, HIGH);
 				}
 			}
 			else
@@ -143,7 +144,7 @@ void TaskBlink(void* pvParameters)
 				lsigOn = false;
 				lstrip.setPixelColor(i, 0, 0, 0);
 				lstrip.show();
-				//digitalWrite(LED_BUILTIN, LOW);
+				digitalWrite(LED_BUILTIN, LOW);
 			}
 
 			if (peripheralStates[Hazard] == STATE_EN || peripheralStates[Rsig] == STATE_EN)
