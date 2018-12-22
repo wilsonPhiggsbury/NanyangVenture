@@ -9,8 +9,10 @@
 #include <Arduino_FreeRTOS.h>
 #include <queue.h>
 #include "Pins_front.h"
-Adafruit_NeoPixel lstrip = Adafruit_NeoPixel(7, LSIG_PIN, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel rstrip = Adafruit_NeoPixel(7, RSIG_PIN, NEO_GRB + NEO_KHZ800);
+
+#define PIXELS 6
+Adafruit_NeoPixel lstrip = Adafruit_NeoPixel(PIXELS, LSIG_PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel rstrip = Adafruit_NeoPixel(PIXELS, RSIG_PIN, NEO_GRB + NEO_KHZ800);
 CAN_Serializer serializer;
 
 /*
@@ -39,7 +41,7 @@ void setup() {
 	Serial.begin(9600);
 
 	serializer.init(CAN_CS_PIN);
-	//serializer.onlyListenFor(BT);
+	serializer.onlyListenFor(BT);
 	attachInterrupt(digitalPinToInterrupt(CAN_INT_PIN), CAN_ISR, FALLING);
 	
 	xTaskCreate(
@@ -54,14 +56,14 @@ void setup() {
 		, (const portCHAR *)"CAN la"
 		, 1200 // -25
 		, NULL
-		, 1
+		, 3
 		, NULL);
 	xTaskCreate(
 		TaskBlink
 		, (const portCHAR *)"SIG"
 		, 150 // -25
 		, NULL
-		, 3
+		, 1
 		, &taskBlink);
 	//xTaskCreate(
 	//	TaskMoveWiper
@@ -113,60 +115,74 @@ void TaskBlink(void* pvParameters)
 	bool lsigOn = false, rsigOn = false;
 	//pinMode(LSIG_PIN, OUTPUT);
 	//pinMode(RSIG_PIN, OUTPUT);
+
 	lstrip.begin();
 	rstrip.begin();
-	lstrip.setBrightness(64);
-	rstrip.setBrightness(64);
+	lstrip.setBrightness(255);
+	rstrip.setBrightness(255);
 	pinMode(LED_BUILTIN, OUTPUT);
 	while (1)
 	{
-		for (int i = 0; i < 7; i++)
+		if (peripheralStates[Hazard] == STATE_EN || peripheralStates[Lsig] == STATE_EN)
 		{
-			if (peripheralStates[Hazard] == STATE_EN || peripheralStates[Lsig] == STATE_EN)
+			if (lsigOn)
 			{
-				if (lsigOn)
+				lsigOn = false;
+				digitalWrite(LED_BUILTIN, LOW);
+				for (int i = 0; i < PIXELS; i++)
 				{
-					lsigOn = false;
 					lstrip.setPixelColor(i, 0, 0, 0);
 					lstrip.show();
-					digitalWrite(LED_BUILTIN, LOW);
-				}
-				else
-				{
-					lsigOn = true;
-					lstrip.setPixelColor(i, 255, 165, 0);
-					lstrip.show();
-					digitalWrite(LED_BUILTIN, HIGH);
 				}
 			}
 			else
 			{
-				lsigOn = false;
+				lsigOn = true;
+				digitalWrite(LED_BUILTIN, HIGH);
+				for (int i = 0; i < PIXELS; i++)
+				{
+					lstrip.setPixelColor(i, 255, 165, 0);
+					lstrip.show();
+				}
+			}
+		}
+		else
+		{
+			lsigOn = false;
+			digitalWrite(LED_BUILTIN, LOW);
+			for (int i = 0; i < PIXELS; i++)
+			{
 				lstrip.setPixelColor(i, 0, 0, 0);
 				lstrip.show();
-				digitalWrite(LED_BUILTIN, LOW);
 			}
+		}
 
-			if (peripheralStates[Hazard] == STATE_EN || peripheralStates[Rsig] == STATE_EN)
+		if (peripheralStates[Hazard] == STATE_EN || peripheralStates[Rsig] == STATE_EN)
+		{
+			if (rsigOn)
 			{
-				//debug("RSIG ON");
-				if (rsigOn)
+				rsigOn = false;
+				for (int i = 0; i < PIXELS; i++)
 				{
-					rsigOn = false;
 					rstrip.setPixelColor(i, 0, 0, 0);
 					rstrip.show();
 				}
-				else
+			}
+			else
+			{
+				rsigOn = true;
+				for (int i = 0; i < PIXELS; i++)
 				{
-					rsigOn = true;
 					rstrip.setPixelColor(i, 255, 165, 0);
 					rstrip.show();
 				}
 			}
-			else
+		}
+		else
+		{
+			rsigOn = false;
+			for (int i = 0; i < PIXELS; i++)
 			{
-				//debug("RSIG OFF");
-				rsigOn = false;
 				rstrip.setPixelColor(i, 0, 0, 0);
 				rstrip.show();
 			}
@@ -204,8 +220,11 @@ void doReceiveAction(Packet* q)
 		{
 			peripheralStates[i] = q->data[0][i];
 		}
+		peripheralStates[Hazard] = STATE_DS;
+		peripheralStates[Wiper] = STATE_DS;
+		peripheralStates[Horn] = STATE_DS;
 		// kick up taskToggle to toggle accessories such as Headlights Horn etc
-		xTaskAbortDelay(taskToggle);
+		vTaskResume(taskToggle);
 		// kick up time-controlled tasks so they respond immediately.
 		// Example: "turn off blinking signal lights" should apply immediately instead of happening at the end of a blink cycle
 		xTaskAbortDelay(taskBlink);

@@ -11,7 +11,7 @@ Author:	MX
 #include <SPI.h>
 
 void TaskGenerate(void *pvParameters __attribute__((unused)));
-void TaskSend(void *pvParameters __attribute__((unused)));
+void TaskCAN(void *pvParameters __attribute__((unused)));
 QueueHandle_t queueForCAN = xQueueCreate(1, sizeof(Packet));
 CAN_Serializer serializer = CAN_Serializer();
 bool CAN_incoming = false;
@@ -35,7 +35,7 @@ void setup() {
 		, 2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
 		, NULL);
 	xTaskCreate(
-		TaskSend
+		TaskCAN
 		, (const portCHAR *)"Enqueue"  // A name just for humans
 		, 1200  // This stack size can be checked & adjusted by reading the Stack Highwater
 		, NULL
@@ -72,7 +72,7 @@ void TaskGenerate(void *pvParameters __attribute__((unused)))
 	}
 }
 
-void TaskSend(void *pvParameters __attribute__((unused)))  // This is a Task.
+void TaskCAN(void *pvParameters __attribute__((unused)))  // This is a Task.
 {
 	Packet out, in;
 

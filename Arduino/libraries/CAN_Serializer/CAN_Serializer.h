@@ -28,7 +28,10 @@ public:
 	// Designed to be called both inside/outside an ISR.
 	void recvCAN_OneFrame();
 
-
+	// debug printing
+	static void printFrames(Frames & frames);
+	static void printPacket(Packet & q);
+	
 private:
 	uint16_t pin;
 	MCP_CAN* CAN;
@@ -41,7 +44,4 @@ private:
 	unsigned long id;
 	byte len;
 	byte inBuffer[8];
-	// debug printing
-	void printFrames(Frames & frames);
-	void printPacket(Packet & q);
 };
