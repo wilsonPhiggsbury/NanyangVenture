@@ -130,7 +130,7 @@ void loop() {
 }
 void TaskRefreshScreen(void* pvParameters)
 {
-	const uint8_t CAN_resetThreshold = 10;
+	const uint8_t CAN_resetThreshold = 20;
 	uint8_t CAN_resetCounter = 0;
 
 	pinMode(LCD_BACKLIGHT, OUTPUT);
@@ -157,9 +157,6 @@ void TaskRefreshScreen(void* pvParameters)
 			//dummyData(&received, SM);
 			//screens.refreshScreens();
 			screens.refreshScreens();
-			char data[MAX_STRING_LEN];
-			received.toString(data);
-			debug(data);
 			
 		}
 		else
@@ -170,7 +167,7 @@ void TaskRefreshScreen(void* pvParameters)
 				digitalWrite(CAN_RST_PIN, LOW);
 				vTaskDelay(delay);
 				digitalWrite(CAN_RST_PIN, HIGH);
-				CAN_resetCounter = 0; debug("GG");
+				CAN_resetCounter = 0; debug("Resetting 328P...");
 			}
 		}
 		vTaskDelay(delay);
@@ -179,15 +176,18 @@ void TaskRefreshScreen(void* pvParameters)
 void TaskReadSerial(void* pvParameters)
 {
 	Packet outgoing;
-	char payload[MAX_STRING_LEN];
 	TickType_t delay = pdMS_TO_TICKS(200);
 	while (1)
 	{
-		if(CAN_Serializer::recvSerial(Serial1, &outgoing))
+		if (CAN_Serializer::recvSerial(Serial1, &outgoing))
+		{
 			xQueueSend(queueForDisplay, &outgoing, 100);
-		outgoing.toString(payload);
-		debug(payload);
-
+#if DEBUG
+			char payload[MAX_STRING_LEN];
+			outgoing.toString(payload);
+			debug(payload);
+#endif
+		}
 		vTaskDelay(delay);
 	}
 }

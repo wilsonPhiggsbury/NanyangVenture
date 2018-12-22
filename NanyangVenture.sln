@@ -61,6 +61,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DUE_button_test", "Arduino\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CAN_Serializer", "Arduino\libraries\CAN_Serializer\CAN_Serializer.vcxitems", "{D0053034-7EF4-451E-B6FA-BB852A3B0799}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NeopixelTest", "..\NeopixelTest\NeopixelTest.vcxproj", "{E09F16EE-B5AE-43F5-B7C5-2475EF26B782}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\libraries\FreeRTOS_ARM\FreeRTOS_ARM.vcxitems*{1a2bb78a-9ab3-45b7-abfc-2430b4752132}*SharedItemsImports = 9
@@ -149,6 +151,10 @@ Global
 		{A14D819E-53C2-47DD-844C-67D7860BA1FA}.Debug|x86.Build.0 = Debug|Win32
 		{A14D819E-53C2-47DD-844C-67D7860BA1FA}.Release|x86.ActiveCfg = Release|Win32
 		{A14D819E-53C2-47DD-844C-67D7860BA1FA}.Release|x86.Build.0 = Release|Win32
+		{E09F16EE-B5AE-43F5-B7C5-2475EF26B782}.Debug|x86.ActiveCfg = Debug|Win32
+		{E09F16EE-B5AE-43F5-B7C5-2475EF26B782}.Debug|x86.Build.0 = Debug|Win32
+		{E09F16EE-B5AE-43F5-B7C5-2475EF26B782}.Release|x86.ActiveCfg = Release|Win32
+		{E09F16EE-B5AE-43F5-B7C5-2475EF26B782}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

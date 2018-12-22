@@ -7,7 +7,7 @@
 #include "Pins_dashboard.h"
 Packet q;
 int rst = 0;
-const int RST = 17;//29
+const int RST = 17;// 28;
 // the setup function runs once when you press reset or power the board
 void setup() {
 	Serial.begin(9600);

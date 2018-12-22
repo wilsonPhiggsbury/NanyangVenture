@@ -8,24 +8,56 @@
 #include <FreeRTOS_ARM.h>
 
 const unsigned int buttonPins[] = { BTN_HAZARD,BTN_HEADLIGHT,BTN_HORN,BTN_LSIG,BTN_RSIG,BTN_WIPER };
-int triggered[NUM_BUTTONS];
 void TaskTest(void*);
 // the setup function runs once when you press reset or power the board
 void setup() {
 	Serial.begin(9600);
 	Serial.println("YO HI");
 	setDebounce(buttonPins, NUM_BUTTONS, 900); // PROBLEMATIC
-	pinMode(BTN_HEADLIGHT, INPUT_PULLUP);
-	attachInterrupt(BTN_HEADLIGHT, [] {
-		int* a = &triggered[getIndexFromButton(BTN_HEADLIGHT)];
-		if(*a != 1) *a = 1;
-		else *a = 0;
+	for (int i = 0; i < NUMSTATES; i++)
+		pinMode(buttonPins[i], INPUT_PULLUP);
+	attachInterrupt(digitalPinToInterrupt(BTN_HAZARD), [] {
+		if (peripheralStates[Hazard] == STATE_EN)
+			peripheralStates[Hazard] = STATE_DS;
+		else
+			peripheralStates[Hazard] = STATE_EN;
+	}, FALLING);
+	attachInterrupt(digitalPinToInterrupt(BTN_HEADLIGHT), [] {
+		if (peripheralStates[Headlights] == STATE_EN)
+			peripheralStates[Headlights] = STATE_DS;
+		else
+			peripheralStates[Headlights] = STATE_EN;
+	}, FALLING);
+	attachInterrupt(digitalPinToInterrupt(BTN_HORN), [] {
+		if (peripheralStates[Horn] == STATE_EN)
+			peripheralStates[Horn] = STATE_DS;
+		else
+			peripheralStates[Horn] = STATE_EN;
+	}, FALLING);
+	attachInterrupt(digitalPinToInterrupt(BTN_LSIG), [] {
+		if (peripheralStates[Lsig] == STATE_EN)
+			peripheralStates[Lsig] = STATE_DS;
+		else
+			peripheralStates[Lsig] = STATE_EN;
+	}, FALLING);
+	attachInterrupt(digitalPinToInterrupt(BTN_RSIG), [] {
+		if (peripheralStates[Rsig] == STATE_EN)
+			peripheralStates[Rsig] = STATE_DS;
+		else
+			peripheralStates[Rsig] = STATE_EN;
+	}, FALLING);
+	attachInterrupt(digitalPinToInterrupt(BTN_WIPER), [] {
+		if (peripheralStates[Wiper] == STATE_EN)
+			peripheralStates[Wiper] = STATE_DS;
+		else
+			peripheralStates[Wiper] = STATE_EN;
 	}, FALLING);
 
 }
 
 // the loop function runs over and over again until power down or reset
 void loop() {
+	setDebounce(buttonPins, NUM_BUTTONS, 900);
 	if (Serial.available())
 	{
 		uint16_t newDebounce = Serial.parseInt();
@@ -33,13 +65,19 @@ void loop() {
 		Serial.print("New debounce value: ");
 		Serial.println(newDebounce, HEX);
 	}
-	for (uint8_t index = 0; index < NUM_BUTTONS; index++)
-	{
-		if (triggered[index] != 0)
-		{
-			Serial.println(triggered[index]);
-		}
-	}
+	if (peripheralStates[Hazard] == STATE_EN)
+		debug_("0");
+	if (peripheralStates[Headlights] == STATE_EN)
+		debug_("1");
+	if (peripheralStates[Horn] == STATE_EN)
+		debug_("2");
+	if (peripheralStates[Lsig] == STATE_EN)
+		debug_("3");
+	if (peripheralStates[Rsig] == STATE_EN)
+		debug_("4");
+	if (peripheralStates[Wiper] == STATE_EN)
+		debug_("5");
+	debug();
 	//delay(1000);
 }
 void TaskTest(void* a)
