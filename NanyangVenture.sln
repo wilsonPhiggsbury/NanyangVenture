@@ -61,10 +61,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DUE_button_test", "Arduino\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CAN_Serializer", "Arduino\libraries\CAN_Serializer\CAN_Serializer.vcxitems", "{D0053034-7EF4-451E-B6FA-BB852A3B0799}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NeopixelTest", "..\NeopixelTest\NeopixelTest.vcxproj", "{E09F16EE-B5AE-43F5-B7C5-2475EF26B782}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EEPROM", "..\..\ide\hardware\arduino\avr\libraries\EEPROM\EEPROM.vcxitems", "{11B94213-5BA2-44F2-AA88-C7EADEB24346}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		..\..\ide\hardware\arduino\avr\libraries\EEPROM\EEPROM.vcxitems*{11b94213-5ba2-44f2-aa88-c7eadeb24346}*SharedItemsImports = 9
 		..\libraries\FreeRTOS_ARM\FreeRTOS_ARM.vcxitems*{1a2bb78a-9ab3-45b7-abfc-2430b4752132}*SharedItemsImports = 9
 		..\libraries\FreeRTOS\FreeRTOS.vcxitems*{216d3e33-021a-4bd1-93e9-8ea99ee382aa}*SharedItemsImports = 9
 		..\libraries\FreeRTOS_AVR\FreeRTOS_AVR.vcxitems*{2e764fb8-a6c5-413e-bc90-5dd0d0dd1db8}*SharedItemsImports = 9
@@ -151,10 +152,6 @@ Global
 		{A14D819E-53C2-47DD-844C-67D7860BA1FA}.Debug|x86.Build.0 = Debug|Win32
 		{A14D819E-53C2-47DD-844C-67D7860BA1FA}.Release|x86.ActiveCfg = Release|Win32
 		{A14D819E-53C2-47DD-844C-67D7860BA1FA}.Release|x86.Build.0 = Release|Win32
-		{E09F16EE-B5AE-43F5-B7C5-2475EF26B782}.Debug|x86.ActiveCfg = Debug|Win32
-		{E09F16EE-B5AE-43F5-B7C5-2475EF26B782}.Debug|x86.Build.0 = Debug|Win32
-		{E09F16EE-B5AE-43F5-B7C5-2475EF26B782}.Release|x86.ActiveCfg = Release|Win32
-		{E09F16EE-B5AE-43F5-B7C5-2475EF26B782}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -182,6 +179,7 @@ Global
 		{D8187EE3-2CA8-4B1B-92E4-CCB0901F1F40} = {D73944EA-C027-4B9A-B26C-CF8857527539}
 		{A14D819E-53C2-47DD-844C-67D7860BA1FA} = {D73944EA-C027-4B9A-B26C-CF8857527539}
 		{D0053034-7EF4-451E-B6FA-BB852A3B0799} = {B731DFF7-A7B2-4F18-831B-D04250650B2F}
+		{11B94213-5BA2-44F2-AA88-C7EADEB24346} = {B731DFF7-A7B2-4F18-831B-D04250650B2F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D50621B3-45DA-4D63-A156-3461EB4C4703}
