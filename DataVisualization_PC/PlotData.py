@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from Data import getData
 from MockDataSource import readStreamData
 
+# Does not seem to work for files that only involve 1 graph due to subplot function.
 def viewGraph(fileType):
     # get data for associated fileType
     fileTypeData = getData()[fileType]
