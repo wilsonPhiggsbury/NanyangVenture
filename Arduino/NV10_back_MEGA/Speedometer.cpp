@@ -9,6 +9,10 @@ unsigned long Speedometer::timeStamp;
 Speedometer::Speedometer(uint8_t id, uint16_t diameter_in_mm):id(id),wheelDiameter(diameter_in_mm)
 {
 }
+/// <summary>
+/// Records down the time since the hall sensor last tripped. 
+/// The time diff will be used for calculation of m/s
+/// </summary>
 void Speedometer::storeWheelInterval()
 {
 	// this is called by an ISR. It can happen anytime in the program.

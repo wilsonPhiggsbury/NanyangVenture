@@ -1,9 +1,50 @@
 #include <EEPROM.h>
+/// <summary>
+/// Initializes SD card if present. Also creates a new folder to store this session's data into.
+/// </summary>
+/// <param name="path">Generated folder path is stored into here.</param>
+/// <returns></returns>
+const uint8_t FILENAME_DIGITS = 4;
 bool initSD(char* path)
 {
 	EEPROM.begin();
-	const uint8_t FILENAME_DIGITS = 4;
-	char index[FILENAME_DIGITS + 1];
+	// begin SD card connection
+	if (!tryReadSd())
+	{
+		return false;
+	}
+
+	strcpy(path, "/LOG_"); // Arduino does not like lengthy path names. Please keep to under 4 alphabets.
+
+	// Comb through existing files in SD card to obtain the latest index. Use it to name our new folder.
+	File sub, root = SD.open("/");
+	auto existingIndex = getNewFolderIndex(sub, root); // start from index 0
+
+	// wipe card (30 is tested to still NOT crash arduino. No gurantee beyond)
+	if (existingIndex >= 30)
+	{
+		promptWipeSd(sub);
+	}
+
+	root.close();
+	sub.close();
+
+	createDirectory(path, existingIndex);
+	createFCLogFiles(path);
+	createCSLogFiles(path);
+	// *path should always contain /LOG_****/
+	// We will still use *path variable whenever we write to a file. 
+	// Clean up trailing file names after use.
+	strcpy(path + FILENAME_HEADER_LENGTH, "");
+	HESFuelCell::setPath(path);
+	return true;
+}
+void storeWheelInterval_ISR()
+{
+	speedo.storeWheelInterval();
+}
+bool tryReadSd()
+{
 	if (!SD.begin(SD_SPI_CS_PIN))
 	{
 		return false;
@@ -12,18 +53,16 @@ bool initSD(char* path)
 	if (EEPROM.read(1) == 1)
 	{
 		EEPROM.write(1, 0);
-		Serial.println(F("NOT logging into SD card."));
+		Serial.println(F("NOT logging into SD card. SD card full."));
 		return false;
 	}
-	strcpy(path, "/");
-	strcat(path, "LOG"); // Arduino does not like lengthy path names. Please keep to under 4 alphabets.
-	strcat(path, "_");
+	return true;
+}
 
-	// Comb through existing files in SD card to obtain the latest index. Use it to name our new folder.
-	File f = SD.open("/");
-	File sub, sub2;
-	int existingIndex = 0; // start from index 0
-	while (sub = f.openNextFile())
+int getNewFolderIndex(File &sub, File &root)
+{
+	auto existingIndex = 0; // start from index 0
+	while (sub = root.openNextFile())
 	{
 		if (sub.isDirectory())
 		{
@@ -31,8 +70,13 @@ bool initSD(char* path)
 			existingIndex = max(thisIndex, existingIndex);
 		}
 	}
-	if (existingIndex >= 30)
-	{
+	return existingIndex;
+}
+
+void promptWipeSd(File &sub)
+{
+	File sub2;
+	char index[FILENAME_DIGITS + 1];
 		Serial.println(F("SD card is nearing threshold to crash Arduino. Wipe the card? (y/n)"));
 		while (!Serial.available());
 		delay(100);
@@ -41,6 +85,7 @@ bool initSD(char* path)
 			Serial.read();
 		if (response == 'y')
 		{
+			// wipe card
 			Serial.println(F("Wiping card..."));
 			for (int i = 1; i < 50; i++)
 			{
@@ -80,55 +125,32 @@ bool initSD(char* path)
 		}
 		// reset the arduino
 		asm volatile ("  jmp 0");
-	}
-	// pad '0' on the front if number contains less than 4 digits
-	sprintf(index, "%04d", existingIndex + 1);
-	//uint8_t paddingZeroCounter = FILENAME_DIGITS;
-	//int existingIndex_tmp = existingIndex + 1;
-	//while (existingIndex_tmp > 0)
-	//{
-	//	existingIndex_tmp /= 10;
-	//	paddingZeroCounter--;
-	//}
-
-	//for (uint8_t i = 0; i < paddingZeroCounter; i++)
-	//	index[i] = '0';
-	//if(paddingZeroCounter != FILENAME_DIGITS)
-	//	itoa(existingIndex+1, index+paddingZeroCounter, DEC);
-
-	f.close();
+}
+void createFCLogFiles(char* path)
+{
+	File sub;
+	strcpy(path + FILENAME_HEADER_LENGTH, FUELCELL_FILENAME);
+	sub = SD.open(path, FILE_WRITE);
+	sub.println(F("\tMillis\t  V_m  A_m   W_m   Wh_mTmp_m Pres_m Vcap_m State_m\t  V_s  A_s   W_s   Wh_sTmp_s Pres_s Vcap_s State_s"));
 	sub.close();
-
+}
+void createCSLogFiles(char* path)
+{
+	File sub;
+	strcpy(path + FILENAME_HEADER_LENGTH, CURRENTSENSOR_FILENAME);
+	sub = SD.open(path, FILE_WRITE);
+	sub.println(F("\tMillis\t V_cI A_cI\t V_cO A_cO\t V_MT A_MT"));
+	sub.close();
+}
+void createDirectory(char* path, int indexInt)
+{
+	char index[FILENAME_DIGITS + 1];
+	// pad '0' on the front if number contains less than 4 digits
+	sprintf(index, "%04d", indexInt + 1);
 	// A new index number is assigned to *path! e.g. /LOG_0002
 	strcpy(path + 5, index);
 	Serial.print("Logging into folder ");	Serial.println(path);
 	SD.mkdir(path);
 	// initialize the interior folder structure
-	strcat(path, "/");
-
-	strcpy(path + FILENAME_HEADER_LENGTH, FUELCELL_FILENAME);
-	sub = SD.open(path, FILE_WRITE);
-	sub.println(F("\tMillis\t  V_m  A_m   W_m   Wh_mTmp_m Pres_m Vcap_m State_m\t  V_s  A_s   W_s   Wh_sTmp_s Pres_s Vcap_s State_s"));
-	sub.close();
-
-	strcpy(path + FILENAME_HEADER_LENGTH, CURRENTSENSOR_FILENAME);
-	sub = SD.open(path, FILE_WRITE);
-	sub.println(F("\tMillis\t V_cI A_cI\t V_cO A_cO\t V_MT A_MT"));
-	sub.close();
-
-	//strcpy(path + FILENAME_HEADER_LENGTH, MASTER_FUELCELL_RAW_FILENAME);
-	//sub = SD.open(path, FILE_WRITE);
-	//sub.close();
-	//strcpy(path + FILENAME_HEADER_LENGTH, SLAVE_FUELCELL_RAW_FILENAME);
-	//sub = SD.open(path, FILE_WRITE);
-	//sub.close();
-	// *path should always contain /LOG_****/
-	// We will still use *path variable whenever we write to a file. 
-	// Clean up trailing file names after use.
-	strcpy(path + FILENAME_HEADER_LENGTH, "");
-	return true;
-}
-void storeWheelInterval_ISR()
-{
-	speedo.storeWheelInterval();
+	strcat(path, "/");	
 }

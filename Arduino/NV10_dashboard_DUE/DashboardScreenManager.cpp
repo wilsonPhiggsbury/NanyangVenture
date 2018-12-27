@@ -6,10 +6,10 @@
 
 static const int screenWidth = 480;
 static const int screenHeight = 320;
-DashboardScreenManager::DashboardScreenManager(Packet* queueItem)
+DashboardScreenManager::DashboardScreenManager(Packet* Packet)
 {
-	q = queueItem;
-	PacketID* trackIDaddr = &(queueItem->ID);
+	q = Packet;
+	PacketID* trackIDaddr = &(Packet->ID);
 	// initialize screens
 	ILI9488* leftScreen = new ILI9488(LCD_LEFT_CS, LCD_DC, LCD_RST);
 	ILI9488* centerScreen = new ILI9488(LCD_CENTER_CS, LCD_DC);
@@ -38,14 +38,14 @@ DashboardScreenManager::DashboardScreenManager(Packet* queueItem)
 	DisplayBar* motorAmp_bar = new DisplayBar(leftScreen, 480/2-10, 180, 220, 70, DisplayBar::RIGHT_TO_LEFT);
 	DisplayBar* motorVolt_bar = new DisplayBar(leftScreen, 480/2+10, 180, 220, 70, DisplayBar::LEFT_TO_RIGHT);
 	// listen to data on a pointer
-	capInAmp_txt->init(CS, trackIDaddr, &(queueItem->data[0][1]));
-	capInAmp_bar->init(CS, trackIDaddr, &(queueItem->data[0][1]));
-	capOutAmp_txt->init(CS, trackIDaddr, &(queueItem->data[1][1]));
-	capOutAmp_bar->init(CS, trackIDaddr, &(queueItem->data[1][1]));
-	motorVolt_txt->init(CS, trackIDaddr, &(queueItem->data[2][0]));
-	motorVolt_bar->init(CS, trackIDaddr, &(queueItem->data[2][0]));
-	motorAmp_txt->init(CS, trackIDaddr, &(queueItem->data[2][1]));
-	motorAmp_bar->init(CS, trackIDaddr, &(queueItem->data[2][1]));
+	capInAmp_txt->init(CS, trackIDaddr, &(Packet->data[0][1]));
+	capInAmp_bar->init(CS, trackIDaddr, &(Packet->data[0][1]));
+	capOutAmp_txt->init(CS, trackIDaddr, &(Packet->data[1][1]));
+	capOutAmp_bar->init(CS, trackIDaddr, &(Packet->data[1][1]));
+	motorVolt_txt->init(CS, trackIDaddr, &(Packet->data[2][0]));
+	motorVolt_bar->init(CS, trackIDaddr, &(Packet->data[2][0]));
+	motorAmp_txt->init(CS, trackIDaddr, &(Packet->data[2][1]));
+	motorAmp_bar->init(CS, trackIDaddr, &(Packet->data[2][1]));
 	// customize each widget
 	capOutAmp_txt->setMargin(0);
 	capInAmp_txt->setMargin(0);
@@ -64,7 +64,7 @@ DashboardScreenManager::DashboardScreenManager(Packet* queueItem)
 	// initialize widgets
 	DisplayText* speedDisplay = new DisplayText(centerScreen, screenWidth/2, screenHeight/2, 200, 200, alignCenter, alignCenter);
 	// listen to data on a pointer
-	speedDisplay->init(SM, trackIDaddr, &(queueItem->data[0][0]));
+	speedDisplay->init(SM, trackIDaddr, &(Packet->data[0][0]));
 	// customize each widget
 	speedDisplay->setColors(ILI9488_WHITE, ILI9488_DARKGREEN);
 
@@ -76,11 +76,11 @@ DashboardScreenManager::DashboardScreenManager(Packet* queueItem)
 	DisplayText* energy_txt = new DisplayText(rightScreen, screenWidth / 2, screenHeight / 2 - 40 + 20, 400, 80, alignCenter, alignCenter);
 	DisplayBar* energy_bar = new DisplayBar(rightScreen, screenWidth / 2, screenHeight / 2 + 40 + 20, 400, 80, alignCenter, alignCenter);
 	// listen to data on a pointer
-	stackTemperature_txt->init(FC, trackIDaddr, &(queueItem->data[0][4]));
-	status_txt->init(FC, trackIDaddr, &(queueItem->data[0][7]));
-	pressure_txt->init(FC, trackIDaddr, &(queueItem->data[0][5]));
-	energy_txt->init(FC, trackIDaddr, &(queueItem->data[0][3]));
-	energy_bar->init(FC, trackIDaddr, &(queueItem->data[0][3]));
+	stackTemperature_txt->init(FC, trackIDaddr, &(Packet->data[0][4]));
+	status_txt->init(FC, trackIDaddr, &(Packet->data[0][7]));
+	pressure_txt->init(FC, trackIDaddr, &(Packet->data[0][5]));
+	energy_txt->init(FC, trackIDaddr, &(Packet->data[0][3]));
+	energy_bar->init(FC, trackIDaddr, &(Packet->data[0][3]));
 	energy_bar->setRange(0, 100);
 	// customize each widget
 	stackTemperature_txt->setColors(ILI9488_WHITE, ILI9488_BLUE);

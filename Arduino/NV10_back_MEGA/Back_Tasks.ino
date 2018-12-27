@@ -1,7 +1,7 @@
 /*--------------------------------------------------*/
 /*---------------------- Tasks ---------------------*/
 /*--------------------------------------------------*/
-void ReadFuelCell(void *pvParameters)  // This is a Task.
+void TaskLogFuelCell(void *pvParameters)  // This is a Task.
 {
 	// Obtain fuel cell object references from parameter passed in
 	HESFuelCell* fuelCell = (HESFuelCell*)pvParameters;
@@ -17,7 +17,7 @@ void ReadFuelCell(void *pvParameters)  // This is a Task.
 		vTaskDelayUntil(&prevTick, delay); // more accurate compared to vTaskDelay, since the delay is shrunk according to execution time of this piece of code
 	}
 }
-void ReadMotorPower(void* pvParameters)
+void TaskLogCurrentSensor(void* pvParameters)
 {
 	// Obtain current sensor object references from parameter passed in
 	AttopilotCurrentSensor* sensor = (AttopilotCurrentSensor*)pvParameters;
@@ -37,48 +37,36 @@ void QueueOutputData(void *pvParameters)
 {
 	const uint16_t fuelcell_logsend = FUELCELL_LOGSEND_INTERVAL / QUEUE_DATA_INTERVAL;
 	const uint16_t motor_logsend = MOTOR_LOGSEND_INTERVAL / QUEUE_DATA_INTERVAL;
-	const uint16_t CAN_frame_interval = CAN_FRAME_INTERVAL / QUEUE_DATA_INTERVAL;
 	const uint16_t speedo_refresh_interval = SPEEDOMETER_REFRESH_INTERVAL / QUEUE_DATA_INTERVAL;
 
 	Packet outgoing;
 	uint8_t syncCounter = 0;
-	//HESFuelCell* masterCell = (HESFuelCell*)pvParameters;
-	//HESFuelCell* slaveCell = ((HESFuelCell*)pvParameters) + 1;
-	//AttopilotCurrentSensor* motor1 = ((Loggers*)pvParameters)->motors;
-	//AttopilotCurrentSensor* motor2 = ((Loggers*)pvParameters)->motors + 1;
-	//AttopilotCurrentSensor* motor3 = ((Loggers*)pvParameters)->motors + 2;
-	TickType_t delay = pdMS_TO_TICKS(QUEUE_DATA_INTERVAL);
-	BaseType_t success;
+	auto delay = pdMS_TO_TICKS(QUEUE_DATA_INTERVAL);
 
 	while (1) // A Task shall never return or exit.
 	{
-		success = pdPASS;
-		syncCounter++;
-		if (syncCounter >= 128)
+		if (++syncCounter >= 128)
 			syncCounter = 0;
-		/* ------------------DATA FORMAT------------------
-		FM								FS
-		millis		V	A	W	Wh	T	P	V_c	St	V	A	W	Wh	T	P	V_c	St
-		--------------------------------------------------*/
-
+		// Send one outgoing fuel cell (FC) frame every x ms
 		if (syncCounter % fuelcell_logsend == 0)
 		{
 			// Arrange for outgoing fuel cell payload
 			outgoing.ID = FC;
+			// todo: move dumptimestamp func into packet class
 			HESFuelCell::dumpTimestampInto(&outgoing.timeStamp);
-			for (int i = 0; i < NUM_FUELCELLS; i++)
+			for (auto i = 0; i < NUM_FUELCELLS; i++)
 			{
 				if (hydroCells[i].hasUpdated())
 				{
 					hydroCells[i].dumpDataInto(outgoing.data);
 				}
-				/*else
-				{
-					strcat(outgoing.payload, "-\t-\t-\t-\t-\t-\t-\t-");
-				}*/
 			}
+			/* ------------------DATA FORMAT------------------
+			FM								FS
+			millis		V	A	W	Wh	T	P	V_c	St	V	A	W	Wh	T	P	V_c	St
+			--------------------------------------------------*/
 			xQueueSend(queueForLogSend, &outgoing, 100);
-			if(CAN_avail)
+			if (CAN_avail)
 				xQueueSend(queueForCAN, &outgoing, 100);
 		}
 
@@ -89,6 +77,7 @@ void QueueOutputData(void *pvParameters)
 		millis		V_L		V_R		V_c		A_L		A_R		A_c		Ap_L*	Ap_R*	Ap_c*	Wh_L*	Wh_R*	Wh_c*
 		*: only for display, not for logsend
 		--------------------------------------------------*/
+		// send one outgoing current sensor (CS) every x ms
 		if (syncCounter % motor_logsend == 0)
 		{
 			// Arrange for outgoing current sensor payload
@@ -99,7 +88,7 @@ void QueueOutputData(void *pvParameters)
 				motors[i].dumpDataInto(outgoing.data);//len 5
 			}
 			xQueueSend(queueForLogSend, &outgoing, 100);
-			if(CAN_avail)
+			if (CAN_avail)
 				xQueueSend(queueForCAN, &outgoing, 100);
 			//if (syncCounter % (back_lcd_refresh) == 0)
 			//{
@@ -115,19 +104,24 @@ void QueueOutputData(void *pvParameters)
 			//	}
 			//}
 		}
+		// send one outgoing speedometer (SM) every x ms
 		if (syncCounter % speedo_refresh_interval == 0)
 		{
 			outgoing.ID = SM;
 			Speedometer::dumpTimestampInto(&outgoing.timeStamp);
 			speedo.dumpDataInto(outgoing.data);
 			xQueueSend(queueForLogSend, &outgoing, 100);
-			if(CAN_avail)
+			if (CAN_avail)
 				xQueueSend(queueForCAN, &outgoing, 100);
 		}
 		vTaskDelay(delay);
 	}
 }
 
+/// <summary>
+/// Output task to log and send data
+/// </summary>
+/// <param name="pvParameters"></param>
 void LogSendData(void *pvParameters __attribute__((unused)))  // This is a Task.
 {
 	Packet received;
@@ -142,6 +136,7 @@ void LogSendData(void *pvParameters __attribute__((unused)))  // This is a Task.
 			received.toString(data);
 
 			// -------------- Store into SD -------------
+			// log
 			if (SD_avail)
 			{
 				// Set path char array to the document we want to save to, determined by a const array
@@ -157,6 +152,7 @@ void LogSendData(void *pvParameters __attribute__((unused)))  // This is a Task.
 				strcpy(path + FILENAME_HEADER_LENGTH, "");
 			}
 
+			// send
 			// finally print out the payload to be transmitted by XBee
 			Serial.println(data);
 		}
@@ -164,6 +160,7 @@ void LogSendData(void *pvParameters __attribute__((unused)))  // This is a Task.
 		vTaskDelay(delay);
 	}
 }
+
 void TaskBlink(void* pvParameters)
 {
 	bool lsigOn = false, rsigOn = false;

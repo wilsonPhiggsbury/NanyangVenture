@@ -54,8 +54,8 @@ bool SD_avail = false, CAN_avail = false;
 char path[FILENAME_HEADER_LENGTH + 8 + 4 + 1]; // +8 for filename, +4 for '.txt', +1 for '\0'
 
 // define tasks, types are: input, control, output
-void ReadFuelCell(void *pvParameters);		// Input task:		Refreshes class variables for fuel cell Volts, Amps, Watts and Energy
-void ReadMotorPower(void *pvParameters);	// Input task:		Refreshes class variables for motor Volts and Amps
+void TaskLogFuelCell(void *pvParameters);		// Input task:		Refreshes class variables for fuel cell Volts, Amps, Watts and Energy
+void TaskLogCurrentSensor(void *pvParameters);	// Input task:		Refreshes class variables for motor Volts and Amps
 void QueueOutputData(void *pvParameters);	// Control task:	Controls frequency to queue payload from above tasks to output tasks
 void LogSendData(void *pvParameters);		// Output task:		Data logged in SD card and sent through XBee. Logged and sent payload should be consistent, hence they are grouped together
 void TaskCAN(void* pvParameters);			// In/Out task:		Manages 2-way CAN bus comms
@@ -67,6 +67,11 @@ void TaskBlink(void *pvParameters);			//
 
 
 // the setup function runs once when you press reset or power the board
+/// <summary>
+/// Collects data from 3 different sources: Fuel Cell, Current Sensor, SpeedoMeter.
+/// Outputs data to 2 different places: SD card & XBee Serial
+/// Manages running lights, brake lights, signal lights.
+/// </summary>
 void setup() {
 	// initialize serial communication at 9600 bits per second:
 	Serial.begin(9600);
@@ -75,26 +80,25 @@ void setup() {
 	CAN_avail = serializer.init(CAN_CS_PIN);
 	// create all files in a new directory
 	SD_avail = initSD(path);
-	if (SD_avail)
-		HESFuelCell::setPath(path);
 	debug_("SD avail: ");
 	debug(SD_avail);
 	debug_("CAN avail: ");
 	debug(CAN_avail);
+
 	// initialize speedometer
 	pinMode(SPEEDOMETER_INTERRUPT_PIN, INPUT_PULLUP);
 	attachInterrupt(digitalPinToInterrupt(SPEEDOMETER_INTERRUPT_PIN), storeWheelInterval_ISR, FALLING);
 
 	// Now set up all Tasks to run independently. Task functions are found in Tasks.ino
 	xTaskCreate(
-		ReadFuelCell
+		TaskLogFuelCell
 		, (const portCHAR *)"Fuel"
 		, 750
 		, hydroCells
 		, 3
 		, NULL);
 	xTaskCreate(
-		ReadMotorPower
+		TaskLogCurrentSensor
 		, (const portCHAR *)"CSensor"
 		, 200
 		, motors

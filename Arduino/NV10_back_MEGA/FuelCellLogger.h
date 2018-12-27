@@ -11,7 +11,6 @@
 #define RX_BUFFER_LEN 100
 
 #include <Constants.h>
-
 class HESFuelCell
 {
  private:

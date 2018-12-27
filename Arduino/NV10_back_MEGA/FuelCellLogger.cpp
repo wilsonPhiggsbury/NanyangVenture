@@ -5,6 +5,7 @@
 uint32_t HESFuelCell::timeStamp;
 char* HESFuelCell::path;
 bool HESFuelCell::SD_avail = false;
+
 HESFuelCell::HESFuelCell(uint8_t id, HardwareSerial *port):id(id),port(port)
 {
 	port->begin(19200);
@@ -13,11 +14,19 @@ HESFuelCell::HESFuelCell(uint8_t id, HardwareSerial *port):id(id),port(port)
 	
 	timeStamp = 0;
 }
+/// <summary>
+/// Passes the path to store log data in SD card. 
+/// <para> Fuel Cells need to store their raw readings into the specified path. </para>
+/// </summary>
+/// <param name="thePath"></param>
 void HESFuelCell::setPath(char* thePath)
 {
 	SD_avail = true;
 	path = thePath;
 }
+/// <summary>
+/// Logs the Fuel Cell Serial data. Called at fixed intervals since Fuel Cells print once per second.
+/// </summary>
 void HESFuelCell::logData()
 {
 	// read into buffer, see if payload found by using DELIMITER "\n"

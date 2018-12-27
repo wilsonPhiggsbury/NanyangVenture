@@ -179,7 +179,7 @@ void TaskReadSerial(void* pvParameters)
 	TickType_t delay = pdMS_TO_TICKS(200);
 	while (1)
 	{
-		if (CAN_Serializer::recvSerial(Serial1, &outgoing))
+		if (CAN_Serializer::receiveSerial(Serial1, &outgoing))
 		{
 			xQueueSend(queueForDisplay, &outgoing, 100);
 #if DEBUG

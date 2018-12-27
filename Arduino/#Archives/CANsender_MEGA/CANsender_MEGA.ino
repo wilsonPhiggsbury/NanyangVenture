@@ -81,7 +81,7 @@ void TaskCAN(void *pvParameters __attribute__((unused)))  // This is a Task.
 		BaseType_t success = xQueueReceive(queueForCAN, &out, 0);
 		if (success)
 		{
-			if (!serializer.sendCAN(&out))
+			if (!serializer.sendCanPacket(&out))
 			{
 				Serial.println(F("Dropped frame!"));
 			}
@@ -91,7 +91,7 @@ void TaskCAN(void *pvParameters __attribute__((unused)))  // This is a Task.
 				printQ(&out);
 			}
 		}
-		bool received = serializer.recvCAN(&in);
+		bool received = serializer.receiveCanPacket(&in);
 		if (received)
 		{
 			//Serial.print("RECV ");

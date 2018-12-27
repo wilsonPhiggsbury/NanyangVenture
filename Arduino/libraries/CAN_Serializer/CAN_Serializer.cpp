@@ -13,6 +13,10 @@ bool CAN_Serializer::init(byte pin)
 		return false;
 	}
 }
+/// <summary>
+/// Blocks out other unwanted PacketIDs except for the specified one.
+/// </summary>
+/// <param name="ID"></param>
 void CAN_Serializer::onlyListenFor(PacketID ID)
 {
 	unsigned long id = ID;
@@ -29,14 +33,14 @@ void CAN_Serializer::onlyListenFor(PacketID ID)
 	CAN->init_Filt(4, 0, filterVal | 2 << 16);                // Init filter:  XX01 0010 <--- they are explicit commands to accept termination bits
 	CAN->init_Filt(5, 0, filterVal | 3 << 16);                // Init filter:  XX01 0011 <--- could've done without, but MCP_CAN needs these to work properly
 }
-bool CAN_Serializer::sendCAN(Packet* q)
+bool CAN_Serializer::sendCanPacket(Packet* packet)
 {
-	// only accept the queueItem when available
+	// only accept the Packet when available
 	if (!pendingSend)
 	{
-		framesO.clear();
-		q->toFrames(&framesO);
-		pendingSend = framesO.getNumFrames();
+		framesOut.clear();
+		packet->toFrames(&framesOut);
+		pendingSend = framesOut.getNumFrames();
 		return true;
 	}
 	else
@@ -44,13 +48,13 @@ bool CAN_Serializer::sendCAN(Packet* q)
 		return false;
 	}
 }
-bool CAN_Serializer::recvCAN(Packet* q)
+bool CAN_Serializer::receiveCanPacket(Packet* packet)
 {
-	if (readyRecv)
+	if (readyToRecieve)
 	{
-		bool status = framesI.toPacket(q);
-		framesI.clear();
-		readyRecv = false;
+		bool status = framesIn.toPacket(packet);
+		framesIn.clear();
+		readyToRecieve = false;
 		return status;
 	}
 	else
@@ -58,14 +62,14 @@ bool CAN_Serializer::recvCAN(Packet* q)
 		return false;
 	}
 }
-bool CAN_Serializer::sendSerial(HardwareSerial& serial, Packet* q)
+bool CAN_Serializer::sendSerial(HardwareSerial& serial, Packet* packet)
 {
 	char payload[MAX_STRING_LEN];
-	q->toString(payload);
+	packet->toString(payload);
 	serial.println(payload);
 	return true;
 }
-bool CAN_Serializer::recvSerial(HardwareSerial& serial, Packet* q)
+bool CAN_Serializer::receiveSerial(HardwareSerial& serial, Packet* packet)
 {
 	char payload[MAX_STRING_LEN];
 	if (serial.available())
@@ -73,7 +77,7 @@ bool CAN_Serializer::recvSerial(HardwareSerial& serial, Packet* q)
 		int bytesRead = serial.readBytesUntil('\n', payload, MAX_STRING_LEN);
 		if (bytesRead > 0)
 			payload[bytesRead - 1] = '\0';
-		bool convertSuccess = Packet::toPacket(payload, q);
+		bool convertSuccess = Packet::toPacket(payload, packet);
 		return convertSuccess;
 	}
 	else
@@ -85,10 +89,10 @@ void CAN_Serializer::sendCAN_OneFrame()
 {
 	// ---------------------  pulse out one frame -----------------------
 	// ------------ does nothing if there is nothing to send ------------
-	if(pendingSend)
+	if (pendingSend)
 	{
 		// total - current = index of frameToSend
-		NV_CanFrame& frameToSend = framesO.frames[framesO.getNumFrames()-pendingSend];
+		NV_CanFrame& frameToSend = framesOut.frames[framesOut.getNumFrames() - pendingSend];
 		byte status = CAN->sendMsgBuf(frameToSend.id, 0, frameToSend.length, frameToSend.payload);
 
 		if (status != CAN_OK)
@@ -105,12 +109,12 @@ void CAN_Serializer::sendCAN_OneFrame()
 void CAN_Serializer::recvCAN_OneFrame()
 {
 	// ---------------------  pulse in one frame -----------------------
-	// ---------- updates readyRecv when a queueItem is ready ----------
+	// ---------- updates readyRecv when a Packet is ready ----------
 	if (CAN->checkReceive() == CAN_MSGAVAIL && CAN->checkError() == CAN_OK)
 	{
 		CAN->readMsgBuf(&id, &len, inBuffer);
-		bool isLastFrame = framesI.addItem(id, len, inBuffer);
-		readyRecv = isLastFrame;
+		bool isLastFrame = framesIn.addItem(id, len, inBuffer);
+		readyToRecieve = isLastFrame;
 	}
 
 }

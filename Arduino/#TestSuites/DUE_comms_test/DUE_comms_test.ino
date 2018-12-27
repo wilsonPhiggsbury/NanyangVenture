@@ -17,7 +17,7 @@ void setup() {
 
 // the loop function runs over and over again until power down or reset
 void loop() {
-	if (CAN_Serializer::recvSerial(Serial1, &q))
+	if (CAN_Serializer::receiveSerial(Serial1, &q))
 	{
 		CAN_Serializer::sendSerial(Serial, &q); rst = 0;
 	}
@@ -33,7 +33,7 @@ void loop() {
 			rst = 0;
 		}
 	}
-	if (CAN_Serializer::recvSerial(Serial, &q))
+	if (CAN_Serializer::receiveSerial(Serial, &q))
 	{
 		CAN_Serializer::sendSerial(Serial1, &q);
 	}

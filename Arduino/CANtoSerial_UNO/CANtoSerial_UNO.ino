@@ -27,12 +27,12 @@ void setup() {
 
 void loop() {
 	// anything to send?
-	if (serializer.recvSerial(Serial, &out))
+	if (serializer.receiveSerial(Serial, &out))
 	{
-		serializer.sendCAN(&out);
+		serializer.sendCanPacket(&out);
 	}
 	// anything to receive?
-	if (serializer.recvCAN(&in))
+	if (serializer.receiveCanPacket(&in))
 	{
 		serializer.sendSerial(Serial, &in);
 	}

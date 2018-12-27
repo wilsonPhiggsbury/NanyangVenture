@@ -9,7 +9,7 @@ public:
 	unsigned long timeStamp;
 	float data[NUM_DATASETS][NUM_DATASUBSETS];
 	void toString(char* putHere);
-	static bool toPacket(char * str, Packet * queueItem); //		<--- *NOT YET verified if it works on AVR chips*
+	static bool toPacket(char * str, Packet * Packet); //		<--- *NOT YET verified if it works on AVR chips*
 private:
 	void toFrames(Frames* putHere);
 };

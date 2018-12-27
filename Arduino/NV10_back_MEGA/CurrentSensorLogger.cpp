@@ -9,6 +9,9 @@ AttopilotCurrentSensor::AttopilotCurrentSensor(int motorID, uint8_t voltPin, uin
 {
 	// id is only for accessing lookup table
 }
+/// <summary>
+/// Logs the Current Sensor analog data. 
+/// </summary>
 void AttopilotCurrentSensor::logData()
 {
 	loggedParams[volt] = analogRead(voltPin);
@@ -45,6 +48,12 @@ void AttopilotCurrentSensor::processData()
 		loggedParams[i] = rawToVA((LoggedParameters)i, loggedParams[i]);
 	}
 }
+/// <summary>
+/// Converts raw analog readings [0-1023] to Volts/Amps, using a lookup table.
+/// </summary>
+/// <param name="which">An enum to specify V or A</param>
+/// <param name="reading"></param>
+/// <returns></returns>
 float AttopilotCurrentSensor::rawToVA(LoggedParameters which, float reading)
 {
 	float first, last, step, maxIndex;

@@ -1,5 +1,5 @@
 #include "Frames.h"
-#include "QueueItem.h"
+#include "Packet.h"
 
 /*
 --- About Frame IDs ---															ID[10:0]
@@ -64,11 +64,11 @@ void Packet::toString(char* putHere)
 	// \t: tab
 	// \0: null terminator
 }
-bool Packet::toPacket(char* str, Packet* queueItem)
+bool Packet::toPacket(char* str, Packet* Packet)
 {
 	char* cur = strtok(str, "\t");
 	int i, j = 0;
-	// linear search for queueItem ID, stop at correct ID. Return fail if overshoot.
+	// linear search for Packet ID, stop at correct ID. Return fail if overshoot.
 	while(j<FRAMETYPES && strcmp(frameType_shortNames[j],cur))
 	{
 		j++;
@@ -77,12 +77,12 @@ bool Packet::toPacket(char* str, Packet* queueItem)
 	{
 		return false;
 	}
-	queueItem->ID = (PacketID)j;
+	Packet->ID = (PacketID)j;
 	uint8_t sets = FRAME_INFO_SETS[j];
 	uint8_t subsets = FRAME_INFO_SUBSETS[j];
 
 	cur = strtok(NULL, "\t");
-	queueItem->timeStamp = strtoul(cur, NULL, 16);
+	Packet->timeStamp = strtoul(cur, NULL, 16);
 
 	for (i = 0; i < sets; i++)
 	{
@@ -93,9 +93,9 @@ bool Packet::toPacket(char* str, Packet* queueItem)
 			if (i != 0 && j == 0)
 				cur++;
 #ifdef __AVR__
-			queueItem->data[i][j] = atof(cur);
+			Packet->data[i][j] = atof(cur);
 #elif defined _SAM3XA_
-			queueItem->data[i][j] = strtof(cur, NULL);
+			Packet->data[i][j] = strtof(cur, NULL);
 #endif
 		}
 		//cur = strtok(NULL, "\t");

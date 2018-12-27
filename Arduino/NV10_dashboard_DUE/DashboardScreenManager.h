@@ -16,7 +16,7 @@ private:
 	Packet* q;
 	
 public:
-	DashboardScreenManager(Packet* queueItem);
+	DashboardScreenManager(Packet* Packet);
 	void refreshScreens(void* null); // multiplex the data to respective screens
 	void refreshScreens(); // no data from CAN bus! indicate in the screens
 	~DashboardScreenManager();
