@@ -14,9 +14,10 @@
 
 // rear peripherals
 #define SPEEDOMETER_INTERRUPT_PIN 18
-#define BRAKE_PIN 45
-#define LSIG_PIN 46
-#define RSIG_PIN 47
+#define RUNNINGLIGHT_PIN 9
+#define BRAKELIGHT_PIN 10
+#define LSIG_PIN 11
+#define RSIG_PIN 12
 
 // current sensor inputs
 #define CAP_IN_VPIN A0

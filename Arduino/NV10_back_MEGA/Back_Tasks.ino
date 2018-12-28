@@ -168,52 +168,67 @@ void TaskBlink(void* pvParameters)
 	//pinMode(RSIG_PIN, OUTPUT);
 	lstrip.begin();
 	rstrip.begin();
-	lstrip.setBrightness(64);
-	rstrip.setBrightness(64);
+	lstrip.setBrightness(255);
+	rstrip.setBrightness(255);
 	while (1)
 	{
-		for (int i = 0; i < 7; i++)
+		if (peripheralStates[Hazard] == STATE_EN || peripheralStates[Lsig] == STATE_EN)
 		{
-			if (peripheralStates[Hazard] == STATE_EN || peripheralStates[Lsig] == STATE_EN)
+			if (lsigOn)
 			{
-				if (lsigOn)
+				lsigOn = false;
+				for (int i = 0; i < 7; i++)
 				{
-					lsigOn = false;
 					lstrip.setPixelColor(i, 0, 0, 0);
 					lstrip.show();
 				}
-				else
+			}
+			else
+			{
+				lsigOn = true;
+				for (int i = 0; i < 7; i++)
 				{
-					lsigOn = true;
 					lstrip.setPixelColor(i, 255, 165, 0);
 					lstrip.show();
 				}
 			}
-			else
+		}
+		else
+		{
+			lsigOn = false;
+			for (int i = 0; i < 7; i++)
 			{
-				lsigOn = false;
 				lstrip.setPixelColor(i, 0, 0, 0);
 				lstrip.show();
 			}
+		}
 
-			if (peripheralStates[Hazard] == STATE_EN || peripheralStates[Rsig] == STATE_EN)
+		if (peripheralStates[Hazard] == STATE_EN || peripheralStates[Rsig] == STATE_EN)
+		{
+			if (rsigOn)
 			{
-				if (rsigOn)
+				rsigOn = false;
+				for (int i = 0; i < 7; i++)
 				{
-					rsigOn = false;
 					rstrip.setPixelColor(i, 0, 0, 0);
 					rstrip.show();
 				}
-				else
+			}
+			else
+			{
+				rsigOn = true;
+				for (int i = 0; i < 7; i++)
 				{
-					rsigOn = true;
 					rstrip.setPixelColor(i, 255, 165, 0);
 					rstrip.show();
 				}
 			}
-			else
+		}
+		else
+		{
+			rsigOn = false;
+			for (int i = 0; i < 7; i++)
 			{
-				rsigOn = false;
 				rstrip.setPixelColor(i, 0, 0, 0);
 				rstrip.show();
 			}
@@ -228,9 +243,7 @@ void doReceiveAction(Packet* q)
 	if (q->ID == BT)
 	{
 		for (int i = 0; i < NUMSTATES; i++)
-		{
 			peripheralStates[i] = q->data[0][i];
-		}
 		xTaskAbortDelay(taskBlink);
 	}
 }

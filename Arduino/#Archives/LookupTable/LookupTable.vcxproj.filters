@@ -21,15 +21,6 @@
     <ClInclude Include="__vm\.LookupTable.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\NV10_back\Wiring.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\NV10_back\CurrentSensorLogger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\NV10_back\Behaviour.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\NV10_back\CurrentSensorLogger.cpp">

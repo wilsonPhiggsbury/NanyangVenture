@@ -195,6 +195,8 @@ void TaskCaptureButtons(void* pvParameters)
 {
 	Packet buttonCommand;
 	buttonCommand.ID = BT;
+	peripheralStates[Horn] = peripheralStates[Wiper] = peripheralStates[Hazard] = STATE_DS;
+	buttonCommand.data[0][Horn] = buttonCommand.data[0][Wiper] = buttonCommand.data[0][Hazard] = STATE_DS;
 	uint32_t syncTime = 0;
 	const uint32_t syncInterval = 2000;
 	TickType_t delay = pdMS_TO_TICKS(200);
@@ -205,6 +207,8 @@ void TaskCaptureButtons(void* pvParameters)
 		for (int i = 0; i < NUM_BUTTONS; i++)
 		{
 			buttonCommand.timeStamp = millis();
+			// only update peripheral states if changed. 
+			// Flag the existence of change with stateChanged boolean to trigger immediate broadcast later.
 			if (buttonCommand.data[0][i] != peripheralStates[i])
 			{
 				stateChanged = true;

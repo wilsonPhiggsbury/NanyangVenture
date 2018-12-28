@@ -61,7 +61,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DUE_button_test", "Arduino\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CAN_Serializer", "Arduino\libraries\CAN_Serializer\CAN_Serializer.vcxitems", "{D0053034-7EF4-451E-B6FA-BB852A3B0799}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CanSerializer_Test", "CanToSerialUno_Test\CanToSerialUno_Test.vcxproj", "{9BCB025E-DB8B-4FDA-953A-73A0F91BF4F4}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CStest", "..\CStest\CStest.vcxproj", "{862FA1C6-B06A-44E9-9CFA-21982ECB1219}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -92,7 +92,6 @@ Global
 		Arduino\libraries\CAN_Serializer\CAN_Serializer.vcxitems*{8b3a2447-325c-473e-a84c-45b578507bd3}*SharedItemsImports = 4
 		..\libraries\Adafruit_GFX_Library\Adafruit_GFX_Library.vcxitems*{8c1a22a5-7653-42a6-b3dd-80639fa902d1}*SharedItemsImports = 9
 		Arduino\libraries\CAN_Serializer\CAN_Serializer.vcxitems*{8d011ae1-9a38-4688-b43b-08794e403492}*SharedItemsImports = 4
-		Arduino\libraries\CAN_Serializer\CAN_Serializer.vcxitems*{9bcb025e-db8b-4fda-953a-73a0f91bf4f4}*SharedItemsImports = 4
 		Arduino\libraries\CAN_Serializer\CAN_Serializer.vcxitems*{a14d819e-53c2-47dd-844c-67d7860ba1fa}*SharedItemsImports = 4
 		..\..\ide\portable\packages\arduino\hardware\sam\1.6.11\libraries\Wire\Wire.vcxitems*{a7192e66-f105-4569-885c-47923cd5f91a}*SharedItemsImports = 9
 		..\libraries\MCP_CAN_lib\MCP_CAN_lib.vcxitems*{bf888b28-eef3-4922-a68f-36a1fd54b965}*SharedItemsImports = 9
@@ -176,14 +175,12 @@ Global
 		{A14D819E-53C2-47DD-844C-67D7860BA1FA}.Release|x64.ActiveCfg = Release|Win32
 		{A14D819E-53C2-47DD-844C-67D7860BA1FA}.Release|x86.ActiveCfg = Release|Win32
 		{A14D819E-53C2-47DD-844C-67D7860BA1FA}.Release|x86.Build.0 = Release|Win32
-		{9BCB025E-DB8B-4FDA-953A-73A0F91BF4F4}.Debug|x64.ActiveCfg = Debug|x64
-		{9BCB025E-DB8B-4FDA-953A-73A0F91BF4F4}.Debug|x64.Build.0 = Debug|x64
-		{9BCB025E-DB8B-4FDA-953A-73A0F91BF4F4}.Debug|x86.ActiveCfg = Debug|Win32
-		{9BCB025E-DB8B-4FDA-953A-73A0F91BF4F4}.Debug|x86.Build.0 = Debug|Win32
-		{9BCB025E-DB8B-4FDA-953A-73A0F91BF4F4}.Release|x64.ActiveCfg = Release|x64
-		{9BCB025E-DB8B-4FDA-953A-73A0F91BF4F4}.Release|x64.Build.0 = Release|x64
-		{9BCB025E-DB8B-4FDA-953A-73A0F91BF4F4}.Release|x86.ActiveCfg = Release|Win32
-		{9BCB025E-DB8B-4FDA-953A-73A0F91BF4F4}.Release|x86.Build.0 = Release|Win32
+		{862FA1C6-B06A-44E9-9CFA-21982ECB1219}.Debug|x64.ActiveCfg = Debug|Win32
+		{862FA1C6-B06A-44E9-9CFA-21982ECB1219}.Debug|x86.ActiveCfg = Debug|Win32
+		{862FA1C6-B06A-44E9-9CFA-21982ECB1219}.Debug|x86.Build.0 = Debug|Win32
+		{862FA1C6-B06A-44E9-9CFA-21982ECB1219}.Release|x64.ActiveCfg = Release|Win32
+		{862FA1C6-B06A-44E9-9CFA-21982ECB1219}.Release|x86.ActiveCfg = Release|Win32
+		{862FA1C6-B06A-44E9-9CFA-21982ECB1219}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -211,7 +208,6 @@ Global
 		{D8187EE3-2CA8-4B1B-92E4-CCB0901F1F40} = {D73944EA-C027-4B9A-B26C-CF8857527539}
 		{A14D819E-53C2-47DD-844C-67D7860BA1FA} = {D73944EA-C027-4B9A-B26C-CF8857527539}
 		{D0053034-7EF4-451E-B6FA-BB852A3B0799} = {B731DFF7-A7B2-4F18-831B-D04250650B2F}
-		{9BCB025E-DB8B-4FDA-953A-73A0F91BF4F4} = {D73944EA-C027-4B9A-B26C-CF8857527539}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D50621B3-45DA-4D63-A156-3461EB4C4703}

@@ -48,6 +48,8 @@ AttopilotCurrentSensor motors[NUM_CURRENTSENSORS] = {
 Speedometer speedo = Speedometer(0, 545);
 Adafruit_NeoPixel lstrip = Adafruit_NeoPixel(7, LSIG_PIN, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel rstrip = Adafruit_NeoPixel(7, RSIG_PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel lightstrip = Adafruit_NeoPixel(7, RUNNINGLIGHT_PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel brakestrip = Adafruit_NeoPixel(7, BRAKELIGHT_PIN, NEO_GRB + NEO_KHZ800);
 CAN_Serializer serializer;
 // define globals
 bool SD_avail = false, CAN_avail = false;
@@ -85,6 +87,12 @@ void setup() {
 	debug_("CAN avail: ");
 	debug(CAN_avail);
 
+	// initialize light strips
+	lightstrip.begin();
+	lightstrip.setBrightness(255);
+	for(int i=0; i<7; i++)
+		lightstrip.setPixelColor(i, 255, 255, 255);
+	lightstrip.show();
 	// initialize speedometer
 	pinMode(SPEEDOMETER_INTERRUPT_PIN, INPUT_PULLUP);
 	attachInterrupt(digitalPinToInterrupt(SPEEDOMETER_INTERRUPT_PIN), storeWheelInterval_ISR, FALLING);
@@ -123,14 +131,14 @@ void setup() {
 		, (const portCHAR *)"SIG"
 		, 150 // -25
 		, NULL
-		, 1
+		, 3
 		, &taskBlink);
 	xTaskCreate(
 		TaskCAN
 		, (const portCHAR *) "CAN la!" // where got cannot?
 		, 1200  // Stack size
 		, NULL
-		, 0  // Priority
+		, 2  // Priority
 		, NULL);
 	//vTaskStartScheduler();
 	debug_(F("Free Memory in Bytes: "));
