@@ -6,23 +6,23 @@
 
 static const int screenWidth = 480;
 static const int screenHeight = 320;
-DashboardScreenManager::DashboardScreenManager(QueueItem* queueItem)
+DashboardScreenManager::DashboardScreenManager(QueueItem* queueItem):q(queueItem)
 {
 	DataSource* trackIDaddr = &(queueItem->ID);
 	// initialize screens
-	ILI9488* leftScreen = new ILI9488(LEFT_LCD_CS, LEFT_LCD_DC, LEFT_LCD_RST);
+	ILI9488* leftScreen = new ILI9488(LEFT_LCD_CS, LCD_DC, LCD_RST);
 	leftScreen->begin();
-	leftScreen->setRotation(1);
+	leftScreen->setRotation(3);
 	leftScreen->fillScreen(ILI9488_BLACK);
 	leftScreen->setTextColor(ILI9488_WHITE);
-	ILI9488* centerScreen = new ILI9488(CENTER_LCD_CS, CENTER_LCD_DC, CENTER_LCD_RST);
+	ILI9488* centerScreen = new ILI9488(CENTER_LCD_CS, LCD_DC);
 	centerScreen->begin();
 	centerScreen->setRotation(1);
 	centerScreen->fillScreen(ILI9488_BLACK);
 	centerScreen->setTextColor(ILI9488_WHITE);
-	ILI9488* rightScreen = new ILI9488(RIGHT_LCD_CS, RIGHT_LCD_DC, RIGHT_LCD_RST);
+	ILI9488* rightScreen = new ILI9488(RIGHT_LCD_CS, LCD_DC);
 	rightScreen->begin();
-	rightScreen->setRotation(1);
+	rightScreen->setRotation(3);
 	rightScreen->fillScreen(ILI9488_BLACK);
 	rightScreen->setTextColor(ILI9488_WHITE);
 	// ---------------------------- LEFT SCREEN -----------------------------
@@ -36,14 +36,14 @@ DashboardScreenManager::DashboardScreenManager(QueueItem* queueItem)
 	DisplayBar* motorAmp_bar = new DisplayBar(leftScreen, 480/2-10, 180, 220, 70, DisplayBar::RIGHT_TO_LEFT);
 	DisplayBar* motorVolt_bar = new DisplayBar(leftScreen, 480/2+10, 180, 220, 70, DisplayBar::LEFT_TO_RIGHT);
 	// listen to data on a pointer
-	capInAmp_txt->init(CS, trackIDaddr, &(queueItem->data[0][1]));
-	capInAmp_bar->init(CS, trackIDaddr, &(queueItem->data[0][1]));
-	capOutAmp_txt->init(CS, trackIDaddr, &(queueItem->data[1][1]));
-	capOutAmp_bar->init(CS, trackIDaddr, &(queueItem->data[1][1]));
-	motorVolt_txt->init(CS, trackIDaddr, &(queueItem->data[2][0]));
-	motorVolt_bar->init(CS, trackIDaddr, &(queueItem->data[2][0]));
-	motorAmp_txt->init(CS, trackIDaddr, &(queueItem->data[2][1]));
-	motorAmp_bar->init(CS, trackIDaddr, &(queueItem->data[2][1]));
+	capInAmp_txt->init(CS, trackIDaddr, &(queueItem->data[0][0]));
+	capInAmp_bar->init(CS, trackIDaddr, &(queueItem->data[0][0]));
+	capOutAmp_txt->init(CS, trackIDaddr, &(queueItem->data[1][0]));
+	capOutAmp_bar->init(CS, trackIDaddr, &(queueItem->data[1][0]));
+	motorVolt_txt->init(CS, trackIDaddr, &(queueItem->data[2][1]));
+	motorVolt_bar->init(CS, trackIDaddr, &(queueItem->data[2][1]));
+	motorAmp_txt->init(CS, trackIDaddr, &(queueItem->data[2][0]));
+	motorAmp_bar->init(CS, trackIDaddr, &(queueItem->data[2][0]));
 	// customize each widget
 	capOutAmp_txt->setMargin(0);
 	capInAmp_txt->setMargin(0);
@@ -80,7 +80,7 @@ DashboardScreenManager::DashboardScreenManager(QueueItem* queueItem)
 	energy_txt->init(FC, trackIDaddr, &(queueItem->data[0][3]));
 	energy_bar->init(FC, trackIDaddr, &(queueItem->data[0][3]));
 	energy_bar->setRange(0, 100);
-	// customize each widget
+	// customize each widget's skin
 	stackTemperature_txt->setColors(ILI9488_WHITE, ILI9488_BLUE);
 	status_txt->setColors(ILI9488_WHITE, ILI9488_BLUE);
 	pressure_txt->setColors(ILI9488_WHITE, ILI9488_BLUE);
@@ -110,7 +110,34 @@ DashboardScreenManager::DashboardScreenManager(QueueItem* queueItem)
 void DashboardScreenManager::refreshScreens()
 {
 	for (int i = 0; i < 14; i++)
-		allWidgets[i]->update();
+	{
+		if (q->ID == FC && i == 11)
+		{
+			DisplayText* statusBox = (DisplayText*)allWidgets[i];
+			if (q->data[0][7] == 1.0)
+			{
+				statusBox->setColors(ILI9488_GREEN, ILI9488_DARKGREEN);
+				statusBox->update("ON");
+			}
+			else
+			{
+				statusBox->setColors(ILI9488_RED, ILI9488_MAROON);
+				statusBox->update("OFF");
+			}
+		}
+		else
+		{
+			allWidgets[i]->update();
+		}
+	}
+}
+void DashboardScreenManager::refreshScreens(int status)
+{
+	if (status == 0)
+	{
+		DisplayText* speedDisplay = (DisplayText*)allWidgets[8];
+		speedDisplay->update("---");
+	}
 }
 
 DashboardScreenManager::~DashboardScreenManager()

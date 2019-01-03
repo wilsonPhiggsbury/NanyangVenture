@@ -213,7 +213,7 @@ void SendCANFrame(void *pvParameters __attribute__((unused)))  // This is a Task
 					// handle sending error
 					//Serial.println("FAIL SEND");
 				}
-				vTaskDelay(pdMS_TO_TICKS(5));
+				vTaskDelay(pdMS_TO_TICKS(10));
 			}
 
 		}

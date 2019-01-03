@@ -56,13 +56,13 @@ void setup() {
 		, 3  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
 		, NULL);
 
-	//xTaskCreate(
-	//	TaskReadSerial
-	//	, (const portCHAR *)"ReadS1"  // A name just for humans
-	//	, 1000  // This stack size can be checked & adjusted by reading the Stack Highwater
-	//	, NULL // Any pointer to pass in
-	//	, 2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
-	//	, NULL);
+	xTaskCreate(
+		TaskReadSerial
+		, (const portCHAR *)"ReadS1"  // A name just for humans
+		, 1000  // This stack size can be checked & adjusted by reading the Stack Highwater
+		, NULL // Any pointer to pass in
+		, 2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
+		, NULL);
 
 	vTaskStartScheduler();
 }
@@ -73,9 +73,9 @@ void loop() {
 }
 void TaskTest(void* pvParameters)
 {
-	pinMode(CENTER_LCD_LED, OUTPUT);
-	digitalWrite(CENTER_LCD_LED, HIGH);
-	ILI9488 scr = ILI9488(LEFT_LCD_CS, LEFT_LCD_DC, RIGHT_LCD_RST);
+	pinMode(LCD_LED, OUTPUT);
+	digitalWrite(LCD_LED, HIGH);
+	ILI9488 scr = ILI9488(LEFT_LCD_CS, LCD_DC, LCD_RST);
 	scr.begin();
 	scr.setRotation(1);
 	scr.fillScreen(ILI9488_PURPLE);
@@ -100,8 +100,8 @@ void TaskRefreshScreen(void* pvParameters)
 	uint8_t CAN_resetCounter = 0;
 	
 
-	pinMode(CENTER_LCD_LED, OUTPUT);
-	digitalWrite(CENTER_LCD_LED, HIGH);
+	pinMode(LCD_LED, OUTPUT);
+	digitalWrite(LCD_LED, HIGH);
 
 	QueueItem received;
 	char content[FLOAT_TO_STRING_LEN + 1];
@@ -113,27 +113,21 @@ void TaskRefreshScreen(void* pvParameters)
 	uint8_t tstVal = 0;
 	while (1)
 	{
-		BaseType_t success = true;// xQueueReceive(queueForDisplay, &received, 0);
+		BaseType_t success = xQueueReceive(queueForDisplay, &received, 0);
 		if (success)
 		{
 			CAN_resetCounter = 0;
-			// dummy data
-			dummyData(&received, FC);
 			screens.refreshScreens();
-			dummyData(&received, CS);
-			screens.refreshScreens();
-			dummyData(&received, SM);
-			screens.refreshScreens();
-			//char data[MAX_STRING_LEN];
-			//received.toString(data);
-			//Serial.println(data);
+			char data[MAX_STRING_LEN];
+			received.toString(data);
+			Serial.println(data);
 			
 		}
 		else
 		{
 			if (CAN_resetCounter++ >= CAN_resetThreshold)
 			{
-				screens.refreshScreens();
+				screens.refreshScreens(0);
 				digitalWrite(CAN_RST_PIN, LOW);
 				vTaskDelay(delay);
 				digitalWrite(CAN_RST_PIN, HIGH);
@@ -143,48 +137,48 @@ void TaskRefreshScreen(void* pvParameters)
 		vTaskDelay(delay);
 	}
 }
-//void TaskReadSerial(void* pvParameters)
-//{
-//	QueueItem outgoing;
-//	char payload[MAX_STRING_LEN];
-//	TickType_t delay = pdMS_TO_TICKS(200);
-//	pinMode(CAN_RST_PIN, OUTPUT);
-//	digitalWrite(CAN_RST_PIN, HIGH);
-//	while (1)
-//	{
-//
-//		if (Serial1.available())
-//		{
-//			int bytesRead = Serial1.readBytesUntil('\n', payload, MAX_STRING_LEN);
-//			if(bytesRead>0)
-//				payload[bytesRead-1] = '\0';
-//			//// ------------------------------ covert back -----------------------------------
-//			bool convertSuccess = QueueItem::toQueueItem(payload, &outgoing);
-//			if(convertSuccess)
-//				xQueueSend(queueForDisplay, &outgoing, 100);
-//
-//			// DEBUG printing that prints out special bytes as uint
-//			//int counter = 0;
-//			//while (counter < bytesRead)
-//			//{
-//			//	char tmp = payload[counter++];
-//			//	if (isPrintable(tmp))
-//			//		Serial.print(tmp);
-//			//	else
-//			//	{
-//			//		Serial.print("<");
-//			//		Serial.print((uint8_t)tmp);
-//			//		Serial.print(">");
-//			//	}
-//			//}
-//			//Serial.print("[");
-//			//Serial.print(Serial.available());
-//			//Serial.print("]");
-//			//Serial.println("__");
-//		}
-//		vTaskDelay(delay);
-//	}
-//}
+void TaskReadSerial(void* pvParameters)
+{
+	QueueItem outgoing;
+	char payload[MAX_STRING_LEN];
+	TickType_t delay = pdMS_TO_TICKS(200);
+	pinMode(CAN_RST_PIN, OUTPUT);
+	digitalWrite(CAN_RST_PIN, HIGH);
+	while (1)
+	{
+
+		if (Serial1.available())
+		{
+			int bytesRead = Serial1.readBytesUntil('\n', payload, MAX_STRING_LEN);
+			if(bytesRead>0)
+				payload[bytesRead-1] = '\0';
+			//// ------------------------------ covert back -----------------------------------
+			bool convertSuccess = QueueItem::toQueueItem(payload, &outgoing);
+			if(convertSuccess)
+				xQueueSend(queueForDisplay, &outgoing, 100);
+
+			// DEBUG printing that prints out special bytes as uint
+			//int counter = 0;
+			//while (counter < bytesRead)
+			//{
+			//	char tmp = payload[counter++];
+			//	if (isPrintable(tmp))
+			//		Serial.print(tmp);
+			//	else
+			//	{
+			//		Serial.print("<");
+			//		Serial.print((uint8_t)tmp);
+			//		Serial.print(">");
+			//	}
+			//}
+			//Serial.print("[");
+			//Serial.print(Serial.available());
+			//Serial.print("]");
+			//Serial.println("__");
+		}
+		vTaskDelay(delay);
+	}
+}
 //centerLCD.drawRGBBitmap(77, 0, image, 150, 150);
 //centerLCD.setAddrWindow(120, 80, 240, 160);
 //centerLCD.pushColors(image, 9600, true);

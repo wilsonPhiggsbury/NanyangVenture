@@ -4,6 +4,7 @@
  Author:	MX
 */
 
+#include <mcp_can_dfs.h>
 #include <Arduino_FreeRTOS.h>
 #include <queue.h>
 //#include <FreeRTOS_AVR.h>
