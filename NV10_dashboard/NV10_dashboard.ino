@@ -110,7 +110,6 @@ void TaskRefreshScreen(void* pvParameters)
 	TickType_t delay = pdMS_TO_TICKS(200);
 	uint32_t lastTick = 0;
 
-	uint8_t tstVal = 0;
 	while (1)
 	{
 		BaseType_t success = xQueueReceive(queueForDisplay, &received, 0);
@@ -120,8 +119,7 @@ void TaskRefreshScreen(void* pvParameters)
 			screens.refreshScreens();
 			char data[MAX_STRING_LEN];
 			received.toString(data);
-			Serial.println(data);
-			
+			Serial.println(data);			
 		}
 		else
 		{
@@ -258,6 +256,8 @@ void dummyData(QueueItem* q, DataSource id) {
 	case FC:
 		q->data[0][7] = random(0, 1);
 		q->data[0][3] = random(0, 100);
+		q->data[0][4] = 59; // tmp too high!
+		q->data[0][5] = 0.51; // pres too low!
 		break;
 	case CS:
 		q->data[2][1] = random(0, 40);

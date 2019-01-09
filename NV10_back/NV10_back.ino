@@ -71,7 +71,14 @@ void setup() {
 	// create all files in a new directory
 	SD_avail = initSD(path);
 	if (SD_avail)
+	{
 		HESFuelCell::setPath(path);
+		Serial.println("SD ready.");
+	}
+	else
+	{
+		Serial.println("SD not detected.");
+	}
 	// initialize speedometer
 	attachInterrupt(digitalPinToInterrupt(SPEEDOMETER_INTERRUPT_PIN), storeWheelInterval_ISR, FALLING);
 	// initialize CAN bus

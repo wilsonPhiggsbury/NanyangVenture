@@ -150,8 +150,6 @@ void LogSendData(void *pvParameters __attribute__((unused)))  // This is a Task.
 				strcpy(path + FILENAME_HEADER_LENGTH, frameType_shortNames[received.ID]);
 				strcat(path, ".txt");
 				// DO NOT SWITCH OUT THIS TASK IN THE MIDST OF WRITING A FILE ON SD CARD
-				// (consequence: some serial payload may be missed. Hang or miss payload? Tough choice...)
-				// ^^^^ this is probably fixed, if verified delete this line ^^^^
 				vTaskSuspendAll();
 				File writtenFile = SD.open(path, FILE_WRITE);
 				writtenFile.println(data);

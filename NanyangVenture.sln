@@ -53,7 +53,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Archive", "Archive", "{1FB7
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CANsender", "CANsender\CANsender.vcxproj", "{606A1460-864B-450D-BA10-221513A5B956}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MCP_CAN_lib", "..\libraries\MCP_CAN_lib\MCP_CAN_lib.vcxitems", "{B3A69DA8-682F-49E7-9E6F-FC5224725D50}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MCP_CAN_lib", "..\libraries\MCP_CAN_lib\MCP_CAN_lib.vcxitems", "{BF888B28-EEF3-4922-A68F-36A1FD54B965}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -84,7 +84,7 @@ Global
 		SharedProtocols\SharedProtocols.vcxitems*{8b3a2447-325c-473e-a84c-45b578507bd3}*SharedItemsImports = 4
 		..\libraries\Adafruit_GFX_Library\Adafruit_GFX_Library.vcxitems*{8c1a22a5-7653-42a6-b3dd-80639fa902d1}*SharedItemsImports = 9
 		..\..\ide\portable\packages\arduino\hardware\sam\1.6.11\libraries\Wire\Wire.vcxitems*{a7192e66-f105-4569-885c-47923cd5f91a}*SharedItemsImports = 9
-		..\libraries\MCP_CAN_lib\MCP_CAN_lib.vcxitems*{b3a69da8-682f-49e7-9e6f-fc5224725d50}*SharedItemsImports = 9
+		..\libraries\MCP_CAN_lib\MCP_CAN_lib.vcxitems*{bf888b28-eef3-4922-a68f-36a1fd54b965}*SharedItemsImports = 9
 		..\..\ide\portable\packages\arduino\hardware\sam\1.6.11\libraries\SPI\SPI.vcxitems*{cdca65f1-80ec-465d-91ff-e25112f2bfbc}*SharedItemsImports = 4
 		..\libraries\FreeRTOS_ARM\FreeRTOS_ARM.vcxitems*{cdca65f1-80ec-465d-91ff-e25112f2bfbc}*SharedItemsImports = 4
 		..\libraries\FreeRTOS\FreeRTOS.vcxitems*{e0f75ac7-15bb-4c7a-98cd-37a96c9641a3}*SharedItemsImports = 4
@@ -158,7 +158,7 @@ Global
 		{2E764FB8-A6C5-413E-BC90-5DD0D0DD1DB8} = {B731DFF7-A7B2-4F18-831B-D04250650B2F}
 		{216D3E33-021A-4BD1-93E9-8EA99EE382AA} = {B731DFF7-A7B2-4F18-831B-D04250650B2F}
 		{606A1460-864B-450D-BA10-221513A5B956} = {D73944EA-C027-4B9A-B26C-CF8857527539}
-		{B3A69DA8-682F-49E7-9E6F-FC5224725D50} = {B731DFF7-A7B2-4F18-831B-D04250650B2F}
+		{BF888B28-EEF3-4922-A68F-36A1FD54B965} = {B731DFF7-A7B2-4F18-831B-D04250650B2F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D50621B3-45DA-4D63-A156-3461EB4C4703}
