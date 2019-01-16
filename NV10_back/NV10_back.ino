@@ -43,7 +43,7 @@ AttopilotCurrentSensor motors[NUM_CURRENTSENSORS] = {
 	AttopilotCurrentSensor(2,MOTOR_VPIN,MOTOR_APIN)
 };
 // ATTR: wheel diameter
-Speedometer speedo = Speedometer(0, 545);
+Speedometer speedo = Speedometer(0, 545/2);
 MCP_CAN CANObj = MCP_CAN(CAN_CS_PIN);
 // define globals
 bool SD_avail, CAN_avail;
