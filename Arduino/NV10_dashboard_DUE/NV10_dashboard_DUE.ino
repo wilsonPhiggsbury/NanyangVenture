@@ -39,23 +39,29 @@ void setup() {
 	}
 	// I tried putting attachinterrupt in the for loop above but failed. Lambda functions complain.
 	// So here, have some wall text.
-	attachInterrupt(digitalPinToInterrupt(BTN_HAZARD), [] {
-		if (peripheralStates[Hazard] == STATE_EN)
-			peripheralStates[Hazard] = STATE_DS;
-		else
-			peripheralStates[Hazard] = STATE_EN;
-	}, FALLING);
+	//attachInterrupt(digitalPinToInterrupt(BTN_HAZARD), [] {
+	//	if (peripheralStates[Hazard] == STATE_EN)
+	//		peripheralStates[Hazard] = STATE_DS;
+	//	else
+	//		peripheralStates[Hazard] = STATE_EN;
+	//}, FALLING);
+	//attachInterrupt(digitalPinToInterrupt(BTN_WIPER), [] {
+	//	if (peripheralStates[Wiper] == STATE_EN)
+	//		peripheralStates[Wiper] = STATE_DS;
+	//	else
+	//		peripheralStates[Wiper] = STATE_EN;
+	//}, FALLING);
+	//attachInterrupt(digitalPinToInterrupt(BTN_HORN), [] {
+	//	if (peripheralStates[Horn] == STATE_EN)
+	//		peripheralStates[Horn] = STATE_DS;
+	//	else
+	//		peripheralStates[Horn] = STATE_EN;
+	//}, FALLING);
 	attachInterrupt(digitalPinToInterrupt(BTN_HEADLIGHT), [] {
 		if (peripheralStates[Headlights] == STATE_EN)
 			peripheralStates[Headlights] = STATE_DS;
 		else
 			peripheralStates[Headlights] = STATE_EN;
-	}, FALLING);
-	attachInterrupt(digitalPinToInterrupt(BTN_HORN), [] {
-		if (peripheralStates[Horn] == STATE_EN)
-			peripheralStates[Horn] = STATE_DS;
-		else
-			peripheralStates[Horn] = STATE_EN;
 	}, FALLING);
 	attachInterrupt(digitalPinToInterrupt(BTN_LSIG), [] {
 		if (peripheralStates[Lsig] == STATE_EN)
@@ -68,12 +74,6 @@ void setup() {
 			peripheralStates[Rsig] = STATE_DS;
 		else
 			peripheralStates[Rsig] = STATE_EN;
-	}, FALLING);
-	attachInterrupt(digitalPinToInterrupt(BTN_WIPER), [] {
-		if (peripheralStates[Wiper] == STATE_EN)
-			peripheralStates[Wiper] = STATE_DS;
-		else
-			peripheralStates[Wiper] = STATE_EN;
 	}, FALLING);
 	//attachInterrupt(digitalPinToInterrupt(BTN_RADIO), [] {
 	//	peripheralStates[Radio] = STATE_EN;
@@ -115,7 +115,7 @@ void setup() {
 		, NULL);
 	xTaskCreate(
 		TaskCaptureButtons
-		, (const portCHAR *)"ReadS1"  // A name just for humans
+		, (const portCHAR *)"ReadBT"  // A name just for humans
 		, 600  
 		, NULL 
 		, 2  
@@ -130,7 +130,7 @@ void loop() {
 }
 void TaskRefreshScreen(void* pvParameters)
 {
-	const uint8_t CAN_resetThreshold = 20;
+	const uint8_t CAN_resetThreshold = 15;
 	uint8_t CAN_resetCounter = 0;
 
 	pinMode(LCD_BACKLIGHT, OUTPUT);
@@ -200,13 +200,13 @@ void TaskCaptureButtons(void* pvParameters)
 	uint32_t syncTime = 0;
 	const uint32_t syncInterval = 2000;
 	TickType_t delay = pdMS_TO_TICKS(200);
-	setDebounce(buttonPins, NUM_BUTTONS, 500); // for some reason, setDebounce() if called in setup() seems to have no effect
+	setDebounce(buttonPins, NUM_BUTTONS, 900); // for some reason, setDebounce() if called in setup() seems to have no effect
 	while (1)
 	{
 		bool stateChanged = false;
 		for (int i = 0; i < NUM_BUTTONS; i++)
 		{
-			buttonCommand.timeStamp = millis();
+			//if (i == Lsig) { debug_("Lsig read = "); debug(digitalRead(buttonPins[i])); }
 			// only update peripheral states if changed. 
 			// Flag the existence of change with stateChanged boolean to trigger immediate broadcast later.
 			if (buttonCommand.data[0][i] != peripheralStates[i])
@@ -215,6 +215,7 @@ void TaskCaptureButtons(void* pvParameters)
 				buttonCommand.data[0][i] = peripheralStates[i];
 			}
 		}
+		buttonCommand.timeStamp = millis();
 		// broadcast a regular syncing frame every now and then to avoid 
 		// random microcontroller resets from throwing off the peripheral states
 		// broadcast immediately if there are updates
@@ -222,6 +223,7 @@ void TaskCaptureButtons(void* pvParameters)
 		{
 			syncTime = millis();
 			CAN_Serializer::sendSerial(Serial1, &buttonCommand);
+			if(stateChanged)CAN_Serializer::sendSerial(Serial, &buttonCommand);
 			//for (int i = 0; i < NUM_BUTTONS; i++)
 			//{
 			//	debug_(buttonCommand.data[0][i]);

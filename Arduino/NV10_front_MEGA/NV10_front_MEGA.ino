@@ -88,23 +88,19 @@ void TaskToggle(void* pvParameters)
 	{
 		if (peripheralStates[Horn] == STATE_EN)
 		{
-			debug(F("HORN ON"));
 			digitalWrite(HORN_PIN, HIGH);
 		}
 		else if (peripheralStates[Horn] == STATE_DS)
 		{
-			debug(F("HORN OFF"));
 			digitalWrite(HORN_PIN, LOW);
 		}
 
 		if (peripheralStates[Headlights] == STATE_EN)
 		{
-			debug(F("LIGHTS ON"));
 			digitalWrite(HEADLIGHTS_PIN, HIGH);
 		}
 		else if (peripheralStates[Headlights] == STATE_DS)
 		{
-			debug(F("LIGHTS OFF"));
 			digitalWrite(HEADLIGHTS_PIN, LOW);
 		}
 		vTaskSuspend(taskToggle);
@@ -133,6 +129,7 @@ void TaskBlink(void* pvParameters)
 				{
 					lstrip.setPixelColor(i, 0, 0, 0);
 					lstrip.show();
+					digitalWrite(LED_BUILTIN, LOW);
 				}
 			}
 			else
@@ -143,6 +140,7 @@ void TaskBlink(void* pvParameters)
 				{
 					lstrip.setPixelColor(i, 255, 165, 0);
 					lstrip.show();
+					digitalWrite(LED_BUILTIN, HIGH);
 				}
 			}
 		}
@@ -154,6 +152,7 @@ void TaskBlink(void* pvParameters)
 			{
 				lstrip.setPixelColor(i, 0, 0, 0);
 				lstrip.show();
+				digitalWrite(LED_BUILTIN, LOW);
 			}
 		}
 
@@ -218,11 +217,37 @@ void doReceiveAction(Packet* q)
 	{
 		for (int i = 0; i < NUMSTATES; i++)
 		{
-			peripheralStates[i] = q->data[0][i];
+			if (peripheralStates[i] != q->data[0][i])
+			{
+				switch (i)
+				{
+				case Horn:
+					if (peripheralStates[Horn] == STATE_EN)debug(F("Horn should not be on!"));
+					break;
+				case Wiper:
+					if (peripheralStates[Wiper] == STATE_EN)debug(F("Wiper should not be on!"));
+					break;
+				case Hazard:
+					if (peripheralStates[Hazard] == STATE_EN)debug(F("Hazard should not be on!"));
+					break;
+				case Lsig:
+					if (peripheralStates[Lsig] == STATE_EN)debug(F("Lsig ON"));
+					else debug(F("Lsig OFF"));
+					peripheralStates[i] = q->data[0][i];
+					break;
+				case Rsig:
+					if (peripheralStates[Rsig] == STATE_EN)debug(F("Rsig ON"));
+					else debug(F("Rsig OFF"));
+					peripheralStates[i] = q->data[0][i];
+					break;
+				case Headlights:
+					if (peripheralStates[Headlights] == STATE_EN)debug(F("Headlights ON"));
+					else debug(F("Headlights OFF"));
+					peripheralStates[i] = q->data[0][i];
+					break;
+				}
+			}
 		}
-		peripheralStates[Hazard] = STATE_DS;
-		peripheralStates[Wiper] = STATE_DS;
-		peripheralStates[Horn] = STATE_DS;
 		// kick up taskToggle to toggle accessories such as Headlights Horn etc
 		vTaskResume(taskToggle);
 		// kick up time-controlled tasks so they respond immediately.

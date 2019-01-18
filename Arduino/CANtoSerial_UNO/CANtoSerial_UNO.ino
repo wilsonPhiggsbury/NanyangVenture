@@ -20,7 +20,11 @@ void CAN_ISR();
 void setup() {
 	Serial.begin(9600);
 	delay(100);
-	serializer.init(CAN_CS_PIN);
+	if (!serializer.init(CAN_CS_PIN))
+	{
+		delay(1000);
+		asm volatile ("  jmp 0");
+	}
 	pinMode(CAN_INT_PIN, INPUT_PULLUP);
 	attachInterrupt(digitalPinToInterrupt(CAN_INT_PIN), CAN_ISR, FALLING);
 }
@@ -38,6 +42,7 @@ void loop() {
 	}
 	// pulse one frame out
 	serializer.sendCAN_OneFrame();
+	delay(20);
 }
 void CAN_ISR()
 {

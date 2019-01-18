@@ -9,6 +9,11 @@ Author:	MX
 #include <queue.h>
 #include <CAN_Serializer.h>
 
+#define CCS 7
+#define INT 20
+//#define CS 48
+//#define INT 19
+
 void TaskGenerate(void *pvParameters __attribute__((unused)));
 void TaskCAN(void *pvParameters __attribute__((unused)));
 QueueHandle_t queueForCAN = xQueueCreate(1, sizeof(Packet));
@@ -18,13 +23,13 @@ void CAN_ISR();
 void setup() {
 	Serial.begin(9600);
 	delay(1000);
-	if (!serializer.init(48))
+	if (!serializer.init(CCS))
 	{
 		Serial.print("CAN FAIL");
 		while (1);
 	}
 	Serial.println("CAN Full Duplex terminal COM6.");
-	attachInterrupt(digitalPinToInterrupt(19), CAN_ISR, FALLING);
+	attachInterrupt(digitalPinToInterrupt(INT), CAN_ISR, FALLING);
 
 	xTaskCreate(
 		TaskGenerate
@@ -35,7 +40,7 @@ void setup() {
 		, NULL);
 	xTaskCreate(
 		TaskCAN
-		, (const portCHAR *)"Enqueue"  // A name just for humans
+		, (const portCHAR *)"CAN"  // A name just for humans
 		, 1000  // This stack size can be checked & adjusted by reading the Stack Highwater
 		, NULL
 		, 1  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
@@ -53,13 +58,13 @@ void TaskGenerate(void *pvParameters __attribute__((unused)))
 	{
 		dummyData(&out, CS);
 		xQueueSend(queueForCAN, &out, 100);
-		vTaskDelay(5);
-		dummyData(&out, BT);
+		vTaskDelay(random(10,15));
+		dummyData(&out, SM);
 		xQueueSend(queueForCAN, &out, 100);
-		vTaskDelay(5);
+		vTaskDelay(random(10, 15));
 		dummyData(&out, FC);
 		xQueueSend(queueForCAN, &out, 100);
-		vTaskDelay(50);
+		vTaskDelay(random(10, 15));
 	}
 }
 
@@ -78,14 +83,14 @@ void TaskCAN(void *pvParameters __attribute__((unused)))  // This is a Task.
 			}
 			else
 			{
-				Serial.print("SENT ");
-				printQ(&out);
+				//Serial.print("SENT ");
+				//printQ(&out);
 			}
 		}
 		bool received = serializer.receiveCanPacket(&in);
 		if (received)
 		{
-			Serial.print("RECV ");
+			//Serial.print("RECV ");
 			printQ(&in);
 		}
 		serializer.sendCAN_OneFrame();
