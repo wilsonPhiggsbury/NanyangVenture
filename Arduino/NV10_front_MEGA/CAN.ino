@@ -27,6 +27,8 @@ xTaskCreate(
 void TaskCAN(void *pvParameters){
 	Packet in, out;
 	bool sent, received;
+	int receiveTimeout = 200;
+	unsigned long lastTime = 0;
 	attachInterrupt(digitalPinToInterrupt(CAN_INT_PIN), CAN_ISR, FALLING);
 	debug(F("CAN started."));
 	while (1)
@@ -45,11 +47,25 @@ void TaskCAN(void *pvParameters){
 		received = serializer.receiveCanPacket(&in);
 		if (received)
 		{
+			debug_(F("----------Ticks left: ")); debug_(receiveTimeout); debug_(F("----------"));
+			receiveTimeout = 200;
+			serializer.receiveTimeout();
 			doReceiveAction(&in);
+		}
+		else
+		{
+			if (--receiveTimeout <= 0)
+			{
+				receiveTimeout = 50;
+				debug_(F("----------CAN receive timeout @ ")); debug_(millis());debug_(F(" ms----------"));
+				serializer.receiveTimeout();
+			}
 		}
 		// pulse one frame out
 		serializer.sendCAN_OneFrame();
-		vTaskDelay(pdMS_TO_TICKS(20));
+		//debug(millis() - lastTime);
+		lastTime = millis();
+		vTaskDelay(2); // ~35ms delay between calls
 	}
 }
 void CAN_ISR()

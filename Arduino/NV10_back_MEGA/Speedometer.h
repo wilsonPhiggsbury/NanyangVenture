@@ -25,7 +25,7 @@ private:
 	static unsigned long timeStamp;
 	void processData();
 	uint8_t id;
-	float loggedParams[SPEEDOMETER_READVALUES] = {};
+	float loggedParams[SPEEDOMETER_READVALUES];
 	typedef enum {
 		kmh
 	}LoggedParams;

@@ -151,8 +151,6 @@ void LogSendData(void *pvParameters __attribute__((unused)))  // This is a Task.
 				// *path should only remain as /LOG_****/, clean up after use
 				strcpy(path + FILENAME_HEADER_LENGTH, "");
 			}
-
-			// send
 			// finally print out the payload to be transmitted by XBee
 			Serial.println(data);
 		}
@@ -169,9 +167,14 @@ void TaskBlink(void* pvParameters)
 	lstrip.begin();
 	rstrip.begin();
 	lstrip.setBrightness(255);
-	rstrip.setBrightness(255);
+	rstrip.setBrightness(255); pinMode(LED_BUILTIN, OUTPUT);
 	while (1)
 	{
+		//if (peripheralStates[Headlights] == STATE_EN)debug(F("Headlights ON"));
+		//else debug(F("Headlights OFF"));
+		//if (peripheralStates[Rsig] == STATE_EN)debug(F("Rsig ON"));
+		//else debug(F("Rsig OFF"));
+		//debug(F("--------"));
 		if (peripheralStates[Hazard] == STATE_EN || peripheralStates[Lsig] == STATE_EN)
 		{
 			if (lsigOn)
@@ -180,7 +183,8 @@ void TaskBlink(void* pvParameters)
 				for (int i = 0; i < 7; i++)
 				{
 					lstrip.setPixelColor(i, 0, 0, 0);
-					lstrip.show();
+					lstrip.show(); 
+					digitalWrite(LED_BUILTIN, LOW);
 				}
 			}
 			else
@@ -190,6 +194,7 @@ void TaskBlink(void* pvParameters)
 				{
 					lstrip.setPixelColor(i, 255, 165, 0);
 					lstrip.show();
+					digitalWrite(LED_BUILTIN, HIGH);
 				}
 			}
 		}
@@ -200,6 +205,7 @@ void TaskBlink(void* pvParameters)
 			{
 				lstrip.setPixelColor(i, 0, 0, 0);
 				lstrip.show();
+				digitalWrite(LED_BUILTIN, LOW);
 			}
 		}
 

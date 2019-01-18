@@ -27,6 +27,9 @@ public:
 	void sendCAN_OneFrame();
 	// Designed to be called both inside/outside an ISR.
 	void recvCAN_OneFrame();
+	
+	// called upon receive timeout. patch for randomly spoiling CAN bus.
+	void receiveTimeout();
 
 	// debug printing
 	static void printFrames(Frames & frames);

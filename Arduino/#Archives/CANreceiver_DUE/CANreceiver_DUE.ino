@@ -6,78 +6,120 @@ Author:	MX
 #include <mcp_can_dfs.h>
 #include <mcp_can.h>
 #include <FreeRTOS_ARM.h>
-#include <Adafruit_GFX.h>
+#include <CAN_Serializer.h>
 
-#include <SPI.h>
-
-void QueueOutputData(void *pvParameters __attribute__((unused)));
-MCP_CAN CANObj = MCP_CAN(4);
-volatile int CAN_incoming = 0;
+void TaskGenerate(void *pvParameters __attribute__((unused)));
+void TaskCAN(void *pvParameters __attribute__((unused)));
+QueueHandle_t queueForCAN = xQueueCreate(1, sizeof(Packet));
+bool CAN_incoming = false;
 void CAN_ISR();
 void setup() {
 	Serial.begin(9600);
+	Serial1.begin(9600);
 	delay(1000);
-	if (CANObj.begin(CAN_1000KBPS) == CAN_OK)
-	{
-		Serial.println("CAN receiver DUE initialized.");
-	}
-	else
-	{
-		Serial.println("CAN error.");
-	}
-	attachInterrupt(digitalPinToInterrupt(3), CAN_ISR, FALLING);
 
 	xTaskCreate(
-		QueueOutputData
+		TaskGenerate
 		, (const portCHAR *)"Enqueue"  // A name just for humans
-		, 400  // This stack size can be checked & adjusted by reading the Stack Highwater
+		, 200  // This stack size can be checked & adjusted by reading the Stack Highwater
+		, NULL
+		, 2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
+		, NULL);
+	xTaskCreate(
+		TaskCAN
+		, (const portCHAR *)"Enqueue"  // A name just for humans
+		, 1000  // This stack size can be checked & adjusted by reading the Stack Highwater
 		, NULL
 		, 1  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
 		, NULL);
-	vTaskStartScheduler();
+	
 }
 
 void loop() {
 
 }
-
-void QueueOutputData(void *pvParameters __attribute__((unused)))  // This is a Task.
+void TaskGenerate(void *pvParameters __attribute__((unused)))
 {
-	uint8_t msgLength = 8;
-	byte inBuffer[8];
+	Packet out;
+	while (1)
+	{
+		dummyData(&out, CS);
+		xQueueSend(queueForCAN, &out, 100);
+		vTaskDelay(5);
+		dummyData(&out, SM);
+		xQueueSend(queueForCAN, &out, 100);
+		vTaskDelay(5);
+		dummyData(&out, FC);
+		xQueueSend(queueForCAN, &out, 100);
+		vTaskDelay(50);
+	}
+}
+
+void TaskCAN(void *pvParameters __attribute__((unused)))  // This is a Task.
+{
+	Packet out, in;
+
 	while (1) // A Task shall never return or exit.
 	{
-		if (CAN_incoming == 1)
+		BaseType_t success = xQueueReceive(queueForCAN, &out, 0);
+		if (success)
 		{
-			CANObj.readMsgBuf(&msgLength, inBuffer);
-			Serial.print("Received data from source ");
-			Serial.println(CANObj.getCanId());
-			Serial.println("CONTENT:");
-			for (int i = 0; i < msgLength; i++)
+			if (!serializer.sendCanPacket(&out))
 			{
-				if (isPrintable(inBuffer[i]))
-					Serial.print((char)inBuffer[i]);
-				else
-					Serial.print((int)inBuffer[i]);
+				Serial.println(F("Dropped frame!"));
 			}
-			Serial.println();
+			else
+			{
+				Serial.print("SENT ");
+				printQ(&out);
+			}
 		}
-		else if (CAN_incoming == -1)
+		bool received = serializer.receiveCanPacket(&in);
+		if (received)
 		{
-			Serial.println("CAN receive error.");
+			Serial.print("RECV ");
+			printQ(&in);
 		}
-		CAN_incoming = 0;
-		vTaskDelay(pdMS_TO_TICKS(5));
+		serializer.sendCAN_OneFrame();
+		vTaskDelay(pdMS_TO_TICKS(5));   // send payload per 5ms
 	}
 }
 void CAN_ISR()
 {
-	if (CANObj.checkError() == CAN_OK)
+	serializer.recvCAN_OneFrame();
+}
+
+void dummyData(Packet* q, PacketID id) {
+	q->ID = id;
+	int i, j;
+	i = FRAME_INFO_SETS[id];
+	j = FRAME_INFO_SUBSETS[id];
+	for (int _i = 0; _i < i; _i++)
 	{
-		CAN_incoming = 1;
+		for (int _j = 0; _j < j; _j++)
+		{
+			q->data[_i][_j] = random(0, 10);
+		}
 	}
-	else
+	switch (id)
 	{
-		CAN_incoming = -1;
+	case FC:
+		q->data[0][7] = random(0, 1);
+		q->data[0][3] = random(0, 100);
+		break;
+	case CS:
+		q->data[2][1] = random(0, 40);
+		q->data[2][0] = random(45, 60);
+		break;
+	case SM:
+
+		break;
 	}
+
+}
+void printQ(Packet *q)
+{
+	char str[MAX_STRING_LEN];
+	q->toString(str);
+	Serial.println(str);
 }

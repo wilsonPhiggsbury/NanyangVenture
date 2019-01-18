@@ -28,7 +28,7 @@ class HESFuelCell
 	 bool updated;
 	 void writeAsRawData(char* toWrite);
 
-	 float loggedParams[FUELCELL_READVALUES] = {};
+	 float loggedParams[FUELCELL_READVALUES];
 	 typedef enum {
 		 volts,
 		 amps,

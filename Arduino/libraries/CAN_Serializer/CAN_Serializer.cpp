@@ -118,6 +118,10 @@ void CAN_Serializer::recvCAN_OneFrame()
 	}
 
 }
+void CAN_Serializer::receiveTimeout()
+{
+	debug_("Error code: "); debug(CAN->checkError());
+}
 void CAN_Serializer::printFrames(Frames& frames)
 {
 	for (uint8_t i = 0; i < frames.getNumFrames(); i++)

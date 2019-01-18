@@ -45,7 +45,7 @@ AttopilotCurrentSensor motors[NUM_CURRENTSENSORS] = {
 	AttopilotCurrentSensor(2,MOTOR_VPIN,MOTOR_APIN)
 };
 // wheel diameter is 545 mm, feed into speedo
-Speedometer speedo = Speedometer(0, 545);
+Speedometer speedo = Speedometer(0, 545/2);
 Adafruit_NeoPixel lstrip = Adafruit_NeoPixel(7, LSIG_PIN, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel rstrip = Adafruit_NeoPixel(7, RSIG_PIN, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel lightstrip = Adafruit_NeoPixel(7, RUNNINGLIGHT_PIN, NEO_GRB + NEO_KHZ800);
@@ -82,10 +82,10 @@ void setup() {
 	CAN_avail = serializer.init(CAN_CS_PIN);
 	// create all files in a new directory
 	SD_avail = initSD(path);
-	debug_("SD avail: ");
-	debug(SD_avail);
-	debug_("CAN avail: ");
-	debug(CAN_avail);
+	Serial.print("SD avail: ");
+	Serial.println(SD_avail);
+	Serial.print("CAN avail: ");
+	Serial.println(CAN_avail);
 
 	// initialize light strips
 	lightstrip.begin();

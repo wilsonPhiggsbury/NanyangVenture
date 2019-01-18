@@ -50,15 +50,15 @@ const uint16_t V_TABLE[][V_ENTRIES] PROGMEM = {
 		62,
 		128,
 		193,
-		259,
-		325,
-		390,
-		455,
-		520,
-		586,
-		651,
-		717,
-		782
+		257,
+		323,
+		388,
+		453,
+		519,
+		584,
+		648,
+		714,
+		779
 	},
 	{
 		// Motor
@@ -105,26 +105,26 @@ const uint16_t A_TABLE[][A_ENTRIES] PROGMEM = {
 	{
 		// CAP_OUT
 		0.0,
-		4.0,
-		10.0,
-		17.0,
-		24.0,
-		31.0,
-		38.0,
+		5.5,
+		12.0,
+		18.5,
+		26.0,
+		32.0,
+		39.5,
 		46.0,
-		52.5,
+		53.5,
 		60.0,
-		67.0,
+		66.0,
 		73.5,
-		81.0,
+		80.0,
 		88.0,
-		95.0,
-		103.0,
-		110.0,
-		116.5,
-		123.5,
-		131.0,
-		138.0
+		94.5,
+		100.0,
+		107.0,
+		114.0,
+		120.0,
+		127.0,
+		134.5
 	},
 	{
 		// Motor
@@ -162,7 +162,7 @@ private:
 	uint8_t voltPin;
 	uint8_t ampPin;
 
-	float loggedParams[CURRENTSENSOR_READVALUES] = {};
+	float loggedParams[CURRENTSENSOR_READVALUES];
 	typedef enum {
 		volt,
 		amp
