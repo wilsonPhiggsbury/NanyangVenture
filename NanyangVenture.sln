@@ -9,7 +9,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Wire", "..\..\ide\hardware\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SD", "..\..\ide\libraries\SD\SD.vcxitems", "{FA968CF9-C643-4453-A136-BDED4E20B71A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SPI", "..\..\ide\hardware\arduino\avr\libraries\SPI\SPI.vcxitems", "{6F81BC15-C478-45A4-A060-02D3EAC23A77}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SPI_AVR", "..\..\ide\hardware\arduino\avr\libraries\SPI\SPI.vcxitems", "{6F81BC15-C478-45A4-A060-02D3EAC23A77}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Adafruit_GFX_Library", "..\libraries\Adafruit_GFX_Library\Adafruit_GFX_Library.vcxitems", "{8C1A22A5-7653-42A6-B3DD-80639FA902D1}"
 EndProject
@@ -60,8 +60,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DUE_button_test", "Arduino\#TestSuites\DUE_button_test\DUE_button_test.vcxproj", "{A14D819E-53C2-47DD-844C-67D7860BA1FA}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CAN_Serializer", "Arduino\libraries\CAN_Serializer\CAN_Serializer.vcxitems", "{D0053034-7EF4-451E-B6FA-BB852A3B0799}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CStest", "..\CStest\CStest.vcxproj", "{862FA1C6-B06A-44E9-9CFA-21982ECB1219}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -175,12 +173,6 @@ Global
 		{A14D819E-53C2-47DD-844C-67D7860BA1FA}.Release|x64.ActiveCfg = Release|Win32
 		{A14D819E-53C2-47DD-844C-67D7860BA1FA}.Release|x86.ActiveCfg = Release|Win32
 		{A14D819E-53C2-47DD-844C-67D7860BA1FA}.Release|x86.Build.0 = Release|Win32
-		{862FA1C6-B06A-44E9-9CFA-21982ECB1219}.Debug|x64.ActiveCfg = Debug|Win32
-		{862FA1C6-B06A-44E9-9CFA-21982ECB1219}.Debug|x86.ActiveCfg = Debug|Win32
-		{862FA1C6-B06A-44E9-9CFA-21982ECB1219}.Debug|x86.Build.0 = Debug|Win32
-		{862FA1C6-B06A-44E9-9CFA-21982ECB1219}.Release|x64.ActiveCfg = Release|Win32
-		{862FA1C6-B06A-44E9-9CFA-21982ECB1219}.Release|x86.ActiveCfg = Release|Win32
-		{862FA1C6-B06A-44E9-9CFA-21982ECB1219}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
