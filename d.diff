@@ -1,0 +1,134 @@
+diff --git a/Arduino/NV10_dashboard_DUE/DashboardScreenManager.cpp b/Arduino/NV10_dashboard_DUE/DashboardScreenManager.cpp
+index d76b956..5be6259 100644
+--- a/Arduino/NV10_dashboard_DUE/DashboardScreenManager.cpp
++++ b/Arduino/NV10_dashboard_DUE/DashboardScreenManager.cpp
+@@ -30,16 +30,16 @@ DashboardScreenManager::DashboardScreenManager(Packet* Packet)
+ 	// ---------------------------- LEFT SCREEN -----------------------------
+ 	// initialize widgets
+ 	DisplayText* capOutAmp_txt = new DisplayText(leftScreen, 0, 0, 90, 75, alignLeft, alignTop);
+-	DisplayText* capInAmp_txt = new DisplayText(leftScreen, screenWidth, 0, 90, 75, alignRight, alignTop);
++	//DisplayText* capInAmp_txt = new DisplayText(leftScreen, screenWidth, 0, 90, 75, alignRight, alignTop);
+ 	DisplayText* motorAmp_txt = new DisplayText(leftScreen, 0, screenHeight, 90, 75, alignLeft, alignBtm);
+ 	DisplayText* motorVolt_txt = new DisplayText(leftScreen, screenWidth, screenHeight, 90, 75, alignRight, alignBtm);
+ 	DisplayBar* capOutAmp_bar = new DisplayBar(leftScreen, 480/2-10, 100, 220, 35, DisplayBar::RIGHT_TO_LEFT);
+-	DisplayBar* capInAmp_bar = new DisplayBar(leftScreen, 480/2+10, 100, 220, 35, DisplayBar::LEFT_TO_RIGHT);
+-	DisplayBar* motorAmp_bar = new DisplayBar(leftScreen, 480/2-10, 180, 220, 70, DisplayBar::RIGHT_TO_LEFT);
+-	DisplayBar* motorVolt_bar = new DisplayBar(leftScreen, 480/2+10, 180, 220, 70, DisplayBar::LEFT_TO_RIGHT);
++	// capInAmp_bar = new DisplayBar(leftScreen, 480/2+10, 100, 220, 35, DisplayBar::LEFT_TO_RIGHT);
++	DisplayBar* motorAmp_bar = new DisplayBar(leftScreen, 480/2-10, 160, 220, 90, DisplayBar::RIGHT_TO_LEFT); // original y = 180, h = 70
++	DisplayBar* motorVolt_bar = new DisplayBar(leftScreen, 480/2+10, 140, 220, 110, DisplayBar::LEFT_TO_RIGHT); // original y = 180, h = 70
+ 	// listen to data on a pointer
+-	capInAmp_txt->init(CS, trackIDaddr, &(Packet->data[0][1]));
+-	capInAmp_bar->init(CS, trackIDaddr, &(Packet->data[0][1]));
++	//capInAmp_txt->init(CS, trackIDaddr, &(Packet->data[0][1]));
++	//capInAmp_bar->init(CS, trackIDaddr, &(Packet->data[0][1]));
+ 	capOutAmp_txt->init(CS, trackIDaddr, &(Packet->data[1][1]));
+ 	capOutAmp_bar->init(CS, trackIDaddr, &(Packet->data[1][1]));
+ 	motorVolt_txt->init(CS, trackIDaddr, &(Packet->data[2][0]));
+@@ -48,15 +48,15 @@ DashboardScreenManager::DashboardScreenManager(Packet* Packet)
+ 	motorAmp_bar->init(CS, trackIDaddr, &(Packet->data[2][1]));
+ 	// customize each widget
+ 	capOutAmp_txt->setMargin(0);
+-	capInAmp_txt->setMargin(0);
++	//capInAmp_txt->setMargin(0);
+ 	motorAmp_txt->setMargin(0);
+ 	motorVolt_txt->setMargin(2);
+ 	capOutAmp_bar->setRange(0, 10);
+-	capInAmp_bar->setRange(0, 10);
++	//capInAmp_bar->setRange(0, 10);
+ 	motorAmp_bar->setRange(0, 40);
+ 	motorVolt_bar->setRange(45, 60);
+ 	capOutAmp_bar->setColors(ILI9488_RED, ILI9488_MAROON);
+-	capInAmp_bar->setColors(ILI9488_CYAN, ILI9488_DARKCYAN);
++	//capInAmp_bar->setColors(ILI9488_CYAN, ILI9488_DARKCYAN);
+ 	motorAmp_bar->setColors(ILI9488_RED, ILI9488_MAROON);
+ 	motorVolt_bar->setColors(ILI9488_CYAN, ILI9488_DARKCYAN);
+ 
+@@ -90,8 +90,8 @@ DashboardScreenManager::DashboardScreenManager(Packet* Packet)
+ 	energy_bar->setColors(ILI9488_YELLOW, ILI9488_BLACK);
+ 
+ 	// ---------------------------- tie up references for updating later -----------------------------
+-	allWidgets[0] = capInAmp_txt;
+-	allWidgets[1] = capInAmp_bar;
++	allWidgets[0] = NULL;// capInAmp_txt;
++	allWidgets[1] = NULL;// capInAmp_bar;
+ 	allWidgets[2] = capOutAmp_txt;
+ 	allWidgets[3] = capOutAmp_bar;
+ 	allWidgets[4] = motorAmp_txt;
+@@ -111,25 +111,67 @@ DashboardScreenManager::DashboardScreenManager(Packet* Packet)
+ }
+ void DashboardScreenManager::refreshScreens()
+ {
+-	for (int i = 0; i < 14; i++)
++	for (int i = 2; i < 14; i++)
+ 	{
+-		// handle fuel cell status text box 
+-		if (i == 11)
++		DisplayText* box;
++		if (q->ID == FC)
+ 		{
+-			if (q->ID == FC)
++			switch (i)
+ 			{
+-				DisplayText* statusBox = (DisplayText*)allWidgets[i];
++			case 9: // FC temp should be < 60
++				box = (DisplayText*)allWidgets[i];
++				if (q->data[0][4] >= 60)
++					box->setColors(ILI9488_WHITE, ILI9488_RED);
++				else
++					box->setColors(ILI9488_WHITE, ILI9488_BLUE);
++				allWidgets[i]->update();
++				break;
++			case 11: // FC status should be = 1.0 (only two possible values)
++				box = (DisplayText*)allWidgets[i];
+ 				if (q->data[0][7] == 1.0)
+ 				{
+-					statusBox->setColors(ILI9488_GREEN, ILI9488_DARKGREEN);
+-					statusBox->update("ON");
++					box->setColors(ILI9488_GREEN, ILI9488_DARKGREEN);
++					box->update("ON");
+ 				}
+ 				else
+ 				{
+-					statusBox->setColors(ILI9488_RED, ILI9488_MAROON);
+-					statusBox->update("OFF");
++					box->setColors(ILI9488_RED, ILI9488_MAROON);
++					box->update("OFF");
+ 				}
++				break;
++			case 10: // FC pressure should be > 0.5
++				box = (DisplayText*)allWidgets[i];
++				if (q->data[0][5] <= 0.5)
++					box->setColors(ILI9488_WHITE, ILI9488_RED);
++				else
++					box->setColors(ILI9488_WHITE, ILI9488_BLUE);
++				allWidgets[i]->update();
++				break;
++			default:
++				allWidgets[i]->update();
++				break;
++			}
++		}
++		else if (q->ID == CS)
++		{
++			switch (i)
++			{
++			case 4: // motor amp should be < 25 
++				box = (DisplayText*)allWidgets[i];
++				if (q->data[2][1] >= 25)
++					box->setColors(ILI9488_WHITE, ILI9488_RED);
++				else
++					box->setColors(ILI9488_WHITE, ILI9488_BLACK);
++				break;
++			case 6: // motor volt should be > 45 
++				box = (DisplayText*)allWidgets[i];
++				if (q->data[2][0] <= 45)
++					box->setColors(ILI9488_WHITE, ILI9488_RED);
++				else
++					box->setColors(ILI9488_WHITE, ILI9488_BLACK);
++				break;
+ 			}
++			allWidgets[i]->update();
+ 		}
+ 		else
+ 		{

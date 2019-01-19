@@ -75,7 +75,6 @@ Global
 		..\..\ide\portable\packages\arduino\hardware\sam\1.6.11\libraries\SPI\SPI.vcxitems*{6bf971b4-9758-41f0-a084-398e99c260f7}*SharedItemsImports = 4
 		..\libraries\Adafruit_GFX_Library\Adafruit_GFX_Library.vcxitems*{6bf971b4-9758-41f0-a084-398e99c260f7}*SharedItemsImports = 4
 		..\libraries\ILI9488\ILI9488.vcxitems*{6bf971b4-9758-41f0-a084-398e99c260f7}*SharedItemsImports = 4
-		Arduino\SharedProtocols\SharedProtocols.vcxitems*{6bf971b4-9758-41f0-a084-398e99c260f7}*SharedItemsImports = 4
 		..\..\ide\hardware\arduino\avr\libraries\SPI\SPI.vcxitems*{6f81bc15-c478-45a4-a060-02d3eac23a77}*SharedItemsImports = 9
 		..\libraries\LiquidCrystal\LiquidCrystal.vcxitems*{71c8833b-db48-45fc-bf91-791068c94fb0}*SharedItemsImports = 9
 		..\..\ide\portable\packages\arduino\hardware\sam\1.6.11\libraries\SPI\SPI.vcxitems*{7e88a9ac-293c-43d8-8aca-7d6b1f56531f}*SharedItemsImports = 9
