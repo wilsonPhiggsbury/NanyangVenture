@@ -99,8 +99,8 @@
   <ItemGroup>
     <ClInclude Include="Bitmaps.h" />
     <ClInclude Include="DashboardScreenManager.h" />
+    <ClInclude Include="DisplayArrow.h" />
     <ClInclude Include="DisplayBar.h" />
-    <ClInclude Include="DisplayDrawing.h" />
     <ClInclude Include="DisplayElement.h" />
     <ClInclude Include="DisplayGauge.h" />
     <ClInclude Include="DisplayText.h" />
@@ -109,8 +109,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DashboardScreenManager.cpp" />
+    <ClCompile Include="DisplayArrow.cpp" />
     <ClCompile Include="DisplayBar.cpp" />
-    <ClCompile Include="DisplayDrawing.cpp" />
     <ClCompile Include="DisplayElement.cpp" />
     <ClCompile Include="DisplayGauge.cpp" />
     <ClCompile Include="DisplayText.cpp" />
