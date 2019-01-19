@@ -15,7 +15,10 @@ void setup() {
 	Serial.println("YO HI");
 	setDebounce(buttonPins, NUM_BUTTONS, 900); // PROBLEMATIC
 	for (int i = 0; i < NUMSTATES; i++)
+	{
 		pinMode(buttonPins[i], INPUT_PULLUP);
+		peripheralStates[i] = STATE_DS;
+	}
 	attachInterrupt(digitalPinToInterrupt(BTN_HAZARD), [] {
 		if (peripheralStates[Hazard] == STATE_EN)
 			peripheralStates[Hazard] = STATE_DS;
@@ -57,7 +60,6 @@ void setup() {
 
 // the loop function runs over and over again until power down or reset
 void loop() {
-	setDebounce(buttonPins, NUM_BUTTONS, 900);
 	if (Serial.available())
 	{
 		uint16_t newDebounce = Serial.parseInt();
@@ -66,19 +68,19 @@ void loop() {
 		Serial.println(newDebounce, HEX);
 	}
 	if (peripheralStates[Hazard] == STATE_EN)
-		debug_("0");
+		Serial.print("HZ\t");
 	if (peripheralStates[Headlights] == STATE_EN)
-		debug_("1");
+		Serial.print("HL\t");
 	if (peripheralStates[Horn] == STATE_EN)
-		debug_("2");
+		Serial.print("HN\t");
 	if (peripheralStates[Lsig] == STATE_EN)
-		debug_("3");
+		Serial.print("LS\t");
 	if (peripheralStates[Rsig] == STATE_EN)
-		debug_("4");
+		Serial.print("RS\t");
 	if (peripheralStates[Wiper] == STATE_EN)
-		debug_("5");
-	debug();
-	//delay(1000);
+		Serial.print("WP\t");
+	Serial.println();
+	delay(100);
 }
 void TaskTest(void* a)
 {

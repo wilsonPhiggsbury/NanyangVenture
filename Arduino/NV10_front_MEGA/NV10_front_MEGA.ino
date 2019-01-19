@@ -56,14 +56,14 @@ void setup() {
 		, (const portCHAR *)"CAN la"
 		, 1200 // -25
 		, NULL
-		, 3
+		, 1
 		, NULL);
 	xTaskCreate(
 		TaskBlink
 		, (const portCHAR *)"SIG"
 		, 150 // -25
 		, NULL
-		, 1
+		, 3
 		, &taskBlink);
 	//xTaskCreate(
 	//	TaskMoveWiper
@@ -88,7 +88,12 @@ void TaskToggle(void* pvParameters)
 	{
 		if (peripheralStates[Horn] == STATE_EN)
 		{
+			debug("BEEEP!");
 			digitalWrite(HORN_PIN, HIGH);
+			vTaskDelay(pdMS_TO_TICKS(1000));
+			digitalWrite(HORN_PIN, LOW);
+			peripheralStates[Horn] = STATE_DS;
+			debug("beep off.");
 		}
 		else if (peripheralStates[Horn] == STATE_DS)
 		{
@@ -103,14 +108,12 @@ void TaskToggle(void* pvParameters)
 		{
 			digitalWrite(HEADLIGHTS_PIN, LOW);
 		}
-		vTaskSuspend(taskToggle);
+		vTaskDelay(pdMS_TO_TICKS(200));
 	}
 }
 void TaskBlink(void* pvParameters)
 {
 	bool lsigOn = false, rsigOn = false;
-	//pinMode(LSIG_PIN, OUTPUT);
-	//pinMode(RSIG_PIN, OUTPUT);
 
 	lstrip.begin();
 	rstrip.begin();
@@ -222,7 +225,7 @@ void doReceiveAction(Packet* q)
 				switch (i)
 				{
 				case Horn:
-					if (peripheralStates[Horn] == STATE_EN)debug(F("Horn should not be on!"));
+					peripheralStates[i] = q->data[0][i];
 					break;
 				case Wiper:
 					if (peripheralStates[Wiper] == STATE_EN)debug(F("Wiper should not be on!"));
@@ -249,7 +252,7 @@ void doReceiveAction(Packet* q)
 			}
 		}
 		// kick up taskToggle to toggle accessories such as Headlights Horn etc
-		vTaskResume(taskToggle);
+		xTaskAbortDelay(taskToggle);
 		// kick up time-controlled tasks so they respond immediately.
 		// Example: "turn off blinking signal lights" should apply immediately instead of happening at the end of a blink cycle
 		xTaskAbortDelay(taskBlink);

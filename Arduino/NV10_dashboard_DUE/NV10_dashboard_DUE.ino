@@ -29,7 +29,7 @@ void setup() {
 	Serial.begin(9600);
 	Serial1.begin(9600);
 	//Serial1.setTimeout(100);
-	delay(100);
+	delay(1000);
 	queueForDisplay = xQueueCreate(1, sizeof(Packet));
 	// setup buttons
 	for (int i = 0; i < NUM_BUTTONS; i++)
@@ -51,12 +51,12 @@ void setup() {
 	//	else
 	//		peripheralStates[Wiper] = STATE_EN;
 	//}, FALLING);
-	//attachInterrupt(digitalPinToInterrupt(BTN_HORN), [] {
-	//	if (peripheralStates[Horn] == STATE_EN)
-	//		peripheralStates[Horn] = STATE_DS;
-	//	else
-	//		peripheralStates[Horn] = STATE_EN;
-	//}, FALLING);
+	attachInterrupt(digitalPinToInterrupt(BTN_HORN), [] {
+		if (peripheralStates[Horn] == STATE_EN)
+			peripheralStates[Horn] = STATE_DS;
+		else
+			peripheralStates[Horn] = STATE_EN;
+	}, FALLING);
 	attachInterrupt(digitalPinToInterrupt(BTN_HEADLIGHT), [] {
 		if (peripheralStates[Headlights] == STATE_EN)
 			peripheralStates[Headlights] = STATE_DS;
@@ -197,8 +197,6 @@ void TaskCaptureButtons(void* pvParameters)
 	buttonCommand.ID = BT;
 	peripheralStates[Horn] = peripheralStates[Wiper] = peripheralStates[Hazard] = STATE_DS;
 	buttonCommand.data[0][Horn] = buttonCommand.data[0][Wiper] = buttonCommand.data[0][Hazard] = STATE_DS;
-	uint32_t syncTime = 0;
-	const uint32_t syncInterval = 2000;
 	TickType_t delay = pdMS_TO_TICKS(200);
 	setDebounce(buttonPins, NUM_BUTTONS, 900); // for some reason, setDebounce() if called in setup() seems to have no effect
 	while (1)
@@ -206,7 +204,6 @@ void TaskCaptureButtons(void* pvParameters)
 		bool stateChanged = false;
 		for (int i = 0; i < NUM_BUTTONS; i++)
 		{
-			//if (i == Lsig) { debug_("Lsig read = "); debug(digitalRead(buttonPins[i])); }
 			// only update peripheral states if changed. 
 			// Flag the existence of change with stateChanged boolean to trigger immediate broadcast later.
 			if (buttonCommand.data[0][i] != peripheralStates[i])
@@ -216,20 +213,28 @@ void TaskCaptureButtons(void* pvParameters)
 			}
 		}
 		buttonCommand.timeStamp = millis();
-		// broadcast a regular syncing frame every now and then to avoid 
-		// random microcontroller resets from throwing off the peripheral states
-		// broadcast immediately if there are updates
-		if (millis()-syncTime > syncInterval || stateChanged)
+		// broadcast peripheral states when requested (pull)
+		// broadcast immediately if there are updates (push)
+		bool peripheralStateRequest = false;
+		if (peripheralStateRequest || stateChanged)
 		{
-			syncTime = millis();
 			CAN_Serializer::sendSerial(Serial1, &buttonCommand);
-			if(stateChanged)CAN_Serializer::sendSerial(Serial, &buttonCommand);
+#if DEBUG
+			if (stateChanged)
+			{
+				debug(F("____________"));
+				CAN_Serializer::sendSerial(Serial, &buttonCommand);
+				debug(F("____________"));
+			}
 			//for (int i = 0; i < NUM_BUTTONS; i++)
 			//{
 			//	debug_(buttonCommand.data[0][i]);
 			//	debug_("\t");
 			//}
 			//debug();
+#endif
+			// disable horn immediately here, front has code to auto-determine how long to beep the horn
+			buttonCommand.data[0][Horn] = peripheralStates[Horn] = STATE_DS;
 		}
 		vTaskDelay(delay);
 	}

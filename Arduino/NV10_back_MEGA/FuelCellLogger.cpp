@@ -9,7 +9,7 @@ bool HESFuelCell::SD_avail = false;
 HESFuelCell::HESFuelCell(uint8_t id, HardwareSerial *port):id(id),port(port)
 {
 	port->begin(19200);
-	port->setTimeout(500);
+	port->setTimeout(50);
 	updated = false;
 	
 	timeStamp = 0;
@@ -33,6 +33,7 @@ void HESFuelCell::logData()
 	if (!port->available())
 		return;
 	uint8_t bytesRead = port->readBytesUntil('\n', buffer, RX_BUFFER_LEN);
+	buffer[bytesRead] = '\0';
 	writeAsRawData(buffer);
 
 	if (bytesRead >= 77)
@@ -83,10 +84,6 @@ void HESFuelCell::logData()
 		//>>00.0V 00.0A 0000W 00000Wh 021.1C 028.3C 028.5C 031.6C 0.90B 59.0V 028.0C IN 00.0C 00 0000
 		//  ^   * ^   * ^   * ^    *  ^    * ^    * ^    * ^    * ^   * ^   *        ^ *
 		//  ".........:.........:.........:.........:.........".........:.........:.........:.........:........."
-	}
-	else
-	{
-		writeAsRawData("**");
 	}
 }
 void HESFuelCell::dumpTimestampInto(unsigned long* location)
