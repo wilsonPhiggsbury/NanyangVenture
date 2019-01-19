@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <ItemsProjectGuid>{d0053034-7ef4-451e-b6fa-bb852a3b0799}</ItemsProjectGuid>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)CAN_Serializer.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Constants.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Frames.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Packet.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)CAN_Serializer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Constants.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Frames.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Packet.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="$(MSBuildThisFileDirectory)keywords.txt" />
+    <Text Include="$(MSBuildThisFileDirectory)readme.txt" />
+    <Text Include="$(MSBuildThisFileDirectory)vs-readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+</Project>
