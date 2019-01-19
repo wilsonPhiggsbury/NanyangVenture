@@ -36,8 +36,7 @@ QueueHandle_t queueForCAN = xQueueCreate(1, sizeof(Packet));
 TaskHandle_t taskBlink;
 // define instances of main modules
 HESFuelCell hydroCells[NUM_FUELCELLS] = {
-	HESFuelCell(0, &FC_MASTER_PORT),
-	HESFuelCell(1, &FC_SLAVE_PORT)
+	HESFuelCell(0, &FC_MASTER_PORT)
 };
 AttopilotCurrentSensor motors[NUM_CURRENTSENSORS] = {
 	AttopilotCurrentSensor(0,CAP_IN_VPIN,CAP_IN_APIN),

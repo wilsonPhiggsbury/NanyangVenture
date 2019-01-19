@@ -16,13 +16,13 @@
 // Declare instances of every payload point
 // ATTR: payload point = where the payload comes from
 const uint8_t FRAME_INFO_SETS[] = {
-	2,	// 2 sets of Fuel Cell data, via Serial port
+	1,	// 2 sets of Fuel Cell data, via Serial port
 	3,	// 3 sets of Current Sensor data, via Analog input
 	1,	// 1 set of Speedometer data, uses Interrupt
 	0,	// Unused
 	1	// 1 set of Buttons
 };
-#define NUM_FUELCELLS 2
+#define NUM_FUELCELLS 1
 #define NUM_CURRENTSENSORS 3
 #define NUM_SPEEDOMETERS 1
 #define NUM_DATASETS 3	// max of above
