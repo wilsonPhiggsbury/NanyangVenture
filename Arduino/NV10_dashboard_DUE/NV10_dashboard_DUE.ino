@@ -151,25 +151,26 @@ void TaskRefreshScreen(void* pvParameters)
 			CAN_resetCounter = 0;
 			//// dummy data
 			//dummyData(&received, FC);
-			//screens.refreshScreens();
+			//screens.refreshDataWidgets();
 			//dummyData(&received, CS);
-			//screens.refreshScreens();
+			//screens.refreshDataWidgets();
 			//dummyData(&received, SM);
-			//screens.refreshScreens();
-			screens.refreshScreens();
+			//screens.refreshDataWidgets();
+			screens.refreshDataWidgets();
 			
 		}
 		else
 		{
 			if (CAN_resetCounter++ >= CAN_resetThreshold)
 			{
-				screens.refreshScreens(NULL);
+				screens.refreshDataWidgets(NULL);
 				digitalWrite(CAN_RST_PIN, LOW);
 				vTaskDelay(delay);
 				digitalWrite(CAN_RST_PIN, HIGH);
 				CAN_resetCounter = 0; debug("Resetting 328P...");
 			}
 		}
+		screens.refreshAnimatedWidgets();
 		vTaskDelay(delay);
 	}
 }
@@ -235,6 +236,8 @@ void TaskCaptureButtons(void* pvParameters)
 #endif
 			// disable horn immediately here, front has code to auto-determine how long to beep the horn
 			buttonCommand.data[0][Horn] = peripheralStates[Horn] = STATE_DS;
+			// tell the display about my button state too
+			xQueueSend(queueForDisplay, &buttonCommand, 100);
 		}
 		vTaskDelay(delay);
 	}

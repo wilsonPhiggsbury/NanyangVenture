@@ -22,7 +22,6 @@ DisplayElement::DisplayElement(ILI9488* screen, uint16_t xPos, uint16_t yPos, ui
 	}
 	xPos = constrain(xPos, 0, 480);
 	yPos = constrain(yPos, 0, 320);
-
 }
 
 DisplayElement::~DisplayElement()
