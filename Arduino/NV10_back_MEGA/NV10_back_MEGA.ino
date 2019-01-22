@@ -86,12 +86,6 @@ void setup() {
 	Serial.print("CAN avail: ");
 	Serial.println(CAN_avail);
 
-	// initialize light strips
-	lightstrip.begin();
-	lightstrip.setBrightness(255);
-	for(int i=0; i<7; i++)
-		lightstrip.setPixelColor(i, 255, 255, 255);
-	lightstrip.show();
 	// initialize speedometer
 	pinMode(SPEEDOMETER_INTERRUPT_PIN, INPUT_PULLUP);
 	attachInterrupt(digitalPinToInterrupt(SPEEDOMETER_INTERRUPT_PIN), storeWheelInterval_ISR, FALLING);

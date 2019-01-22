@@ -36,7 +36,7 @@ DashboardScreenManager::DashboardScreenManager(Packet* Packet)
 	DisplayBar* capOutAmp_bar = new DisplayBar(leftScreen, 480/2-10, 100, 220, 35, DisplayBar::RIGHT_TO_LEFT);
 	//DisplayBar* capInAmp_bar = new DisplayBar(leftScreen, 480/2+10, 100, 220, 35, DisplayBar::LEFT_TO_RIGHT);
 	DisplayBar* motorAmp_bar = new DisplayBar(leftScreen, 480/2-10, 160, 220, 90, DisplayBar::RIGHT_TO_LEFT);
-	DisplayBar* motorVolt_bar = new DisplayBar(leftScreen, 480/2+10, 140, 220, 110, DisplayBar::LEFT_TO_RIGHT); // original y=180, h=70
+	DisplayBar* motorVolt_bar = new DisplayBar(leftScreen, 480/2+10, 140, 220, 120, DisplayBar::LEFT_TO_RIGHT); // original y=180, h=70
 	// listen to data on a pointer
 	//capInAmp_txt->init(CS, trackIDaddr, &(Packet->data[0][1]));
 	//capInAmp_bar->init(CS, trackIDaddr, &(Packet->data[0][1]));
@@ -62,11 +62,17 @@ DashboardScreenManager::DashboardScreenManager(Packet* Packet)
 
 	// ---------------------------- CENTER SCREEN -----------------------------
 	// initialize widgets
-	DisplayText* speedDisplay = new DisplayText(centerScreen, screenWidth/2, screenHeight/2, 200, 200, alignCenter, alignCenter);
+	DisplayText* speedDisplay = new DisplayText(centerScreen, screenWidth/2 + 20, screenHeight/2, 200, 200, alignCenter, alignCenter);
+	lSigArrow = new DisplayArrow(centerScreen, 40, screenHeight / 2, 100, 80, DisplayArrow::left);
+	rSigArrow = new DisplayArrow(centerScreen, screenWidth-100, screenHeight / 2, 100, 80, DisplayArrow::right);
 	// listen to data on a pointer
 	speedDisplay->init(SM, trackIDaddr, &(Packet->data[0][0]));
+	lSigArrow->init(BT, trackIDaddr, &(Packet->data[0][Lsig]));
+	rSigArrow->init(BT, trackIDaddr, &(Packet->data[0][Rsig]));
 	// customize each widget
 	speedDisplay->setColors(ILI9488_WHITE, ILI9488_DARKGREEN);
+	lSigArrow->setColors(ILI9488_GREEN, ILI9488_BLACK);
+	rSigArrow->setColors(ILI9488_GREEN, ILI9488_BLACK);
 
 	// ---------------------------- RIGHT SCREEN -----------------------------
 	// initialize widgets
@@ -90,26 +96,24 @@ DashboardScreenManager::DashboardScreenManager(Packet* Packet)
 	energy_bar->setColors(ILI9488_YELLOW, ILI9488_BLACK);
 
 	// ---------------------------- tie up references for updating later -----------------------------
-	allWidgets[0] = NULL;// capInAmp_txt;
-	allWidgets[1] = NULL;// capInAmp_bar;
-	allWidgets[2] = capOutAmp_txt;
-	allWidgets[3] = capOutAmp_bar;
-	allWidgets[4] = motorAmp_txt;
-	allWidgets[5] = motorAmp_bar;
-	allWidgets[6] = motorVolt_txt;
-	allWidgets[7] = motorVolt_bar;
+	dataWidgets[0] = NULL;// capInAmp_txt;
+	dataWidgets[1] = NULL;// capInAmp_bar;
+	dataWidgets[2] = capOutAmp_txt;
+	dataWidgets[3] = capOutAmp_bar;
+	dataWidgets[4] = motorAmp_txt;
+	dataWidgets[5] = motorAmp_bar;
+	dataWidgets[6] = motorVolt_txt;
+	dataWidgets[7] = motorVolt_bar;
 
-	allWidgets[8] = speedDisplay;
+	dataWidgets[8] = speedDisplay;
 
-	allWidgets[9] = stackTemperature_txt;
-	allWidgets[10] = pressure_txt;
-	allWidgets[11] = status_txt;
-	allWidgets[12] = energy_txt;
-	allWidgets[13] = energy_bar;
-
-
+	dataWidgets[9] = stackTemperature_txt;
+	dataWidgets[10] = pressure_txt;
+	dataWidgets[11] = status_txt;
+	dataWidgets[12] = energy_txt;
+	dataWidgets[13] = energy_bar;
 }
-void DashboardScreenManager::refreshScreens()
+void DashboardScreenManager::refreshDataWidgets()
 {
 	for (int i = 2; i < 14; i++)
 	{
@@ -119,15 +123,15 @@ void DashboardScreenManager::refreshScreens()
 			switch (i)
 			{
 			case 9: // FC temp should be < 60
-				box = (DisplayText*)allWidgets[i];
+				box = (DisplayText*)dataWidgets[i];
 				if (q->data[0][4] >= 60)
 					box->setColors(ILI9488_WHITE, ILI9488_RED);
 				else
 					box->setColors(ILI9488_WHITE, ILI9488_BLUE);
-				allWidgets[i]->update();
+				dataWidgets[i]->update();
 				break;
 			case 11: // FC status should be = 1.0 (only two possible values)
-				box = (DisplayText*)allWidgets[i];
+				box = (DisplayText*)dataWidgets[i];
 				if (q->data[0][7] == 1.0)
 				{
 					box->setColors(ILI9488_GREEN, ILI9488_DARKGREEN);
@@ -140,15 +144,15 @@ void DashboardScreenManager::refreshScreens()
 				}
 				break;
 			case 10: // FC pressure should be > 0.5
-				box = (DisplayText*)allWidgets[i];
+				box = (DisplayText*)dataWidgets[i];
 				if (q->data[0][5] <= 0.5)
 					box->setColors(ILI9488_WHITE, ILI9488_RED);
 				else
 					box->setColors(ILI9488_WHITE, ILI9488_BLUE);
-				allWidgets[i]->update();
+				dataWidgets[i]->update();
 				break;
 			default:
-				allWidgets[i]->update();
+				dataWidgets[i]->update();
 				break;
 			}
 		}
@@ -157,33 +161,42 @@ void DashboardScreenManager::refreshScreens()
 			switch (i)
 			{
 			case 4: // motor amp should be < 25 
-				box = (DisplayText*)allWidgets[i];
+				box = (DisplayText*)dataWidgets[i];
 				if (q->data[2][1] >= 25)
 					box->setColors(ILI9488_WHITE, ILI9488_RED);
 				else
 					box->setColors(ILI9488_WHITE, ILI9488_BLACK);
 				break;
 			case 6: // motor volt should be > 45 
-				box = (DisplayText*)allWidgets[i];
+				box = (DisplayText*)dataWidgets[i];
 				if (q->data[2][0] <= 45)
 					box->setColors(ILI9488_WHITE, ILI9488_RED);
 				else
 					box->setColors(ILI9488_WHITE, ILI9488_BLACK);
 				break;
 			}
-			allWidgets[i]->update();
+			dataWidgets[i]->update();
 		}
 		else
 		{
-			allWidgets[i]->update();
+			dataWidgets[i]->update();
 		}
 	}
 }
-void DashboardScreenManager::refreshScreens(void* null)
+void DashboardScreenManager::refreshDataWidgets(void* null)
 {
 	for (int i = 2; i < 14; i++)
-		allWidgets[i]->updateNull();
-
+		dataWidgets[i]->updateNull();
+}
+void DashboardScreenManager::refreshAnimatedWidgets()
+{
+	lSigArrow->update();
+	rSigArrow->update();
+	if (q->ID == BT)
+	{
+		Serial.print("LSIG is "); Serial.println(q->data[0][Lsig]);
+		Serial.print("RSIG is "); Serial.println(q->data[0][Rsig]);
+	}
 }
 
 DashboardScreenManager::~DashboardScreenManager()
