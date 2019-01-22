@@ -162,12 +162,17 @@ void LogSendData(void *pvParameters __attribute__((unused)))  // This is a Task.
 void TaskBlink(void* pvParameters)
 {
 	bool lsigOn = false, rsigOn = false;
-	//pinMode(LSIG_PIN, OUTPUT);
-	//pinMode(RSIG_PIN, OUTPUT);
+	// initialize light strips
+	lightstrip.begin();
+	lightstrip.setBrightness(50);
+	for (int i = 0; i < 7; i++)
+		lightstrip.setPixelColor(i, 255, 255, 255);
+	lightstrip.show();
+
 	lstrip.begin();
 	rstrip.begin();
-	lstrip.setBrightness(255);
-	rstrip.setBrightness(255); pinMode(LED_BUILTIN, OUTPUT);
+	lstrip.setBrightness(50);
+	rstrip.setBrightness(50); pinMode(LED_BUILTIN, OUTPUT);
 	while (1)
 	{
 		//if (peripheralStates[Headlights] == STATE_EN)debug(F("Headlights ON"));
