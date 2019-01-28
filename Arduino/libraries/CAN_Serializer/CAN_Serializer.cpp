@@ -35,32 +35,19 @@ void CAN_Serializer::onlyListenFor(PacketID ID)
 }
 bool CAN_Serializer::sendCanPacket(Packet* packet)
 {
-	// only accept the Packet when available
-	if (!pendingSend)
-	{
-		framesOut.clear();
-		packet->toFrames(&framesOut);
-		pendingSend = framesOut.getNumFrames();
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	packet->toFrames(&framesOut);
+	byte status = CAN->sendMsgBuf(framesOut.id, 0, framesOut.len, framesOut.payload);
+	return status == CAN_OK;
 }
 bool CAN_Serializer::receiveCanPacket(Packet* packet)
 {
-	if (readyToRecieve)
+	if (CAN->checkReceive() == CAN_MSGAVAIL && CAN->checkError() == CAN_OK)
 	{
-		bool status = framesIn.toPacket(packet);
-		framesIn.clear();
-		readyToRecieve = false;
-		return status;
+		CAN->readMsgBuf(&framesIn.id, &framesIn.len, framesIn.payload);
+		framesIn.toPacket(packet);
+		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 bool CAN_Serializer::sendSerial(HardwareSerial& serial, Packet* packet)
 {
@@ -85,58 +72,9 @@ bool CAN_Serializer::receiveSerial(HardwareSerial& serial, Packet* packet)
 		return false;
 	}
 }
-void CAN_Serializer::sendCAN_OneFrame()
-{
-	// ---------------------  pulse out one frame -----------------------
-	// ------------ does nothing if there is nothing to send ------------
-	if (pendingSend)
-	{
-		// total - current = index of frameToSend
-		NV_CanFrame& frameToSend = framesOut.frames[framesOut.getNumFrames() - pendingSend];
-		byte status = CAN->sendMsgBuf(frameToSend.id, 0, frameToSend.length, frameToSend.payload);
-
-		if (status != CAN_OK)
-		{
-			// abort sending this full frame
-			pendingSend = 0;
-		}
-		else
-		{
-			pendingSend--;
-		}
-	}
-}
-void CAN_Serializer::recvCAN_OneFrame()
-{
-	// ---------------------  pulse in one frame -----------------------
-	// ---------- updates readyRecv when a Packet is ready ----------
-	if (CAN->checkReceive() == CAN_MSGAVAIL && CAN->checkError() == CAN_OK)
-	{
-		CAN->readMsgBuf(&id, &len, inBuffer);
-		bool isLastFrame = framesIn.addItem(id, len, inBuffer);
-		readyToRecieve = isLastFrame;
-	}
-
-}
 void CAN_Serializer::receiveTimeout()
 {
 	debug_("Error code: "); debug(CAN->checkError());
-}
-void CAN_Serializer::printFrames(Frames& frames)
-{
-	for (uint8_t i = 0; i < frames.getNumFrames(); i++)
-	{
-		NV_CanFrame f = frames.frames[i];
-		Serial.print("ID: ");
-		Serial.println(f.id);
-		for (uint8_t j = 0; j < f.length; j++)
-		{
-			Serial.print(f.payload[j], HEX);
-			Serial.print(" ");
-		}
-		Serial.println();
-	}
-	Serial.println("---------");
 }
 void CAN_Serializer::printPacket(Packet& q)
 {

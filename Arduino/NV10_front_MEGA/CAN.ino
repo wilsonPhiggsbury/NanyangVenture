@@ -48,8 +48,6 @@ void TaskCAN(void *pvParameters){
 		{
 			doReceiveAction(&in);
 		}
-		// pulse one frame out
-		serializer.sendCAN_OneFrame();
 		//debug(millis() - lastTime);
 		lastTime = millis();
 		vTaskDelay(1); // ~35ms delay between calls
@@ -58,5 +56,5 @@ void TaskCAN(void *pvParameters){
 void CAN_ISR()
 {
 	// pulse one frame in
-	serializer.recvCAN_OneFrame();
+	//serializer.receiveCanPacket();
 }

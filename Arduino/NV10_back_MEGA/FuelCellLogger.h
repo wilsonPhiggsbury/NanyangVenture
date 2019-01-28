@@ -30,13 +30,9 @@ class HESFuelCell
 
 	 float loggedParams[FUELCELL_READVALUES];
 	 typedef enum {
-		 volts,
-		 amps,
-		 watts,
 		 energy,
 		 maxTemperature,
 		 pressure,
-		 capacitorVolts,
 		 status
 	 }LoggedParams;
 	 

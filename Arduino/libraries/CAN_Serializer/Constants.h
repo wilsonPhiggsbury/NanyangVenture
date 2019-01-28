@@ -28,16 +28,16 @@ const uint8_t FRAME_INFO_SETS[] = {
 #define NUM_DATASETS 3	// max of above
 // Every time we read from each payload point, how many floats are returned? (float is chosen to be the standard of return type)
 const uint8_t FRAME_INFO_SUBSETS[] = { 
-	8,	// V, A, W, Wh, T, P, V_c, St (St represented through 0 or 1)
+	4,	// Wh, T, P, St (St represented through 0 or 1)
 	2,	// V, A
 	1,	// km/h
 	0,	// Unused
 	6	// Headlights, Brake, Lsig, Rsig, Horn(?), Hazard
 };
-#define FUELCELL_READVALUES 8
+#define FUELCELL_READVALUES 4
 #define CURRENTSENSOR_READVALUES 2
 #define SPEEDOMETER_READVALUES 1
-#define NUM_DATASUBSETS 8	// max of above
+#define NUM_DATASUBSETS 4	// max of above
 
 #define FLOAT_TO_STRING_LEN 4
 #define SHORTNAME_LEN 3

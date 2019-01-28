@@ -46,13 +46,13 @@ void HESFuelCell::logData()
 			return;
 
 		readPtr = strtok(readPtr, " ");
-		loggedParams[volts] = atof(readPtr);
+		//loggedParams[volts] = atof(readPtr);
 
 		readPtr = strtok(NULL, " ");
-		loggedParams[amps] = atof(readPtr);
+		//loggedParams[amps] = atof(readPtr);
 
 		readPtr = strtok(NULL, " ");
-		loggedParams[watts] = atof(readPtr);
+		//loggedParams[watts] = atof(readPtr);
 
 		readPtr = strtok(NULL, " ");
 		loggedParams[energy] = atof(readPtr);
@@ -70,7 +70,7 @@ void HESFuelCell::logData()
 		loggedParams[pressure] = atof(readPtr);
 
 		readPtr = strtok(NULL, " ");
-		loggedParams[capacitorVolts] = atof(readPtr);
+		//loggedParams[capacitorVolts] = atof(readPtr);
 
 		readPtr = strtok(NULL, " ");
 		// skip average temperature

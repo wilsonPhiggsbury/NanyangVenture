@@ -40,12 +40,10 @@ void loop() {
 	{
 		serializer.sendSerial(Serial, &in);
 	}
-	// pulse one frame out
-	serializer.sendCAN_OneFrame();
-	delay(20);
+	delay(10);
 }
 void CAN_ISR()
 {
 	// pulse one frame in
-	serializer.recvCAN_OneFrame();
+	//serializer.recvCAN_OneFrame();
 }

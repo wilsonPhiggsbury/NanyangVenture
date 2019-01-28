@@ -1,4 +1,3 @@
-#include "Frames.h"
 #include "Packet.h"
 
 /*
@@ -102,41 +101,119 @@ bool Packet::toPacket(char* str, Packet* Packet)
 	}
 	return true;
 }
-void Packet::toFrames(Frames* putHere)
+void Packet::toFrames(NV_CanFrame* putHere)
 {
-	uint8_t dataPoints = FRAME_INFO_SETS[ID];
-	uint8_t readValues = FRAME_INFO_SUBSETS[ID];
-
-	// prepare timeStamp frame
-	//putHere->frames->id = (ID << 2) | HEADER_FRAME;
-	//putHere->frames->length = sizeof(unsigned long);
-	//memcpy(putHere->frames->payload, &timeStamp, putHere->frames->length);
-	//(putHere->numFrames)++;
-	putHere->addItem((ID << 2) | HEADER_FRAME, sizeof(unsigned long), (byte*)&timeStamp);
-	// prepare payload frames
-	uint8_t i,j;
-	for (i = 0; i < dataPoints; i++)
+	putHere->id = ID << 2;
+	uint8_t data8;
+	uint16_t data16;
+	switch (ID)
 	{
-		TerminatorStatus terminatorStatus;
-		for (j = 0; j < readValues - 1; j += 2)
+	case FC:
+		putHere->len = 8; // 4 data * 2 bytes
+		for (int i = 0; i < 4; i++)
 		{
-			if (j == readValues - 2)
-			{
-				if (i == dataPoints - 1)
-					terminatorStatus = HARD_TERMINATING_FRAME; // B*whatever* is binary representation of numbers
-				else
-					terminatorStatus = SOFT_TERMINATING_FRAME;
-			}
-			else
-			{
-				terminatorStatus = NORMAL_FRAME;
-			}
-			putHere->addItem(ID, terminatorStatus, data[i][j], data[i][j + 1]);
+			data16 = data[0][i]*10;
+			memcpy(putHere->payload + (i) * 2, &data16, putHere->len);
 		}
-		if (j == readValues - 1)
+		break;
+	case CS:
+		putHere->len = 6; // 6 data * 1 byte
+		for (int i = 0; i < 3; i++)
 		{
-			terminatorStatus = HARD_TERMINATING_FRAME;
-			putHere->addItem(ID, terminatorStatus, data[i][j]);
+			for (int j = 0; j < 2; j++)
+			{
+				data8 = data[i][j];
+				memcpy(putHere->payload + (i * 2 + j) * 1, &data8, putHere->len);
+			}
 		}
+		break;
+	case SM:
+		putHere->len = 2; // 1 data * 2 bytes
+		data16 = data[0][0]*10;
+		memcpy(putHere->payload, &data16, putHere->len);
+		break;
+	case BT:
+		putHere->len = 6; // 6 data * 1 byte
+		for (int i = 0; i < 6; i++)
+		{
+			data16 = data[0][i];
+			memcpy(putHere->payload + (i) * 1, &data16, putHere->len);
+		}
+		break;
 	}
+	// -------------------------------------------- LEGACY --------------------------------------------
+	//uint8_t dataPoints = FRAME_INFO_SETS[ID];
+	//uint8_t readValues = FRAME_INFO_SUBSETS[ID];
+	//// prepare timeStamp frame
+	////putHere->frames->id = (ID << 2) | HEADER_FRAME;
+	////putHere->frames->length = sizeof(unsigned long);
+	////memcpy(putHere->frames->payload, &timeStamp, putHere->frames->length);
+	////(putHere->numFrames)++;
+	//putHere->addItem((ID << 2) | HEADER_FRAME, sizeof(unsigned long), (byte*)&timeStamp);
+	//// prepare payload frames
+	//uint8_t i,j;
+	//for (i = 0; i < dataPoints; i++)
+	//{
+	//	TerminatorStatus terminatorStatus;
+	//	for (j = 0; j < readValues - 1; j += 2)
+	//	{
+	//		if (j == readValues - 2)
+	//		{
+	//			if (i == dataPoints - 1)
+	//				terminatorStatus = HARD_TERMINATING_FRAME; // B*whatever* is binary representation of numbers
+	//			else
+	//				terminatorStatus = SOFT_TERMINATING_FRAME;
+	//		}
+	//		else
+	//		{
+	//			terminatorStatus = NORMAL_FRAME;
+	//		}
+	//		putHere->addItem(ID, terminatorStatus, data[i][j], data[i][j + 1]);
+	//	}
+	//	if (j == readValues - 1)
+	//	{
+	//		terminatorStatus = HARD_TERMINATING_FRAME;
+	//		putHere->addItem(ID, terminatorStatus, data[i][j]);
+	//	}
+	//}
+}
+
+void _NV_CanFrame::toPacket(Packet * putHere)
+{
+	putHere->ID = (PacketID)(id >> 2);
+	putHere->timeStamp = 0;
+	uint8_t data8;
+	uint16_t data16;
+	switch (id)
+	{
+	case FC:// 4 data * 2 bytes
+		for (int i = 0; i < 4; i++)
+		{
+			memcpy(&data16, payload + i * 2, 2);
+			putHere->data[0][i] = data16 / 10.0;
+		}
+		break;
+	case CS:// 6 data * 1 byte
+		for (int i = 0; i < 3; i++)
+		{
+			for (int j = 0; j < 2; j++)
+			{
+				memcpy(&data8, payload + (i * 2 + j) * 1, 1);
+				putHere->data[i][j] = data8;
+			}
+		}
+		break;
+	case SM:// 1 data * 2 bytes
+		memcpy(&data16, payload, 2);
+		putHere->data[0][0] = data16 / 10.0;
+		break;
+	case BT:// 6 data * 1 byte
+		for (int i = 0; i < 6; i++)
+		{
+			memcpy(&data8, payload + i * 1, 1);
+			putHere->data[0][i] = data8;
+		}
+		break;
+	}
+
 }
