@@ -2,8 +2,8 @@
 // if any of below interval fufils:
 //		(interval / QUEUE_DATA_INTERVAL) % 100 = 0 
 // then it is valid. Otherwise execution may be delayed sometimes.
-#define FUELCELL_LOGSEND_INTERVAL 1500 // must be higher than 1000ms, meaningless if send faster than fuel cell payload coming in
-#define MOTOR_LOGSEND_INTERVAL 600 // enables furious plotting on PC side, try not to overtax the XBee though
+#define FUELCELL_LOGSEND_INTERVAL 900 // must be higher than 1000ms, meaningless if send faster than fuel cell payload coming in
+#define MOTOR_LOGSEND_INTERVAL 300 // enables furious plotting on PC side, try not to overtax the XBee though
 #define BACK_LCD_REFRESH_INTERVAL 2*MOTOR_LOGSEND_INTERVAL // can be slower, won't look at it often
 #define SPEEDOMETER_REFRESH_INTERVAL 600 // 0.8s refresh rate
 

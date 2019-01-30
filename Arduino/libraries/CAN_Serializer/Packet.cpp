@@ -110,34 +110,34 @@ void Packet::toFrames(NV_CanFrame* putHere)
 	{
 	case FC:
 		putHere->len = 8; // 4 data * 2 bytes
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < FRAME_INFO_SUBSETS[FC]; i++)
 		{
 			data16 = data[0][i]*10;
-			memcpy(putHere->payload + (i) * 2, &data16, putHere->len);
+			memcpy(putHere->payload + (i) * 2, &data16, 2);
 		}
 		break;
 	case CS:
 		putHere->len = 6; // 6 data * 1 byte
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < FRAME_INFO_SETS[CS]; i++)
 		{
-			for (int j = 0; j < 2; j++)
+			for (int j = 0; j < FRAME_INFO_SUBSETS[CS]; j++)
 			{
 				data8 = data[i][j];
-				memcpy(putHere->payload + (i * 2 + j) * 1, &data8, putHere->len);
+				memcpy(putHere->payload + (i * FRAME_INFO_SUBSETS[CS] + j) * 1, &data8, 1);
 			}
 		}
 		break;
 	case SM:
 		putHere->len = 2; // 1 data * 2 bytes
 		data16 = data[0][0]*10;
-		memcpy(putHere->payload, &data16, putHere->len);
+		memcpy(putHere->payload, &data16, 2);
 		break;
 	case BT:
 		putHere->len = 6; // 6 data * 1 byte
-		for (int i = 0; i < 6; i++)
+		for (int i = 0; i < FRAME_INFO_SUBSETS[BT]; i++)
 		{
-			data16 = data[0][i];
-			memcpy(putHere->payload + (i) * 1, &data16, putHere->len);
+			data8 = data[0][i];
+			memcpy(putHere->payload + (i) * 1, &data8, 1);
 		}
 		break;
 	}
@@ -184,33 +184,35 @@ void _NV_CanFrame::toPacket(Packet * putHere)
 	putHere->timeStamp = 0;
 	uint8_t data8;
 	uint16_t data16;
-	switch (id)
+	switch (putHere->ID)
 	{
 	case FC:// 4 data * 2 bytes
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < FRAME_INFO_SUBSETS[FC]; i++)
 		{
 			memcpy(&data16, payload + i * 2, 2);
 			putHere->data[0][i] = data16 / 10.0;
 		}
 		break;
 	case CS:// 6 data * 1 byte
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < FRAME_INFO_SETS[CS]; i++)
 		{
-			for (int j = 0; j < 2; j++)
+			for (int j = 0; j < FRAME_INFO_SUBSETS[CS]; j++)
 			{
-				memcpy(&data8, payload + (i * 2 + j) * 1, 1);
+				memcpy(&data8, payload + (i * FRAME_INFO_SUBSETS[CS] + j) * 1, 1);
 				putHere->data[i][j] = data8;
 			}
 		}
 		break;
 	case SM:// 1 data * 2 bytes
 		memcpy(&data16, payload, 2);
+		//Serial.print("**Data16:"); Serial.print(data16); Serial.print("**");
 		putHere->data[0][0] = data16 / 10.0;
 		break;
 	case BT:// 6 data * 1 byte
-		for (int i = 0; i < 6; i++)
+		for (int i = 0; i < FRAME_INFO_SUBSETS[BT]; i++)
 		{
 			memcpy(&data8, payload + i * 1, 1);
+			//Serial.print("**Data8:"); Serial.print(data8); Serial.print("**");
 			putHere->data[0][i] = data8;
 		}
 		break;

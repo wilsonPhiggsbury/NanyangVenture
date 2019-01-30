@@ -59,6 +59,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DUE_button_test", "Arduino\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CAN_Serializer", "Arduino\libraries\CAN_Serializer\CAN_Serializer.vcxitems", "{D0053034-7EF4-451E-B6FA-BB852A3B0799}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DUE_button_test_raw", "Arduino\#TestSuites\DUE_button_test_raw\DUE_button_test_raw.vcxproj", "{3383C944-EB27-487E-8A72-CD9B5ADD16CE}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\libraries\FreeRTOS_ARM\FreeRTOS_ARM.vcxitems*{1a2bb78a-9ab3-45b7-abfc-2430b4752132}*SharedItemsImports = 9
@@ -164,6 +166,12 @@ Global
 		{A14D819E-53C2-47DD-844C-67D7860BA1FA}.Release|x64.ActiveCfg = Release|Win32
 		{A14D819E-53C2-47DD-844C-67D7860BA1FA}.Release|x86.ActiveCfg = Release|Win32
 		{A14D819E-53C2-47DD-844C-67D7860BA1FA}.Release|x86.Build.0 = Release|Win32
+		{3383C944-EB27-487E-8A72-CD9B5ADD16CE}.Debug|x64.ActiveCfg = Debug|Win32
+		{3383C944-EB27-487E-8A72-CD9B5ADD16CE}.Debug|x86.ActiveCfg = Debug|Win32
+		{3383C944-EB27-487E-8A72-CD9B5ADD16CE}.Debug|x86.Build.0 = Debug|Win32
+		{3383C944-EB27-487E-8A72-CD9B5ADD16CE}.Release|x64.ActiveCfg = Release|Win32
+		{3383C944-EB27-487E-8A72-CD9B5ADD16CE}.Release|x86.ActiveCfg = Release|Win32
+		{3383C944-EB27-487E-8A72-CD9B5ADD16CE}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -190,6 +198,7 @@ Global
 		{D8187EE3-2CA8-4B1B-92E4-CCB0901F1F40} = {D73944EA-C027-4B9A-B26C-CF8857527539}
 		{A14D819E-53C2-47DD-844C-67D7860BA1FA} = {D73944EA-C027-4B9A-B26C-CF8857527539}
 		{D0053034-7EF4-451E-B6FA-BB852A3B0799} = {B731DFF7-A7B2-4F18-831B-D04250650B2F}
+		{3383C944-EB27-487E-8A72-CD9B5ADD16CE} = {D73944EA-C027-4B9A-B26C-CF8857527539}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D50621B3-45DA-4D63-A156-3461EB4C4703}

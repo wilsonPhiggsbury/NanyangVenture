@@ -55,20 +55,20 @@ void TaskGenerate(void *pvParameters __attribute__((unused)))
 		dummyData(&out, BT);
 		out.data[0][Lsig] = STATE_EN;
 		xQueueSend(queueForCAN, &out, 100);
-		vTaskDelay(50);
+		vTaskDelay(500);
 		dummyData(&out, BT);
 		out.data[0][Lsig] = STATE_DS;
 		xQueueSend(queueForCAN, &out, 100);
-		vTaskDelay(50);
+		vTaskDelay(500);
 		dummyData(&out, SM);
 		xQueueSend(queueForCAN, &out, 100);
-		vTaskDelay(50);
+		vTaskDelay(500);
 		dummyData(&out, CS);
 		xQueueSend(queueForCAN, &out, 100);
-		vTaskDelay(50);
+		vTaskDelay(500);
 		dummyData(&out, FC);
 		xQueueSend(queueForCAN, &out, 100);
-		vTaskDelay(50);
+		vTaskDelay(500);
 	}
 }
 
@@ -94,7 +94,7 @@ void TaskCAN(void *pvParameters __attribute__((unused)))  // This is a Task.
 		bool received = serializer.receiveCanPacket(&in);
 		if (received)
 		{
-			Serial.print("RECV ");
+			//Serial.print("RECV ");
 			printQ(&in);
 		}
 		vTaskDelay(pdMS_TO_TICKS(5));   // send payload per 5ms

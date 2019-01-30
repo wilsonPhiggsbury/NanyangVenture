@@ -82,11 +82,11 @@ DashboardScreenManager::DashboardScreenManager(Packet* Packet)
 	DisplayText* energy_txt = new DisplayText(rightScreen, screenWidth / 2, screenHeight / 2 - 40 + 20, 400, 80, alignCenter, alignCenter);
 	DisplayBar* energy_bar = new DisplayBar(rightScreen, screenWidth / 2, screenHeight / 2 + 40 + 20, 400, 80, alignCenter, alignCenter);
 	// listen to data on a pointer
-	stackTemperature_txt->init(FC, trackIDaddr, &(Packet->data[0][4]));
-	status_txt->init(FC, trackIDaddr, &(Packet->data[0][7]));
-	pressure_txt->init(FC, trackIDaddr, &(Packet->data[0][5]));
-	energy_txt->init(FC, trackIDaddr, &(Packet->data[0][3]));
-	energy_bar->init(FC, trackIDaddr, &(Packet->data[0][3]));
+	stackTemperature_txt->init(FC, trackIDaddr, &(Packet->data[0][1]));
+	status_txt->init(FC, trackIDaddr, &(Packet->data[0][3]));
+	pressure_txt->init(FC, trackIDaddr, &(Packet->data[0][2]));
+	energy_txt->init(FC, trackIDaddr, &(Packet->data[0][0]));
+	energy_bar->init(FC, trackIDaddr, &(Packet->data[0][0]));
 	energy_bar->setRange(0, 100);
 	// customize each widget
 	stackTemperature_txt->setColors(ILI9488_WHITE, ILI9488_BLUE);
@@ -124,7 +124,7 @@ void DashboardScreenManager::refreshDataWidgets()
 			{
 			case 9: // FC temp should be < 60
 				box = (DisplayText*)dataWidgets[i];
-				if (q->data[0][4] >= 60)
+				if (q->data[0][1] >= 60)
 					box->setColors(ILI9488_WHITE, ILI9488_RED);
 				else
 					box->setColors(ILI9488_WHITE, ILI9488_BLUE);
@@ -132,7 +132,7 @@ void DashboardScreenManager::refreshDataWidgets()
 				break;
 			case 11: // FC status should be = 1.0 (only two possible values)
 				box = (DisplayText*)dataWidgets[i];
-				if (q->data[0][7] == 1.0)
+				if (q->data[0][3] == 1.0)
 				{
 					box->setColors(ILI9488_GREEN, ILI9488_DARKGREEN);
 					box->update("ON");
@@ -143,9 +143,9 @@ void DashboardScreenManager::refreshDataWidgets()
 					box->update("OFF");
 				}
 				break;
-			case 10: // FC pressure should be > 0.5
+			case 10: // FC pressure should be > 0.6, < 0.9
 				box = (DisplayText*)dataWidgets[i];
-				if (q->data[0][5] <= 0.5)
+				if (q->data[0][2] <= 0.6 && q->data[0][2] >= 0.9)
 					box->setColors(ILI9488_WHITE, ILI9488_RED);
 				else
 					box->setColors(ILI9488_WHITE, ILI9488_BLUE);
@@ -160,9 +160,9 @@ void DashboardScreenManager::refreshDataWidgets()
 		{
 			switch (i)
 			{
-			case 4: // motor amp should be < 25 
+			case 4: // motor amp should be < 40 
 				box = (DisplayText*)dataWidgets[i];
-				if (q->data[2][1] >= 25)
+				if (q->data[2][1] >= 40)
 					box->setColors(ILI9488_WHITE, ILI9488_RED);
 				else
 					box->setColors(ILI9488_WHITE, ILI9488_BLACK);

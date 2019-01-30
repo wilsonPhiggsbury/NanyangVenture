@@ -56,13 +56,13 @@ void TaskGenerate(void *pvParameters __attribute__((unused)))
 	{
 		dummyData(&out, CS);
 		xQueueSend(queueForCAN, &out, 100);
-		vTaskDelay(random(10,15));
+		vTaskDelay(500);
 		dummyData(&out, SM);
 		xQueueSend(queueForCAN, &out, 100);
-		vTaskDelay(random(10, 15));
+		vTaskDelay(500);
 		dummyData(&out, FC);
 		xQueueSend(queueForCAN, &out, 100);
-		vTaskDelay(random(10, 15));
+		vTaskDelay(500);
 	}
 }
 

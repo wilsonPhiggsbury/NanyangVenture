@@ -37,7 +37,7 @@ const uint8_t FRAME_INFO_SUBSETS[] = {
 #define FUELCELL_READVALUES 4
 #define CURRENTSENSOR_READVALUES 2
 #define SPEEDOMETER_READVALUES 1
-#define NUM_DATASUBSETS 4	// max of above
+#define NUM_DATASUBSETS 6	// max of above
 
 #define FLOAT_TO_STRING_LEN 4
 #define SHORTNAME_LEN 3

@@ -18,7 +18,7 @@ bool initSD(char* path)
 
 	// Comb through existing files in SD card to obtain the latest index. Use it to name our new folder.
 	File sub, root = SD.open("/");
-	auto existingIndex = getNewFolderIndex(sub, root); // start from index 0
+	int existingIndex = getNewFolderIndex(sub, root); // start from index 0
 
 	// wipe card (30 is tested to still NOT crash arduino. No gurantee beyond)
 	if (existingIndex >= 30)
@@ -61,7 +61,7 @@ bool tryReadSd()
 
 int getNewFolderIndex(File &sub, File &root)
 {
-	auto existingIndex = 0; // start from index 0
+	int existingIndex = 0; // start from index 0
 	while (sub = root.openNextFile())
 	{
 		if (sub.isDirectory())
