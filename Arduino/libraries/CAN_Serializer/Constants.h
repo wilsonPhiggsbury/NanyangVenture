@@ -19,7 +19,7 @@ const uint8_t FRAME_INFO_SETS[] = {
 	1,	// 2 sets of Fuel Cell data, via Serial port
 	3,	// 3 sets of Current Sensor data, via Analog input
 	1,	// 1 set of Speedometer data, uses Interrupt
-	0,	// Unused
+	1,	// 1 set of brake light data
 	1	// 1 set of Buttons
 };
 #define NUM_FUELCELLS 1
@@ -31,7 +31,7 @@ const uint8_t FRAME_INFO_SUBSETS[] = {
 	4,	// Wh, T, P, St (St represented through 0 or 1)
 	2,	// V, A
 	1,	// km/h
-	0,	// Unused
+	1,	// bool for brakelight on/off
 	6	// Headlights, Brake, Lsig, Rsig, Horn(?), Hazard
 };
 #define FUELCELL_READVALUES 4
@@ -51,7 +51,7 @@ typedef enum
 	FC,
 	CS,
 	SM,
-	N1,
+	BK,
 	BT
 }PacketID;
 typedef enum {
@@ -66,6 +66,6 @@ typedef enum {
 #define STATE_DS 0
 #define NUMSTATES 6
 extern uint8_t peripheralStates[NUMSTATES];
-const char frameType_shortNames[FRAMETYPES][SHORTNAME_LEN] = {"FC", "CS", "SM", "??", "BT"};
+const char frameType_shortNames[FRAMETYPES][SHORTNAME_LEN] = {"FC", "CS", "SM", "BK", "BT"};
 
 #endif

@@ -37,12 +37,16 @@ void TaskMoveWiper(void* pvParameters);
 void TaskCAN(void* pvParameters);
 QueueHandle_t queueForCAN = xQueueCreate(1, sizeof(Packet));
 TaskHandle_t taskBlink, taskMoveWiper, taskToggle;
+
+static bool brakeOn = false;
 void setup() {
 	Serial.begin(9600);
 
 	serializer.init(CAN_CS_PIN);
 	serializer.onlyListenFor(BT);
-	attachInterrupt(digitalPinToInterrupt(CAN_INT_PIN), CAN_ISR, FALLING);
+
+	pinMode(BRAKE_PIN, INPUT_PULLUP);
+	attachInterrupt(digitalPinToInterrupt(BRAKE_PIN), BRAKE_ISR, CHANGE);
 	
 	xTaskCreate(
 		TaskToggle
@@ -81,11 +85,22 @@ void loop() {
 }
 void TaskToggle(void* pvParameters)
 {
-	Packet incoming;
+	Packet brakeOrders;
+	brakeOrders.ID = BK;
 	pinMode(HORN_PIN, OUTPUT);
 	pinMode(HEADLIGHTS_PIN, OUTPUT);
 	while (1)
 	{
+		// ** hotfix for brake status **
+		bool brakeOnNew = !digitalRead(BRAKE_PIN);
+		if (brakeOnNew != brakeOn)
+		{
+			brakeOn = brakeOnNew;
+			brakeOrders.timeStamp = millis();
+			brakeOrders.data[0][0] = brakeOn ? STATE_EN : STATE_DS;
+			xQueueSend(queueForCAN, &brakeOrders, 100);
+		}
+		// ** end hotfix **
 		if (peripheralStates[Horn] == STATE_EN)
 		{
 			debug("BEEEP!");
@@ -119,7 +134,6 @@ void TaskBlink(void* pvParameters)
 	rstrip.begin();
 	lstrip.setBrightness(255);
 	rstrip.setBrightness(255);
-	pinMode(LED_BUILTIN, OUTPUT);
 	while (1)
 	{
 		if (peripheralStates[Hazard] == STATE_EN || peripheralStates[Lsig] == STATE_EN)
@@ -213,6 +227,24 @@ void TaskMoveWiper(void* pvParameters)
 		wiper.write(wiperPos);
 		vTaskDelay(pdMS_TO_TICKS(1000));
 	}
+}
+void BRAKE_ISR()
+{
+	static unsigned long brakePinDebounceLastTime = 0;
+	if (millis() - brakePinDebounceLastTime < 100)
+		return;
+	brakePinDebounceLastTime = millis();
+
+	// toggle the status whenever pin change detected. the status is kept up to sync in taskToggle.
+	brakeOn = !brakeOn;
+	float brake = brakeOn ? STATE_EN : STATE_DS;
+	Packet out;
+	out.ID = BK;
+	out.timeStamp = millis();// brakePinDebounceLastTime;
+	out.data[0][0] = brake;
+	// xQueueSendFromISR writes to an extra parameter, indicating if it has woken up a higher priority task
+	// in our case the only task being woken up is taskCAN, which is lowest priority, hence the extra parameter is not used
+	xQueueSendFromISR(queueForCAN, &out, NULL);
 }
 void doReceiveAction(Packet* q)
 {

@@ -129,8 +129,13 @@ void Packet::toFrames(NV_CanFrame* putHere)
 		break;
 	case SM:
 		putHere->len = 2; // 1 data * 2 bytes
-		data16 = data[0][0]*10;
+		data16 = data[0][0] * 10;
 		memcpy(putHere->payload, &data16, 2);
+		break;
+	case BK:
+		putHere->len = 1; // 1 data * 1 byte
+		data8 = data[0][0];
+		memcpy(putHere->payload, &data8, 1);
 		break;
 	case BT:
 		putHere->len = 6; // 6 data * 1 byte
@@ -182,15 +187,15 @@ void _NV_CanFrame::toPacket(Packet * putHere)
 {
 	putHere->ID = (PacketID)(id >> 2);
 	putHere->timeStamp = 0;
-	uint8_t data8;
-	uint16_t data16;
+	uint8_t data1Byte;
+	uint16_t data2Byte;
 	switch (putHere->ID)
 	{
 	case FC:// 4 data * 2 bytes
 		for (int i = 0; i < FRAME_INFO_SUBSETS[FC]; i++)
 		{
-			memcpy(&data16, payload + i * 2, 2);
-			putHere->data[0][i] = data16 / 10.0;
+			memcpy(&data2Byte, payload + i * 2, 2);
+			putHere->data[0][i] = data2Byte / 10.0;
 		}
 		break;
 	case CS:// 6 data * 1 byte
@@ -198,22 +203,25 @@ void _NV_CanFrame::toPacket(Packet * putHere)
 		{
 			for (int j = 0; j < FRAME_INFO_SUBSETS[CS]; j++)
 			{
-				memcpy(&data8, payload + (i * FRAME_INFO_SUBSETS[CS] + j) * 1, 1);
-				putHere->data[i][j] = data8;
+				memcpy(&data1Byte, payload + (i * FRAME_INFO_SUBSETS[CS] + j) * 1, 1);
+				putHere->data[i][j] = data1Byte;
 			}
 		}
 		break;
 	case SM:// 1 data * 2 bytes
-		memcpy(&data16, payload, 2);
-		//Serial.print("**Data16:"); Serial.print(data16); Serial.print("**");
-		putHere->data[0][0] = data16 / 10.0;
+		memcpy(&data2Byte, payload, 2);
+		putHere->data[0][0] = data2Byte / 10.0;
 		break;
+	case BK:
+		memcpy(&data1Byte, payload, 1);
+		putHere->data[0][0] = data1Byte;
+		break;
+
 	case BT:// 6 data * 1 byte
 		for (int i = 0; i < FRAME_INFO_SUBSETS[BT]; i++)
 		{
-			memcpy(&data8, payload + i * 1, 1);
-			//Serial.print("**Data8:"); Serial.print(data8); Serial.print("**");
-			putHere->data[0][i] = data8;
+			memcpy(&data1Byte, payload + i * 1, 1);
+			putHere->data[0][i] = data1Byte;
 		}
 		break;
 	}

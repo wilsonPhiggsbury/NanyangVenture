@@ -164,15 +164,21 @@ void TaskBlink(void* pvParameters)
 	bool lsigOn = false, rsigOn = false;
 	// initialize light strips
 	lightstrip.begin();
+	brakestrip.begin();
 	lightstrip.setBrightness(50);
+	brakestrip.setBrightness(200);
 	for (int i = 0; i < 7; i++)
+	{
 		lightstrip.setPixelColor(i, 255, 255, 255);
+		brakestrip.setPixelColor(i, 0, 0, 0);
+	}
 	lightstrip.show();
+	brakestrip.show();
 
 	lstrip.begin();
 	rstrip.begin();
 	lstrip.setBrightness(50);
-	rstrip.setBrightness(50); pinMode(LED_BUILTIN, OUTPUT);
+	rstrip.setBrightness(50);
 	while (1)
 	{
 		//if (peripheralStates[Headlights] == STATE_EN)debug(F("Headlights ON"));
@@ -189,7 +195,6 @@ void TaskBlink(void* pvParameters)
 				{
 					lstrip.setPixelColor(i, 0, 0, 0);
 					lstrip.show(); 
-					digitalWrite(LED_BUILTIN, LOW);
 				}
 			}
 			else
@@ -199,7 +204,6 @@ void TaskBlink(void* pvParameters)
 				{
 					lstrip.setPixelColor(i, 255, 165, 0);
 					lstrip.show();
-					digitalWrite(LED_BUILTIN, HIGH);
 				}
 			}
 		}
@@ -210,7 +214,6 @@ void TaskBlink(void* pvParameters)
 			{
 				lstrip.setPixelColor(i, 0, 0, 0);
 				lstrip.show();
-				digitalWrite(LED_BUILTIN, LOW);
 			}
 		}
 
@@ -256,5 +259,26 @@ void doReceiveAction(Packet* q)
 		for (int i = 0; i < NUMSTATES; i++)
 			peripheralStates[i] = q->data[0][i];
 		xTaskAbortDelay(taskBlink);
+	}
+	else if (q->ID == BK)
+	{
+		if (q->data[0][0] == STATE_EN)
+		{
+			for (int i = 0; i < 7; i++)
+			{
+				brakestrip.setPixelColor(i, 255, 0, 0);
+				lightstrip.setPixelColor(i, 255, 0, 0);
+			}
+		}
+		else if (q->data[0][0] == STATE_DS)
+		{
+			for (int i = 0; i < 7; i++)
+			{
+				brakestrip.setPixelColor(i, 0, 0, 0);
+				lightstrip.setPixelColor(i, 255, 255, 255);
+			}
+		}
+		brakestrip.show();
+		lightstrip.show();
 	}
 }
