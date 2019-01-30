@@ -10,22 +10,22 @@ Author:	MX
 #include <CAN_Serializer.h>
 #include <SPI.h>
 
+#define CCS 18
+#define INT 19
 void TaskGenerate(void *pvParameters __attribute__((unused)));
 void TaskCAN(void *pvParameters __attribute__((unused)));
 QueueHandle_t queueForCAN = xQueueCreate(1, sizeof(Packet));
 CAN_Serializer serializer = CAN_Serializer();
 bool CAN_incoming = false;
-void CAN_ISR();
 void setup() {
 	Serial.begin(9600);
 	delay(1000);
-	if (!serializer.init(18))
+	if (!serializer.init(CCS))
 	{
 		Serial.print("CAN FAIL");
 		while (1);
 	}
-	Serial.println("CAN Full Duplex terminal COM3.");
-	attachInterrupt(digitalPinToInterrupt(19), CAN_ISR, FALLING);
+	Serial.println("CAN Full Duplex terminal MEGA COM3.");
 
 	xTaskCreate(
 		TaskGenerate
@@ -94,16 +94,11 @@ void TaskCAN(void *pvParameters __attribute__((unused)))  // This is a Task.
 		bool received = serializer.receiveCanPacket(&in);
 		if (received)
 		{
-			//Serial.print("RECV ");
+			Serial.print("RECV ");
 			printQ(&in);
 		}
-		serializer.sendCAN_OneFrame();
 		vTaskDelay(pdMS_TO_TICKS(5));   // send payload per 5ms
 	}
-}
-void CAN_ISR()
-{
-	serializer.recvCAN_OneFrame();
 }
 
 void dummyData(Packet* q, PacketID id) {

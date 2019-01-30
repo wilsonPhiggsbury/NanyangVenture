@@ -19,7 +19,6 @@ void TaskCAN(void *pvParameters __attribute__((unused)));
 QueueHandle_t queueForCAN = xQueueCreate(1, sizeof(Packet));
 CAN_Serializer serializer = CAN_Serializer();
 bool CAN_incoming = false;
-void CAN_ISR();
 void setup() {
 	Serial.begin(9600);
 	delay(1000);
@@ -28,8 +27,7 @@ void setup() {
 		Serial.print("CAN FAIL");
 		while (1);
 	}
-	Serial.println("CAN Full Duplex terminal COM6.");
-	attachInterrupt(digitalPinToInterrupt(INT), CAN_ISR, FALLING);
+	Serial.println("CAN Full Duplex terminal MEGA COM11.");
 
 	xTaskCreate(
 		TaskGenerate
@@ -83,23 +81,18 @@ void TaskCAN(void *pvParameters __attribute__((unused)))  // This is a Task.
 			}
 			else
 			{
-				//Serial.print("SENT ");
-				//printQ(&out);
+				Serial.print("SENT ");
+				printQ(&out);
 			}
 		}
 		bool received = serializer.receiveCanPacket(&in);
 		if (received)
 		{
-			//Serial.print("RECV ");
+			Serial.print("RECV ");
 			printQ(&in);
 		}
-		serializer.sendCAN_OneFrame();
 		vTaskDelay(pdMS_TO_TICKS(5));   // send payload per 5ms
 	}
-}
-void CAN_ISR()
-{
-	serializer.recvCAN_OneFrame();
 }
 
 void dummyData(Packet* q, PacketID id) {
