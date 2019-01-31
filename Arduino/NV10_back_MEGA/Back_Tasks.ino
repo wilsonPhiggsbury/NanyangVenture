@@ -136,20 +136,17 @@ void LogSendData(void *pvParameters __attribute__((unused)))  // This is a Task.
 			received.toString(data);
 
 			// -------------- Store into SD -------------
-			// log
 			if (SD_avail)
 			{
 				// Set path char array to the document we want to save to, determined by a const array
-				strcpy(path + FILENAME_HEADER_LENGTH, frameType_shortNames[received.ID]);
+				strcpy(path, frameType_shortNames[received.ID]);
 				strcat(path, ".txt");
 				// DO NOT SWITCH OUT THIS TASK IN THE MIDST OF WRITING A FILE ON SD CARD
 				vTaskSuspendAll();
-				File writtenFile = SD.open(path, FILE_WRITE);
+				File writtenFile = card.open(path, FILE_WRITE);
 				writtenFile.println(data);
 				writtenFile.close();
 				xTaskResumeAll();
-				// *path should only remain as /LOG_****/, clean up after use
-				strcpy(path + FILENAME_HEADER_LENGTH, "");
 			}
 			// finally print out the payload to be transmitted by XBee
 			Serial.println(data);

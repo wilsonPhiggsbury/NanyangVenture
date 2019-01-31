@@ -11,6 +11,7 @@
 #define RX_BUFFER_LEN 100
 
 #include <Constants.h>
+#include <SdFat.h>
 class HESFuelCell
 {
  private:
@@ -18,7 +19,7 @@ class HESFuelCell
 	 static uint32_t timeStamp;
 	 
 	 static bool SD_avail;
-	 static char* path;
+	 static SdFat* card;
 	 static const uint8_t FILENAME_HEADER_LENGTH = 10;
 
 	 uint8_t id;
@@ -39,7 +40,7 @@ class HESFuelCell
 
  public: 
 	 HESFuelCell(uint8_t id, HardwareSerial *port);
-	 static void setPath(char* thePath);
+	 static void setPath(SdFat* theCard);
 	 void logData();
 	 static void dumpTimestampInto(unsigned long * location);
 	 void dumpDataInto(float location[NUM_DATASETS][NUM_DATASUBSETS]);
