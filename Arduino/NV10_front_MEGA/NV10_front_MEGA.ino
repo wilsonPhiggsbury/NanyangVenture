@@ -32,7 +32,7 @@ peripheralStates:
 
  ------------------------------------------------------- */
 void TaskToggle(void* pvParameters);
-void TaskBlink(void* pvParameters);
+void blinkRGB(void* pvParameters);
 void TaskMoveWiper(void* pvParameters);
 void TaskCAN(void* pvParameters);
 QueueHandle_t queueForCAN = xQueueCreate(1, sizeof(Packet));
@@ -63,7 +63,7 @@ void setup() {
 		, 1
 		, NULL);
 	xTaskCreate(
-		TaskBlink
+		blinkRGB
 		, (const portCHAR *)"SIG"
 		, 150 // -25
 		, NULL
@@ -126,7 +126,7 @@ void TaskToggle(void* pvParameters)
 		vTaskDelay(pdMS_TO_TICKS(200));
 	}
 }
-void TaskBlink(void* pvParameters)
+void blinkRGB(void* pvParameters)
 {
 	bool lsigOn = false, rsigOn = false;
 

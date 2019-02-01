@@ -50,7 +50,7 @@ bool initSD(SdFat& card)
 }
 void storeWheelInterval_ISR()
 {
-	speedo.storeWheelInterval();
+	//speedo.storeWheelInterval();
 }
 
 void initiateWipe(SdFat& card)

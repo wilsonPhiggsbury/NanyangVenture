@@ -24,35 +24,6 @@ xTaskCreate(
 
 // kept in .ino file for now, due to function signature consistency. No idea yet how to port it out into a separate project/library
 
-void TaskCAN(void *pvParameters){
-	Packet in, out;
-	bool sent, received;
-	unsigned long lastTime = 0;
-	attachInterrupt(digitalPinToInterrupt(CAN_INT_PIN), CAN_ISR, FALLING);
-	debug(F("CAN started."));
-	while (1)
-	{
-		// anything to send?
-		BaseType_t success = xQueueReceive(queueForCAN, &out, 0);
-		if (success)
-		{
-			sent = serializer.sendCanPacket(&out);
-			if(!sent)
-			{
-				Serial.println(F("!!"));
-			}
-		}
-		// anything to receive?
-		received = serializer.receiveCanPacket(&in);
-		if (received)
-		{
-			doReceiveAction(&in);
-		}
-		//debug(millis() - lastTime);
-		lastTime = millis();
-		vTaskDelay(1); // ~35ms delay between calls
-	}
-}
 void CAN_ISR()
 {
 	// pulse one frame in
