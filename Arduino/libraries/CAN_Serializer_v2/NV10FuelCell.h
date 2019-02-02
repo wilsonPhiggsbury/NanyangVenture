@@ -19,8 +19,7 @@ class NV10FuelCellClass:public DataPoint
 	 char statusTxt[3];
 
  public:
-	 NV10FuelCellClass();
-	void init();
+	 NV10FuelCellClass(uint8_t CANId);
 
 	float getPressure();
 	uint16_t getWatts();
@@ -29,7 +28,6 @@ class NV10FuelCellClass:public DataPoint
 
 
 	void insertData(char* str);
-	virtual void getStringHeader(char* c);
 	void packCAN(CANFrame*);
 	void unpackCAN(const CANFrame*);
 	void packString(char*);

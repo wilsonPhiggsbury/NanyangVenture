@@ -15,7 +15,7 @@ class CANFrame
 public:
 	unsigned long id;
 	byte length;
-	byte payload[8]; // TODO: extend payload byte length, then implement conversion below through stored references of dataPoints
+	byte payload[8]; // TODO: extend payload byte length, then perform slicing in CANSerializer
 };
 class CANSerializer
 {
@@ -23,7 +23,7 @@ private:
 	MCP_CAN* CAN;
 	//DataPoint* dataPoints[1]; // TODO: implement convertion to raw CAN bytes only inside CANSerializer
 public:
-	void init(uint8_t cs);
+	bool init(uint8_t cs);
 	bool sendCanFrame(CANFrame*);
 	// Populates Packet only if data is available.
 	bool receiveCanFrame(CANFrame*);

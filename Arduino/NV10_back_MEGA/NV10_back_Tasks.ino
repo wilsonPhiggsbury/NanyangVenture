@@ -3,185 +3,192 @@
 /*--------------------------------------------------*/
 void logFuelCell(void *pvParameters)  // This is a Task.
 {
+	for (int i = 0; i < 50; i += 1)
+	{
+		Serial.print(i);
+		Serial.print("ms->");
+		Serial.print(pdMS_TO_TICKS(i));
+		Serial.println("ticks");
+	}
+	Serial3.begin(19200);
+	Serial3.setTimeout(50);
+
 	TickType_t prevTick = xTaskGetTickCount(); // only needed when vTaskDelayUntil is called instead of vTaskDelay
-	NV10FuelCell fc, fc2;
-	char buf[] = ">>62.5V 00.0A 0112W 00000Wh 019.6C 026.0C 032.8C 025.0C 0.79B 52.2V 029.4C IN 00.0C 00 0000 ";
-	char buf2[] = ">>62.5V 00.0A 1144W 00000Wh 019.6C 056.0C 032.8C 025.0C 1.00B 52.2V 029.4C SD 00.0C 00 0000 ";
-	fc.insertData(buf);
-	fc2.insertData(buf2);
-	buf[0] = buf2[0] = 0; // clear string buffer
-	char s[40], s2[40];
-	TickType_t delay = pdMS_TO_TICKS(READ_FC_INTERVAL);
+	CANFrame fMain, fSub;
+	DataForLogSend bufRaw(false, true);
+	DataForLogSend buf(true, true);
+	TickType_t delay = pdMS_TO_TICKS(500);
 	while (1)
 	{
-		// pack string
-		fc.packString(s);
-		fc2.packString(s2);
+		uint8_t bytesRead = Serial3.readBytesUntil('\n', bufRaw.data, 100);
+		bufRaw.data[bytesRead] = '\0'; // this slot would be '\r' from the Fuel Cell, replace it with null terminator instead
+		if (bytesRead)xQueueSend(queueForLogSend, &bufRaw, 100); // log this raw data
+		dpFCMain.insertData(bufRaw.data);
+		bufRaw.data[0] = '\0'; // clear this buffer to avoid inserting same data twice later (e.g. when serial port has no new data)
 
-		fc2.unpackString(s);
-		fc.unpackString(s2);
-		Serial.println("FC1");
-		Serial.print(" Watts: "); Serial.print(fc.getWatts());
-		Serial.print(" Pressure: "); Serial.print(fc.getPressure());
-		Serial.print(" Temperature: "); Serial.print(fc.getTemperature());
-		Serial.print(" Status: "); Serial.print(fc.getStatus());
-		Serial.println();
-
-		Serial.println("FC2");
-		Serial.print(" Watts: "); Serial.print(fc2.getWatts());
-		Serial.print(" Pressure: "); Serial.print(fc2.getPressure());
-		Serial.print(" Temperature: "); Serial.print(fc2.getTemperature());
-		Serial.print(" Status: "); Serial.print(fc2.getStatus());
-		Serial.println();
-		// pack can
+		dpFCMain.packString(buf.data);
+		if(bytesRead)xQueueSend(queueForLogSend, &buf, 100); // log and send this refined data
+		
+		dpFCMain.packCAN(&fMain);
+		//xQueueSend(queueForCAN, &fMain, 100);
 		vTaskDelayUntil(&prevTick, delay); // more accurate compared to vTaskDelay, since the delay is shrunk according to execution time of this piece of code
 	}
 }
 void logCurrentSensor(void* pvParameters)
 {
+	Adafruit_ADS1115 adc;
+	adc.setGain(GAIN_SIXTEEN);
+	adc.begin();
+
+	CANFrame f;
+	DataForLogSend buf(false, true);
+	buf.logThis = false;
 
 	TickType_t prevTick = xTaskGetTickCount(); // only needed when vTaskDelayUntil is called instead of vTaskDelay
-	TickType_t delay = pdMS_TO_TICKS(READ_MT_INTERVAL);
+	TickType_t delay = pdMS_TO_TICKS(100);
+	uint8_t sendDelay = 0;
 	while (1)
 	{
-
+		int volt = analogRead(CAP_OUT_VPIN);
+		int amps = abs(adc.readADC_Differential_0_1());
+		dpCS.insertData(volt, analogRead(CAP_IN_APIN), analogRead(CAP_OUT_APIN), amps);
+		dpCSStats.insertData(volt, amps);
+		sendDelay += 4; // overflows in 256/4 = 64 ticks
+		if (sendDelay == 0) // procs once per 64 ticks (6400ms)
+		{
+			dpCSStats.packCAN(&f);
+			//if(CAN_avail)xQueueSend(queueForCAN, &f, 100);
+		}
+		if (sendDelay % 16 == 0) // procs once per 4 ticks (400ms)
+		{
+			dpCS.packCAN(&f);
+			dpCS.packString(buf.data);
+			//if(CAN_avail)xQueueSend(queueForCAN, &f, 100);
+			xQueueSend(queueForLogSend, &buf, 100);
+		}
 		vTaskDelayUntil(&prevTick, delay);
 	}
 }
-void outputToSd(void *pvParameters)
-{
-
-	while (1) // A Task shall never return or exit.
-	{
-		
-		vTaskDelay(1);
-	}
-}
-
 /// <summary>
 /// Output task to log and send data
 /// </summary>
 /// <param name="pvParameters"></param>
-//void outputToSerial(void *pvParameters __attribute__((unused)))  // This is a Task.
-//{
-//	Packet received;
-//	char data[MAX_STRING_LEN];
-//	TickType_t delay = pdMS_TO_TICKS(LOGSEND_INTERVAL); // delay 300 ms, shorter than reading/queueing tasks since this task has lower priority
-//
-//	while (1)
-//	{
-//		BaseType_t success = xQueueReceive(queueForLogSend, &received, 100);
-//		if (success == pdPASS)
-//		{
-//			received.toString(data);
-//
-//			// -------------- Store into SD -------------
-//			if (SD_avail)
-//			{
-//				// Set path char array to the document we want to save to, determined by a const array
-//				strcpy(path, STRING_HEADER[received.ID]);
-//				strcat(path, ".txt");
-//				// DO NOT SWITCH OUT THIS TASK IN THE MIDST OF WRITING A FILE ON SD CARD
-//				vTaskSuspendAll();
-//				File writtenFile = card.open(path, FILE_WRITE);
-//				writtenFile.println(data);
-//				writtenFile.close();
-//				xTaskResumeAll();
-//			}
-//			// finally print out the payload to be transmitted by XBee
-//			Serial.println(data);
-//		}
-//
-//		vTaskDelay(delay);
-//	}
-//}
-//
-//void blinkRGB(void* pvParameters)
-//{
-//	bool lsigOn = false, rsigOn = false;
-//	// initialize light strips
-//	lightstrip.begin();
-//	brakestrip.begin();
-//	lightstrip.setBrightness(50);
-//	brakestrip.setBrightness(200);
-//	for (int i = 0; i < 7; i++)
-//	{
-//		lightstrip.setPixelColor(i, 255, 255, 255);
-//		brakestrip.setPixelColor(i, 0, 0, 0);
-//	}
-//	lightstrip.show();
-//	brakestrip.show();
-//
-//	lstrip.begin();
-//	rstrip.begin();
-//	lstrip.setBrightness(50);
-//	rstrip.setBrightness(50);
-//	while (1)
-//	{
-//		if (peripheralStates[Hazard] == STATE_EN || peripheralStates[Lsig] == STATE_EN)
-//		{
-//			if (lsigOn)
-//			{
-//				lsigOn = false;
-//				for (int i = 0; i < 7; i++)
-//				{
-//					lstrip.setPixelColor(i, 0, 0, 0);
-//					lstrip.show(); 
-//				}
-//			}
-//			else
-//			{
-//				lsigOn = true;
-//				for (int i = 0; i < 7; i++)
-//				{
-//					lstrip.setPixelColor(i, 255, 165, 0);
-//					lstrip.show();
-//				}
-//			}
-//		}
-//		else
-//		{
-//			lsigOn = false;
-//			for (int i = 0; i < 7; i++)
-//			{
-//				lstrip.setPixelColor(i, 0, 0, 0);
-//				lstrip.show();
-//			}
-//		}
-//
-//		if (peripheralStates[Hazard] == STATE_EN || peripheralStates[Rsig] == STATE_EN)
-//		{
-//			if (rsigOn)
-//			{
-//				rsigOn = false;
-//				for (int i = 0; i < 7; i++)
-//				{
-//					rstrip.setPixelColor(i, 0, 0, 0);
-//					rstrip.show();
-//				}
-//			}
-//			else
-//			{
-//				rsigOn = true;
-//				for (int i = 0; i < 7; i++)
-//				{
-//					rstrip.setPixelColor(i, 255, 165, 0);
-//					rstrip.show();
-//				}
-//			}
-//		}
-//		else
-//		{
-//			rsigOn = false;
-//			for (int i = 0; i < 7; i++)
-//			{
-//				rstrip.setPixelColor(i, 0, 0, 0);
-//				rstrip.show();
-//			}
-//		}
-//		vTaskDelay(pdMS_TO_TICKS(500));
-//	}
-//}
+void outputToSdSerial(void *pvParameters __attribute__((unused)))  // This is a Task.
+{
+	struct DataForLogSend buf(false, false);
+	char path[8 + 4 + 1]; // +8 for filename, +4 for '.txt', +1 for '\0'
+	TickType_t delay = pdMS_TO_TICKS(100); // delay 300 ms, shorter than reading/queueing tasks since this task has lower priority
+
+	while (1)
+	{
+		BaseType_t success = xQueueReceive(queueForLogSend, &buf, 0);
+		if (success == pdPASS)
+		{
+			if (buf.sendThis)
+			{
+				// print everything before we butcher the string with strtok() below!
+				Serial.println(buf.data);
+			}
+			if (SD_avail && buf.logThis)
+			{
+				char* ptr;
+				ptr = strtok(buf.data, "\t");
+				// -------------- Store into SD -------------
+				// Set path char array to the document we want to save to, determined by a const array
+				strcpy(path, ptr);
+				strcat(path, ".txt");
+				ptr = strtok(NULL, "\0");
+				// DO NOT SWITCH OUT THIS TASK IN THE MIDST OF WRITING A FILE ON SD CARD
+				vTaskSuspendAll();
+				File writtenFile = card.open(path, FILE_WRITE);
+				writtenFile.println(ptr);
+				writtenFile.close();
+				xTaskResumeAll();
+			}
+		}
+
+		vTaskDelay(delay);
+	}
+}
+void ioForCAN(void *pvParameters)
+{
+	CANFrame pendingSend, pendingReceive;
+	while (1)
+	{
+		// dispatch frames
+		if (xQueueReceive(queueForCAN, &pendingSend, 0))
+		{
+			serializer.sendCanFrame(&pendingSend);
+		}
+		// receive frames (poll-based, infrequent frames expected)
+		if (serializer.receiveCanFrame(&pendingReceive))
+		{
+			for (int i = 0; i < 1; i++)
+			{
+				dpReceiveList[i]->checkMatchCAN(&pendingReceive);
+			}
+		}
+	}
+}
+void blinkRGB(void* pvParameters)
+{
+	bool lsigOn = false, rsigOn = false;
+	// initialize light strips
+	lightstrip.begin();
+	brakestrip.begin();
+	lightstrip.setBrightness(50);
+	brakestrip.setBrightness(200);
+	writeRGB(lightstrip, 7, RUNNING_LIGHT_COLOR);
+	writeRGB(brakestrip, 7, BRAKE_LIGHT_COLOR);
+
+	lstrip.begin();
+	rstrip.begin();
+	lstrip.setBrightness(50);
+	rstrip.setBrightness(50);
+	writeRGB(lstrip , 7, NO_LIGHT);
+	writeRGB(rstrip, 7, NO_LIGHT);
+	while (1)
+	{
+		if (dpStatus.getHazard() == STATE_EN || dpStatus.getLsig() == STATE_EN)
+		{
+			if (lsigOn)
+			{
+				lsigOn = false;
+				writeRGB(lstrip, 7, NO_LIGHT);
+			}
+			else
+			{
+				lsigOn = true;
+				writeRGB(lstrip, 7, SIGNAL_LIGHT_COLOR);
+			}
+		}
+		else
+		{
+			lsigOn = false;
+			writeRGB(lstrip, 7, NO_LIGHT);
+		}
+
+		if (dpStatus.getHazard() == STATE_EN || dpStatus.getRsig() == STATE_EN)
+		{
+			if (rsigOn)
+			{
+				rsigOn = false;
+				writeRGB(rstrip, 7, NO_LIGHT);
+			}
+			else
+			{
+				rsigOn = true;
+				writeRGB(rstrip, 7, SIGNAL_LIGHT_COLOR);
+			}
+		}
+		else
+		{
+			rsigOn = false;
+			writeRGB(rstrip, 7, NO_LIGHT);
+		}
+		vTaskDelay(pdMS_TO_TICKS(500));
+	}
+}
 //void doReceiveAction(Packet* q)
 //{
 //	// ************************* Code for signal lights ****************************

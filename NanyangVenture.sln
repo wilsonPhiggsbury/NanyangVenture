@@ -61,6 +61,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LookupTable", "Arduino\#Arc
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CAN_Serializer_v2", "Arduino\libraries\CAN_Serializer_v2\CAN_Serializer_v2.vcxitems", "{55B4D806-20D6-4928-AF38-5AE4E1470A2E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Adafruit_ADS1X15", "..\libraries\Adafruit_ADS1X15\Adafruit_ADS1X15.vcxitems", "{EE96D38B-689A-49EC-B661-4BC019E7D9AC}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\libraries\FreeRTOS_ARM\FreeRTOS_ARM.vcxitems*{1a2bb78a-9ab3-45b7-abfc-2430b4752132}*SharedItemsImports = 9
@@ -83,6 +85,7 @@ Global
 		Arduino\libraries\CAN_Serializer\CAN_Serializer.vcxitems*{7ed24bf0-127d-4fc9-843e-85d8ba0529c7}*SharedItemsImports = 4
 		..\libraries\MemoryFree\MemoryFree.vcxitems*{86486ce1-3d43-4d25-8616-4e6372ac1896}*SharedItemsImports = 9
 		..\..\ide\hardware\arduino\avr\libraries\SPI\SPI.vcxitems*{8b3a2447-325c-473e-a84c-45b578507bd3}*SharedItemsImports = 4
+		..\libraries\Adafruit_ADS1X15\Adafruit_ADS1X15.vcxitems*{8b3a2447-325c-473e-a84c-45b578507bd3}*SharedItemsImports = 4
 		..\libraries\Adafruit_NeoPixel\Adafruit_NeoPixel.vcxitems*{8b3a2447-325c-473e-a84c-45b578507bd3}*SharedItemsImports = 4
 		..\libraries\SdFat\SdFat.vcxitems*{8b3a2447-325c-473e-a84c-45b578507bd3}*SharedItemsImports = 4
 		Arduino\libraries\CAN_Serializer_v2\CAN_Serializer_v2.vcxitems*{8b3a2447-325c-473e-a84c-45b578507bd3}*SharedItemsImports = 4
@@ -94,6 +97,7 @@ Global
 		Arduino\libraries\CAN_Serializer\CAN_Serializer.vcxitems*{d8187ee3-2ca8-4b1b-92e4-ccb0901f1f40}*SharedItemsImports = 4
 		..\libraries\FreeRTOS\FreeRTOS.vcxitems*{e0f75ac7-15bb-4c7a-98cd-37a96c9641a3}*SharedItemsImports = 4
 		Arduino\libraries\CAN_Serializer\CAN_Serializer.vcxitems*{e0f75ac7-15bb-4c7a-98cd-37a96c9641a3}*SharedItemsImports = 4
+		..\libraries\Adafruit_ADS1X15\Adafruit_ADS1X15.vcxitems*{ee96d38b-689a-49ec-b661-4bc019e7d9ac}*SharedItemsImports = 9
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -196,6 +200,7 @@ Global
 		{DF811E8F-266F-4E9B-A5B4-19A51BB4D3A3} = {D73944EA-C027-4B9A-B26C-CF8857527539}
 		{BDC82998-34FD-4847-9807-8AB2DBE47408} = {D73944EA-C027-4B9A-B26C-CF8857527539}
 		{55B4D806-20D6-4928-AF38-5AE4E1470A2E} = {B731DFF7-A7B2-4F18-831B-D04250650B2F}
+		{EE96D38B-689A-49EC-B661-4BC019E7D9AC} = {B731DFF7-A7B2-4F18-831B-D04250650B2F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D50621B3-45DA-4D63-A156-3461EB4C4703}

@@ -4,52 +4,72 @@
  Author:	MX
 */
 
-#include "NV10CurrentSensor.h"
-#include "NV10FuelCell.h"
 #include <Arduino_FreeRTOS.h>
 #include <queue.h>
 //#include <FreeRTOS_AVR.h>
 #include <SPI.h>
 #include <SdFat.h>
+#include <Adafruit_ADS1015.h>
 #include <Adafruit_NeoPixel.h>
 #include "Behaviour.h"
 
 //#include "JoulemeterDisplay.h"	
 
+#include <NV10FuelCell.h>
+#include <NV10CurrentSensor.h>
+#include <NV10CurrentSensorStats.h>
+#include <NV10AccesoriesStatus.h>
 
 #include "Pins_back.h"
 
 // file names
 SdFat card;
-// sample filename: /LOG_0002/12345678.txt   1+8+1+8+4+1, 
-//											  ^^^ | ^^^
-//										   HEADER | FILENAME
-
-// define queues
-//QueueHandle_t queueForLogSend = xQueueCreate(1, sizeof(Packet));
-//QueueHandle_t queueForCAN = xQueueCreate(1, sizeof(Packet));
-//QueueHandle_t queueForDisplay = xQueueCreate(1, sizeof(Packet));
-TaskHandle_t taskBlink;
-// define instances of main modules
-
+CANSerializer serializer;
 // wheel diameter is 545 mm, feed into speedo
 //Speedometer speedo = Speedometer(0, 545/2);
 Adafruit_NeoPixel lstrip = Adafruit_NeoPixel(7, LSIG_PIN, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel rstrip = Adafruit_NeoPixel(7, RSIG_PIN, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel lightstrip = Adafruit_NeoPixel(7, RUNNINGLIGHT_PIN, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel brakestrip = Adafruit_NeoPixel(7, BRAKELIGHT_PIN, NEO_GRB + NEO_KHZ800);
+const uint32_t RUNNING_LIGHT_COLOR = Adafruit_NeoPixel::Color(255, 255, 255);
+const uint32_t BRAKE_LIGHT_COLOR = Adafruit_NeoPixel::Color(255, 0, 0);
+const uint32_t SIGNAL_LIGHT_COLOR = Adafruit_NeoPixel::Color(255, 165, 0);
+const uint32_t NO_LIGHT = Adafruit_NeoPixel::Color(0, 0, 0);
+// sample filename: /LOG_0002/12345678.txt   1+8+1+8+4+1, 
+//											  ^^^ | ^^^
+//										   HEADER | FILENAME
+
+// initialize data points. Their names are prepended with 'dp'
+NV10FuelCell dpFCMain(0x01), dpFCBackup(0x02);
+NV10CurrentSensor dpCS(0x03);
+NV10CurrentSensorStats dpCSStats(0x04);
+
+NV10AccesoriesStatus dpStatus(0x05);
+DataPoint* dpReceiveList[] = { &dpStatus }; // make a collection of all DPs, scan them whenever we receive message
+struct DataForLogSend
+{
+	bool logThis, sendThis;
+	char data[100];
+	DataForLogSend(bool log, bool send) :logThis(log), sendThis(send) {};
+};
+// define queues
+QueueHandle_t queueForLogSend = xQueueCreate(1, sizeof(struct DataForLogSend));
+QueueHandle_t queueForCAN = xQueueCreate(1, sizeof(CANFrame));
+//QueueHandle_t queueForDisplay = xQueueCreate(1, sizeof(Packet));
+TaskHandle_t taskBlink;
+// define instances of main modules
+
 //CAN_Serializer serializer;
 // define globals
 bool SD_avail = false, CAN_avail = false;
-char path[5 + 8 + 4 + 1]; // +8 for filename, +4 for '.txt', +1 for '\0'
 
 // define tasks, types are: input, control, output
 void logFuelCell(void *pvParameters);		// Input task:		Refreshes class variables for fuel cell Volts, Amps, Watts and Energy
 void logCurrentSensor(void *pvParameters);	// Input task:		Refreshes class variables for motor Volts and Amps
-void outputToSd(void *pvParameters);	// Control task:	Controls frequency to queue payload from above tasks to output tasks
-void outputToSerial(void *pvParameters);		// Output task:		Data logged in SD card and sent through XBee. Logged and sent payload should be consistent, hence they are grouped together
-void TaskCAN(void* pvParameters);			// In/Out task:		Manages 2-way CAN bus comms
+void outputToSdSerial(void *pvParameters);		// Output task:		Data logged in SD card and sent through XBee. Logged and sent payload should be consistent, hence they are grouped together
+void ioForCAN(void* pvParameters);			// In/Out task:		Manages 2-way CAN bus comms
 void blinkRGB(void *pvParameters);			// 
+void taskTest(void*);
 
 //// _______________OPTIONAL_____________
 //void TaskReceiveCommands(void *pvParameters);	// Input task:		Enable real-time control of Arduino (if any)
@@ -65,8 +85,7 @@ void blinkRGB(void *pvParameters);			//
 void setup() {
 	Serial.begin(9600);
 	delay(100);
-	Serial.println(SERIAL_RX_BUFFER_SIZE);
-	//CAN_avail = serializer.init(CAN_CS_PIN);
+	CAN_avail = serializer.init(CAN_CS_PIN);
 	// create all files in a new directory
 	SD_avail = initSD(card);
 	Serial.print("SD avail: ");
@@ -79,52 +98,58 @@ void setup() {
 	//attachInterrupt(digitalPinToInterrupt(SPEEDOMETER_INTERRUPT_PIN), storeWheelInterval_ISR, FALLING);
 
 	// Now set up all Tasks to run independently. Task functions are found in Tasks.ino
-	xTaskCreate(
-		logFuelCell
-		, (const portCHAR *)"Fuel"
-		, 750
-		, NULL
-		, 3
-		, NULL);
 	//xTaskCreate(
 	//	logCurrentSensor
-	//	, (const portCHAR *)"CSensor"
+	//	, (const portCHAR *)"CS"
 	//	, 200
-	//	, motors
+	//	, NULL
 	//	, 3
 	//	, NULL);
 	//xTaskCreate(
-	//	outputToSd
-	//	, (const portCHAR *)"Enqueue"  // A name just for humans
-	//	, 275  // This stack size can be checked & adjusted by reading the Stack Highwater
-	//	, NULL // Any pointer to pass in
-	//	, 2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
+	//	logFuelCell
+	//	, (const portCHAR *)"FC"
+	//	, 500
+	//	, NULL
+	//	, 2
 	//	, NULL);
+	xTaskCreate(
+		blinkRGB
+		, (const portCHAR *)"SIG"
+		, 150 // -25
+		, NULL
+		, 2
+		, &taskBlink);
 	//xTaskCreate(
-	//	outputToSerial
+	//	outputToSdSerial
 	//	, (const portCHAR *) "LogSend"
 	//	, 800  // Stack size
 	//	, NULL
 	//	, 1  // Priority
 	//	, NULL);
-	//xTaskCreate(
-	//	blinkRGB
-	//	, (const portCHAR *)"SIG"
-	//	, 150 // -25
-	//	, NULL
-	//	, 3
-	//	, &taskBlink);
-	//xTaskCreate(
-	//	TaskCAN
-	//	, (const portCHAR *) "CAN la!" // where got cannot?
-	//	, 1200  // Stack size
-	//	, NULL
-	//	, 2  // Priority
-	//	, NULL);
+	xTaskCreate(
+		ioForCAN
+		, (const portCHAR *) "CAN la!" // where got cannot?
+		, 1200  // Stack size
+		, NULL
+		, 1  // Priority
+		, NULL);
+	xTaskCreate(taskTest, "test", 200, NULL, 2, NULL);
 	//vTaskStartScheduler();
 
 }
-
+void taskTest(void*)
+{
+	char local[20];
+	CANFrame f;
+	while (1)
+	{
+		Serial.print("lsig: "); Serial.println(dpStatus.getLsig());
+		Serial.print("rsig: "); Serial.println(dpStatus.getRsig());
+		Serial.print("brake: "); Serial.println(dpStatus.getBrake());
+		Serial.println("-------");
+		vTaskDelay(50);
+	}
+}
 void loop()
 {
 	// Empty. Things are done in Tasks.

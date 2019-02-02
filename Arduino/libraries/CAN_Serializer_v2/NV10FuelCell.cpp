@@ -3,15 +3,11 @@
 // 
 
 #include "NV10FuelCell.h"
-const uint16_t canLength = 1 * sizeof(float) + 1 * sizeof(uint16_t) + 2 * sizeof(uint8_t), strLen = 4+4+4+2;
-NV10FuelCellClass::NV10FuelCellClass():DataPoint(canLength, strLen)
+// parameter(CANbytes, stringChars)
+// Watts(2,4), pressure(4,4), temperature(1,2), status(1,2)
+NV10FuelCellClass::NV10FuelCellClass(uint8_t CANId):DataPoint(CANId, 4 + 2 + 1 + 1)
 {
 	strcpy(strHeader, "FC");
-}
-
-void NV10FuelCellClass::init()
-{
-
 }
 
 float NV10FuelCellClass::getPressure()
@@ -93,11 +89,6 @@ void NV10FuelCellClass::insertData(char* str)
 	// TODO: remember to terminate the string in the main code!
 }
 
-void NV10FuelCellClass::getStringHeader(char * c)
-{
-	strcpy(c, "FC");
-}
-
 void NV10FuelCellClass::packCAN(CANFrame *f)
 {
 	DataPoint::packCANDefault(f);
@@ -121,7 +112,7 @@ void NV10FuelCellClass::packString(char * str)
 	// p = 4.2, t = 2, w = 4, st = 2
 #ifdef __AVR__
 	char tmp[8];
-	dtostrf(pressure, 4, 1, tmp);
+	dtostrf(pressure, 3, 1, tmp);
 	sprintf(shiftedStr, "%04d\t%s\t%2d\t%s", watts, tmp, temperature, statusTxt);
 
 #elif defined _SAM3XA_
@@ -144,7 +135,7 @@ void NV10FuelCellClass::unpackString(char * str)
 	ptr = strtok(NULL, "\t");
 	temperature = atoi(ptr);
 
-	ptr = strtok(NULL, "\0");
+	ptr = strtok(NULL, "\t");
 	strcpy(statusTxt, ptr);
 
 }

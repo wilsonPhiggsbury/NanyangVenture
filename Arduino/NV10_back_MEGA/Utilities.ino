@@ -28,7 +28,7 @@ bool initSD(SdFat& card)
 
 	// Make new directory and operate within it.
 	char folderPath[18] = "/NV10_";	// max 8 chars. len("NV10_") = 5, pad 3 digits to entry
-	sprintf(folderPath, "%03d", folderEntries);	// pad '0' on the front if number contains less than 3 digits
+	sprintf(folderPath+6, "%03d", folderEntries);	// pad '0' on the front if number contains less than 3 digits
 	card.mkdir(folderPath);
 	card.chdir(folderPath);
 
@@ -89,4 +89,13 @@ void flushRX()
 void softReset()
 {
 	asm volatile ("  jmp 0");
+}
+
+void writeRGB(Adafruit_NeoPixel& light, uint8_t numLights, uint32_t color)
+{
+	for (int i = 0; i < numLights; i++)
+	{
+		light.setPixelColor(i, color);
+	}
+	light.show();
 }

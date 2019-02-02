@@ -13,14 +13,13 @@
 class NV10CurrentSensorClass:public DataPoint
 {
  protected:
-	 float volts, amps;
+	float volt, ampCapIn, ampCapOut, ampMotor;
 
  public:
-	 NV10CurrentSensorClass();
-	 void init();
+	NV10CurrentSensorClass(uint8_t CANId);
 
-	virtual void insertData(float volts, float amps);
-	virtual void getStringHeader(char * c);
+	void insertData(uint32_t voltRaw, uint32_t ampCInRaw, uint32_t ampCOutRaw, uint32_t ampMotorRaw);
+
 	void packCAN(CANFrame*);
 	void unpackCAN(const CANFrame*);
 	void packString(char*);

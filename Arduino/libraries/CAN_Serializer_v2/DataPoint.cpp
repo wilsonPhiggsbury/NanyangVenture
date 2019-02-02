@@ -38,15 +38,15 @@ const char* STRING_HEADER[] = { "FC","CS","Cs","SM","H2","ST","CM","HB" };
 //}
 // TODO: see DataPoint.h file
 
-void DataPoint::setCanId(uint16_t id)
+void DataPoint::setCanId(uint8_t id)
 {
-	CanId = id << 2;
+	CANId = id;
 }
-uint16_t DataPoint::getCanId()
+uint8_t DataPoint::getCanId()
 {
-	return CanId >> 2;
+	return CANId;
 }
-DataPoint::DataPoint(const uint16_t canLength, const uint16_t strLen):CANLength(canLength), stringLength(strLen+12)
+DataPoint::DataPoint(uint8_t CANId, const uint8_t CANLength):CANId(CANId), CANLength(CANLength)
 {
 }
 
@@ -57,12 +57,12 @@ const char * DataPoint::getStringHeader()
 
 void DataPoint::packCANDefault(CANFrame *f)
 {
-	f->id |= CanId;
+	f->id = CANId;
 	f->length = this->CANLength;
 }
 bool DataPoint::checkMatchCAN(const CANFrame *f)
 {
-	if (f->id == this->CanId && f->length == this->CANLength)
+	if (f->id == this->CANId && f->length == this->CANLength)
 	{
 		this->unpackCAN(f);
 		return true;

@@ -9,6 +9,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)NV10CurrentSensor.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)NV10CurrentSensorStats.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)DataPoint.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)NV10AccesoriesStatus.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)CANSerializer.h" />
@@ -16,5 +17,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)NV10CurrentSensor.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)NV10CurrentSensorStats.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)DataPoint.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)NV10AccesoriesStatus.h" />
   </ItemGroup>
 </Project>

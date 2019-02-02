@@ -21,8 +21,8 @@ public:
 	/// Provide a standard CAN ID for each DataPoint
 	/// </summary>
 	/// <param name="id">value between 0 - 0x7FF</param>
-	void setCanId(uint16_t id);
-	uint16_t getCanId();
+	void setCanId(uint8_t id);
+	uint8_t getCanId();
 	//virtual void insertData() = 0; cancelled due to different function signatures in different implementations
 	bool checkMatchString(char * str);
 	bool checkMatchCAN(const CANFrame*);
@@ -39,12 +39,12 @@ protected:
 	//}eEncodingPreset;
 	//
 	//DataPoint(eEncodingPreset (&presets)[8]);
-	DataPoint(const uint16_t canLength, const uint16_t strLen);
+	DataPoint(uint8_t CANId, const uint8_t CANLength);
 	char strHeader[3];
 	// TODO: utilize encodingPresets to specify CAN encoding. Proposal: child classes use aliases to parent class' variables
 	unsigned long timeStamp;
-	const uint16_t CANLength, stringLength;
-	uint16_t CanId;
+	const uint8_t CANLength;
+	uint8_t CANId;
 	const char* getStringHeader();
 	void packCANDefault(CANFrame*);
 	char* packStringDefault(char * str);
