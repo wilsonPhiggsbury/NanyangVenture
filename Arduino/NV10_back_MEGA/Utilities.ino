@@ -4,153 +4,96 @@
 /// </summary>
 /// <param name="path">Generated folder path is stored into here.</param>
 /// <returns></returns>
-const uint8_t FILENAME_DIGITS = 4;
-bool initSD(char* path)
+bool initSD(SdFat& card)
 {
-	EEPROM.begin();
-	// begin SD card connection
-	if (!tryReadSd())
-	{
+	if (!card.begin(SD_SPI_CS_PIN))
 		return false;
-	}
+	else
+		HESFuelCell::setPath(&card);
+	File f;
+	// obtain number of existing entries in SD card
+	uint16_t folderEntries = 0;
+	char folderPath[18] = "/NV10_";	// max 8 chars. len("NV10_") = 5, pad 3 digits to entry
+	do {
+		sprintf(folderPath + 6, "%03d", ++folderEntries);	// pad '0' on the front if number contains less than 3 digits
+		f = card.open(folderPath);
+	} while (f != NULL);
 
-	strcpy(path, "/LOG_"); // Arduino does not like lengthy path names. Please keep to under 4 alphabets.
-
-	// Comb through existing files in SD card to obtain the latest index. Use it to name our new folder.
-	File sub, root = SD.open("/");
-	int existingIndex = getNewFolderIndex(sub, root); // start from index 0
-
-	// wipe card (30 is tested to still NOT crash arduino. No gurantee beyond)
-	if (existingIndex >= 30)
+	debug_("Folder entries: "); debug(folderEntries);
+	// Wipe when too full, or on user request ('~' char)
+	if (folderEntries > 30)
 	{
-		promptWipeSd(sub);
+		Serial.println(F("SD card is nearing threshold to crash Arduino."));
+		initiateWipe(card);
+	}
+	for (int wipeWindow = 10; wipeWindow >= 0; wipeWindow--)
+	{
+		if (Serial.read() == '~')
+		{
+			Serial.println(F("Requesting to wipe SD card."));
+			initiateWipe(card);
+		}
+		flushRX();
+		delay(100);
 	}
 
-	root.close();
-	sub.close();
+	// Make new directory and operate within it.
+	card.mkdir(folderPath);
+	card.chdir(folderPath);
 
-	createDirectory(path, existingIndex);
-	createFCLogFiles(path);
-	createCSLogFiles(path);
-	// *path should always contain /LOG_****/
-	// We will still use *path variable whenever we write to a file. 
-	// Clean up trailing file names after use.
-	strcpy(path + FILENAME_HEADER_LENGTH, "");
-	HESFuelCell::setPath(path);
+	// initialize FC column text
+	f = card.open("FC.txt", FILE_WRITE);
+	f.println(F("Millis	Watt	P	Tmp	Status"));
+	f.close();
+	// initialize CS column text
+	f = card.open("CS.txt", FILE_WRITE);
+	f.println(F("Millis	 Volt	CapIn	CapOut	Motor"));
+	f.close();
+	// initialize SM column text
+	f = card.open("SM.txt", FILE_WRITE);
+	f.println(F("Millis\tkm/h"));
+	f.close();
+
 	return true;
 }
+void initiateWipe(SdFat& card)
+{
+	File sub2;
+	Serial.println(F("Wipe the card? (y/n)"));
+
+	char response = '\0';
+	while (response != 'y' && response != 'n')
+	{
+		delay(100);
+		response = Serial.read();
+	}
+	if (response == 'y')
+	{
+		// wipe card
+		Serial.print(F("Wiping card"));
+		card.wipe(&Serial);
+		Serial.println(F("done"));
+		if (!card.begin(SD_SPI_CS_PIN))
+		{
+			Serial.println(F("Card corrupted. Please format manually.\nArduino will reset in 5 seconds..."));
+			delay(5000);
+			softReset();
+		}
+	}
+	flushRX();
+}
+void flushRX()
+{
+	// clean up any trailing characters in serial RX buffer
+	while (Serial.available())
+		Serial.read();
+}
+void softReset()
+{
+	asm volatile ("  jmp 0");
+}
+
 void storeWheelInterval_ISR()
 {
 	speedo.storeWheelInterval();
-}
-bool tryReadSd()
-{
-	if (!SD.begin(SD_SPI_CS_PIN))
-	{
-		return false;
-	}
-	// skip looking at SD card if it is too full.
-	if (EEPROM.read(1) == 1)
-	{
-		EEPROM.write(1, 0);
-		Serial.println(F("NOT logging into SD card. SD card full."));
-		return false;
-	}
-	return true;
-}
-
-int getNewFolderIndex(File &sub, File &root)
-{
-	int existingIndex = 0; // start from index 0
-	while (sub = root.openNextFile())
-	{
-		if (sub.isDirectory())
-		{
-			int thisIndex = atoi(sub.name() + strlen(path) - 1); // -1 for excluding the '/' at the beginning, as sub.name() does not contain '/'
-			existingIndex = max(thisIndex, existingIndex);
-		}
-	}
-	return existingIndex;
-}
-
-void promptWipeSd(File &sub)
-{
-	File sub2;
-	char index[FILENAME_DIGITS + 1];
-		Serial.println(F("SD card is nearing threshold to crash Arduino. Wipe the card? (y/n)"));
-		while (!Serial.available());
-		delay(100);
-		char response = Serial.read();
-		while (Serial.available())
-			Serial.read();
-		if (response == 'y')
-		{
-			// wipe card
-			Serial.println(F("Wiping card..."));
-			for (int i = 1; i < 50; i++)
-			{
-				sprintf(index, "%04d", i);
-				strcpy(path + 5, index);
-				strcat(path, "/");
-				Serial.println(path);
-
-				sub = SD.open(path);
-				while (sub2 = sub.openNextFile(FILE_WRITE))
-				{
-					Serial.print("\t");
-					Serial.println(sub2.name());
-					strcat(path, sub2.name());
-					SD.remove(path);
-					strcpy(path + FILENAME_HEADER_LENGTH, "");
-					sub2.close();
-				}
-				sub.close();
-				SD.rmdir(path);
-
-				delay(50);
-			}
-			Serial.println(F("Card wiped. Resetting in..."));
-			delay(1000);
-			for (int i = 5; i >= 0; i--)
-			{
-				Serial.print(i);
-				Serial.print("...");
-				delay(1000);
-			}
-		}
-		else
-		{
-			// tell arduino to ignore sd card on next reset.
-			EEPROM.write(1, 1);
-		}
-		// reset the arduino
-		asm volatile ("  jmp 0");
-}
-void createFCLogFiles(char* path)
-{
-	File sub;
-	strcpy(path + FILENAME_HEADER_LENGTH, FUELCELL_FILENAME);
-	sub = SD.open(path, FILE_WRITE);
-	sub.println(F("\tMillis\t  V_m  A_m   W_m   Wh_mTmp_m Pres_m Vcap_m State_m\t  V_s  A_s   W_s   Wh_sTmp_s Pres_s Vcap_s State_s"));
-	sub.close();
-}
-void createCSLogFiles(char* path)
-{
-	File sub;
-	strcpy(path + FILENAME_HEADER_LENGTH, CURRENTSENSOR_FILENAME);
-	sub = SD.open(path, FILE_WRITE);
-	sub.println(F("\tMillis\t V_cI A_cI\t V_cO A_cO\t V_MT A_MT"));
-	sub.close();
-}
-void createDirectory(char* path, int indexInt)
-{
-	char index[FILENAME_DIGITS + 1];
-	// pad '0' on the front if number contains less than 4 digits
-	sprintf(index, "%04d", indexInt + 1);
-	// A new index number is assigned to *path! e.g. /LOG_0002
-	strcpy(path + 5, index);
-	Serial.print("Logging into folder ");	Serial.println(path);
-	SD.mkdir(path);
-	// initialize the interior folder structure
-	strcat(path, "/");	
 }

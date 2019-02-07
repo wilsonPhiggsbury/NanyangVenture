@@ -142,7 +142,7 @@ void TaskRefreshScreen(void* pvParameters)
 	char content[FLOAT_TO_STRING_LEN + 1];
 	DashboardScreenManager screens = DashboardScreenManager(&received); // Singleton Facade pattern probably?
 
-	TickType_t delay = pdMS_TO_TICKS(200);
+	const TickType_t delay = pdMS_TO_TICKS(200);
 	while (1)
 	{
 		BaseType_t success = xQueueReceive(queueForDisplay, &received, 0);
@@ -198,7 +198,7 @@ void TaskCaptureButtons(void* pvParameters)
 	buttonCommand.ID = BT;
 	peripheralStates[Horn] = peripheralStates[Wiper] = peripheralStates[Hazard] = STATE_DS;
 	buttonCommand.data[0][Horn] = buttonCommand.data[0][Wiper] = buttonCommand.data[0][Hazard] = STATE_DS;
-	TickType_t delay = pdMS_TO_TICKS(200);
+	const TickType_t delay = pdMS_TO_TICKS(100);
 	setDebounce(buttonPins, NUM_BUTTONS, 900); // for some reason, setDebounce() if called in setup() seems to have no effect
 	while (1)
 	{

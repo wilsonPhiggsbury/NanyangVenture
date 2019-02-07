@@ -7,11 +7,11 @@
 #include <MemoryFree.h>
 #include <Arduino_FreeRTOS.h>
 #include <queue.h>
+#include <SdFat.h>
+#include <SPI.h>
 //#include <FreeRTOS_AVR.h>
 #include <Adafruit_NeoPixel.h>
 #include <CAN_Serializer.h>
-#include <SPI.h>
-#include <SD.h>
 #include "Behaviour.h"
 
 //#include "JoulemeterDisplay.h"	
@@ -53,7 +53,7 @@ CAN_Serializer serializer;
 // define globals
 bool SD_avail = false, CAN_avail = false;
 char path[FILENAME_HEADER_LENGTH + 8 + 4 + 1]; // +8 for filename, +4 for '.txt', +1 for '\0'
-
+SdFat card;
 // define tasks, types are: input, control, output
 void TaskLogFuelCell(void *pvParameters);		// Input task:		Refreshes class variables for fuel cell Volts, Amps, Watts and Energy
 void TaskLogCurrentSensor(void *pvParameters);	// Input task:		Refreshes class variables for motor Volts and Amps
@@ -79,7 +79,7 @@ void setup() {
 
 	CAN_avail = serializer.init(CAN_CS_PIN);
 	// create all files in a new directory
-	SD_avail = initSD(path);
+	SD_avail = initSD(card);
 	Serial.print("SD avail: ");
 	Serial.println(SD_avail);
 	Serial.print("CAN avail: ");

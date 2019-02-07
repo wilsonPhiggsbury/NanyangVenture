@@ -7,8 +7,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LiquidCrystal", "..\librari
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Wire", "..\..\ide\hardware\arduino\avr\libraries\Wire\Wire.vcxitems", "{50699B74-4B7A-418A-BCD4-33D264BFE581}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SD", "..\..\ide\libraries\SD\SD.vcxitems", "{FA968CF9-C643-4453-A136-BDED4E20B71A}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SPI_AVR", "..\..\ide\hardware\arduino\avr\libraries\SPI\SPI.vcxitems", "{6F81BC15-C478-45A4-A060-02D3EAC23A77}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Adafruit_GFX_Library", "..\libraries\Adafruit_GFX_Library\Adafruit_GFX_Library.vcxitems", "{8C1A22A5-7653-42A6-B3DD-80639FA902D1}"
@@ -80,8 +78,8 @@ Global
 		Arduino\libraries\CAN_Serializer\CAN_Serializer.vcxitems*{7ed24bf0-127d-4fc9-843e-85d8ba0529c7}*SharedItemsImports = 4
 		..\libraries\MemoryFree\MemoryFree.vcxitems*{86486ce1-3d43-4d25-8616-4e6372ac1896}*SharedItemsImports = 9
 		..\..\ide\hardware\arduino\avr\libraries\SPI\SPI.vcxitems*{8b3a2447-325c-473e-a84c-45b578507bd3}*SharedItemsImports = 4
-		..\..\ide\libraries\SD\SD.vcxitems*{8b3a2447-325c-473e-a84c-45b578507bd3}*SharedItemsImports = 4
 		..\libraries\Adafruit_NeoPixel\Adafruit_NeoPixel.vcxitems*{8b3a2447-325c-473e-a84c-45b578507bd3}*SharedItemsImports = 4
+		..\libraries\SdFat\SdFat.vcxitems*{8b3a2447-325c-473e-a84c-45b578507bd3}*SharedItemsImports = 4
 		Arduino\libraries\CAN_Serializer\CAN_Serializer.vcxitems*{8b3a2447-325c-473e-a84c-45b578507bd3}*SharedItemsImports = 4
 		..\libraries\Adafruit_GFX_Library\Adafruit_GFX_Library.vcxitems*{8c1a22a5-7653-42a6-b3dd-80639fa902d1}*SharedItemsImports = 9
 		Arduino\libraries\CAN_Serializer\CAN_Serializer.vcxitems*{a14d819e-53c2-47dd-844c-67d7860ba1fa}*SharedItemsImports = 4
@@ -91,7 +89,6 @@ Global
 		Arduino\libraries\CAN_Serializer\CAN_Serializer.vcxitems*{d8187ee3-2ca8-4b1b-92e4-ccb0901f1f40}*SharedItemsImports = 4
 		..\libraries\FreeRTOS\FreeRTOS.vcxitems*{e0f75ac7-15bb-4c7a-98cd-37a96c9641a3}*SharedItemsImports = 4
 		Arduino\libraries\CAN_Serializer\CAN_Serializer.vcxitems*{e0f75ac7-15bb-4c7a-98cd-37a96c9641a3}*SharedItemsImports = 4
-		..\..\ide\libraries\SD\SD.vcxitems*{fa968cf9-c643-4453-a136-bded4e20b71a}*SharedItemsImports = 9
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -167,7 +164,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{71C8833B-DB48-45FC-BF91-791068C94FB0} = {B731DFF7-A7B2-4F18-831B-D04250650B2F}
 		{50699B74-4B7A-418A-BCD4-33D264BFE581} = {B731DFF7-A7B2-4F18-831B-D04250650B2F}
-		{FA968CF9-C643-4453-A136-BDED4E20B71A} = {B731DFF7-A7B2-4F18-831B-D04250650B2F}
 		{6F81BC15-C478-45A4-A060-02D3EAC23A77} = {B731DFF7-A7B2-4F18-831B-D04250650B2F}
 		{8C1A22A5-7653-42A6-B3DD-80639FA902D1} = {B731DFF7-A7B2-4F18-831B-D04250650B2F}
 		{5C6172FD-CE53-4A19-9733-98B83ADDEEF5} = {B731DFF7-A7B2-4F18-831B-D04250650B2F}
