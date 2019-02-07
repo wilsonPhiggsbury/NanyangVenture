@@ -8,6 +8,14 @@
 #else
 	#include "WProgram.h"
 #endif
+#define DEBUG 0
+#if DEBUG
+#define debug_(str) Serial.print(str)
+#define debug(str)  Serial.println(str)
+#else
+#define debug_(...)
+#define debug(...)
+#endif
 
 #include <CANSerializer.h>
 

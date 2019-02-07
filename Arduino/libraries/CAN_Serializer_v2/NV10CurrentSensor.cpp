@@ -65,4 +65,24 @@ void NV10CurrentSensorClass::unpackString(char * str)
 	ampMotor = atoi(ptr);
 }
 
+float NV10CurrentSensorClass::getVolt()
+{
+	return volt;
+}
+
+float NV10CurrentSensorClass::getAmpCapIn()
+{
+	return ampCapIn;
+}
+
+float NV10CurrentSensorClass::getAmpCapOut()
+{
+	return ampCapOut;
+}
+
+float NV10CurrentSensorClass::getAmpMotor()
+{
+	return ampMotor;
+}
+
 

@@ -64,14 +64,14 @@ void DisplayBar::draw()
 	{
 		if (thisValue > prevValue)
 		{
-			// bigger: draw foreground color, from old value to new value
+			// value has increased: draw foreground color, from old value to new value
 			screen->fillRect(xPos + width - margin - ceil(thisWidth), yPos + margin, \
 				ceil(diff), actualHeight, \
 				foreground);
 		}
 		else if (prevValue > thisValue)
 		{
-			// smaller: draw background color, from new value to old value
+			// value has decreased: draw background color, from new value to old value
 			screen->fillRect(xPos + width - margin - ceil(prevWidth), yPos + margin, \
 				ceil(diff), actualHeight, \
 				background);
@@ -81,14 +81,14 @@ void DisplayBar::draw()
 	{
 		if (thisValue > prevValue)
 		{
-			// bigger: draw foreground color, from old value to new value
+			// value has increased: draw foreground color, from old value to new value
 			screen->fillRect(xPos + margin + floor(prevWidth), yPos + margin, \
 				ceil(diff), actualHeight, \
 				foreground);
 		}
 		else if (prevValue > thisValue)
 		{
-			// smaller: draw background color, from new value to old value
+			// value has decreased: draw background color, from new value to old value
 			screen->fillRect(xPos + margin + floor(thisWidth), yPos + margin,\
 				ceil(diff), actualHeight, \
 				background);

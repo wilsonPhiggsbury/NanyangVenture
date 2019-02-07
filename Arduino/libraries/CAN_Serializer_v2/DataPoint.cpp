@@ -88,6 +88,7 @@ bool DataPoint::checkMatchString(char * str)
 
 void debugPrint(char * toPrint, int len)
 {
+#if DEBUG
 	for (int i = 0; i < len; i++)
 	{
 		char c = *(toPrint + i);
@@ -101,6 +102,7 @@ void debugPrint(char * toPrint, int len)
 		}
 	}
 	Serial.println();
+#endif
 }
 
 void print(char * toPrint)

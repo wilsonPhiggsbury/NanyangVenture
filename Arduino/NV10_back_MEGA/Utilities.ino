@@ -8,7 +8,16 @@ bool initSD(SdFat& card)
 {
 	if (!card.begin(SD_SPI_CS_PIN))
 		return false;
-	const uint16_t folderEntries = card.rootDirEntryCount();
+	File f;
+	// obtain number of existing entries in SD card
+	uint16_t folderEntries = 0;
+	char folderPath[18] = "/NV10_";	// max 8 chars. len("NV10_") = 5, pad 3 digits to entry
+	do {
+		sprintf(folderPath + 6, "%03d", ++folderEntries);	// pad '0' on the front if number contains less than 3 digits
+		f = card.open(folderPath);
+	} while (f != NULL);
+	
+	debug_("Folder entries: "); debug(folderEntries);
 	// Wipe when too full, or on user request ('~' char)
 	if (folderEntries > 30)
 	{
@@ -23,27 +32,24 @@ bool initSD(SdFat& card)
 			initiateWipe(card);
 		}
 		flushRX();
-		delay(200);
+		delay(100);
 	}
 
 	// Make new directory and operate within it.
-	char folderPath[18] = "/NV10_";	// max 8 chars. len("NV10_") = 5, pad 3 digits to entry
-	sprintf(folderPath+6, "%03d", folderEntries);	// pad '0' on the front if number contains less than 3 digits
 	card.mkdir(folderPath);
 	card.chdir(folderPath);
 
-	File f;
 	// initialize FC column text
 	f = card.open("FC.txt", FILE_WRITE);
-	f.println(F("\tMillis\t  V_m  A_m   W_m   Wh_mTmp_m Pres_m Vcap_m State_m\t  V_s  A_s   W_s   Wh_sTmp_s Pres_s Vcap_s State_s"));
+	f.println(F("Millis	Watt	P	Tmp	Status"));
 	f.close();
 	// initialize CS column text
 	f = card.open("CS.txt", FILE_WRITE);
-	f.println(F("\tMillis\t V_cI A_cI\t V_cO A_cO\t V_MT A_MT"));
+	f.println(F("Millis	 Volt	CapIn	CapOut	Motor"));
 	f.close();
 	// initialize SM column text
 	f = card.open("SM.txt", FILE_WRITE);
-	f.println(F("\tMillis\t km/h"));
+	f.println(F("Millis\tkm/h"));
 	f.close();
 	
 	return true;

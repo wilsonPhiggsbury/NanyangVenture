@@ -24,6 +24,11 @@ class NV10CurrentSensorClass:public DataPoint
 	void unpackCAN(const CANFrame*);
 	void packString(char*);
 	void unpackString(char * str);
+
+	float getVolt();
+	float getAmpCapIn();
+	float getAmpCapOut();
+	float getAmpMotor();
 };
 
 typedef NV10CurrentSensorClass NV10CurrentSensor;
