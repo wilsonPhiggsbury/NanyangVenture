@@ -1,9 +1,7 @@
 #include "FuelCellLogger.h"
-#include <SPI.h>
-#include <SD.h>
 
 uint32_t HESFuelCell::timeStamp;
-char* HESFuelCell::path;
+SdFat* HESFuelCell::card;
 bool HESFuelCell::SD_avail = false;
 
 HESFuelCell::HESFuelCell(uint8_t id, HardwareSerial *port):id(id),port(port)
@@ -19,10 +17,10 @@ HESFuelCell::HESFuelCell(uint8_t id, HardwareSerial *port):id(id),port(port)
 /// <para> Fuel Cells need to store their raw readings into the specified path. </para>
 /// </summary>
 /// <param name="thePath"></param>
-void HESFuelCell::setPath(char* thePath)
+void HESFuelCell::setPath(SdFat* thecard)
 {
 	SD_avail = true;
-	path = thePath;
+	card = thecard;
 }
 /// <summary>
 /// Logs the Fuel Cell Serial data. Called at fixed intervals since Fuel Cells print once per second.
@@ -107,23 +105,23 @@ bool HESFuelCell::hasUpdated()
 }
 void HESFuelCell::writeAsRawData(char* toWrite)
 {
+	char path[12];
 	if (SD_avail)
 	{
 		// set path to FC*RAW.txt
 		// outcome: path = /LOG****/FC*raw.txt
-		char* pathTail = path + FILENAME_HEADER_LENGTH;
-		strcpy(pathTail, frameType_shortNames[FC]);
-		itoa(id, pathTail + 2, 10);
-		strcpy(pathTail + 2 + 1, "raw.txt");
+		strcpy(path, frameType_shortNames[FC]);
+		itoa(id, path + 2, 10);
+		strcpy(path + 2 + 1, "raw.txt");
 
 		// higher priority task does not need critical section eh?
-		File rawFCdata = SD.open(path, FILE_WRITE);
+		File rawFCdata = card->open(path, FILE_WRITE);
 		rawFCdata.print(toWrite);
 		rawFCdata.print("\n");
 		rawFCdata.close();
 
 		// revert path back to original
-		strcpy(pathTail, "");
+		strcpy(path, "");
 	}
 }
 

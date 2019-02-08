@@ -13,6 +13,9 @@
 #define PIXELS 6
 Adafruit_NeoPixel lstrip = Adafruit_NeoPixel(PIXELS, LSIG_PIN, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel rstrip = Adafruit_NeoPixel(PIXELS, RSIG_PIN, NEO_GRB + NEO_KHZ800);
+const uint32_t SIG_COLOR = Adafruit_NeoPixel::Color(255, 165, 0);
+const uint32_t NO_COLOR = Adafruit_NeoPixel::Color(0, 0, 0);
+
 CAN_Serializer serializer;
 
 /*
@@ -105,7 +108,7 @@ void TaskToggle(void* pvParameters)
 		{
 			debug("BEEEP!");
 			digitalWrite(HORN_PIN, HIGH);
-			vTaskDelay(pdMS_TO_TICKS(1000));
+			vTaskDelay(pdMS_TO_TICKS(500));
 			digitalWrite(HORN_PIN, LOW);
 			peripheralStates[Horn] = STATE_DS;
 			debug("beep off.");
@@ -128,7 +131,7 @@ void TaskToggle(void* pvParameters)
 }
 void TaskBlink(void* pvParameters)
 {
-	bool lsigOn = false, rsigOn = false;
+	bool sigOn = false;
 
 	lstrip.begin();
 	rstrip.begin();
@@ -136,71 +139,23 @@ void TaskBlink(void* pvParameters)
 	rstrip.setBrightness(255);
 	while (1)
 	{
-		if (peripheralStates[Hazard] == STATE_EN || peripheralStates[Lsig] == STATE_EN)
+		if (sigOn)
 		{
-			if (lsigOn)
-			{
-				lsigOn = false;
-				digitalWrite(LED_BUILTIN, LOW);
-				for (int i = 0; i < PIXELS; i++)
-				{
-					lstrip.setPixelColor(i, 0, 0, 0);
-					lstrip.show();
-					digitalWrite(LED_BUILTIN, LOW);
-				}
-			}
-			else
-			{
-				lsigOn = true;
-				digitalWrite(LED_BUILTIN, HIGH);
-				for (int i = 0; i < PIXELS; i++)
-				{
-					lstrip.setPixelColor(i, 255, 165, 0);
-					lstrip.show();
-					digitalWrite(LED_BUILTIN, HIGH);
-				}
-			}
+			sigOn = false;
+			setRGB(lstrip, PIXELS, NO_COLOR);
+			setRGB(rstrip, PIXELS, NO_COLOR);
 		}
 		else
 		{
-			lsigOn = false;
-			digitalWrite(LED_BUILTIN, LOW);
-			for (int i = 0; i < PIXELS; i++)
+			if (peripheralStates[Hazard] == STATE_EN || peripheralStates[Lsig] == STATE_EN)
 			{
-				lstrip.setPixelColor(i, 0, 0, 0);
-				lstrip.show();
-				digitalWrite(LED_BUILTIN, LOW);
+				sigOn = true;
+				setRGB(lstrip, PIXELS, SIG_COLOR);
 			}
-		}
-
-		if (peripheralStates[Hazard] == STATE_EN || peripheralStates[Rsig] == STATE_EN)
-		{
-			if (rsigOn)
+			if (peripheralStates[Hazard] == STATE_EN || peripheralStates[Rsig] == STATE_EN)
 			{
-				rsigOn = false;
-				for (int i = 0; i < PIXELS; i++)
-				{
-					rstrip.setPixelColor(i, 0, 0, 0);
-					rstrip.show();
-				}
-			}
-			else
-			{
-				rsigOn = true;
-				for (int i = 0; i < PIXELS; i++)
-				{
-					rstrip.setPixelColor(i, 255, 165, 0);
-					rstrip.show();
-				}
-			}
-		}
-		else
-		{
-			rsigOn = false;
-			for (int i = 0; i < PIXELS; i++)
-			{
-				rstrip.setPixelColor(i, 0, 0, 0);
-				rstrip.show();
+				sigOn = true;
+				setRGB(rstrip, PIXELS, SIG_COLOR);
 			}
 		}
 		vTaskDelay(pdMS_TO_TICKS(500));
@@ -230,10 +185,10 @@ void TaskMoveWiper(void* pvParameters)
 }
 void BRAKE_ISR()
 {
-	static unsigned long brakePinDebounceLastTime = 0;
-	if (millis() - brakePinDebounceLastTime < 100)
-		return;
-	brakePinDebounceLastTime = millis();
+	//static unsigned long brakePinDebounceLastTime = 0;
+	//if (millis() - brakePinDebounceLastTime < 100)
+	//	return;
+	//brakePinDebounceLastTime = millis();
 
 	// toggle the status whenever pin change detected. the status is kept up to sync in taskToggle.
 	brakeOn = !brakeOn;
@@ -263,7 +218,7 @@ void doReceiveAction(Packet* q)
 					if (peripheralStates[Wiper] == STATE_EN)debug(F("Wiper should not be on!"));
 					break;
 				case Hazard:
-					if (peripheralStates[Hazard] == STATE_EN)debug(F("Hazard should not be on!"));
+					peripheralStates[i] = q->data[0][i];
 					break;
 				case Lsig:
 					if (peripheralStates[Lsig] == STATE_EN)debug(F("Lsig ON"));
@@ -289,4 +244,12 @@ void doReceiveAction(Packet* q)
 		// Example: "turn off blinking signal lights" should apply immediately instead of happening at the end of a blink cycle
 		xTaskAbortDelay(taskBlink);
 	}
+}
+void setRGB(Adafruit_NeoPixel& strip, uint8_t numLights, uint32_t color)
+{
+	for (int i = 0; i < numLights; i++)
+	{
+		strip.setPixelColor(i, color);
+	}
+	strip.show();
 }

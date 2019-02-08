@@ -182,6 +182,8 @@ void DashboardScreenManager::refreshDataWidgets()
 			dataWidgets[i]->update();
 		}
 	}
+	lSigArrow->update();
+	rSigArrow->update();
 }
 void DashboardScreenManager::refreshDataWidgets(void* null)
 {
@@ -190,13 +192,6 @@ void DashboardScreenManager::refreshDataWidgets(void* null)
 }
 void DashboardScreenManager::refreshAnimatedWidgets()
 {
-	lSigArrow->update();
-	rSigArrow->update();
-	if (q->ID == BT)
-	{
-		Serial.print("LSIG is "); Serial.println(q->data[0][Lsig]);
-		Serial.print("RSIG is "); Serial.println(q->data[0][Rsig]);
-	}
 }
 
 DashboardScreenManager::~DashboardScreenManager()
