@@ -34,7 +34,9 @@ bool initSD(SdFat& card)
 			initiateWipe(card);
 		}
 		flushRX();
-		delay(100);
+		folderEntries = 0;
+		sprintf(folderPath + 6, "%03d", folderEntries);
+		delay(200);
 	}
 
 	// Make new directory and operate within it.
@@ -43,15 +45,15 @@ bool initSD(SdFat& card)
 
 	// initialize FC column text
 	f = card.open("FC.txt", FILE_WRITE);
-	f.println(F("Millis	Watt	P	Tmp	Status"));
+	f.println(F("	Millis	Watt	P	Tmp	Status"));
 	f.close();
 	// initialize CS column text
 	f = card.open("CS.txt", FILE_WRITE);
-	f.println(F("Millis	 Volt	CapIn	CapOut	Motor"));
+	f.println(F("	Millis	 Volt	CapIn	CapOut	Motor"));
 	f.close();
 	// initialize SM column text
 	f = card.open("SM.txt", FILE_WRITE);
-	f.println(F("Millis\tkm/h"));
+	f.println(F("	Millis	km/h"));
 	f.close();
 
 	return true;

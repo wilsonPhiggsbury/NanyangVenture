@@ -130,7 +130,7 @@ void loop() {
 }
 void TaskRefreshScreen(void* pvParameters)
 {
-	const uint8_t CAN_resetThreshold = 15;
+	const uint8_t CAN_resetThreshold = 30;
 	uint8_t CAN_resetCounter = 0;
 
 	pinMode(LCD_BACKLIGHT, OUTPUT);
@@ -142,7 +142,7 @@ void TaskRefreshScreen(void* pvParameters)
 	char content[FLOAT_TO_STRING_LEN + 1];
 	DashboardScreenManager screens = DashboardScreenManager(&received); // Singleton Facade pattern probably?
 
-	const TickType_t delay = pdMS_TO_TICKS(200);
+	const TickType_t delay = pdMS_TO_TICKS(100);
 	while (1)
 	{
 		BaseType_t success = xQueueReceive(queueForDisplay, &received, 0);
@@ -157,7 +157,6 @@ void TaskRefreshScreen(void* pvParameters)
 			//dummyData(&received, SM);
 			//screens.refreshDataWidgets();
 			screens.refreshDataWidgets();
-			
 		}
 		else
 		{
@@ -170,7 +169,7 @@ void TaskRefreshScreen(void* pvParameters)
 				CAN_resetCounter = 0; debug("Resetting 328P...");
 			}
 		}
-		screens.refreshAnimatedWidgets();
+		//screens.refreshAnimatedWidgets();
 		vTaskDelay(delay);
 	}
 }
@@ -237,7 +236,7 @@ void TaskCaptureButtons(void* pvParameters)
 			// disable horn immediately here, front has code to auto-determine how long to beep the horn
 			buttonCommand.data[0][Horn] = peripheralStates[Horn] = STATE_DS;
 			// tell the display about my button state too
-			xQueueSend(queueForDisplay, &buttonCommand, 100);
+			BaseType_t s =  xQueueSend(queueForDisplay, &buttonCommand, 500);
 		}
 		vTaskDelay(delay);
 	}

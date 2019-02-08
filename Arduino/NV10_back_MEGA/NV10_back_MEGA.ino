@@ -22,8 +22,6 @@
 #include "Pins_back.h"
 
 // file names
-const char FUELCELL_FILENAME[] = "FC.txt";
-const char CURRENTSENSOR_FILENAME[] = "CS.txt";
 const uint8_t FILENAME_HEADER_LENGTH = 1 + 8 + 1;
 // sample filename: /LOG_0002/12345678.txt   1+8+1+8+4+1, 
 //											  ^^^ | ^^^
