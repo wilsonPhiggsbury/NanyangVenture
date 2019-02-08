@@ -167,19 +167,14 @@ void LogSendData(void *pvParameters __attribute__((unused)))  // This is a Task.
 
 void TaskBlink(void* pvParameters)
 {
-	bool lsigOn = false, rsigOn = false;
+	bool sigOn = false;
 	// initialize light strips
 	lightstrip.begin();
 	brakestrip.begin();
 	lightstrip.setBrightness(50);
 	brakestrip.setBrightness(200);
-	for (int i = 0; i < 7; i++)
-	{
-		lightstrip.setPixelColor(i, 255, 255, 255);
-		brakestrip.setPixelColor(i, 0, 0, 0);
-	}
-	lightstrip.show();
-	brakestrip.show();
+	setRGB(lightstrip, PIXELS, LIGHT_COLOR);
+	setRGB(brakestrip, PIXELS, BRAKE_COLOR);
 
 	lstrip.begin();
 	rstrip.begin();
@@ -192,65 +187,23 @@ void TaskBlink(void* pvParameters)
 		//if (peripheralStates[Rsig] == STATE_EN)debug(F("Rsig ON"));
 		//else debug(F("Rsig OFF"));
 		//debug(F("--------"));
-		if (peripheralStates[Hazard] == STATE_EN || peripheralStates[Lsig] == STATE_EN)
+		if (sigOn)
 		{
-			if (lsigOn)
-			{
-				lsigOn = false;
-				for (int i = 0; i < 7; i++)
-				{
-					lstrip.setPixelColor(i, 0, 0, 0);
-					lstrip.show(); 
-				}
-			}
-			else
-			{
-				lsigOn = true;
-				for (int i = 0; i < 7; i++)
-				{
-					lstrip.setPixelColor(i, 255, 165, 0);
-					lstrip.show();
-				}
-			}
+			sigOn = false;
+			setRGB(lstrip, PIXELS, NO_COLOR);
+			setRGB(rstrip, PIXELS, NO_COLOR);
 		}
 		else
 		{
-			lsigOn = false;
-			for (int i = 0; i < 7; i++)
+			if (peripheralStates[Hazard] == STATE_EN || peripheralStates[Lsig] == STATE_EN)
 			{
-				lstrip.setPixelColor(i, 0, 0, 0);
-				lstrip.show();
+				sigOn = true;
+				setRGB(lstrip, PIXELS, SIG_COLOR);
 			}
-		}
-
-		if (peripheralStates[Hazard] == STATE_EN || peripheralStates[Rsig] == STATE_EN)
-		{
-			if (rsigOn)
+			if (peripheralStates[Hazard] == STATE_EN || peripheralStates[Rsig] == STATE_EN)
 			{
-				rsigOn = false;
-				for (int i = 0; i < 7; i++)
-				{
-					rstrip.setPixelColor(i, 0, 0, 0);
-					rstrip.show();
-				}
-			}
-			else
-			{
-				rsigOn = true;
-				for (int i = 0; i < 7; i++)
-				{
-					rstrip.setPixelColor(i, 255, 165, 0);
-					rstrip.show();
-				}
-			}
-		}
-		else
-		{
-			rsigOn = false;
-			for (int i = 0; i < 7; i++)
-			{
-				rstrip.setPixelColor(i, 0, 0, 0);
-				rstrip.show();
+				sigOn = true;
+				setRGB(rstrip, PIXELS, SIG_COLOR);
 			}
 		}
 		vTaskDelay(pdMS_TO_TICKS(500));
@@ -270,21 +223,13 @@ void doReceiveAction(Packet* q)
 	{
 		if (q->data[0][0] == STATE_EN)
 		{
-			for (int i = 0; i < 7; i++)
-			{
-				brakestrip.setPixelColor(i, 255, 0, 0);
-				lightstrip.setPixelColor(i, 255, 0, 0);
-			}
+			setRGB(brakestrip, PIXELS, BRAKE_COLOR);
+			setRGB(lightstrip, PIXELS, BRAKE_COLOR);
 		}
 		else if (q->data[0][0] == STATE_DS)
 		{
-			for (int i = 0; i < 7; i++)
-			{
-				brakestrip.setPixelColor(i, 0, 0, 0);
-				lightstrip.setPixelColor(i, 255, 255, 255);
-			}
+			setRGB(brakestrip, PIXELS, NO_COLOR);
+			setRGB(lightstrip, PIXELS, LIGHT_COLOR);
 		}
-		brakestrip.show();
-		lightstrip.show();
 	}
 }

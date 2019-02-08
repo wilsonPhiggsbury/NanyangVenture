@@ -99,3 +99,11 @@ void storeWheelInterval_ISR()
 {
 	speedo.storeWheelInterval();
 }
+void setRGB(Adafruit_NeoPixel& strip, uint8_t numLights, uint32_t color)
+{
+	for (int i = 0; i < numLights; i++)
+	{
+		strip.setPixelColor(i, color);
+	}
+	strip.show();
+}

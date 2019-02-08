@@ -47,6 +47,11 @@ Adafruit_NeoPixel lstrip = Adafruit_NeoPixel(7, LSIG_PIN, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel rstrip = Adafruit_NeoPixel(7, RSIG_PIN, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel lightstrip = Adafruit_NeoPixel(7, RUNNINGLIGHT_PIN, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel brakestrip = Adafruit_NeoPixel(7, BRAKELIGHT_PIN, NEO_GRB + NEO_KHZ800);
+const uint8_t PIXELS = 7;
+const uint32_t LIGHT_COLOR = Adafruit_NeoPixel::Color(255, 255, 255);
+const uint32_t BRAKE_COLOR = Adafruit_NeoPixel::Color(255, 0, 0);
+const uint32_t SIG_COLOR = Adafruit_NeoPixel::Color(255, 165, 0);
+const uint32_t NO_COLOR = Adafruit_NeoPixel::Color(0, 0, 0);
 CAN_Serializer serializer;
 // define globals
 bool SD_avail = false, CAN_avail = false;
