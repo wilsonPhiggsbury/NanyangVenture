@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <ItemsProjectGuid>{55b4d806-20d6-4928-af38-5ae4e1470a2e}</ItemsProjectGuid>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="$(MSBuildThisFileDirectory)readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)CANSerializer.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)DataPoint.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)NV10AccesoriesStatus.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)NV10CurrentSensor.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)NV10CurrentSensorStats.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)NV10FuelCell.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)CANSerializer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)DataPoint.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)NV10AccesoriesStatus.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)NV10CurrentSensor.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)NV10CurrentSensorStats.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)NV10FuelCell.h" />
+  </ItemGroup>
+</Project>

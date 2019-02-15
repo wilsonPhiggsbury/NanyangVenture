@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Text Include="$(MSBuildThisFileDirectory)readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)CANSerializer.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)NV10FuelCell.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)NV10CurrentSensor.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)NV10CurrentSensorStats.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)DataPoint.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)NV10AccesoriesStatus.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)CANSerializer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)NV10FuelCell.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)NV10CurrentSensor.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)NV10CurrentSensorStats.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)DataPoint.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)NV10AccesoriesStatus.h" />
+  </ItemGroup>
+</Project>
