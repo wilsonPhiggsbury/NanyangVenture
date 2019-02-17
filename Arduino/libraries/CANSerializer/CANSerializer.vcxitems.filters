@@ -39,7 +39,6 @@
     <Text Include="$(MSBuildThisFileDirectory)CANSerializer.h">
       <Filter>Header Files</Filter>
     </Text>
-    <Text Include="$(MSBuildThisFileDirectory)keywords.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)DataPoint.h">
