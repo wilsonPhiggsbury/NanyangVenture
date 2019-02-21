@@ -15,7 +15,7 @@ public:
 	Speedometer(uint16_t pinA, uint16_t pinB, uint16_t diameterInMM, uint16_t ticksPerRot, bool positivePhaseshiftWhenForward);
 	void trip();
 	uint32_t getTotalDistTravelled();
-	float calculateSpeedKmh();
+	float getSpeedKmh();
 	uint32_t getTicks();
 
 private:

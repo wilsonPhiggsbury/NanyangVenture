@@ -32,7 +32,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)NV10FuelCell.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Arduino\Projects\NanyangVenture\Arduino\libraries\CANSerializer\NV11DataSpeedo.cpp">
+    <ClCompile Include="$(MSBuildThisFileDirectory)NV11DataSpeedo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -62,7 +62,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)NV10FuelCell.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="D:\Arduino\Projects\NanyangVenture\Arduino\libraries\CANSerializer\NV11DataSpeedo.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)NV11DataSpeedo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
