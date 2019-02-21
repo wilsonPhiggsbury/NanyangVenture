@@ -13,8 +13,8 @@
 class DataPointTemplate:public DataPoint
 {
  protected:
-	 uint32_t param1 = 0;
-	 float param2 = 0; // params can be higher resolution than their packed variants (this float is packed as uint16_t in .cpp file)
+	 uint32_t& param1 = data.Long[0];
+	 float& param2 = data.Float[1]; // params can be higher resolution than their packed variants (this float is packed as uint16_t in .cpp file)
 
  public:
 	DataPointTemplate(uint8_t CANId);
@@ -22,8 +22,6 @@ class DataPointTemplate:public DataPoint
 	void insertData(uint32_t param1, uint32_t param2);
 	uint16_t getParam1();
 	float getParam2();
-	void packCAN(CANFrame*);
-	void unpackCAN(const CANFrame*);
 	void packString(char*);
 	void unpackString(char * str);
 };

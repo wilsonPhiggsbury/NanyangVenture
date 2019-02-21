@@ -32,9 +32,9 @@ void setup() {
 // the loop function runs over and over again until power down or reset
 void loop() {
 	delay(100);
-	blSpeed.data = speedoBL.getSpeedKmh();
+	blSpeed.data = speedoBL.calculateSpeedKmh();
 	blDist.data = speedoBL.getTotalDistTravelled();
-	brSpeed.data = speedoBR.getSpeedKmh();
+	brSpeed.data = speedoBR.calculateSpeedKmh();
 	brDist.data = speedoBR.getTotalDistTravelled();
   
 	blSpeedPublisher.publish(&blSpeed);

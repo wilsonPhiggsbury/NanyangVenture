@@ -4,7 +4,7 @@
 #include "DataPointTemplate.h"
 // parameter(CANbytes, stringChars)
 // param1(2,4), param2(1,2)
-DataPointTemplate::DataPointTemplate(uint8_t CANId) :DataPoint(CANId, 2+1)
+DataPointTemplate::DataPointTemplate(uint8_t CANId) :DataPoint(CANId, 8)
 {
 	strcpy(strHeader, "XX");
 }
@@ -23,19 +23,6 @@ uint16_t DataPointTemplate::getParam1()
 float DataPointTemplate::getParam2()
 {
 	return param2;
-}
-
-void DataPointTemplate::packCAN(CANFrame *f)
-{
-	DataPoint::packCANDefault(f);
-	memcpy(f->payload, &param1, sizeof(uint16_t));
-	memcpy(f->payload + sizeof(uint16_t), &param2, sizeof(uint8_t));
-}
-
-void DataPointTemplate::unpackCAN(const CANFrame *f)
-{
-	memcpy(&param1, f->payload, sizeof(uint16_t));
-	memcpy(&param2, f->payload + sizeof(uint16_t), sizeof(uint8_t));
 }
 
 void DataPointTemplate::packString(char *str)

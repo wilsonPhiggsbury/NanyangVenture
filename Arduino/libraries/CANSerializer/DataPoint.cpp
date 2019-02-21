@@ -55,19 +55,23 @@ const char * DataPoint::getStringHeader()
 	return strHeader;
 }
 
-void DataPoint::packCANDefault(CANFrame *f)
-{
-	f->id = CANId;
-	f->length = this->CANLength;
-}
-bool DataPoint::checkMatchCAN(const CANFrame *f)
+bool DataPoint::checkMatchCAN(const CANFrame * f)
 {
 	if (f->id == this->CANId && f->length == this->CANLength)
 	{
-		this->unpackCAN(f);
 		return true;
 	}
 	return false;
+}
+void DataPoint::packCAN(CANFrame *f)
+{
+	f->id = CANId;
+	f->length = this->CANLength;
+	memcpy(f->payload, data.Byte, 8);
+}
+void DataPoint::unpackCAN(const CANFrame *f)
+{
+	memcpy(data.Byte, f->payload, 8);
 }
 
 char* DataPoint::packStringDefault(char * str)
@@ -76,14 +80,39 @@ char* DataPoint::packStringDefault(char * str)
 	str += charsPrinted;// incr counter of the calling function
 	return str;
 }
+char* DataPoint::unpackStringDefault(char * str)
+{
+	char* ptr = strtok(str, "\t");
+	ptr = strtok(NULL, "\t");
+	timeStamp = strtoul(ptr, NULL, 16);
+
+	return ptr;
+}
 bool DataPoint::checkMatchString(char * str)
 {
 	if (!strncmp(str, getStringHeader(), 2))
 	{
-		this->unpackString(str);
 		return true;
 	}
 	return false;
+}
+void DataPoint::packString(char *str)
+{
+	char* shiftedStr = DataPoint::packStringDefault(str);
+	// param1 = 4, param2 = 2
+	sprintf(shiftedStr, "%x\t%x\t%x\t%x\t%x\t%x\t%x\t%x", data.Byte[0], data.Byte[1], data.Byte[2], data.Byte[3], data.Byte[4], data.Byte[5], data.Byte[6], data.Byte[7]);
+}
+void DataPoint::unpackString(char * str)
+{
+	char* ptr = strtok(str, "\t");
+	ptr = strtok(NULL, "\t");
+	timeStamp = strtoul(ptr, NULL, 16);
+
+	for (int i = 0; i < 8; i++)
+	{
+		ptr = strtok(NULL, "\t");
+		data.Byte[i] = strtoul(ptr, NULL, 16);
+	}
 }
 
 void debugPrint(char * toPrint, int len)

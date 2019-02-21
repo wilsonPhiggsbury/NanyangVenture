@@ -72,13 +72,13 @@ void setup() {
 		, NULL
 		, 3
 		, &taskBlink);
-	//xTaskCreate(
-	//	TaskMoveWiper
-	//	, (const portCHAR *)"WIPE"
-	//	, 150 // -25
-	//	, NULL
-	//	, 3
-	//	, &taskMoveWiper);
+	xTaskCreate(
+		TaskMoveWiper
+		, (const portCHAR *)"WIPE"
+		, 150 // -25
+		, NULL
+		, 3
+		, &taskMoveWiper);
 	
 }
 
@@ -164,7 +164,7 @@ void TaskBlink(void* pvParameters)
 void TaskMoveWiper(void* pvParameters)
 {
 	Servo wiper;
-	wiper.attach(WIPER_PIN);
+	wiper.attach(WIPER_PIN, 900, 2000);
 	int wiperPos = 0;
 	while (1)
 	{

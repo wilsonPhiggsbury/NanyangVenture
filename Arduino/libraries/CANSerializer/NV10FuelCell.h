@@ -13,9 +13,11 @@
 class NV10FuelCellClass:public DataPoint
 {
  protected:
-	 float pressure;
-	 uint16_t watts;
-	 uint8_t temperature, status;
+	 float& pressure = data.Float[0];
+	 uint16_t& watts = data.UInt[2];
+	 uint8_t& temperature = data.Byte[6];
+	 uint8_t& status = data.Byte[7];
+
 	 char statusTxt[3];
 
  public:
@@ -26,10 +28,8 @@ class NV10FuelCellClass:public DataPoint
 	uint8_t getTemperature();
 	const char* getStatus();
 
-
-	void insertData(char* str);
-	void packCAN(CANFrame*);
 	void unpackCAN(const CANFrame*);
+	void insertData(char* str);
 	void packString(char*);
 	void unpackString(char * str);
 };

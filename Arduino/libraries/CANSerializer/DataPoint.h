@@ -18,6 +18,22 @@
 #endif
 
 #include <CANSerializer.h>
+// TODO: add in comments to explain rationale behind every child class variable being a reference to element of union "data".
+// -> they are actually messages to be sent onto CAN
+// -> they are constrained to add up to 8 bytes max. Multi-frame transmission currently not supported.
+
+/* Usage flow for send: 
+	call packCAN / packString with supplied CANFrame* / char* 
+	call CAN->sendMsgBuf / Serial.print
+Usage flow for receive:
+	call checkMatchCAN / checkMatchString on every dataPoint listening on an input
+	if find match:
+		call CAN->readMsgBuf / Serial.read
+		call unpackCAN / unpackString
+	else:
+		report stray message & suggest hardware filter for CAN
+
+*/
 
 extern const char* STRING_HEADER[];// Fuel Cell, Current Sensor, current sensor stats, Speedometer, Hydrogen Tank Bar, Status of lights, Commands, Heartbeat
 void debugPrint(char* toPrint, int len);
@@ -32,34 +48,29 @@ public:
 	void setCanId(uint8_t id);
 	uint8_t getCanId();
 	//virtual void insertData() = 0; cancelled due to different function signatures in different implementations
+	bool checkMatchCAN(const CANFrame * f);
 	bool checkMatchString(char * str);
-	bool checkMatchCAN(const CANFrame*);
+	virtual void packCAN(CANFrame*);
+	virtual void unpackCAN(const CANFrame*);
+	virtual void packString(char * str);
+	virtual void unpackString(char * str);
 protected:
-	//typedef enum encodingPreset
-	//{
-	//	nil,
-	//	preset_uint8,		// [0, 255]
-	//	preset_uint8x10,	// [0, 25.5]
-	//	preset_uint16,		// [0, 65535]
-	//	preset_uint16x10,	// [0, 6553.5]
-	//	preset_float,		// floats are awesome!
-	//	preset_uint32,		// [0, 4,294,967,295]
-	//}eEncodingPreset;
-	//
-	//DataPoint(eEncodingPreset (&presets)[8]);
 	DataPoint(uint8_t CANId, const uint8_t CANLength);
 	char strHeader[3];
-	// TODO: utilize encodingPresets to specify CAN encoding. Proposal: child classes use aliases to parent class' variables
 	unsigned long timeStamp;
 	const uint8_t CANLength;
 	uint8_t CANId;
+	union {
+		char String[8];
+		byte Byte[8];
+		uint8_t Int8[8];
+		uint16_t UInt[4];
+		uint32_t Long[2];
+		float Float[2];
+	}data;
 	const char* getStringHeader();
-	void packCANDefault(CANFrame*);
 	char* packStringDefault(char * str);
-	virtual void packCAN(CANFrame*) = 0;
-	virtual void packString(char * str) = 0;
-	virtual void unpackCAN(const CANFrame*) = 0;
-	virtual void unpackString(char * str) = 0;
+	char * unpackStringDefault(char * str);
 
 	bool checkError();
 private:

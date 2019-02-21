@@ -4,72 +4,72 @@
 #include "NV10AccesoriesStatus.h"
 // parameter(CANbytes, stringChars)
 // param1(2,4), param2(1,2)
-NV10AccesoriesStatus::NV10AccesoriesStatus(uint8_t CANId) :DataPoint(CANId, 1)
+NV10AccesoriesStatus::NV10AccesoriesStatus(uint8_t CANId) :DataPoint(CANId, 6)
 {
 	strcpy(strHeader, "ST");
 }
 
-void NV10AccesoriesStatus::setLsig(int8_t status)
+void NV10AccesoriesStatus::setLsig(uint8_t status)
 {
 	lsig = status;
 }
 
-void NV10AccesoriesStatus::setRsig(int8_t status)
+void NV10AccesoriesStatus::setRsig(uint8_t status)
 {
 	rsig = status;
 }
 
-void NV10AccesoriesStatus::setWiper(int8_t status)
+void NV10AccesoriesStatus::setWiper(uint8_t status)
 {
 	wiper = status;
 }
 
-void NV10AccesoriesStatus::setHazard(int8_t status)
+void NV10AccesoriesStatus::setHazard(uint8_t status)
 {
 	hazard = status;
 }
 
-void NV10AccesoriesStatus::setHeadlights(int8_t status)
+void NV10AccesoriesStatus::setHeadlights(uint8_t status)
 {
 	headlights = status;
 }
 
-void NV10AccesoriesStatus::setBrake(int8_t status)
+void NV10AccesoriesStatus::setBrake(uint8_t status)
 {
 	brake = status;
 }
 
-int8_t NV10AccesoriesStatus::getLsig()
+uint8_t NV10AccesoriesStatus::getLsig()
 {
 	return lsig;
 }
 
-int8_t NV10AccesoriesStatus::getRsig()
+uint8_t NV10AccesoriesStatus::getRsig()
 {
 	return rsig;
 }
 
-int8_t NV10AccesoriesStatus::getWiper()
+uint8_t NV10AccesoriesStatus::getWiper()
 {
 	return wiper;
 }
 
-int8_t NV10AccesoriesStatus::getHazard()
+uint8_t NV10AccesoriesStatus::getHazard()
 {
 	return hazard;
 }
 
-int8_t NV10AccesoriesStatus::getHeadlights()
+uint8_t NV10AccesoriesStatus::getHeadlights()
 {
 	return headlights;
 }
 
-int8_t NV10AccesoriesStatus::getBrake()
+uint8_t NV10AccesoriesStatus::getBrake()
 {
 	return brake;
 }
 
-void NV10AccesoriesStatus::insertData(int8_t lsig, int8_t rsig, int8_t wiper, int8_t hazard, int8_t headlights, int8_t brake)
+void NV10AccesoriesStatus::insertData(uint8_t lsig, uint8_t rsig, uint8_t wiper, uint8_t hazard, uint8_t headlights, uint8_t brake)
 {
 	this->lsig = lsig;
 	this->rsig = rsig;
@@ -77,25 +77,6 @@ void NV10AccesoriesStatus::insertData(int8_t lsig, int8_t rsig, int8_t wiper, in
 	this->hazard = hazard;
 	this->headlights = headlights;
 	this->brake = brake;
-}
-
-void NV10AccesoriesStatus::packCAN(CANFrame *f)
-{
-	byte compressedStats = (lsig&B1)<<7 | (rsig&B1)<<6 | (hazard&B1)<<5 | (headlights&B1)<<4 | (brake&B1)<<3 | wiper&B111;
-	DataPoint::packCANDefault(f);
-	memcpy(f->payload, &compressedStats, sizeof(byte));
-}
-
-void NV10AccesoriesStatus::unpackCAN(const CANFrame *f)
-{
-	byte compressedStats;
-	memcpy(&compressedStats, f->payload, sizeof(byte));
-	lsig = compressedStats >> 7 & B1;
-	rsig = compressedStats >> 6 & B1;
-	hazard = compressedStats >> 5 & B1;
-	headlights = compressedStats >> 4 & B1;
-	brake = compressedStats >> 3 & B1;
-	wiper = compressedStats & B111;
 }
 
 void NV10AccesoriesStatus::packString(char *str)

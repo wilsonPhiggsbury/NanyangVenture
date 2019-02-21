@@ -5,7 +5,7 @@
 #include "NV10FuelCell.h"
 // parameter(CANbytes, stringChars)
 // Watts(2,4), pressure(4,4), temperature(1,2), status(1,2)
-NV10FuelCellClass::NV10FuelCellClass(uint8_t CANId):DataPoint(CANId, 4 + 2 + 1 + 1)
+NV10FuelCellClass::NV10FuelCellClass(uint8_t CANId):DataPoint(CANId, 8)
 {
 	strcpy(strHeader, "FC");
 }
@@ -89,21 +89,24 @@ void NV10FuelCellClass::insertData(char* str)
 	// TODO: remember to terminate the string in the main code!
 }
 
-void NV10FuelCellClass::packCAN(CANFrame *f)
+void NV10FuelCellClass::unpackCAN(const CANFrame* f)
 {
-	DataPoint::packCANDefault(f);
-	memcpy(f->payload, &pressure, sizeof(float));
-	memcpy(f->payload + sizeof(float), &watts, sizeof(uint16_t));
-	memcpy(f->payload + sizeof(uint16_t), &temperature, sizeof(uint8_t));
-	memcpy(f->payload + sizeof(uint8_t), &status, sizeof(uint8_t));
-}
-
-void NV10FuelCellClass::unpackCAN(const CANFrame *f)
-{
-	memcpy(&pressure, f->payload, sizeof(float));
-	memcpy(&watts, f->payload + sizeof(float), sizeof(uint16_t));
-	memcpy(&temperature, f->payload + sizeof(uint16_t), sizeof(uint8_t));
-	memcpy(&status, f->payload + sizeof(uint8_t), sizeof(uint8_t));
+	DataPoint::unpackCAN(f);
+	switch (status)
+	{
+	case 1:
+		strcpy(statusTxt, "OP");
+		break;
+	case 0:
+		strcpy(statusTxt, "SD");
+		break;
+	case 255:
+		strcpy(statusTxt, "IN");
+		break;
+	default:
+		strcpy(statusTxt, "??");
+		break;
+	}
 }
 
 void NV10FuelCellClass::packString(char * str)

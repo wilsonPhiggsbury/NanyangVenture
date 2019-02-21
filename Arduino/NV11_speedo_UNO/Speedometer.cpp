@@ -32,7 +32,7 @@ uint32_t Speedometer::getTotalDistTravelled()
 	return mmTravelled;
 }
 
-float Speedometer::getSpeedKmh()
+float Speedometer::calculateSpeedKmh()
 {
 	// get deltas
 	uint32_t counterDiff = counter - lastCounter;

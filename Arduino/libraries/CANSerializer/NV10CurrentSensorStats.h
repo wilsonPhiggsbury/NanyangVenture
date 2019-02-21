@@ -13,8 +13,8 @@
 class NV10CurrentSensorStatsClass:public DataPoint
 {
  protected:
-	 uint32_t wattMs = 0;
-	 float ampPeak = 0;
+	 uint32_t& wattMs = data.Long[0];
+	 float& ampPeak = data.Float[1];
 
  public:
 	NV10CurrentSensorStatsClass(uint8_t CANId);
@@ -22,8 +22,6 @@ class NV10CurrentSensorStatsClass:public DataPoint
 	void insertData(uint32_t voltRaw, uint32_t ampMotorRaw);
 	uint16_t getWattHours();
 	float getAmpPeak();
-	void packCAN(CANFrame*);
-	void unpackCAN(const CANFrame*);
 	void packString(char*);
 	void unpackString(char * str);
 	void syncTime();
