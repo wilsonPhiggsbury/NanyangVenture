@@ -42,8 +42,8 @@ DashboardScreenManager::DashboardScreenManager(Packet* Packet)
 	capInAmp_bar->init(CS, trackIDaddr, &(Packet->data[0][1]));
 	capOutAmp_txt->init(CS, trackIDaddr, &(Packet->data[1][1]));
 	capOutAmp_bar->init(CS, trackIDaddr, &(Packet->data[1][1]));
-	motorVolt_txt->init(CS, trackIDaddr, &(Packet->data[2][0]));
-	motorVolt_bar->init(CS, trackIDaddr, &(Packet->data[2][0]));
+	motorVolt_txt->init(CS, trackIDaddr, &(Packet->data[1][0]));
+	motorVolt_bar->init(CS, trackIDaddr, &(Packet->data[1][0]));
 	motorAmp_txt->init(CS, trackIDaddr, &(Packet->data[2][1]));
 	motorAmp_bar->init(CS, trackIDaddr, &(Packet->data[2][1]));
 	// customize each widget
