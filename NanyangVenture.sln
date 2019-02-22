@@ -71,6 +71,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CANSerializerV2_sender", "A
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CANSerializerV2_receiver", "Arduino\#Archives\CANSerializerV2_receiver\CANSerializerV2_receiver.vcxproj", "{19ED73A3-C87A-4D59-B7B7-C48ECBA24E5C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ArduinoISP", "..\..\ide\examples\11.ArduinoISP\ArduinoISP\ArduinoISP.vcxproj", "{BA77862B-3BD6-4E0F-88B9-872C3ADCCF21}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Adafruit_ADS1X15", "..\libraries\Adafruit_ADS1X15\Adafruit_ADS1X15.vcxitems", "{EE96D38B-689A-49EC-B661-4BC019E7D9AC}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\libraries\Rosserial_Arduino_Library\Rosserial_Arduino_Library.vcxitems*{16d6d2c9-e2d8-437f-80bf-3e1b32b814f4}*SharedItemsImports = 9
@@ -108,6 +112,7 @@ Global
 		Arduino\libraries\CAN_Serializer\CAN_Serializer.vcxitems*{d0053034-7ef4-451e-b6fa-bb852a3b0799}*SharedItemsImports = 9
 		..\libraries\FreeRTOS\FreeRTOS.vcxitems*{e0f75ac7-15bb-4c7a-98cd-37a96c9641a3}*SharedItemsImports = 4
 		Arduino\libraries\CAN_Serializer\CAN_Serializer.vcxitems*{e0f75ac7-15bb-4c7a-98cd-37a96c9641a3}*SharedItemsImports = 4
+		..\libraries\Adafruit_ADS1X15\Adafruit_ADS1X15.vcxitems*{ee96d38b-689a-49ec-b661-4bc019e7d9ac}*SharedItemsImports = 9
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -206,6 +211,12 @@ Global
 		{19ED73A3-C87A-4D59-B7B7-C48ECBA24E5C}.Release|x64.ActiveCfg = Release|Win32
 		{19ED73A3-C87A-4D59-B7B7-C48ECBA24E5C}.Release|x86.ActiveCfg = Release|Win32
 		{19ED73A3-C87A-4D59-B7B7-C48ECBA24E5C}.Release|x86.Build.0 = Release|Win32
+		{BA77862B-3BD6-4E0F-88B9-872C3ADCCF21}.Debug|x64.ActiveCfg = Debug|Win32
+		{BA77862B-3BD6-4E0F-88B9-872C3ADCCF21}.Debug|x86.ActiveCfg = Debug|Win32
+		{BA77862B-3BD6-4E0F-88B9-872C3ADCCF21}.Debug|x86.Build.0 = Debug|Win32
+		{BA77862B-3BD6-4E0F-88B9-872C3ADCCF21}.Release|x64.ActiveCfg = Release|Win32
+		{BA77862B-3BD6-4E0F-88B9-872C3ADCCF21}.Release|x86.ActiveCfg = Release|Win32
+		{BA77862B-3BD6-4E0F-88B9-872C3ADCCF21}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -236,6 +247,7 @@ Global
 		{655F68FF-1C08-4FD7-953A-415DD29271D5} = {D73944EA-C027-4B9A-B26C-CF8857527539}
 		{33A793D8-0A11-470D-9498-8523521D1EAC} = {D73944EA-C027-4B9A-B26C-CF8857527539}
 		{16D6D2C9-E2D8-437F-80BF-3E1B32B814F4} = {B731DFF7-A7B2-4F18-831B-D04250650B2F}
+		{EE96D38B-689A-49EC-B661-4BC019E7D9AC} = {B731DFF7-A7B2-4F18-831B-D04250650B2F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D50621B3-45DA-4D63-A156-3461EB4C4703}

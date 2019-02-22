@@ -24,6 +24,7 @@ private:
 	float ticksToMmMultiplier;
 	int8_t positiveIndicator;
 	uint8_t pinA, pinB;
+	bool phaseShift;
 };
 
 #endif

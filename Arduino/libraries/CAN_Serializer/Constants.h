@@ -45,6 +45,9 @@ const int MAX_STRING_LEN = SHORTNAME_LEN + 9 + (FLOAT_TO_STRING_LEN + 1)*(NUM_DA
 //										^^ 9 bits for timeStamp + '\t'
 // declare enum to represent every type of payload points
 #define FRAMETYPES 5
+/// <summary>
+/// Enum for data points. Depreceated in favor of newer implementation of CANSerializer (previously named CAN_Serializer)
+/// </summary>
 typedef enum
 {
 	// if these ever exceed 4, need to extend the frame ID "3 bits needed for message type" below into 4 bits

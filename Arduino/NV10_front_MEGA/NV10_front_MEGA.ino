@@ -72,13 +72,13 @@ void setup() {
 		, NULL
 		, 3
 		, &taskBlink);
-	xTaskCreate(
-		TaskMoveWiper
-		, (const portCHAR *)"WIPE"
-		, 150 // -25
-		, NULL
-		, 3
-		, &taskMoveWiper);
+	//xTaskCreate(
+	//	TaskMoveWiper
+	//	, (const portCHAR *)"WIPE"
+	//	, 150 // -25
+	//	, NULL
+	//	, 3
+	//	, &taskMoveWiper);
 	
 }
 
