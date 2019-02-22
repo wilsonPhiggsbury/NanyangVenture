@@ -39,18 +39,18 @@ void setup() {
 	}
 	// I tried putting attachinterrupt in the for loop above but failed. Lambda functions complain.
 	// So here, have some wall text.
-	//attachInterrupt(digitalPinToInterrupt(BTN_HAZARD), [] {
-	//	if (peripheralStates[Hazard] == STATE_EN)
-	//		peripheralStates[Hazard] = STATE_DS;
-	//	else
-	//		peripheralStates[Hazard] = STATE_EN;
-	//}, FALLING);
-	//attachInterrupt(digitalPinToInterrupt(BTN_WIPER), [] {
-	//	if (peripheralStates[Wiper] == STATE_EN)
-	//		peripheralStates[Wiper] = STATE_DS;
-	//	else
-	//		peripheralStates[Wiper] = STATE_EN;
-	//}, FALLING);
+	attachInterrupt(digitalPinToInterrupt(BTN_HAZARD), [] {
+		if (peripheralStates[Hazard] == STATE_EN)
+			peripheralStates[Hazard] = STATE_DS;
+		else
+			peripheralStates[Hazard] = STATE_EN;
+	}, FALLING);
+	attachInterrupt(digitalPinToInterrupt(BTN_WIPER), [] {
+		if (peripheralStates[Wiper] == STATE_EN)
+			peripheralStates[Wiper] = STATE_DS;
+		else
+			peripheralStates[Wiper] = STATE_EN;
+	}, FALLING);
 	attachInterrupt(digitalPinToInterrupt(BTN_HORN), [] {
 		if (peripheralStates[Horn] == STATE_EN)
 			peripheralStates[Horn] = STATE_DS;
@@ -195,8 +195,10 @@ void TaskCaptureButtons(void* pvParameters)
 {
 	Packet buttonCommand;
 	buttonCommand.ID = BT;
-	peripheralStates[Horn] = peripheralStates[Wiper] = peripheralStates[Hazard] = STATE_DS;
-	buttonCommand.data[0][Horn] = buttonCommand.data[0][Wiper] = buttonCommand.data[0][Hazard] = STATE_DS;
+	peripheralStates[Headlights] = STATE_EN;
+	buttonCommand.data[0][Headlights] = STATE_EN;
+	peripheralStates[Horn] = peripheralStates[Wiper] = peripheralStates[Hazard] = peripheralStates[Lsig] = peripheralStates[Rsig] = STATE_DS;
+	buttonCommand.data[0][Horn] = buttonCommand.data[0][Wiper] = buttonCommand.data[0][Hazard] = buttonCommand.data[0][Lsig] = buttonCommand.data[0][Rsig] = STATE_DS;
 	const TickType_t delay = pdMS_TO_TICKS(100);
 	setDebounce(buttonPins, NUM_BUTTONS, 900); // for some reason, setDebounce() if called in setup() seems to have no effect
 	while (1)

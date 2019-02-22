@@ -12,6 +12,7 @@
 #endif
 
 #include <Constants.h>
+#include <Adafruit_ADS1015.h>
 
 // range of volt & amp readings expected
 #define V_STEP 5
@@ -81,26 +82,26 @@ const uint16_t A_TABLE[][A_ENTRIES] PROGMEM = {
 	{
 		// CAP_IN
 		0.0,
-		5.5,
-		12.0,
-		18.5,
-		26.0,
-		32.0,
-		39.5,
+		4.0,
+		10.0,
+		17.0,
+		24.0,
+		31.0,
+		38.0,
 		46.0,
-		53.5,
+		52.5,
 		60.0,
-		66.0,
+		67.0,
 		73.5,
-		80.0,
+		81.0,
 		88.0,
-		94.5,
-		100.0,
-		107.0,
-		114.0,
-		120.0,
-		127.0,
-		134.5
+		95.0,
+		103.0,
+		110.0,
+		116.5,
+		123.5,
+		131.0,
+		138.0
 	},
 	{
 		// CAP_OUT
@@ -155,12 +156,11 @@ const uint16_t A_TABLE[][A_ENTRIES] PROGMEM = {
 class AttopilotCurrentSensor
 {
 private:
-	float predictableCounter = 0;
+	Adafruit_ADS1115 ADS;
 	static uint32_t timeStamp;
 
 	uint8_t id;
-	uint8_t voltPin;
-	uint8_t ampPin;
+	uint8_t voltPin, ampPin;
 
 	float loggedParams[CURRENTSENSOR_READVALUES];
 	typedef enum {
@@ -174,7 +174,6 @@ private:
 	//float totalEnergy = 0; 
 	void processData();
 	float rawToVA(LoggedParameters which, float reading);
-
 
 public:
 	AttopilotCurrentSensor(int motorID, uint8_t voltPin, uint8_t ampPin);

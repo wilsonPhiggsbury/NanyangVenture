@@ -8,14 +8,24 @@ uint32_t AttopilotCurrentSensor::timeStamp;
 AttopilotCurrentSensor::AttopilotCurrentSensor(int motorID, uint8_t voltPin, uint8_t ampPin):voltPin(voltPin),ampPin(ampPin),id(motorID)
 {
 	// id is only for accessing lookup table
+	ADS.setGain(GAIN_SIXTEEN);
+	ADS.begin();
 }
 /// <summary>
 /// Logs the Current Sensor analog data. 
 /// </summary>
 void AttopilotCurrentSensor::logData()
 {
-	loggedParams[volt] = analogRead(voltPin);
-	loggedParams[amp] = analogRead(ampPin);
+	if (id == 2)
+	{
+		loggedParams[volt] = 0;
+		loggedParams[amp] = ADS.readADC_Differential_0_1();
+	}
+	else
+	{
+		loggedParams[volt] = analogRead(voltPin);
+		loggedParams[amp] = analogRead(ampPin);
+	}
 
 	//ampPeak = max(ampReading, ampPeak);
 	/*if (timeStamp != 0)
@@ -43,9 +53,15 @@ void AttopilotCurrentSensor::dumpDataInto(float location[NUM_DATASETS][NUM_DATAS
 }
 void AttopilotCurrentSensor::processData()
 {
-	for (int i = 0; i < CURRENTSENSOR_READVALUES; i++)
+	if (id == 2) // HOTFIX for motor shunt
 	{
-		loggedParams[i] = rawToVA((LoggedParameters)i, loggedParams[i]);
+		loggedParams[volt] = 0;
+		loggedParams[amp] /= 256.0;
+	}
+	else
+	{
+		loggedParams[volt] = rawToVA(volt, loggedParams[volt]);
+		loggedParams[amp] = rawToVA(amp, loggedParams[amp]);
 	}
 }
 /// <summary>
