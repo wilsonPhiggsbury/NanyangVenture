@@ -10,39 +10,46 @@ bool initSD(SdFat& card)
 		return false;
 	else
 		HESFuelCell::setPath(&card);
-	File f;
+
 	// obtain number of existing entries in SD card
 	uint16_t folderEntries = 0;
 	char folderPath[18] = "/NV10_";	// max 8 chars. len("NV10_") = 5, pad 3 digits to entry
 	do {
-		sprintf(folderPath + 6, "%03d", ++folderEntries);	// pad '0' on the front if number contains less than 3 digits
-		f = card.open(folderPath);
-	} while (f != NULL);
-
-	debug_("Folder entries: "); debug(folderEntries);
+		sprintf(folderPath + 6, "%03d/", ++folderEntries);	// pad '0' on the front if number contains less than 3 digits
+		debug_("Checking: "); debug(folderPath);
+	} while (card.exists(folderPath));
+	debug_(folderPath); debug(" does not exist!");
 	// Wipe when too full, or on user request ('~' char)
 	if (folderEntries > 30)
 	{
 		Serial.println(F("SD card is nearing threshold to crash Arduino."));
-		initiateWipe(card);
-	}
-	for (int wipeWindow = 10; wipeWindow >= 0; wipeWindow--)
-	{
-		if (Serial.read() == '~')
+		if (initiateWipe(card))
 		{
-			Serial.println(F("Requesting to wipe SD card."));
-			initiateWipe(card);
+			sprintf(folderPath + 6, "%03d/", 1);
 		}
-		flushRX();
-		folderEntries = 0;
-		sprintf(folderPath + 6, "%03d", folderEntries);
-		delay(200);
+	}
+	else
+	{
+		for (int wipeWindow = 10; wipeWindow >= 0; wipeWindow--)
+		{
+			if (Serial.read() == '~')
+			{
+				Serial.println(F("Requesting to wipe SD card."));
+				if (initiateWipe(card))
+				{
+					sprintf(folderPath + 6, "%03d/", 1);
+					break;
+				}
+			}
+			delay(200);
+		}
 	}
 
 	// Make new directory and operate within it.
 	card.mkdir(folderPath);
 	card.chdir(folderPath);
-
+	debug_("Created dir "); debug(folderPath);
+	File f;
 	// initialize FC column text
 	f = card.open("FC.txt", FILE_WRITE);
 	f.println(F("	Millis	Watt	P	Tmp	Status"));
@@ -58,9 +65,10 @@ bool initSD(SdFat& card)
 
 	return true;
 }
-void initiateWipe(SdFat& card)
+bool initiateWipe(SdFat& card)
 {
 	File sub2;
+	bool willWipe;
 	Serial.println(F("Wipe the card? (y/n)"));
 
 	char response = '\0';
@@ -69,12 +77,14 @@ void initiateWipe(SdFat& card)
 		delay(100);
 		response = Serial.read();
 	}
-	if (response == 'y')
+	willWipe = response == 'y';
+	if (willWipe)
 	{
 		// wipe card
 		Serial.print(F("Wiping card"));
 		card.wipe(&Serial);
 		Serial.println(F("done"));
+		delay(1000);
 		if (!card.begin(SD_SPI_CS_PIN))
 		{
 			Serial.println(F("Card corrupted. Please format manually.\nArduino will reset in 5 seconds..."));
@@ -83,6 +93,7 @@ void initiateWipe(SdFat& card)
 		}
 	}
 	flushRX();
+	return willWipe;
 }
 void flushRX()
 {

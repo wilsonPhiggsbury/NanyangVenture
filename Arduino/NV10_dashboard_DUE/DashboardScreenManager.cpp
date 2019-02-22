@@ -115,7 +115,7 @@ DashboardScreenManager::DashboardScreenManager(Packet* Packet)
 }
 void DashboardScreenManager::refreshDataWidgets()
 {
-	for (int i = 2; i < 14; i++)
+	for (int i = 0; i < 14; i++)
 	{
 		DisplayText* box;
 		if (q->ID == FC)
