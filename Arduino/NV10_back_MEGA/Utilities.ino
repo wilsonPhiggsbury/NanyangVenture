@@ -6,7 +6,7 @@
 /// <returns></returns>
 bool initSD(SdFat& card)
 {
-	if (!card.begin(SD_SPI_CS_PIN))
+	if (!card.begin(SD_SPI_CS))
 		return false;
 	else
 		HESFuelCell::setPath(&card);
@@ -85,7 +85,7 @@ bool initiateWipe(SdFat& card)
 		card.wipe(&Serial);
 		Serial.println(F("done"));
 		delay(1000);
-		if (!card.begin(SD_SPI_CS_PIN))
+		if (!card.begin(SD_SPI_CS))
 		{
 			Serial.println(F("Card corrupted. Please format manually.\nArduino will reset in 5 seconds..."));
 			delay(5000);

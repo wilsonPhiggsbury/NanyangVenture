@@ -11,8 +11,8 @@
 #include "Pins_front.h"
 
 #define PIXELS 6
-Adafruit_NeoPixel lstrip = Adafruit_NeoPixel(PIXELS, LSIG_PIN, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel rstrip = Adafruit_NeoPixel(PIXELS, RSIG_PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel lstrip = Adafruit_NeoPixel(PIXELS, LSIG_OUTPUT, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel rstrip = Adafruit_NeoPixel(PIXELS, RSIG_OUTPUT, NEO_GRB + NEO_KHZ800);
 const uint32_t SIG_COLOR = Adafruit_NeoPixel::Color(255, 165, 0);
 const uint32_t NO_COLOR = Adafruit_NeoPixel::Color(0, 0, 0);
 
@@ -45,7 +45,7 @@ static bool brakeOn = false;
 void setup() {
 	Serial.begin(9600);
 
-	serializer.init(CAN_CS_PIN);
+	serializer.init(CAN_SPI_CS);
 	serializer.onlyListenFor(BT);
 
 	pinMode(BRAKE_PIN, INPUT_PULLUP);

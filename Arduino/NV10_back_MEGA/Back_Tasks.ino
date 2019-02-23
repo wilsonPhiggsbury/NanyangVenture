@@ -35,6 +35,7 @@ void TaskLogCurrentSensor(void* pvParameters)
 }
 void QueueOutputData(void *pvParameters)
 {
+	debug(F("Queue task started."));
 	const uint16_t fuelcell_logsend = FUELCELL_LOGSEND_INTERVAL / QUEUE_DATA_INTERVAL;
 	const uint16_t motor_logsend = MOTOR_LOGSEND_INTERVAL / QUEUE_DATA_INTERVAL;
 	const uint16_t speedo_refresh_interval = SPEEDOMETER_REFRESH_INTERVAL / QUEUE_DATA_INTERVAL;
@@ -130,6 +131,7 @@ void QueueOutputData(void *pvParameters)
 /// <param name="pvParameters"></param>
 void LogSendData(void *pvParameters __attribute__((unused)))  // This is a Task.
 {
+	debug(F("LogSend task started."));
 	Packet received;
 	char data[MAX_STRING_LEN];
 	TickType_t delay = pdMS_TO_TICKS(LOGSEND_INTERVAL); // delay 300 ms, shorter than reading/queueing tasks since this task has lower priority
@@ -167,6 +169,7 @@ void LogSendData(void *pvParameters __attribute__((unused)))  // This is a Task.
 
 void TaskBlink(void* pvParameters)
 {
+	debug(F("Blink task started."));
 	bool sigOn = false;
 	// initialize light strips
 	lightstrip.begin();

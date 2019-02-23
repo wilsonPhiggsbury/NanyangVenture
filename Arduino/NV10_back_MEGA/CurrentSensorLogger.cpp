@@ -56,7 +56,7 @@ void AttopilotCurrentSensor::processData()
 	if (id == 2) // HOTFIX for motor shunt
 	{
 		loggedParams[volt] = 0;
-		loggedParams[amp] /= 256.0;
+		loggedParams[amp] /= 32.0;
 	}
 	else
 	{

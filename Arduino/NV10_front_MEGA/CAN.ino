@@ -6,7 +6,7 @@
 
 // put this inside setup()
 /*
-CAN_avail = serializer.init(CAN_CS_PIN);
+CAN_avail = serializer.init(CAN_SPI_CS);
 xTaskCreate(
 	TaskCAN
 	, (const portCHAR *) "CAN la!" // where got cannot?
@@ -28,8 +28,8 @@ void TaskCAN(void *pvParameters){
 	Packet in, out;
 	bool sent, received;
 	unsigned long lastTime = 0;
-	attachInterrupt(digitalPinToInterrupt(CAN_INT_PIN), CAN_ISR, FALLING);
-	debug(F("CAN started."));
+	attachInterrupt(digitalPinToInterrupt(CAN_INTERRUPT), CAN_ISR, FALLING);
+	debug(F("CAN task started."));
 	while (1)
 	{
 		// anything to send?

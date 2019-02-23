@@ -11,9 +11,9 @@ DashboardScreenManager::DashboardScreenManager(Packet* Packet)
 	q = Packet;
 	PacketID* trackIDaddr = &(Packet->ID);
 	// initialize screens
-	ILI9488* leftScreen = new ILI9488(LCD_LEFT_CS, LCD_DC, LCD_RST);
-	ILI9488* centerScreen = new ILI9488(LCD_CENTER_CS, LCD_DC);
-	ILI9488* rightScreen = new ILI9488(LCD_RIGHT_CS, LCD_DC);
+	ILI9488* leftScreen = new ILI9488(LCDLEFT_SPI_CS, LCD_OUTPUT_DC, LCD_OUTPUT_RST);
+	ILI9488* centerScreen = new ILI9488(LCDCENTER_SPI_CS, LCD_OUTPUT_DC);
+	ILI9488* rightScreen = new ILI9488(LCDRIGHT_SPI_CS, LCD_OUTPUT_DC);
 	leftScreen->begin();
 	centerScreen->begin();
 	rightScreen->begin();
