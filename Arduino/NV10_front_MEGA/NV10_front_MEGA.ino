@@ -48,8 +48,8 @@ void setup() {
 	serializer.init(CAN_SPI_CS);
 	serializer.onlyListenFor(BT);
 
-	pinMode(BRAKE_PIN, INPUT_PULLUP);
-	attachInterrupt(digitalPinToInterrupt(BRAKE_PIN), BRAKE_ISR, CHANGE);
+	pinMode(PEDALBRAKE_INTERRUPT, INPUT_PULLUP);
+	attachInterrupt(digitalPinToInterrupt(PEDALBRAKE_INTERRUPT), BRAKE_ISR, CHANGE);
 	
 	xTaskCreate(
 		TaskToggle
@@ -90,12 +90,12 @@ void TaskToggle(void* pvParameters)
 {
 	Packet brakeOrders;
 	brakeOrders.ID = BK;
-	pinMode(HORN_PIN, OUTPUT);
-	pinMode(HEADLIGHTS_PIN, OUTPUT);
+	pinMode(HORN_OUTPUT, OUTPUT);
+	pinMode(HEADLIGHTS_OUTPUT, OUTPUT);
 	while (1)
 	{
 		// ** hotfix for brake status **
-		bool brakeOnNew = !digitalRead(BRAKE_PIN);
+		bool brakeOnNew = !digitalRead(PEDALBRAKE_INTERRUPT);
 		if (brakeOnNew != brakeOn)
 		{
 			brakeOn = brakeOnNew;
@@ -107,24 +107,24 @@ void TaskToggle(void* pvParameters)
 		if (peripheralStates[Horn] == STATE_EN)
 		{
 			debug("BEEEP!");
-			digitalWrite(HORN_PIN, HIGH);
+			digitalWrite(HORN_OUTPUT, HIGH);
 			vTaskDelay(pdMS_TO_TICKS(500));
-			digitalWrite(HORN_PIN, LOW);
+			digitalWrite(HORN_OUTPUT, LOW);
 			peripheralStates[Horn] = STATE_DS;
 			debug("beep off.");
 		}
 		else if (peripheralStates[Horn] == STATE_DS)
 		{
-			digitalWrite(HORN_PIN, LOW);
+			digitalWrite(HORN_OUTPUT, LOW);
 		}
 
 		if (peripheralStates[Headlights] == STATE_EN)
 		{
-			digitalWrite(HEADLIGHTS_PIN, HIGH);
+			digitalWrite(HEADLIGHTS_OUTPUT, HIGH);
 		}
 		else if (peripheralStates[Headlights] == STATE_DS)
 		{
-			digitalWrite(HEADLIGHTS_PIN, LOW);
+			digitalWrite(HEADLIGHTS_OUTPUT, LOW);
 		}
 		vTaskDelay(pdMS_TO_TICKS(200));
 	}
@@ -164,7 +164,7 @@ void TaskBlink(void* pvParameters)
 void TaskMoveWiper(void* pvParameters)
 {
 	Servo wiper;
-	wiper.attach(WIPER_PIN, 900, 2000);
+	wiper.attach(WIPER_PWM_SERVO, 900, 2000);
 	int wiperPos = 0;
 	while (1)
 	{
@@ -215,7 +215,7 @@ void doReceiveAction(Packet* q)
 					peripheralStates[i] = q->data[0][i];
 					break;
 				case Wiper:
-					if (peripheralStates[Wiper] == STATE_EN)debug(F("Wiper should not be on!"));
+					peripheralStates[i] = q->data[0][i];
 					break;
 				case Hazard:
 					peripheralStates[i] = q->data[0][i];
