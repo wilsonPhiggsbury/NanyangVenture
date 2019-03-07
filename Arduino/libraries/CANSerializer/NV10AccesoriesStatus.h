@@ -1,7 +1,7 @@
 // NV10CurrentSensorStats.h
 
-#ifndef _DATAPOINTTEMPLATE_h
-#define _DATAPOINTTEMPLATE_h
+#ifndef _NV10ACCESSORIESSTATUS_h
+#define _NV10ACCESSORIESSTATUS_h
 
 #if defined(ARDUINO) && ARDUINO >= 100
 	#include "arduino.h"

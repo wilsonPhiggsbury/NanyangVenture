@@ -75,7 +75,7 @@ Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "DataPoint", "RPi\DataPoint\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NV10_CANtoSerial_UNO", "Arduino\NV10_CANtoSerial_UNO\NV10_CANtoSerial_UNO.vcxproj", "{7ED24BF0-127D-4FC9-843E-85D8BA0529C7}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NV11_CANtoSerial_UNO", "Arduino\NV11_CANtoSerial_UNO\NV11_CANtoSerial_UNO.vcxproj", "{9D6D68FC-9A64-4A6E-AA1D-84E63A31EA08}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NV11_CANtoSerial_UNO", "Arduino\NV11_CANtoSerial_UNO\NV11_CANtoSerial_UNO.vcxproj", "{E3AF1D76-18E9-4F28-86FC-56CDF2EBCDC0}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -114,6 +114,7 @@ Global
 		Arduino\libraries\CAN_Serializer\CAN_Serializer.vcxitems*{d0053034-7ef4-451e-b6fa-bb852a3b0799}*SharedItemsImports = 9
 		..\libraries\FreeRTOS\FreeRTOS.vcxitems*{e0f75ac7-15bb-4c7a-98cd-37a96c9641a3}*SharedItemsImports = 4
 		Arduino\libraries\CAN_Serializer\CAN_Serializer.vcxitems*{e0f75ac7-15bb-4c7a-98cd-37a96c9641a3}*SharedItemsImports = 4
+		Arduino\libraries\CANSerializer\CANSerializer.vcxitems*{e3af1d76-18e9-4f28-86fc-56cdf2ebcdc0}*SharedItemsImports = 4
 		..\libraries\Adafruit_ADS1X15\Adafruit_ADS1X15.vcxitems*{ee96d38b-689a-49ec-b661-4bc019e7d9ac}*SharedItemsImports = 9
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -251,14 +252,14 @@ Global
 		{7ED24BF0-127D-4FC9-843E-85D8BA0529C7}.Release|x64.ActiveCfg = Release|Win32
 		{7ED24BF0-127D-4FC9-843E-85D8BA0529C7}.Release|x86.ActiveCfg = Release|Win32
 		{7ED24BF0-127D-4FC9-843E-85D8BA0529C7}.Release|x86.Build.0 = Release|Win32
-		{9D6D68FC-9A64-4A6E-AA1D-84E63A31EA08}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{9D6D68FC-9A64-4A6E-AA1D-84E63A31EA08}.Debug|x64.ActiveCfg = Debug|Win32
-		{9D6D68FC-9A64-4A6E-AA1D-84E63A31EA08}.Debug|x86.ActiveCfg = Debug|Win32
-		{9D6D68FC-9A64-4A6E-AA1D-84E63A31EA08}.Debug|x86.Build.0 = Debug|Win32
-		{9D6D68FC-9A64-4A6E-AA1D-84E63A31EA08}.Release|Any CPU.ActiveCfg = Release|Win32
-		{9D6D68FC-9A64-4A6E-AA1D-84E63A31EA08}.Release|x64.ActiveCfg = Release|Win32
-		{9D6D68FC-9A64-4A6E-AA1D-84E63A31EA08}.Release|x86.ActiveCfg = Release|Win32
-		{9D6D68FC-9A64-4A6E-AA1D-84E63A31EA08}.Release|x86.Build.0 = Release|Win32
+		{E3AF1D76-18E9-4F28-86FC-56CDF2EBCDC0}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{E3AF1D76-18E9-4F28-86FC-56CDF2EBCDC0}.Debug|x64.ActiveCfg = Debug|Win32
+		{E3AF1D76-18E9-4F28-86FC-56CDF2EBCDC0}.Debug|x86.ActiveCfg = Debug|Win32
+		{E3AF1D76-18E9-4F28-86FC-56CDF2EBCDC0}.Debug|x86.Build.0 = Debug|Win32
+		{E3AF1D76-18E9-4F28-86FC-56CDF2EBCDC0}.Release|Any CPU.ActiveCfg = Release|Win32
+		{E3AF1D76-18E9-4F28-86FC-56CDF2EBCDC0}.Release|x64.ActiveCfg = Release|Win32
+		{E3AF1D76-18E9-4F28-86FC-56CDF2EBCDC0}.Release|x86.ActiveCfg = Release|Win32
+		{E3AF1D76-18E9-4F28-86FC-56CDF2EBCDC0}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
