@@ -13,7 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{7ED24BF0-127D-4FC9-843E-85D8BA0529C7}</ProjectGuid>
     <RootNamespace>ScratchPad2</RootNamespace>
-    <ProjectName>CANtoSerial_UNO</ProjectName>
+    <ProjectName>NV10_CANtoSerial_UNO</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -67,8 +67,8 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\CANtoSerial_UNO;$(ProjectDir)..\..\..\libraries\MemoryFree;$(ProjectDir)..\libraries\CAN_Serializer;$(ProjectDir)..\..\..\libraries\MCP_CAN_lib;$(ProjectDir)..\..\..\..\ide\hardware\arduino\avr\libraries\SPI\src;$(ProjectDir)..\..\..\..\ide\libraries;$(ProjectDir)..\..\..\..\ide\hardware\arduino\avr\libraries;$(ProjectDir)..\..\..\..\ide\hardware\breadboard\avr\libraries;$(ProjectDir)..\..\..\libraries;$(ProjectDir)..\..\..\..\ide\hardware\arduino\avr\cores\arduino;$(ProjectDir)..\..\..\..\ide\hardware\arduino\avr\variants\standard;$(ProjectDir)..\..\..\..\ide\hardware\tools\avr\avr\include;$(ProjectDir)..\..\..\..\ide\hardware\tools\avr\avr\include\avr;$(ProjectDir)..\..\..\..\ide\hardware\tools\avr\lib\gcc\avr\4.8.1\include;$(ProjectDir)..\..\..\..\ide\hardware\tools\avr\lib\gcc\avr\4.9.2\include;$(ProjectDir)..\..\..\..\ide\hardware\tools\avr\lib\gcc\avr\4.9.3\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <ForcedIncludeFiles>$(ProjectDir)__vm\.CANtoSerial_UNO.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\NV10_CANtoSerial_UNO;$(ProjectDir)..\libraries\CAN_Serializer;$(ProjectDir)..\..\..\libraries\MemoryFree;$(ProjectDir)..\..\..\..\ide\libraries;$(ProjectDir)..\..\..\..\ide\hardware\arduino\avr\libraries;$(ProjectDir)..\..\..\hardware\breadboard\avr\libraries;$(ProjectDir)..\..\..\libraries;$(ProjectDir)..\..\..\..\ide\hardware\arduino\avr\cores\arduino;$(ProjectDir)..\..\..\..\ide\hardware\arduino\avr\variants\standard;$(ProjectDir)..\..\..\..\ide\hardware\tools\avr\avr\include;$(ProjectDir)..\..\..\..\ide\hardware\tools\avr\avr\include\avr;$(ProjectDir)..\..\..\..\ide\hardware\tools\avr\lib\gcc\avr\4.8.1\include;$(ProjectDir)..\..\..\..\ide\hardware\tools\avr\lib\gcc\avr\4.9.2\include;$(ProjectDir)..\..\..\..\ide\hardware\tools\avr\lib\gcc\avr\4.9.3\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>$(ProjectDir)__vm\.NV10_CANtoSerial_UNO.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <PreprocessorDefinitions>__AVR_ATmega328p__;__AVR_ATmega328P__;F_CPU=8000000L;ARDUINO=10805;ARDUINO_AVR_BREADBOARD_BREADBOARD_AVR_ATMEGA328BB;ARDUINO_ARCH_AVR;__cplusplus=201103L;_VMICRO_INTELLISENSE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
@@ -85,12 +85,12 @@
     <DebuggerFlavor>VisualMicroDebugger</DebuggerFlavor>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="CANtoSerial_UNO.ino">
+    <None Include="NV10_CANtoSerial_UNO.ino">
       <FileType>CppCode</FileType>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="__vm\.CANtoSerial_UNO.vsarduino.h" />
+    <ClInclude Include="__vm\.NV10_CANtoSerial_UNO.vsarduino.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

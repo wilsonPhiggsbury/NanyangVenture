@@ -71,6 +71,7 @@ uint8_t NV10AccesoriesStatus::getBrake()
 
 void NV10AccesoriesStatus::insertData(uint8_t lsig, uint8_t rsig, uint8_t wiper, uint8_t hazard, uint8_t headlights, uint8_t brake)
 {
+	timeStamp = millis();
 	this->lsig = lsig;
 	this->rsig = rsig;
 	this->wiper = wiper;

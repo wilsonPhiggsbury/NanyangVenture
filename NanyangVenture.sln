@@ -27,8 +27,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FreeRTOS_AVR", "..\librarie
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FreeRTOS", "..\libraries\FreeRTOS\FreeRTOS.vcxitems", "{216D3E33-021A-4BD1-93E9-8EA99EE382AA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CANtoSerial_UNO", "Arduino\CANtoSerial_UNO\CANtoSerial_UNO.vcxproj", "{7ED24BF0-127D-4FC9-843E-85D8BA0529C7}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NV10_front_MEGA", "Arduino\NV10_front_MEGA\NV10_front_MEGA.vcxproj", "{E0F75AC7-15BB-4C7A-98CD-37A96C9641A3}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NV10_dashboard_DUE", "Arduino\NV10_dashboard_DUE\NV10_dashboard_DUE.vcxproj", "{3313DEBC-FD6F-45C2-A323-B7F691565980}"
@@ -74,6 +72,10 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Adafruit_ADS1X15", "..\libraries\Adafruit_ADS1X15\Adafruit_ADS1X15.vcxitems", "{EE96D38B-689A-49EC-B661-4BC019E7D9AC}"
 EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "DataPoint", "RPi\DataPoint\DataPoint.pyproj", "{FA7541B1-386A-4634-978D-479039D2BBEC}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NV10_CANtoSerial_UNO", "Arduino\NV10_CANtoSerial_UNO\NV10_CANtoSerial_UNO.vcxproj", "{7ED24BF0-127D-4FC9-843E-85D8BA0529C7}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NV11_CANtoSerial_UNO", "Arduino\NV11_CANtoSerial_UNO\NV11_CANtoSerial_UNO.vcxproj", "{9D6D68FC-9A64-4A6E-AA1D-84E63A31EA08}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -123,14 +125,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{7ED24BF0-127D-4FC9-843E-85D8BA0529C7}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{7ED24BF0-127D-4FC9-843E-85D8BA0529C7}.Debug|x64.ActiveCfg = Debug|Win32
-		{7ED24BF0-127D-4FC9-843E-85D8BA0529C7}.Debug|x86.ActiveCfg = Debug|Win32
-		{7ED24BF0-127D-4FC9-843E-85D8BA0529C7}.Debug|x86.Build.0 = Debug|Win32
-		{7ED24BF0-127D-4FC9-843E-85D8BA0529C7}.Release|Any CPU.ActiveCfg = Release|Win32
-		{7ED24BF0-127D-4FC9-843E-85D8BA0529C7}.Release|x64.ActiveCfg = Release|Win32
-		{7ED24BF0-127D-4FC9-843E-85D8BA0529C7}.Release|x86.ActiveCfg = Release|Win32
-		{7ED24BF0-127D-4FC9-843E-85D8BA0529C7}.Release|x86.Build.0 = Release|Win32
 		{E0F75AC7-15BB-4C7A-98CD-37A96C9641A3}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{E0F75AC7-15BB-4C7A-98CD-37A96C9641A3}.Debug|x64.ActiveCfg = Debug|Win32
 		{E0F75AC7-15BB-4C7A-98CD-37A96C9641A3}.Debug|x86.ActiveCfg = Debug|Win32
@@ -249,6 +243,22 @@ Global
 		{FA7541B1-386A-4634-978D-479039D2BBEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FA7541B1-386A-4634-978D-479039D2BBEC}.Release|x64.ActiveCfg = Release|Any CPU
 		{FA7541B1-386A-4634-978D-479039D2BBEC}.Release|x86.ActiveCfg = Release|Any CPU
+		{7ED24BF0-127D-4FC9-843E-85D8BA0529C7}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{7ED24BF0-127D-4FC9-843E-85D8BA0529C7}.Debug|x64.ActiveCfg = Debug|Win32
+		{7ED24BF0-127D-4FC9-843E-85D8BA0529C7}.Debug|x86.ActiveCfg = Debug|Win32
+		{7ED24BF0-127D-4FC9-843E-85D8BA0529C7}.Debug|x86.Build.0 = Debug|Win32
+		{7ED24BF0-127D-4FC9-843E-85D8BA0529C7}.Release|Any CPU.ActiveCfg = Release|Win32
+		{7ED24BF0-127D-4FC9-843E-85D8BA0529C7}.Release|x64.ActiveCfg = Release|Win32
+		{7ED24BF0-127D-4FC9-843E-85D8BA0529C7}.Release|x86.ActiveCfg = Release|Win32
+		{7ED24BF0-127D-4FC9-843E-85D8BA0529C7}.Release|x86.Build.0 = Release|Win32
+		{9D6D68FC-9A64-4A6E-AA1D-84E63A31EA08}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{9D6D68FC-9A64-4A6E-AA1D-84E63A31EA08}.Debug|x64.ActiveCfg = Debug|Win32
+		{9D6D68FC-9A64-4A6E-AA1D-84E63A31EA08}.Debug|x86.ActiveCfg = Debug|Win32
+		{9D6D68FC-9A64-4A6E-AA1D-84E63A31EA08}.Debug|x86.Build.0 = Debug|Win32
+		{9D6D68FC-9A64-4A6E-AA1D-84E63A31EA08}.Release|Any CPU.ActiveCfg = Release|Win32
+		{9D6D68FC-9A64-4A6E-AA1D-84E63A31EA08}.Release|x64.ActiveCfg = Release|Win32
+		{9D6D68FC-9A64-4A6E-AA1D-84E63A31EA08}.Release|x86.ActiveCfg = Release|Win32
+		{9D6D68FC-9A64-4A6E-AA1D-84E63A31EA08}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

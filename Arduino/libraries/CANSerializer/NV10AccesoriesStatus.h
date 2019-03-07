@@ -17,10 +17,10 @@ class NV10AccesoriesStatus:public DataPoint
  protected:
 	uint8_t& lsig = data.Byte[0];
 	uint8_t& rsig = data.Byte[1];
-	uint8_t& wiper = data.Byte[2];
-	uint8_t& hazard = data.Byte[3];
-	uint8_t& headlights = data.Byte[4];
-	uint8_t& brake = data.Byte[5];
+	uint8_t& hazard = data.Byte[2];
+	uint8_t& headlights = data.Byte[3];
+	uint8_t& brake = data.Byte[4];
+	uint8_t& wiper = data.Byte[5];
 	
 public:
 	NV10AccesoriesStatus(uint8_t CANId);

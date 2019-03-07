@@ -52,11 +52,10 @@ class DataPoint:
 class NV11DataSpeedo(DataPoint):
     def __init__(self, canId):
         self.speedKmh = 0.0
-        return super().__init__(canId, "SM", 1, 4) # average of Left & Right wheel speed (1x float)
+        return super().__init__(canId, "SM", 1, 4) # 1 data, 4 bytes
     def packString(self):
         resultList = self._packStringDefault()
         resultList[2] = "{:.2f}".format(self.speedKmh)
-        print(len(resultList))
         result = "\t".join(resultList)
         return result
     def unpackString(self, inputStr):
@@ -67,7 +66,38 @@ class NV11DataSpeedo(DataPoint):
             print("speed:",self.speedKmh)
         else:
             print("Did not unpack anything.")
-
+class NV11DataAccessories(DataPoint):
+    def __init__(self, canId):
+        self.lsig = 0
+        self.rsig = 0
+        self.hazard = 0
+        self.headlights = 0
+        self.brake = 0
+        self.wiper = 0
+        return super().__init__(canId, "ST", 6, 6) # 6 data, 6 bytes
+    def packString(self):
+        resultList = self._packStringDefault()
+        resultList[2] = str(self.lsig)
+        resultList[3] = str(self.rsig)
+        resultList[4] = str(self.hazard)
+        resultList[5] = str(self.headlights)
+        resultList[6] = str(self.brake)
+        resultList[7] = str(self.wiper)
+        result = "\t".join(resultList)
+        return result
+    def unpackString(self, inputStr):
+        resultList = self._unpackStringDefault(inputStr)
+        if(resultList):
+            self.lsig = int(resultList[2])
+            self.rsig = int(resultList[3])
+            self.hazard = int(resultList[4])
+            self.headlights = int(resultList[5])
+            self.brake = int(resultList[6])
+            self.wiper = int(resultList[7])
+            # TODO: commit converted parameters into data array
+            print("lsig rsig hazard headlight brake wiper:", self.lsig, self.rsig, self.hazard, self.headlights, self.brake, self.wiper)
+        else:
+            print("Did not unpack anything.")
 
 # Test code for main
 b = DataPoint(10, "YO")
@@ -77,7 +107,9 @@ b.unpackString("ha\tdeadbeef\tfe\tea\tda\t9e\t00\t00\t00\t00")
 dataPointSpeedometer = NV11DataSpeedo(11)
 stringSpeedometer = dataPointSpeedometer.packString()
 print(stringSpeedometer)
-tmpList = list(stringSpeedometer)
-tmpList[-4:-1] = "1.54"
-stringSpeedometer = ''.join(tmpList)
-dataPointSpeedometer.unpackString(stringSpeedometer)
+dataPointSpeedometer.unpackString("SM\t0123beef\t19.332")
+
+dataPointAccessory = NV11DataAccessories(12)
+stringAcc = dataPointAccessory.packString()
+print(stringAcc)
+dataPointAccessory.unpackString("ST\t0435dead\t1\t1\t1\t1\t0\t0")
