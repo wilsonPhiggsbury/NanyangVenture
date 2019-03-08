@@ -77,6 +77,14 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NV10_CANtoSerial_UNO", "Ard
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NV11_CANtoSerial_UNO", "Arduino\NV11_CANtoSerial_UNO\NV11_CANtoSerial_UNO.vcxproj", "{E3AF1D76-18E9-4F28-86FC-56CDF2EBCDC0}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NV11_accessories_MEGA", "Arduino\NV11_accessories_MEGA\NV11_accessories_MEGA.vcxproj", "{FB3D2B90-7B26-4B2C-A8D1-70DF5E5460B6}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ArduinoISP", "..\..\ide\examples\11.ArduinoISP\ArduinoISP\ArduinoISP.vcxproj", "{BA77862B-3BD6-4E0F-88B9-872C3ADCCF21}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MotorconEncoder", "Arduino\#TestSuites\MotorconEncoder\MotorconEncoder.vcxproj", "{B0CED645-05F7-4BEF-BE19-56E2428E5B31}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "NV11DashboardGUI", "RPi\NV11DashboardGUI\NV11DashboardGUI.pyproj", "{F68B5D83-1F4D-44FB-A777-E730122266A9}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\libraries\Rosserial_Arduino_Library\Rosserial_Arduino_Library.vcxitems*{16d6d2c9-e2d8-437f-80bf-3e1b32b814f4}*SharedItemsImports = 9
@@ -116,6 +124,10 @@ Global
 		Arduino\libraries\CAN_Serializer\CAN_Serializer.vcxitems*{e0f75ac7-15bb-4c7a-98cd-37a96c9641a3}*SharedItemsImports = 4
 		Arduino\libraries\CANSerializer\CANSerializer.vcxitems*{e3af1d76-18e9-4f28-86fc-56cdf2ebcdc0}*SharedItemsImports = 4
 		..\libraries\Adafruit_ADS1X15\Adafruit_ADS1X15.vcxitems*{ee96d38b-689a-49ec-b661-4bc019e7d9ac}*SharedItemsImports = 9
+		..\..\ide\hardware\arduino\avr\libraries\SPI\SPI.vcxitems*{fb3d2b90-7b26-4b2c-a8d1-70df5e5460b6}*SharedItemsImports = 4
+		..\libraries\FreeRTOS_AVR\FreeRTOS_AVR.vcxitems*{fb3d2b90-7b26-4b2c-a8d1-70df5e5460b6}*SharedItemsImports = 4
+		..\libraries\MCP_CAN_lib\MCP_CAN_lib.vcxitems*{fb3d2b90-7b26-4b2c-a8d1-70df5e5460b6}*SharedItemsImports = 4
+		Arduino\libraries\CANSerializer\CANSerializer.vcxitems*{fb3d2b90-7b26-4b2c-a8d1-70df5e5460b6}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -260,6 +272,36 @@ Global
 		{E3AF1D76-18E9-4F28-86FC-56CDF2EBCDC0}.Release|x64.ActiveCfg = Release|Win32
 		{E3AF1D76-18E9-4F28-86FC-56CDF2EBCDC0}.Release|x86.ActiveCfg = Release|Win32
 		{E3AF1D76-18E9-4F28-86FC-56CDF2EBCDC0}.Release|x86.Build.0 = Release|Win32
+		{FB3D2B90-7B26-4B2C-A8D1-70DF5E5460B6}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{FB3D2B90-7B26-4B2C-A8D1-70DF5E5460B6}.Debug|x64.ActiveCfg = Debug|Win32
+		{FB3D2B90-7B26-4B2C-A8D1-70DF5E5460B6}.Debug|x86.ActiveCfg = Debug|Win32
+		{FB3D2B90-7B26-4B2C-A8D1-70DF5E5460B6}.Debug|x86.Build.0 = Debug|Win32
+		{FB3D2B90-7B26-4B2C-A8D1-70DF5E5460B6}.Release|Any CPU.ActiveCfg = Release|Win32
+		{FB3D2B90-7B26-4B2C-A8D1-70DF5E5460B6}.Release|x64.ActiveCfg = Release|Win32
+		{FB3D2B90-7B26-4B2C-A8D1-70DF5E5460B6}.Release|x86.ActiveCfg = Release|Win32
+		{FB3D2B90-7B26-4B2C-A8D1-70DF5E5460B6}.Release|x86.Build.0 = Release|Win32
+		{BA77862B-3BD6-4E0F-88B9-872C3ADCCF21}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{BA77862B-3BD6-4E0F-88B9-872C3ADCCF21}.Debug|x64.ActiveCfg = Debug|Win32
+		{BA77862B-3BD6-4E0F-88B9-872C3ADCCF21}.Debug|x86.ActiveCfg = Debug|Win32
+		{BA77862B-3BD6-4E0F-88B9-872C3ADCCF21}.Debug|x86.Build.0 = Debug|Win32
+		{BA77862B-3BD6-4E0F-88B9-872C3ADCCF21}.Release|Any CPU.ActiveCfg = Release|Win32
+		{BA77862B-3BD6-4E0F-88B9-872C3ADCCF21}.Release|x64.ActiveCfg = Release|Win32
+		{BA77862B-3BD6-4E0F-88B9-872C3ADCCF21}.Release|x86.ActiveCfg = Release|Win32
+		{BA77862B-3BD6-4E0F-88B9-872C3ADCCF21}.Release|x86.Build.0 = Release|Win32
+		{B0CED645-05F7-4BEF-BE19-56E2428E5B31}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{B0CED645-05F7-4BEF-BE19-56E2428E5B31}.Debug|x64.ActiveCfg = Debug|Win32
+		{B0CED645-05F7-4BEF-BE19-56E2428E5B31}.Debug|x86.ActiveCfg = Debug|Win32
+		{B0CED645-05F7-4BEF-BE19-56E2428E5B31}.Debug|x86.Build.0 = Debug|Win32
+		{B0CED645-05F7-4BEF-BE19-56E2428E5B31}.Release|Any CPU.ActiveCfg = Release|Win32
+		{B0CED645-05F7-4BEF-BE19-56E2428E5B31}.Release|x64.ActiveCfg = Release|Win32
+		{B0CED645-05F7-4BEF-BE19-56E2428E5B31}.Release|x86.ActiveCfg = Release|Win32
+		{B0CED645-05F7-4BEF-BE19-56E2428E5B31}.Release|x86.Build.0 = Release|Win32
+		{F68B5D83-1F4D-44FB-A777-E730122266A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F68B5D83-1F4D-44FB-A777-E730122266A9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F68B5D83-1F4D-44FB-A777-E730122266A9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F68B5D83-1F4D-44FB-A777-E730122266A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F68B5D83-1F4D-44FB-A777-E730122266A9}.Release|x64.ActiveCfg = Release|Any CPU
+		{F68B5D83-1F4D-44FB-A777-E730122266A9}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -293,6 +335,7 @@ Global
 		{6C3A986E-BC23-459D-82EF-48F035A8D9D5} = {D73944EA-C027-4B9A-B26C-CF8857527539}
 		{19ED73A3-C87A-4D59-B7B7-C48ECBA24E5C} = {D73944EA-C027-4B9A-B26C-CF8857527539}
 		{EE96D38B-689A-49EC-B661-4BC019E7D9AC} = {B731DFF7-A7B2-4F18-831B-D04250650B2F}
+		{B0CED645-05F7-4BEF-BE19-56E2428E5B31} = {D73944EA-C027-4B9A-B26C-CF8857527539}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D50621B3-45DA-4D63-A156-3461EB4C4703}

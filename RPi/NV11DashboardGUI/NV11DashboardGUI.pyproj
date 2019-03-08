@@ -2,15 +2,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>fa7541b1-386a-4634-978d-479039d2bbec</ProjectGuid>
+    <ProjectGuid>f68b5d83-1f4d-44fb-a777-e730122266a9</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>DataPoint.py</StartupFile>
+    <StartupFile>NV11DashboardGUI.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
-    <Name>DataPoint</Name>
-    <RootNamespace>DataPoint</RootNamespace>
+    <Name>NV11DashboardGUI</Name>
+    <RootNamespace>NV11DashboardGUI</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,8 +21,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="DataPoint.py" />
-    <Compile Include="SerialTest.py" />
+    <Compile Include="NV11DashboardGUI.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

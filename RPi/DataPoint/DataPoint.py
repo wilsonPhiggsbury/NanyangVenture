@@ -11,6 +11,8 @@ class DataPoint:
         self.numParameters = 2+numParameters # Length of data in bytes. 10 = 2 (strHeader, timestamp) + 8 (num of properties of this data point. In this case, 8 raw byte values)
         self.canLength = numBytes
         self.data = bytearray(numParameters)
+    def __str__(self):
+        return self.packString()
     def _packStringDefault(self):
         resultList = list(0 for x in range(self.numParameters))
         resultList[0] = self.strHeader
@@ -63,7 +65,8 @@ class NV11DataSpeedo(DataPoint):
         if(resultList):
             self.speedKmh = float(resultList[2])
             # TODO: commit converted parameters into data array
-            print("speed:",self.speedKmh)
+            print("Received Speedometer")
+            print("km/h:",self.speedKmh)
         else:
             print("Did not unpack anything.")
 class NV11DataAccessories(DataPoint):
@@ -95,6 +98,7 @@ class NV11DataAccessories(DataPoint):
             self.brake = int(resultList[6])
             self.wiper = int(resultList[7])
             # TODO: commit converted parameters into data array
+            print("Received Accessories")
             print("lsig rsig hazard headlight brake wiper:", self.lsig, self.rsig, self.hazard, self.headlights, self.brake, self.wiper)
         else:
             print("Did not unpack anything.")
