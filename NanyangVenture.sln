@@ -85,6 +85,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MotorconEncoder", "Arduino\
 EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "NV11DashboardGUI", "RPi\NV11DashboardGUI\NV11DashboardGUI.pyproj", "{F68B5D83-1F4D-44FB-A777-E730122266A9}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MotorDiagnostics", "Arduino\#TestSuites\MotorDiagnostics\MotorDiagnostics.vcxproj", "{9A237D3E-070C-4D33-A444-0B1CDA33FE67}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\libraries\Rosserial_Arduino_Library\Rosserial_Arduino_Library.vcxitems*{16d6d2c9-e2d8-437f-80bf-3e1b32b814f4}*SharedItemsImports = 9
@@ -302,6 +304,14 @@ Global
 		{F68B5D83-1F4D-44FB-A777-E730122266A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F68B5D83-1F4D-44FB-A777-E730122266A9}.Release|x64.ActiveCfg = Release|Any CPU
 		{F68B5D83-1F4D-44FB-A777-E730122266A9}.Release|x86.ActiveCfg = Release|Any CPU
+		{9A237D3E-070C-4D33-A444-0B1CDA33FE67}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{9A237D3E-070C-4D33-A444-0B1CDA33FE67}.Debug|x64.ActiveCfg = Debug|Win32
+		{9A237D3E-070C-4D33-A444-0B1CDA33FE67}.Debug|x86.ActiveCfg = Debug|Win32
+		{9A237D3E-070C-4D33-A444-0B1CDA33FE67}.Debug|x86.Build.0 = Debug|Win32
+		{9A237D3E-070C-4D33-A444-0B1CDA33FE67}.Release|Any CPU.ActiveCfg = Release|Win32
+		{9A237D3E-070C-4D33-A444-0B1CDA33FE67}.Release|x64.ActiveCfg = Release|Win32
+		{9A237D3E-070C-4D33-A444-0B1CDA33FE67}.Release|x86.ActiveCfg = Release|Win32
+		{9A237D3E-070C-4D33-A444-0B1CDA33FE67}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -336,6 +346,7 @@ Global
 		{19ED73A3-C87A-4D59-B7B7-C48ECBA24E5C} = {D73944EA-C027-4B9A-B26C-CF8857527539}
 		{EE96D38B-689A-49EC-B661-4BC019E7D9AC} = {B731DFF7-A7B2-4F18-831B-D04250650B2F}
 		{B0CED645-05F7-4BEF-BE19-56E2428E5B31} = {D73944EA-C027-4B9A-B26C-CF8857527539}
+		{9A237D3E-070C-4D33-A444-0B1CDA33FE67} = {D73944EA-C027-4B9A-B26C-CF8857527539}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D50621B3-45DA-4D63-A156-3461EB4C4703}

@@ -346,3 +346,4 @@ Arduino/NV10_front_MEGA/Pins_front.h
 Arduino/NV11_speedo_UNO/Pins_speedo.h
 \#*/
 /Utilities
+/Arduino/NV11_accessories_MEGA/Pins_lights.h

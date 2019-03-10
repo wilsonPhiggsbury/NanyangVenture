@@ -4,6 +4,7 @@
     Author:     DESKTOP-GV1MS6E\MX
 */
 #define CAN_CS 4
+#define CAN_INT 3
 #include <CANSerializer.h>
 #include <NV10AccesoriesStatus.h>
 #include <NV11DataSpeedo.h>
@@ -11,13 +12,14 @@ CANSerializer serializer;
 NV11DataSpeedo dataSpeedo = NV11DataSpeedo(0x0A);
 NV10AccesoriesStatus dataAccesories = NV10AccesoriesStatus(0x10);
 DataPoint* canListenList[] = { &dataSpeedo, &dataAccesories };
-DataPoint* serialListenList[] = { &dataSpeedo, &dataAccesories };
+DataPoint* serialListenList[] = { &dataAccesories };
 void setup()
 {
 	Serial.begin(9600);
 	Serial.setTimeout(500);
 	while (!Serial);
 	serializer.init(CAN_CS);
+	attachInterrupt(digitalPinToInterrupt(CAN_INT), CAN_ISR, FALLING);
 }
 
 void loop()
@@ -56,4 +58,8 @@ void loop()
 		}
 	}
 	delayMicroseconds(1000);
+}
+void CAN_ISR()
+{
+
 }

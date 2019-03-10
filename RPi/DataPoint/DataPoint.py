@@ -103,17 +103,3 @@ class NV11DataAccessories(DataPoint):
         else:
             print("Did not unpack anything.")
 
-# Test code for main
-b = DataPoint(10, "YO")
-print(b.packString())
-b.unpackString("ha\tdeadbeef\tfe\tea\tda\t9e\t00\t00\t00\t00")
-
-dataPointSpeedometer = NV11DataSpeedo(11)
-stringSpeedometer = dataPointSpeedometer.packString()
-print(stringSpeedometer)
-dataPointSpeedometer.unpackString("SM\t0123beef\t19.332")
-
-dataPointAccessory = NV11DataAccessories(12)
-stringAcc = dataPointAccessory.packString()
-print(stringAcc)
-dataPointAccessory.unpackString("ST\t0435dead\t1\t1\t1\t1\t0\t0")

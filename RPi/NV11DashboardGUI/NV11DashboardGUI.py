@@ -223,20 +223,26 @@ def funct1():
 def funct2():
     print("Display")
     app = DriveUserInterface()
-    app.master.title('Thermal Management System')
+    app.master.title('NV11 Dashboard')
     ##########
-    s = serial.Serial("/dev/serial0", baudrate=9600, timeout=1)
+    try:
+        s = serial.Serial("/dev/serial0", baudrate=9600, timeout=1)
+    except serial.SerialException:
+        s = None
+        pass
     dataSpeed = NV11DataSpeedo(0x0A)
     dataAcc = NV11DataAccessories(0x10)
     while True:
-        line = s.readline().decode()
-        if line is None:
-            continue
-        if dataSpeed.checkMatchString(line):
-            dataSpeed.unpackString(line)
+        if s is not None:
+            line = s.readline().decode()
+            if dataSpeed.checkMatchString(line):
+                dataSpeed.unpackString(line)
             
-        elif dataAcc.checkMatchString(line):
-            dataAcc.unpackString(line)
+            elif dataAcc.checkMatchString(line):
+                dataAcc.unpackString(line)
+        else:
+            dataAcc.lsig = 1
+            dataSpeed.speedKmh = 12.3
             
         for i in range(NO_OF_TELEMETRYCAGES):
             app.updateDriveUI(dataAcc, dataSpeed)
