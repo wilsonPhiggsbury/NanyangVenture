@@ -9,6 +9,7 @@
 CANSerializer Can;
 NV10AccesoriesStatus dataAcc = NV10AccesoriesStatus(0x10);
 bool sigOn;
+unsigned long nextTime = 0;
 // the setup function runs once when you press reset or power the board
 void setup() {
 	pinMode(LSIG_OUTPUT, OUTPUT);
@@ -16,34 +17,42 @@ void setup() {
 	pinMode(BRAKELIGHT_OUTPUT, OUTPUT);
 	pinMode(RUNNINGLIGHT_OUTPUT, OUTPUT);
 
-	pinMode(CAN_INTERRUPT, INPUT_PULLUP);
 	Can.init(CAN_SPI_CS);
-	attachInterrupt(CAN_INTERRUPT, CAN_ISR, FALLING);
-	
+	pinMode(CAN_INTERRUPT, INPUT_PULLUP);
+	attachInterrupt(digitalPinToInterrupt(CAN_INTERRUPT), CAN_ISR, FALLING);	
 }
 
 // loop function manages signal lights blinking
 void loop() {
-	if (sigOn)
+	// relay is PULLUP by default
+	// writing HIGH enables NC, disables NO
+	// writing LOW enables NO, disables NC
+	if (millis() > nextTime)
 	{
-		sigOn = false;
-		digitalWrite(LSIG_OUTPUT, LOW);
-		digitalWrite(RSIG_OUTPUT, LOW);
-	}
-	else
-	{
-		if (dataAcc.getHazard() == STATE_EN || dataAcc.getLsig() == STATE_EN)
+		nextTime += 500;
+		if (sigOn)
 		{
-			sigOn = true;
+			// turn off signal lights
+			sigOn = false;
 			digitalWrite(LSIG_OUTPUT, HIGH);
-		}
-		if (dataAcc.getHazard() == STATE_EN || dataAcc.getRsig() == STATE_EN)
-		{
-			sigOn = true;
 			digitalWrite(RSIG_OUTPUT, HIGH);
 		}
+		else
+		{
+			// turn on signal lights if commanded to do so
+			if (dataAcc.getHazard() == STATE_EN || dataAcc.getLsig() == STATE_EN)
+			{
+				sigOn = true;
+				digitalWrite(LSIG_OUTPUT, LOW);
+			}
+			if (dataAcc.getHazard() == STATE_EN || dataAcc.getRsig() == STATE_EN)
+			{
+				sigOn = true;
+				digitalWrite(RSIG_OUTPUT, LOW);
+			}
+		}
 	}
-	delay(500);
+	delay(10);
 }
 
 void CAN_ISR()
@@ -54,12 +63,12 @@ void CAN_ISR()
 	{
 		dataAcc.unpackCAN(&f);
 		if (dataAcc.getBrake() == STATE_EN)
-			digitalWrite(BRAKELIGHT_OUTPUT, HIGH);
+			digitalWrite(BRAKELIGHT_OUTPUT, LOW); // ON
 		else
-			digitalWrite(BRAKELIGHT_OUTPUT, LOW);
+			digitalWrite(BRAKELIGHT_OUTPUT, HIGH); // OFF
 		if (dataAcc.getHeadlights() == STATE_EN)
-			digitalWrite(RUNNINGLIGHT_OUTPUT, HIGH);
+			digitalWrite(RUNNINGLIGHT_OUTPUT, HIGH); // ON
 		else
-			digitalWrite(RUNNINGLIGHT_OUTPUT, LOW);
+			digitalWrite(RUNNINGLIGHT_OUTPUT, LOW); // OFF
 	}
 }
