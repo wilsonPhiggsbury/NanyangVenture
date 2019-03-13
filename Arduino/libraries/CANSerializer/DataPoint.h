@@ -45,8 +45,6 @@ public:
 	/// Provide a standard CAN ID for each DataPoint
 	/// </summary>
 	/// <param name="id">value between 0 - 0x7FF</param>
-	void setCanId(uint8_t id);
-	uint8_t getCanId();
 	//virtual void insertData() = 0; cancelled due to different function signatures in different implementations
 	bool checkMatchCAN(const CANFrame * f);
 	bool checkMatchString(char * str);
@@ -55,7 +53,7 @@ public:
 	virtual void packString(char * str);
 	virtual void unpackString(char * str);
 protected:
-	DataPoint(uint8_t CANId, const uint8_t CANLength);
+	DataPoint(const char* strHeader, uint8_t CANId, const uint8_t CANLength);
 	char strHeader[3];
 	unsigned long timeStamp;
 	const uint8_t CANLength;
@@ -68,6 +66,8 @@ protected:
 		uint32_t Long[2];
 		float Float[2];
 	}data;
+	void setCanId(uint8_t id);
+	uint8_t getCanId();
 	const char* getStringHeader();
 	char* packStringDefault(char * str);
 	char * unpackStringDefault(char * str);

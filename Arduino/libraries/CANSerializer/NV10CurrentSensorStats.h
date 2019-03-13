@@ -17,7 +17,7 @@ class NV10CurrentSensorStatsClass:public DataPoint
 	 float& ampPeak = data.Float[1];
 
  public:
-	NV10CurrentSensorStatsClass(uint8_t CANId);
+	NV10CurrentSensorStatsClass();
 
 	void insertData(uint32_t voltRaw, uint32_t ampMotorRaw);
 	uint16_t getWattHours();

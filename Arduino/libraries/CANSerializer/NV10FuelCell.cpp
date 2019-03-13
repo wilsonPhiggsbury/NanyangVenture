@@ -5,9 +5,9 @@
 #include "NV10FuelCell.h"
 // parameter(CANbytes, stringChars)
 // Watts(2,4), pressure(4,4), temperature(1,2), status(1,2)
-NV10FuelCellClass::NV10FuelCellClass(uint8_t CANId):DataPoint(CANId, 8)
+NV10FuelCellClass::NV10FuelCellClass():DataPoint("FC", 0x0B, 8)
 {
-	strcpy(strHeader, "FC");
+	debug(F("DataPoint FC:\t0x0B\t8"));
 }
 
 float NV10FuelCellClass::getPressure()

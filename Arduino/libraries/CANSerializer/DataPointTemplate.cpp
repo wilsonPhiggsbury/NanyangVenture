@@ -4,7 +4,7 @@
 #include "DataPointTemplate.h"
 // parameter(CANbytes, stringChars)
 // param1(2,4), param2(1,2)
-DataPointTemplate::DataPointTemplate(uint8_t CANId) :DataPoint(CANId, 8)
+DataPointTemplate::DataPointTemplate(uint8_t CANId) :DataPoint(0xFF, 8)
 {
 	strcpy(strHeader, "XX");
 }

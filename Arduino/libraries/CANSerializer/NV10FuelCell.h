@@ -21,7 +21,7 @@ class NV10FuelCellClass:public DataPoint
 	 char statusTxt[3];
 
  public:
-	 NV10FuelCellClass(uint8_t CANId);
+	 NV10FuelCellClass();
 
 	float getPressure();
 	uint16_t getWatts();

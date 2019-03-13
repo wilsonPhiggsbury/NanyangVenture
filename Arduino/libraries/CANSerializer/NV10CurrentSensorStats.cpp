@@ -9,9 +9,9 @@ const float SHUNT200A_CURRENT_SCALE = 1 / 32.0;
 const float SHUNT50A_CURRENT_SCALE = 1 / 256.0;
 // parameter(CANbytes, stringChars)
 // wattHour(2,4), ampPeak(1,2)
-NV10CurrentSensorStatsClass::NV10CurrentSensorStatsClass(uint8_t CANId) :DataPoint(CANId, 8)
+NV10CurrentSensorStatsClass::NV10CurrentSensorStatsClass() :DataPoint("cs", 0x0D, 8)
 {
-	strcpy(strHeader, "cs");
+	debug(F("DataPoint cs:\t0x0D\t8"));
 }
 
 void NV10CurrentSensorStatsClass::insertData(uint32_t voltRaw, uint32_t ampMotorRaw)

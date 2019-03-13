@@ -23,7 +23,7 @@ class NV10AccesoriesStatus:public DataPoint
 	uint8_t& wiper = data.Byte[5];
 	
 public:
-	NV10AccesoriesStatus(uint8_t CANId);
+	NV10AccesoriesStatus();
 
 	void setLsig(uint8_t status);
 	void setRsig(uint8_t status);

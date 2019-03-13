@@ -19,7 +19,7 @@ class NV10CurrentSensorClass:public DataPoint
 	 uint16_t& ampMotor = data.UInt[3];
 
  public:
-	NV10CurrentSensorClass(uint8_t CANId);
+	NV10CurrentSensorClass();
 
 	void insertData(uint32_t voltRaw, uint32_t ampCInRaw, uint32_t ampCOutRaw, uint32_t ampMotorRaw);
 

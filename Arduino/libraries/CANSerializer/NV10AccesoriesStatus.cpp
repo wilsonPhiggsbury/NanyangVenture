@@ -4,9 +4,9 @@
 #include "NV10AccesoriesStatus.h"
 // parameter(CANbytes, stringChars)
 // param1(2,4), param2(1,2)
-NV10AccesoriesStatus::NV10AccesoriesStatus(uint8_t CANId) :DataPoint(CANId, 6)
+NV10AccesoriesStatus::NV10AccesoriesStatus() :DataPoint("ST", 0x10, 6)
 {
-	strcpy(strHeader, "ST");
+	debug(F("DataPoint ST:\t0x10\t6"));
 }
 
 void NV10AccesoriesStatus::setLsig(uint8_t status)

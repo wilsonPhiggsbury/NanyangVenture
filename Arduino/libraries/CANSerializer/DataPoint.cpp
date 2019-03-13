@@ -46,8 +46,9 @@ uint8_t DataPoint::getCanId()
 {
 	return CANId;
 }
-DataPoint::DataPoint(uint8_t CANId, const uint8_t CANLength):CANId(CANId), CANLength(CANLength)
+DataPoint::DataPoint(const char* strHeader, uint8_t CANId, const uint8_t CANLength):CANId(CANId), CANLength(CANLength)
 {
+	strcpy(this->strHeader, strHeader);
 }
 
 const char * DataPoint::getStringHeader()

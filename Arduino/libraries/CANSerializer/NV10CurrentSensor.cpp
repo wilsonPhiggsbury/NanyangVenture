@@ -8,9 +8,9 @@ const float SHUNT50A_CURRENT_SCALE = 1/256.0;
 #include "NV10CurrentSensor.h"
 // parameter(CANbytes, stringChars)
 // volts(1,2), ampCapIn(1,2), ampCapOut(1,2), ampMotor(1,2)
-NV10CurrentSensorClass::NV10CurrentSensorClass(uint8_t CANId):DataPoint(CANId, 8)
+NV10CurrentSensorClass::NV10CurrentSensorClass():DataPoint("CS", 0x0C, 8)
 {
-	strcpy(strHeader, "CS");
+	debug(F("DataPoint CS:\t0x0C\t8"));
 }
 
 void NV10CurrentSensorClass::insertData(uint32_t voltRaw, uint32_t ampCInRaw, uint32_t ampCOutRaw, uint32_t ampMotorRaw)
