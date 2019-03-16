@@ -340,8 +340,5 @@ ASALocalRun/
 # ___SPECIFIC TO VISUAL MICRO___
 DataVisualization_PC/.vscode/*
 __vm/
-Arduino/NV10_back_MEGA/Pins_back.h
-Arduino/NV10_dashboard_DUE/Pins_dashboard.h
-Arduino/NV10_front_MEGA/Pins_front.h
 \#*/
 /Utilities

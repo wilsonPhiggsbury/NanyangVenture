@@ -88,7 +88,6 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\NV10_front_MEGA\CAN.ino" />
-    <None Include="Back_Tasks.ino" />
     <None Include="NV10_back_MEGA.ino">
       <FileType>CppCode</FileType>
     </None>

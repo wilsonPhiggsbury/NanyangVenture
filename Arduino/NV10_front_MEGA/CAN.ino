@@ -28,7 +28,7 @@ void TaskCAN(void *pvParameters){
 	Packet in, out;
 	bool sent, received;
 	unsigned long lastTime = 0;
-	attachInterrupt(digitalPinToInterrupt(CAN_INT_PIN), CAN_ISR, FALLING);
+	attachInterrupt(digitalPinToInterrupt(CAN_INTERRUPT), CAN_ISR, FALLING);
 	debug(F("CAN started."));
 	while (1)
 	{

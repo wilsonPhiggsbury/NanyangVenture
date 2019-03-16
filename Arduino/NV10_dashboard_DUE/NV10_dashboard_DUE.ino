@@ -133,10 +133,10 @@ void TaskRefreshScreen(void* pvParameters)
 	const uint8_t CAN_resetThreshold = 30;
 	uint8_t CAN_resetCounter = 0;
 
-	pinMode(LCD_BACKLIGHT, OUTPUT);
-	digitalWrite(LCD_BACKLIGHT, HIGH);
-	pinMode(CAN_RST_PIN, OUTPUT);
-	digitalWrite(CAN_RST_PIN, HIGH);
+	pinMode(LCD_OUTPUT_BACKLIGHT, OUTPUT);
+	digitalWrite(LCD_OUTPUT_BACKLIGHT, HIGH);
+	pinMode(CAN_OUTPUT_RST, OUTPUT);
+	digitalWrite(CAN_OUTPUT_RST, HIGH);
 
 	Packet received;
 	char content[FLOAT_TO_STRING_LEN + 1];
@@ -163,9 +163,9 @@ void TaskRefreshScreen(void* pvParameters)
 			if (CAN_resetCounter++ >= CAN_resetThreshold)
 			{
 				screens.refreshDataWidgets(NULL);
-				digitalWrite(CAN_RST_PIN, LOW);
+				digitalWrite(CAN_OUTPUT_RST, LOW);
 				vTaskDelay(delay);
-				digitalWrite(CAN_RST_PIN, HIGH);
+				digitalWrite(CAN_OUTPUT_RST, HIGH);
 				CAN_resetCounter = 0; debug("Resetting 328P...");
 			}
 		}
