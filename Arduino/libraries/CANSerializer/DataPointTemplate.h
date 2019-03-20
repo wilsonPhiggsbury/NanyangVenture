@@ -17,7 +17,7 @@ class DataPointTemplate:public DataPoint
 	 float& param2 = data.Float[1]; // params can be higher resolution than their packed variants (this float is packed as uint16_t in .cpp file)
 
  public:
-	DataPointTemplate();
+	DataPointTemplate(uint8_t CANId);
 
 	void insertData(uint32_t param1, uint32_t param2);
 	uint16_t getParam1();

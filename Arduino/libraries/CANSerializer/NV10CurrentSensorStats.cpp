@@ -9,7 +9,7 @@ const float SHUNT200A_CURRENT_SCALE = 1 / 32.0;
 const float SHUNT50A_CURRENT_SCALE = 1 / 256.0;
 // parameter(CANbytes, stringChars)
 // wattHour(2,4), ampPeak(1,2)
-NV10CurrentSensorStatsClass::NV10CurrentSensorStatsClass() :DataPoint("cs", 0x0D, 8)
+NV10CurrentSensorStatsClass::NV10CurrentSensorStatsClass(uint8_t CANId) :DataPoint("cs", CANId, 8)
 {
 	debug(F("DataPoint cs:\t0x0D\t8"));
 }

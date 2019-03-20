@@ -168,7 +168,6 @@ void TaskRefreshScreen(void* pvParameters)
 				digitalWrite(CAN_OUTPUT_RST, HIGH);
 				CAN_resetCounter = 0; debug("Resetting 328P...");
 			}
-			debug_(CAN_resetCounter); debug_("  ");
 		}
 		//screens.refreshAnimatedWidgets();
 		vTaskDelay(delay);
@@ -186,7 +185,7 @@ void TaskReadSerial(void* pvParameters)
 #if DEBUG
 			char payload[MAX_STRING_LEN];
 			outgoing.toString(payload);
-			debug(payload);
+			//debug(payload);
 #endif
 		}
 		vTaskDelay(delay);

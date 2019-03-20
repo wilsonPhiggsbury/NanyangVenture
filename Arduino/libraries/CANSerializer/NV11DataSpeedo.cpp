@@ -4,7 +4,7 @@
 #include "NV11DataSpeedo.h"
 // parameter(CANbytes, stringChars)
 // param1(2,4), param2(1,2)
-NV11DataSpeedo::NV11DataSpeedo() :DataPoint("SM", 0x0A, 4)
+NV11DataSpeedo::NV11DataSpeedo(uint8_t CANId) :DataPoint("SM", CANId, 4)
 {
 	debug(F("DataPoint SM:\t0x0A\t4"));
 }
