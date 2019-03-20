@@ -15,9 +15,9 @@ bool initSD(SdFat& card)
 	uint16_t folderEntries = 0;
 	char folderPath[18] = "/NV10_";	// max 8 chars. len("NV10_") = 5, pad 3 digits to entry
 	do {
-		sprintf(folderPath + 6, "%03d", ++folderEntries);	// pad '0' on the front if number contains less than 3 digits
-		f = card.open(folderPath);
-	} while (f != NULL);
+		sprintf(folderPath + 6, "%03d/", ++folderEntries);	// pad '0' on the front if number contains less than 3 digits
+		debug_("Checking: "); debug(folderPath);
+	} while (card.exists(folderPath));
 
 	debug_("Folder entries: "); debug(folderEntries);
 	// Wipe when too full, or on user request ('~' char)
@@ -32,9 +32,9 @@ bool initSD(SdFat& card)
 		{
 			Serial.println(F("Requesting to wipe SD card."));
 			initiateWipe(card);
+			folderEntries = 0;
 		}
 		flushRX();
-		folderEntries = 0;
 		sprintf(folderPath + 6, "%03d", folderEntries);
 		delay(200);
 	}
