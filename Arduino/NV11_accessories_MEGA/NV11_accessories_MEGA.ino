@@ -19,7 +19,10 @@ void setup() {
 
 	Can.init(CAN_SPI_CS);
 	pinMode(CAN_INTERRUPT, INPUT_PULLUP);
-	attachInterrupt(digitalPinToInterrupt(CAN_INTERRUPT), CAN_ISR, FALLING);	
+	attachInterrupt(digitalPinToInterrupt(CAN_INTERRUPT), CAN_ISR, FALLING);
+
+	digitalWrite(RUNNINGLIGHT_OUTPUT, HIGH); // turn ON lights by default
+	digitalWrite(BRAKELIGHT_OUTPUT, HIGH); // turn OFF brakelights by default
 }
 
 // loop function manages signal lights blinking
