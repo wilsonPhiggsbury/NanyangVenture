@@ -108,15 +108,15 @@ void TaskToggle(void* pvParameters)
 		if (peripheralStates[Horn] == STATE_EN)
 		{
 			debug("BEEEP!");
-			digitalWrite(HORN_OUTPUT, HIGH);
-			vTaskDelay(pdMS_TO_TICKS(500));
 			digitalWrite(HORN_OUTPUT, LOW);
+			vTaskDelay(pdMS_TO_TICKS(500));
+			digitalWrite(HORN_OUTPUT, HIGH);
 			peripheralStates[Horn] = STATE_DS;
 			debug("beep off.");
 		}
 		else if (peripheralStates[Horn] == STATE_DS)
 		{
-			digitalWrite(HORN_OUTPUT, LOW);
+			digitalWrite(HORN_OUTPUT, HIGH);
 		}
 
 		if (peripheralStates[Headlights] == STATE_EN)
