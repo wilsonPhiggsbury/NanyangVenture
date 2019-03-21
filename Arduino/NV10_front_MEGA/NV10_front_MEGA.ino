@@ -109,7 +109,7 @@ void TaskToggle(void* pvParameters)
 		{
 			debug("BEEEP!");
 			digitalWrite(HORN_OUTPUT, LOW);
-			vTaskDelay(pdMS_TO_TICKS(500));
+			vTaskDelay(pdMS_TO_TICKS(300));
 			digitalWrite(HORN_OUTPUT, HIGH);
 			peripheralStates[Horn] = STATE_DS;
 			debug("beep off.");

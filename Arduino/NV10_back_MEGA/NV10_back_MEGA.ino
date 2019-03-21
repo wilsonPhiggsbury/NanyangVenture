@@ -65,6 +65,7 @@ void LogSendData(void *pvParameters);		// Output task:		Data logged in SD card a
 void TaskCAN(void* pvParameters);			// In/Out task:		Manages 2-way CAN bus comms
 void TaskBlink(void *pvParameters);			// 
 
+volatile bool brakeOn = false;
 //// _______________OPTIONAL_____________
 //void TaskReceiveCommands(void *pvParameters);	// Input task:		Enable real-time control of Arduino (if any)
 //void TaskRefreshPeripherals(void *pvParameters);// Control task:	Updates all CAN-BUS peripherals
@@ -352,6 +353,17 @@ void TaskBlink(void* pvParameters)
 				setRGB(rstrip, PIXELS, SIG_COLOR);
 			}
 		}
+		if (brakeOn == STATE_EN)
+		{
+			setRGB(brakestrip, PIXELS, BRAKE_COLOR);
+			setRGB(lightstrip, PIXELS, BRAKE_COLOR);
+		}
+		else if (brakeOn == STATE_DS)
+		{
+			setRGB(brakestrip, PIXELS, NO_COLOR);
+			setRGB(lightstrip, PIXELS, LIGHT_COLOR);
+		}
+
 		vTaskDelay(pdMS_TO_TICKS(500));
 	}
 }
@@ -367,12 +379,13 @@ void doReceiveAction(Packet* q)
 	}
 	else if (q->ID == BK)
 	{
-		if (q->data[0][0] == STATE_EN)
+		brakeOn = q->data[0][0] == STATE_EN;
+		if (brakeOn == STATE_EN)
 		{
 			setRGB(brakestrip, PIXELS, BRAKE_COLOR);
 			setRGB(lightstrip, PIXELS, BRAKE_COLOR);
 		}
-		else if (q->data[0][0] == STATE_DS)
+		else if (brakeOn == STATE_DS)
 		{
 			setRGB(brakestrip, PIXELS, NO_COLOR);
 			setRGB(lightstrip, PIXELS, LIGHT_COLOR);
