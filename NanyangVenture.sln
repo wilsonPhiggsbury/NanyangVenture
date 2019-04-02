@@ -89,6 +89,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RosserialDuplex", "Arduino\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NV10_dashboard2_DUE", "Arduino\NV10_dashboard2_DUE\NV10_dashboard2_DUE.vcxproj", "{B0EE18E0-782B-49E3-9F73-1CB231D58CE6}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NV11_steeringwheel_UNO", "Arduino\NV11_steeringwheel_UNO\NV11_steeringwheel_UNO.vcxproj", "{3809B57C-8D61-4E1F-9F36-F3987ECFBBF2}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\libraries\Rosserial_Arduino_Library\Rosserial_Arduino_Library.vcxitems*{16d6d2c9-e2d8-437f-80bf-3e1b32b814f4}*SharedItemsImports = 9
@@ -104,6 +106,9 @@ Global
 		..\libraries\ILI9488\ILI9488.vcxitems*{3313debc-fd6f-45c2-a323-b7f691565980}*SharedItemsImports = 4
 		Arduino\libraries\CAN_Serializer\CAN_Serializer.vcxitems*{3313debc-fd6f-45c2-a323-b7f691565980}*SharedItemsImports = 4
 		..\libraries\Adafruit_NeoPixel\Adafruit_NeoPixel.vcxitems*{34ba6dad-9412-4277-92f0-c1477ff871d3}*SharedItemsImports = 9
+		..\..\ide\hardware\arduino\avr\libraries\SPI\SPI.vcxitems*{3809b57c-8d61-4e1f-9f36-f3987ecfbbf2}*SharedItemsImports = 4
+		..\libraries\MCP_CAN_lib\MCP_CAN_lib.vcxitems*{3809b57c-8d61-4e1f-9f36-f3987ecfbbf2}*SharedItemsImports = 4
+		Arduino\libraries\CANSerializer\CANSerializer.vcxitems*{3809b57c-8d61-4e1f-9f36-f3987ecfbbf2}*SharedItemsImports = 4
 		Arduino\libraries\CANSerializer\CANSerializer.vcxitems*{4db19377-19de-4b9d-b8cc-d8769e8f8e82}*SharedItemsImports = 9
 		..\..\ide\hardware\arduino\avr\libraries\Wire\Wire.vcxitems*{50699b74-4b7a-418a-bcd4-33d264bfe581}*SharedItemsImports = 9
 		..\libraries\ILI9488\ILI9488.vcxitems*{5c6172fd-ce53-4a19-9733-98b83addeef5}*SharedItemsImports = 9
@@ -324,6 +329,14 @@ Global
 		{B0EE18E0-782B-49E3-9F73-1CB231D58CE6}.Release|x64.ActiveCfg = Release|Win32
 		{B0EE18E0-782B-49E3-9F73-1CB231D58CE6}.Release|x86.ActiveCfg = Release|Win32
 		{B0EE18E0-782B-49E3-9F73-1CB231D58CE6}.Release|x86.Build.0 = Release|Win32
+		{3809B57C-8D61-4E1F-9F36-F3987ECFBBF2}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{3809B57C-8D61-4E1F-9F36-F3987ECFBBF2}.Debug|x64.ActiveCfg = Debug|Win32
+		{3809B57C-8D61-4E1F-9F36-F3987ECFBBF2}.Debug|x86.ActiveCfg = Debug|Win32
+		{3809B57C-8D61-4E1F-9F36-F3987ECFBBF2}.Debug|x86.Build.0 = Debug|Win32
+		{3809B57C-8D61-4E1F-9F36-F3987ECFBBF2}.Release|Any CPU.ActiveCfg = Release|Win32
+		{3809B57C-8D61-4E1F-9F36-F3987ECFBBF2}.Release|x64.ActiveCfg = Release|Win32
+		{3809B57C-8D61-4E1F-9F36-F3987ECFBBF2}.Release|x86.ActiveCfg = Release|Win32
+		{3809B57C-8D61-4E1F-9F36-F3987ECFBBF2}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

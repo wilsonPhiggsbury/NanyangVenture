@@ -13,7 +13,7 @@ bool initSD(SdFat& card)
 
 	// obtain number of existing entries in SD card
 	uint16_t folderEntries = 0;
-	char folderPath[18] = "/NV10_";	// max 8 chars. len("NV10_") = 5, pad 3 digits to entry
+	char folderPath[18] = "/NV10_";	// max 8 chars. len("NV10_") = 5, pad 3 digits to the new folder
 	do {
 		sprintf(folderPath + 6, "%03d/", ++folderEntries);	// pad '0' on the front if number contains less than 3 digits
 		debug_("Checking: "); debug(folderPath);

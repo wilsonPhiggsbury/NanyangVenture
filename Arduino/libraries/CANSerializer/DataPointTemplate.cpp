@@ -6,7 +6,6 @@
 // param1(2,4), param2(1,2)
 DataPointTemplate::DataPointTemplate(uint8_t CANId) :DataPoint("XX", CANId, 8)
 {
-	strcpy(strHeader, "XX");
 }
 
 void DataPointTemplate::insertData(uint32_t param1, uint32_t param2)

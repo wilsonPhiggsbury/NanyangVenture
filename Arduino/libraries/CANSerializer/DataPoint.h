@@ -17,7 +17,6 @@
 #define debug(...)
 #endif
 
-#include <CANSerializer.h>
 // TODO: add in comments to explain rationale behind every child class variable being a reference to element of union "data".
 // -> they are actually messages to be sent onto CAN
 // -> they are constrained to add up to 8 bytes max. Multi-frame transmission currently not supported.
@@ -77,6 +76,13 @@ private:
 	//eEncodingPreset presets[8];
 	//byte errorFlag = 0;
 	// TODO: error flag appropriate?
+};
+class CANFrame
+{
+public:
+	unsigned long id;
+	byte length;
+	byte payload[8]; // TODO: extend payload byte length, then perform slicing in CANSerializer
 };
 
 #endif

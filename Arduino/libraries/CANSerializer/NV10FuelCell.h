@@ -19,7 +19,15 @@ class NV10FuelCellClass:public DataPoint
 	 uint8_t& status = data.Byte[7];
 
 	 char statusTxt[3];
-
+private:
+	 enum eStatus
+	 {
+		 SD,
+		 OP,
+		 IN,
+		 UNKNOWN
+	 };
+	 const char* cStatus[4] = { "SD", "OP", "IN", "UN" };
  public:
 	 NV10FuelCellClass(uint8_t CANId);
 

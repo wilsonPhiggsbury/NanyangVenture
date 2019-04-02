@@ -3,4 +3,4 @@
 #define SPEEDO_BL_B 5
 #define SPEEDO_BR_A 3
 #define SPEEDO_BR_B 6
-#define CAN_CS 4
+#define CAN_CS 10

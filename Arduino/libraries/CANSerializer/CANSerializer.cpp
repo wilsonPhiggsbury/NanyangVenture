@@ -33,3 +33,37 @@ bool CANSerializer::receiveCanFrame(CANFrame *f)
 	}
 	return false;
 }
+//void 
+//	CANFrame f;
+//	char toSerialPort[100];
+//	char fromSerialPort[100];
+//	if (serializer.receiveCanFrame(&f))
+//	{
+//		for (int i = 0; i < sizeof(canListenList) / sizeof(canListenList[0]); i++)
+//		{
+//			DataPoint& dataPoint = *canListenList[i];
+//			if (dataPoint.checkMatchCAN(&f))
+//			{
+//				dataPoint.unpackCAN(&f);
+//				dataPoint.packString(toSerialPort);
+//				Serial.println(toSerialPort);
+//				break;
+//			}
+//		}
+//	}
+//	if (Serial.available())
+//	{
+//		int bytesRead = Serial.readBytesUntil('\n', fromSerialPort, 100);
+//		fromSerialPort[bytesRead - 1] = '\0'; // "\r\n" should be the terminator, replace '\r' with '\0'
+//		for (int i = 0; i < sizeof(serialListenList) / sizeof(serialListenList[0]); i++)
+//		{
+//			DataPoint& dataPoint = *serialListenList[i];
+//			if (dataPoint.checkMatchString(fromSerialPort))
+//			{
+//				dataPoint.unpackString(fromSerialPort);
+//				dataPoint.packCAN(&f);
+//				serializer.sendCanFrame(&f);
+//				break;
+//			}
+//		}
+//	}

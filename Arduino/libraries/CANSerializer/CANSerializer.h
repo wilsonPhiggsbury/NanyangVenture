@@ -15,13 +15,7 @@
 #endif
 
 #include <mcp_can.h>
-class CANFrame
-{
-public:
-	unsigned long id;
-	byte length;
-	byte payload[8]; // TODO: extend payload byte length, then perform slicing in CANSerializer
-};
+#include <DataPoint.h>
 class CANSerializer
 {
 private:

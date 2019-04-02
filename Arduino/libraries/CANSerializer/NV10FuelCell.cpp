@@ -75,12 +75,15 @@ void NV10FuelCellClass::insertData(char* str)
 
 		readPtr = strtok(NULL, " ");
 		strcpy(statusTxt, readPtr);
+
 		if (strcmp(readPtr, "OP") == 0)
-			status = 1;	// alive
+			status = OP;	// alive
 		else if (strcmp(readPtr, "SD") == 0)
-			status = 0;	// SHUTDOWN! 
+			status = SD;	// SHUTDOWN! 
+		else if (strcmp(readPtr, "IN") == 0)
+			status = IN; // initializing
 		else
-			status = 255; // initializing
+			status = UNKNOWN;
 
 		//>>00.0V 00.0A 0000W 00000Wh 021.1C 028.3C 028.5C 031.6C 0.90B 59.0V 028.0C IN 00.0C 00 0000
 		//  ^   * ^   * ^   * ^    *  ^    * ^    * ^    * ^    * ^   * ^   *        ^ *
@@ -92,21 +95,7 @@ void NV10FuelCellClass::insertData(char* str)
 void NV10FuelCellClass::unpackCAN(const CANFrame* f)
 {
 	DataPoint::unpackCAN(f);
-	switch (status)
-	{
-	case 1:
-		strcpy(statusTxt, "OP");
-		break;
-	case 0:
-		strcpy(statusTxt, "SD");
-		break;
-	case 255:
-		strcpy(statusTxt, "IN");
-		break;
-	default:
-		strcpy(statusTxt, "??");
-		break;
-	}
+	strcpy(statusTxt, cStatus[status]); // status takes on enum value, match with constant Status array string
 }
 
 void NV10FuelCellClass::packString(char * str)
