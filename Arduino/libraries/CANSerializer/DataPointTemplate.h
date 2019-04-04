@@ -3,12 +3,6 @@
 #ifndef _DATAPOINTTEMPLATE_h
 #define _DATAPOINTTEMPLATE_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-	#include "arduino.h"
-#else
-	#include "WProgram.h"
-#endif
-
 #include <DataPoint.h>
 class DataPointTemplate:public DataPoint
 {

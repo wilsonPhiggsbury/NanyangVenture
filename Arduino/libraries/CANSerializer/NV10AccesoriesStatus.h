@@ -3,12 +3,6 @@
 #ifndef _NV10ACCESSORIESSTATUS_h
 #define _NV10ACCESSORIESSTATUS_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-	#include "arduino.h"
-#else
-	#include "WProgram.h"
-#endif
-
 #define STATE_EN 1
 #define STATE_DS 0
 #include <DataPoint.h>

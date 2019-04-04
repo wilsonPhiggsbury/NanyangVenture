@@ -91,6 +91,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NV10_dashboard2_DUE", "Ardu
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NV11_steeringwheel_UNO", "Arduino\NV11_steeringwheel_UNO\NV11_steeringwheel_UNO.vcxproj", "{3809B57C-8D61-4E1F-9F36-F3987ECFBBF2}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ASCIITable", "..\..\ide\examples\04.Communication\ASCIITable\ASCIITable.vcxproj", "{7CD0AE21-3820-41E4-90FC-4E1A52D0C031}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\libraries\Rosserial_Arduino_Library\Rosserial_Arduino_Library.vcxitems*{16d6d2c9-e2d8-437f-80bf-3e1b32b814f4}*SharedItemsImports = 9
@@ -337,6 +339,14 @@ Global
 		{3809B57C-8D61-4E1F-9F36-F3987ECFBBF2}.Release|x64.ActiveCfg = Release|Win32
 		{3809B57C-8D61-4E1F-9F36-F3987ECFBBF2}.Release|x86.ActiveCfg = Release|Win32
 		{3809B57C-8D61-4E1F-9F36-F3987ECFBBF2}.Release|x86.Build.0 = Release|Win32
+		{7CD0AE21-3820-41E4-90FC-4E1A52D0C031}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{7CD0AE21-3820-41E4-90FC-4E1A52D0C031}.Debug|x64.ActiveCfg = Debug|Win32
+		{7CD0AE21-3820-41E4-90FC-4E1A52D0C031}.Debug|x86.ActiveCfg = Debug|Win32
+		{7CD0AE21-3820-41E4-90FC-4E1A52D0C031}.Debug|x86.Build.0 = Debug|Win32
+		{7CD0AE21-3820-41E4-90FC-4E1A52D0C031}.Release|Any CPU.ActiveCfg = Release|Win32
+		{7CD0AE21-3820-41E4-90FC-4E1A52D0C031}.Release|x64.ActiveCfg = Release|Win32
+		{7CD0AE21-3820-41E4-90FC-4E1A52D0C031}.Release|x86.ActiveCfg = Release|Win32
+		{7CD0AE21-3820-41E4-90FC-4E1A52D0C031}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

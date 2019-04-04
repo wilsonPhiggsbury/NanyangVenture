@@ -1,13 +1,7 @@
 // NV10CurrentSensorStats.h
 
-#ifndef _DATAPOINTTEMPLATE_h
-#define _DATAPOINTTEMPLATE_h
-
-#if defined(ARDUINO) && ARDUINO >= 100
-	#include "arduino.h"
-#else
-	#include "WProgram.h"
-#endif
+#ifndef _NV11DATASPEEDO_h
+#define _NV11DATASPEEDO_h
 
 #include <DataPoint.h>
 class NV11DataSpeedo:public DataPoint

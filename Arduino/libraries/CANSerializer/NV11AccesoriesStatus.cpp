@@ -4,7 +4,7 @@
 #include "NV11AccesoriesStatus.h"
 // parameter(CANbytes, stringChars)
 // param1(2,4), param2(1,2)
-NV11AccesoriesStatus::NV11AccesoriesStatus(uint8_t CANId) :DataPoint("ST", CANId, 6)
+NV11AccesoriesStatus::NV11AccesoriesStatus(uint8_t CANId) :DataPoint("ST", CANId, 8)
 {
 	debug(F("DataPoint ST:\t0x10\t6"));
 }
@@ -44,6 +44,11 @@ void NV11AccesoriesStatus::setFourWS(uint8_t status)
 	brake = status;
 }
 
+void NV11AccesoriesStatus::setRegen(uint8_t status)
+{
+	regen = status;
+}
+
 uint8_t NV11AccesoriesStatus::getLsig()
 {
 	return lsig;
@@ -79,7 +84,12 @@ uint8_t NV11AccesoriesStatus::getFourWS()
 	return fourWS;
 }
 
-void NV11AccesoriesStatus::insertData(uint8_t lsig, uint8_t rsig, uint8_t wiper, uint8_t hazard, uint8_t headlights, uint8_t brake)
+uint8_t NV11AccesoriesStatus::getRegen()
+{
+	return regen;
+}
+
+void NV11AccesoriesStatus::insertData(uint8_t lsig, uint8_t rsig, uint8_t wiper, uint8_t hazard, uint8_t headlights, uint8_t brake, uint8_t fourWS, uint8_t regen)
 {
 	timeStamp = millis();
 	this->lsig = lsig;
@@ -88,13 +98,15 @@ void NV11AccesoriesStatus::insertData(uint8_t lsig, uint8_t rsig, uint8_t wiper,
 	this->hazard = hazard;
 	this->headlights = headlights;
 	this->brake = brake;
+	this->fourWS = fourWS;
+	this->regen = regen;
 }
 
 void NV11AccesoriesStatus::packString(char *str)
 {
 	char* shiftedStr = DataPoint::packStringDefault(str);
 	// param1 = 4, param2 = 2
-	sprintf(shiftedStr, "%d\t%d\t%d\t%d\t%d\t%d", lsig, rsig, hazard, headlights, brake, wiper);
+	sprintf(shiftedStr, "%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d", lsig, rsig, hazard, headlights, brake, wiper, fourWS, regen);
 }
 
 void NV11AccesoriesStatus::unpackString(char * str)
@@ -120,4 +132,10 @@ void NV11AccesoriesStatus::unpackString(char * str)
 
 	ptr = strtok(NULL, "\t");
 	wiper = atoi(ptr);
+
+	ptr = strtok(NULL, "\t");
+	fourWS = atoi(ptr);
+
+	ptr = strtok(NULL, "\t");
+	regen = atoi(ptr);
 }

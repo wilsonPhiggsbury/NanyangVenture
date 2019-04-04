@@ -116,6 +116,13 @@ void DataPoint::unpackString(char * str)
 	}
 }
 
+bool DataPoint::dataHasChanged()
+{
+	bool changed = memcmp(data.Byte, oldData.Byte, 8) != 0;
+	memcpy(oldData.Byte, data.Byte, 8);
+	return changed;
+}
+
 void debugPrint(char * toPrint, int len)
 {
 #if DEBUG
