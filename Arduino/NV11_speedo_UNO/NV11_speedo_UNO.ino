@@ -27,11 +27,16 @@ ros::Publisher speedPublisher("speedKmh", &speedData), distPublisher("distMm", &
 //ros::Subscriber 
 
 void setup() {
-	serializer.init(CAN_CS);
-	//Serial.begin(9600);
+	pinMode(CANENABLE_OUTPUT, OUTPUT);
+	if (serializer.init(CAN_CS))
+		digitalWrite(CANENABLE_OUTPUT, HIGH);
+	else
+		digitalWrite(CANENABLE_OUTPUT, LOW);
+
 	attachInterrupt(digitalPinToInterrupt(SPEEDO_BL_A), tickL, FALLING);
 	attachInterrupt(digitalPinToInterrupt(SPEEDO_BR_A), tickR, FALLING);
-	//handle.getHardware()->setBaud(9600);
+	
+	//nh.getHardware()->setBaud(9600);
 
 	nh.initNode();
 	nh.advertise(speedPublisher);
