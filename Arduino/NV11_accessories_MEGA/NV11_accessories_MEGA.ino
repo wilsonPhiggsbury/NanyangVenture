@@ -4,12 +4,12 @@
  Author:	MX
 */
 #include <CANSerializer.h>
-#include "NV10AccesoriesStatus.h"
+#include <NV11AccesoriesStatus.h>
 #include "Pins_lights.h"
 CANSerializer Can;
-NV10AccesoriesStatus dataAcc = NV10AccesoriesStatus(0x10);
+NV11AccesoriesStatus dataAcc = NV11AccesoriesStatus(0x10);
 bool sigOn;
-unsigned long nextTime = 0;
+unsigned long sigNextProc = 0;
 // the setup function runs once when you press reset or power the board
 void setup() {
 	pinMode(LSIG_OUTPUT, OUTPUT);
@@ -30,9 +30,9 @@ void loop() {
 	// relay is PULLUP by default
 	// writing HIGH enables NC, disables NO
 	// writing LOW enables NO, disables NC
-	if (millis() > nextTime)
+	if (millis() > sigNextProc)
 	{
-		nextTime += 500;
+		sigNextProc += 500;
 		if (sigOn)
 		{
 			// turn off signal lights

@@ -6,7 +6,7 @@
 // param1(2,4), param2(1,2)
 NV11AccesoriesStatus::NV11AccesoriesStatus(uint8_t CANId) :DataPoint("ST", CANId, 8)
 {
-	debug(F("DataPoint ST:\t0x10\t6"));
+	debug(F("DataPoint ST:\t0x10\t8"));
 }
 
 void NV11AccesoriesStatus::setLsig(uint8_t status)
@@ -17,11 +17,6 @@ void NV11AccesoriesStatus::setLsig(uint8_t status)
 void NV11AccesoriesStatus::setRsig(uint8_t status)
 {
 	rsig = status;
-}
-
-void NV11AccesoriesStatus::setWiper(uint8_t status)
-{
-	wiper = status;
 }
 
 void NV11AccesoriesStatus::setHazard(uint8_t status)
@@ -39,9 +34,14 @@ void NV11AccesoriesStatus::setBrake(uint8_t status)
 	brake = status;
 }
 
+void NV11AccesoriesStatus::setWiper(uint8_t status)
+{
+	wiper = status;
+}
+
 void NV11AccesoriesStatus::setFourWS(uint8_t status)
 {
-	brake = status;
+	fourWS = status;
 }
 
 void NV11AccesoriesStatus::setRegen(uint8_t status)
@@ -59,11 +59,6 @@ uint8_t NV11AccesoriesStatus::getRsig()
 	return rsig;
 }
 
-uint8_t NV11AccesoriesStatus::getWiper()
-{
-	return wiper;
-}
-
 uint8_t NV11AccesoriesStatus::getHazard()
 {
 	return hazard;
@@ -79,6 +74,11 @@ uint8_t NV11AccesoriesStatus::getBrake()
 	return brake;
 }
 
+uint8_t NV11AccesoriesStatus::getWiper()
+{
+	return wiper;
+}
+
 uint8_t NV11AccesoriesStatus::getFourWS()
 {
 	return fourWS;
@@ -89,15 +89,15 @@ uint8_t NV11AccesoriesStatus::getRegen()
 	return regen;
 }
 
-void NV11AccesoriesStatus::insertData(uint8_t lsig, uint8_t rsig, uint8_t wiper, uint8_t hazard, uint8_t headlights, uint8_t brake, uint8_t fourWS, uint8_t regen)
+void NV11AccesoriesStatus::insertData(uint8_t lsig, uint8_t rsig, uint8_t hazard, uint8_t headlights, uint8_t brake, uint8_t wiper, uint8_t fourWS, uint8_t regen)
 {
 	timeStamp = millis();
 	this->lsig = lsig;
 	this->rsig = rsig;
-	this->wiper = wiper;
 	this->hazard = hazard;
 	this->headlights = headlights;
 	this->brake = brake;
+	this->wiper = wiper;
 	this->fourWS = fourWS;
 	this->regen = regen;
 }
@@ -138,4 +138,16 @@ void NV11AccesoriesStatus::unpackString(char * str)
 
 	ptr = strtok(NULL, "\t");
 	regen = atoi(ptr);
+}
+void NV11AccesoriesStatus::printStatus()
+{
+	Serial.print("Lsig: "); Serial.println(lsig);
+	Serial.print("Rsig: "); Serial.println(rsig);
+	Serial.print("Hazard: "); Serial.println(hazard);
+	Serial.print("Headlights: "); Serial.println(headlights);
+	Serial.print("Brake: "); Serial.println(brake);
+	Serial.print("Wiper: "); Serial.println(wiper);
+	Serial.print("4WS: "); Serial.println(fourWS);
+	Serial.print("Regen: "); Serial.println(regen);
+	Serial.println(F("----------------------"));
 }

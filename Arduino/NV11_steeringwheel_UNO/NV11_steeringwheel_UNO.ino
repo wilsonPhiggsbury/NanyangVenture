@@ -13,14 +13,21 @@ NV11Commands dataCommands(0x11);
 // the setup function runs once when you press reset or power the board
 void setup() {
 	Serial.begin(9600);
-	for (int i = 2; i <= 9; i++)
-	{
-		pinMode(i, INPUT_PULLUP);
-	}
-	for (int i = A0; i <= A5; i++)
-	{
-		pinMode(i, INPUT_PULLUP);
-	}
+	pinMode(WIPER_INPUT1, INPUT_PULLUP);
+	pinMode(WIPER_INPUT2, INPUT_PULLUP);
+	pinMode(FOURWSS_INPUT1, INPUT_PULLUP);
+	pinMode(FOURWSS_INPUT2, INPUT_PULLUP);
+	pinMode(HAZARD_INPUT, INPUT_PULLUP);
+	pinMode(HEADLIGHT_INPUT, INPUT_PULLUP);
+
+	pinMode(HORN_INPUT, INPUT_PULLUP);
+	pinMode(LSIG_INPUT, INPUT_PULLUP);
+	pinMode(RSIG_INPUT, INPUT_PULLUP);
+	pinMode(REGEN_INPUT, INPUT_PULLUP);
+	pinMode(SPARE1_INPUT, INPUT_PULLUP);
+	pinMode(SPARE2_INPUT, INPUT_PULLUP);
+	pinMode(SPARE3_INPUT, INPUT_PULLUP);
+
 	if (!serializer.init(CAN_SPI_CS))
 		Serial.println("CAN init fail");
 	else
@@ -31,18 +38,6 @@ void setup() {
 // the loop function runs over and over again until power down or reset
 void loop() {
 	CANFrame f;
-	// ... code to populate dataCommands (eg: dataCommands.activateHorn())
-	dataCommands.clearActivationHistory();
-	if (!digitalRead(HORN_INPUT))
-	{
-		dataCommands.activateHorn();
-	}
-	
-	if (dataCommands.getHorn() == NV11AccesoriesStatus::enable)
-	{
-		dataCommands.packCAN(&f);
-		serializer.sendCanFrame(&f);
-	}
 
 	// ... code to populate dataAcc (eg: dataAcc.setLsig(STATE_EN))
 	if (!digitalRead(HEADLIGHT_INPUT))
@@ -118,3 +113,17 @@ void CAN_ISR()
 //	}
 //	Serial.println();
 //}
+
+
+	//// ... code to populate dataCommands (eg: dataCommands.activateHorn())
+	//dataCommands.clearActivationHistory();
+	//if (!digitalRead(HORN_INPUT))
+	//{
+	//	dataCommands.activateHorn();
+	//}
+	//
+	//if (dataCommands.getHorn() == NV11AccesoriesStatus::enable)
+	//{
+	//	dataCommands.packCAN(&f);
+	//	serializer.sendCanFrame(&f);
+	//}

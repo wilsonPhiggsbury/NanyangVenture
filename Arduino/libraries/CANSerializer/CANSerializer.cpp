@@ -9,8 +9,38 @@
 
 bool CANSerializer::init(uint8_t cs)
 {
+	return init(cs, 1000);
+}
+
+bool CANSerializer::init(uint8_t cs, uint16_t kbps)
+{
+	byte speedset;
+	switch (kbps)
+	{
+	case 100:
+		speedset = CAN_100KBPS;
+		break;
+	case 125:
+		speedset = CAN_125KBPS;
+		break;
+	case 200:
+		speedset = CAN_200KBPS;
+		break;
+	case 250:
+		speedset = CAN_250KBPS;
+		break;
+	case 500:
+		speedset = CAN_500KBPS;
+		break;
+	case 1000:
+		speedset = CAN_1000KBPS;
+		break;
+	default:
+		Serial.println("Unsupported speed.");
+		return false;
+	}
 	CAN = new MCP_CAN(cs);
-	bool initSuccess = CAN->begin(MCP_STDEXT, CAN_1000KBPS, MCP_16MHZ) == CAN_OK;
+	bool initSuccess = CAN->begin(MCP_STDEXT, speedset, MCP_16MHZ) == CAN_OK;
 	if (initSuccess)
 	{
 		CAN->setMode(MCP_NORMAL);

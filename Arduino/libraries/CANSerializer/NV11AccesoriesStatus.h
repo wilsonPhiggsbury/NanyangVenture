@@ -23,23 +23,24 @@ public:
 
 	void setLsig(uint8_t status);
 	void setRsig(uint8_t status);
-	void setWiper(uint8_t status);
 	void setHazard(uint8_t status);
 	void setHeadlights(uint8_t status);
 	void setBrake(uint8_t status);
+	void setWiper(uint8_t status);
 	void setFourWS(uint8_t status);
 	void setRegen(uint8_t status);
 	uint8_t getLsig();
 	uint8_t getRsig();
-	uint8_t getWiper();
 	uint8_t getHazard();
 	uint8_t getHeadlights();
 	uint8_t getBrake();
+	uint8_t getWiper();
 	uint8_t getFourWS();
 	uint8_t getRegen();
-	void insertData(uint8_t lsig, uint8_t rsig, uint8_t wiper, uint8_t hazard, uint8_t headlights, uint8_t brake, uint8_t fourWS, uint8_t regen);
+	void insertData(uint8_t lsig, uint8_t rsig, uint8_t hazard, uint8_t headlights, uint8_t brake, uint8_t wiper, uint8_t fourWS, uint8_t regen);
 	void packString(char*);
 	void unpackString(char * str);
+	void printStatus();
 	enum eGeneralStates {
 		disable,
 		enable
