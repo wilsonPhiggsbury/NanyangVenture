@@ -22,7 +22,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="NV11DashboardGUI.py" />
-    <Compile Include="NV11DashboardGUI_v2.py" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DataPoint\DataPoint.pyproj">
