@@ -5,24 +5,29 @@
 */
 #include <CANSerializer.h>
 #include <NV11AccesoriesStatus.h>
+#include <RelayModule.h>
 #include "Pins_lights.h"
 CANSerializer Can;
 NV11AccesoriesStatus dataAcc = NV11AccesoriesStatus(0x10);
+RelayModule brakeRelay(BRAKELIGHT_OUTPUT, RelayModule::NO);
+RelayModule runninglightRelay(RUNNINGLIGHT_OUTPUT, RelayModule::NC);
+RelayModule lsigRelay(LSIG_OUTPUT, RelayModule::NO);
+RelayModule rsigRelay(RSIG_OUTPUT, RelayModule::NO);
 bool sigOn;
 unsigned long sigNextProc = 0;
-// the setup function runs once when you press reset or power the board
+const unsigned long sigInterval = 500; // 500ms delay between each signal light flash
+
 void setup() {
-	pinMode(LSIG_OUTPUT, OUTPUT);
-	pinMode(RSIG_OUTPUT, OUTPUT);
-	pinMode(BRAKELIGHT_OUTPUT, OUTPUT);
-	pinMode(RUNNINGLIGHT_OUTPUT, OUTPUT);
+	brakeRelay.init();
+	runninglightRelay.init();
+	lsigRelay.init();
+	rsigRelay.init();
 
 	Can.init(CAN_SPI_CS);
 	pinMode(CAN_INTERRUPT, INPUT_PULLUP);
 	attachInterrupt(digitalPinToInterrupt(CAN_INTERRUPT), CAN_ISR, FALLING);
 
-	digitalWrite(RUNNINGLIGHT_OUTPUT, HIGH); // turn ON lights by default
-	digitalWrite(BRAKELIGHT_OUTPUT, HIGH); // turn OFF brakelights by default
+	Serial.begin(9600);
 }
 
 // loop function manages signal lights blinking
@@ -32,13 +37,13 @@ void loop() {
 	// writing LOW enables NO, disables NC
 	if (millis() > sigNextProc)
 	{
-		sigNextProc += 500;
+		sigNextProc += sigInterval;
 		if (sigOn)
 		{
 			// turn off signal lights
 			sigOn = false;
-			digitalWrite(LSIG_OUTPUT, HIGH);
-			digitalWrite(RSIG_OUTPUT, HIGH);
+			lsigRelay.deactivate();
+			rsigRelay.deactivate();
 		}
 		else
 		{
@@ -46,12 +51,12 @@ void loop() {
 			if (dataAcc.getHazard() == STATE_EN || dataAcc.getLsig() == STATE_EN)
 			{
 				sigOn = true;
-				digitalWrite(LSIG_OUTPUT, LOW);
+				lsigRelay.activate();
 			}
 			if (dataAcc.getHazard() == STATE_EN || dataAcc.getRsig() == STATE_EN)
 			{
 				sigOn = true;
-				digitalWrite(RSIG_OUTPUT, LOW);
+				rsigRelay.activate();
 			}
 		}
 	}
@@ -66,12 +71,51 @@ void CAN_ISR()
 	{
 		dataAcc.unpackCAN(&f);
 		if (dataAcc.getBrake() == STATE_EN)
-			digitalWrite(BRAKELIGHT_OUTPUT, LOW); // ON
+			brakeRelay.activate();
 		else
-			digitalWrite(BRAKELIGHT_OUTPUT, HIGH); // OFF
+			brakeRelay.deactivate();
 		if (dataAcc.getHeadlights() == STATE_EN)
-			digitalWrite(RUNNINGLIGHT_OUTPUT, HIGH); // ON
+			runninglightRelay.activate();
 		else
-			digitalWrite(RUNNINGLIGHT_OUTPUT, LOW); // OFF
+			runninglightRelay.deactivate();
 	}
 }
+
+/* test code
+
+	brakeRelay.activate();
+	Serial.println("brake ON");
+	delay(1000);
+	brakeRelay.deactivate();
+	Serial.println("brake OFF");
+	delay(1000);
+
+	delay(1000);
+
+	runninglightRelay.activate();
+	Serial.println("Runninglight ON");
+	delay(1000);
+	runninglightRelay.deactivate();
+	Serial.println("Runninglight OFF");
+	delay(1000);
+
+	delay(1000);
+
+	digitalWrite(LSIG_OUTPUT, LOW); // lsig ON
+	Serial.println("Lsig ON");
+	delay(1000);
+	digitalWrite(LSIG_OUTPUT, HIGH); // lsig OFF
+	Serial.println("Lsig OFF");
+	delay(1000);
+
+	delay(1000);
+
+	digitalWrite(RSIG_OUTPUT, LOW); // rsig ON
+	Serial.println("Rsig ON");
+	delay(1000);
+	digitalWrite(RSIG_OUTPUT, HIGH); // rsig OFF
+	Serial.println("Rsig OFF");
+	delay(1000);
+
+	delay(2000);
+*/
