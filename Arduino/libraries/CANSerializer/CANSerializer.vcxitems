@@ -28,6 +28,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)NV10CurrentSensorStats.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)NV10FuelCell.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)NV11AccesoriesStatus.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)NV11BMS.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)NV11Commands.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)NV11DataSpeedo.h" />
   </ItemGroup>
@@ -40,6 +41,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)NV10CurrentSensorStats.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)NV10FuelCell.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)NV11AccesoriesStatus.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)NV11BMS.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)NV11Commands.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)NV11DataSpeedo.cpp" />
   </ItemGroup>

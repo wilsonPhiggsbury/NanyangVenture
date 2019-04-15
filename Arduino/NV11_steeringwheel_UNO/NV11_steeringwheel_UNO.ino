@@ -9,27 +9,34 @@
 #include "Pins_steeringwheel.h"
 CANSerializer serializer;
 NV11AccesoriesStatus dataAcc(0x10);
-NV11Commands dataCommands(0x11);
+
+bool canAvail;
 // the setup function runs once when you press reset or power the board
 void setup() {
 	Serial.begin(9600);
+
+	pinMode(LSIG_INPUT, INPUT_PULLUP);
+	pinMode(RSIG_INPUT, INPUT_PULLUP);
+	pinMode(HAZARD_INPUT, INPUT_PULLUP);
+	pinMode(HEADLIGHT_INPUT, INPUT_PULLUP);
+	pinMode(BRAKE_INPUT, INPUT_PULLUP);
 	pinMode(WIPER_INPUT1, INPUT_PULLUP);
 	pinMode(WIPER_INPUT2, INPUT_PULLUP);
 	pinMode(FOURWSS_INPUT1, INPUT_PULLUP);
 	pinMode(FOURWSS_INPUT2, INPUT_PULLUP);
-	pinMode(HAZARD_INPUT, INPUT_PULLUP);
-	pinMode(HEADLIGHT_INPUT, INPUT_PULLUP);
-
-	pinMode(HORN_INPUT, INPUT_PULLUP);
-	pinMode(LSIG_INPUT, INPUT_PULLUP);
-	pinMode(RSIG_INPUT, INPUT_PULLUP);
 	pinMode(REGEN_INPUT, INPUT_PULLUP);
+
 	pinMode(SPARE1_INPUT, INPUT_PULLUP);
 	pinMode(SPARE2_INPUT, INPUT_PULLUP);
-	pinMode(SPARE3_INPUT, INPUT_PULLUP);
+	pinMode(STATUSLED_OUTPUT, OUTPUT);
 
-	if (!serializer.init(CAN_SPI_CS))
+	delay(1000); // wait for all other Arduinos to startup
+	canAvail = serializer.init(CAN_SPI_CS);
+	if (!canAvail)
+	{
 		Serial.println("CAN init fail");
+		digitalWrite(STATUSLED_OUTPUT, HIGH);
+	}
 	else
 		Serial.println("CAN init success");
 	attachInterrupt(digitalPinToInterrupt(CAN_INT_PIN), CAN_ISR, FALLING);
@@ -40,15 +47,6 @@ void loop() {
 	CANFrame f;
 
 	// ... code to populate dataAcc (eg: dataAcc.setLsig(STATE_EN))
-	if (!digitalRead(HEADLIGHT_INPUT))
-		dataAcc.setHeadlights(NV11AccesoriesStatus::enable);
-	else
-		dataAcc.setHeadlights(NV11AccesoriesStatus::disable);
-
-	if (!digitalRead(HAZARD_INPUT))
-		dataAcc.setHazard(NV11AccesoriesStatus::enable);
-	else
-		dataAcc.setHazard(NV11AccesoriesStatus::disable);
 
 	if (!digitalRead(LSIG_INPUT))
 		dataAcc.setLsig(NV11AccesoriesStatus::enable);
@@ -59,6 +57,21 @@ void loop() {
 		dataAcc.setRsig(NV11AccesoriesStatus::enable);
 	else
 		dataAcc.setRsig(NV11AccesoriesStatus::disable);
+
+	if (!digitalRead(HAZARD_INPUT))
+		dataAcc.setHazard(NV11AccesoriesStatus::enable);
+	else
+		dataAcc.setHazard(NV11AccesoriesStatus::disable);
+
+	if (!digitalRead(HEADLIGHT_INPUT))
+		dataAcc.setHeadlights(NV11AccesoriesStatus::enable);
+	else
+		dataAcc.setHeadlights(NV11AccesoriesStatus::disable);
+
+	if (!digitalRead(BRAKE_INPUT))
+		dataAcc.setBrake(NV11AccesoriesStatus::enable);
+	else
+		dataAcc.setBrake(NV11AccesoriesStatus::disable);
 
 	if (!digitalRead(REGEN_INPUT))
 		dataAcc.setRegen(NV11AccesoriesStatus::enable);
@@ -81,10 +94,12 @@ void loop() {
 
 	if (dataAcc.dataHasChanged())
 	{
+		digitalWrite(STATUSLED_OUTPUT, HIGH^canAvail); // invert output if can is unavailable
 		dataAcc.packCAN(&f);
 		serializer.sendCanFrame(&f);
 	}
 	delay(100);
+	digitalWrite(STATUSLED_OUTPUT, LOW^canAvail); // invert output if can is unavailable
 }
 void CAN_ISR()
 {
@@ -115,9 +130,10 @@ void CAN_ISR()
 //}
 
 
+	//NV11Commands dataCommands(0x11);
 	//// ... code to populate dataCommands (eg: dataCommands.activateHorn())
 	//dataCommands.clearActivationHistory();
-	//if (!digitalRead(HORN_INPUT))
+	//if (!digitalRead(BRAKE_INPUT))
 	//{
 	//	dataCommands.activateHorn();
 	//}

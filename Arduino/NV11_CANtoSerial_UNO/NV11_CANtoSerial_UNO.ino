@@ -6,13 +6,15 @@
 #define CAN_CS 4
 #define CAN_INT 3
 #include <CANSerializer.h>
-#include <NV10AccesoriesStatus.h>
+#include <NV11AccesoriesStatus.h>
+#include <NV11BMS.h>
 #include <NV11DataSpeedo.h>
 CANSerializer serializer;
 NV11DataSpeedo dataSpeedo = NV11DataSpeedo(0x0A);
-NV10AccesoriesStatus dataAccesories = NV10AccesoriesStatus(0x10);
-DataPoint* canListenList[] = { &dataSpeedo, &dataAccesories };
-DataPoint* serialListenList[] = { &dataAccesories };
+NV11BMS dataBMS = NV11BMS(0x0B);
+NV11AccesoriesStatus dataAccesories = NV11AccesoriesStatus(0x10);
+DataPoint* canListenList[] = { &dataSpeedo, &dataBMS }; // incoming messages: speedo and BMS
+DataPoint* serialListenList[] = { &dataAccesories }; // outgoing messages: accessories
 void setup()
 {
 	Serial.begin(9600);
@@ -57,7 +59,6 @@ void loop()
 			}
 		}
 	}
-	delayMicroseconds(1000);
 }
 void CAN_ISR()
 {

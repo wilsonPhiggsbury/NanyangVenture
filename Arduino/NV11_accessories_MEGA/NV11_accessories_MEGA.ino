@@ -23,6 +23,8 @@ void setup() {
 	lsigRelay.init();
 	rsigRelay.init();
 
+	runninglightRelay.activate();
+
 	Can.init(CAN_SPI_CS);
 	pinMode(CAN_INTERRUPT, INPUT_PULLUP);
 	attachInterrupt(digitalPinToInterrupt(CAN_INTERRUPT), CAN_ISR, FALLING);

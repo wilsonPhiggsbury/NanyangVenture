@@ -2,8 +2,7 @@
 // 
 // 
 #include "NV11Commands.h"
-// parameter(CANbytes, stringChars)
-// param1(2,4), param2(1,2)
+
 NV11Commands::NV11Commands(uint8_t CANId) :DataPoint("CM", CANId, 1)
 {
 }
