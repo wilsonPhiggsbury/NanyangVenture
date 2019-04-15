@@ -69,6 +69,7 @@ class NV11DataSpeedo(DataPoint):
             print("km/h:",self.speedKmh)
         else:
             print("Did not unpack anything.")
+            
 class NV11DataAccessories(DataPoint):
     def __init__(self, canId):
         self.lsig = 0
@@ -77,7 +78,9 @@ class NV11DataAccessories(DataPoint):
         self.headlights = 0
         self.brake = 0
         self.wiper = 0
-        return super().__init__(canId, "ST", 6, 6) # 6 data, 6 bytes
+        self.fourWS = 0
+        self.regen = 0
+        return super().__init__(canId, "ST", 8, 8) # 8 data, 8 bytes
     def packString(self):
         resultList = self._packStringDefault()
         resultList[2] = str(self.lsig)
@@ -86,6 +89,8 @@ class NV11DataAccessories(DataPoint):
         resultList[5] = str(self.headlights)
         resultList[6] = str(self.brake)
         resultList[7] = str(self.wiper)
+        resultList[8] = str(self.fourWS)
+        resultList[9] = str(self.regen)
         result = "\t".join(resultList)
         return result
     def unpackString(self, inputStr):
@@ -97,9 +102,35 @@ class NV11DataAccessories(DataPoint):
             self.headlights = int(resultList[5])
             self.brake = int(resultList[6])
             self.wiper = int(resultList[7])
+            self.fourWS = int(resultList[8])
+            self.regen = int(resultList[9])
             # TODO: commit converted parameters into data array
             print("Received Accessories")
-            print("lsig rsig hazard headlight brake wiper:", self.lsig, self.rsig, self.hazard, self.headlights, self.brake, self.wiper)
+            print("lsig rsig hazard headlight brake wiper fourWS regen:", self.lsig, self.rsig, self.hazard, self.headlights, self.brake, self.wiper, self.fourWS,self.regen)
         else:
             print("Did not unpack anything.")
 
+class NV11DataBMS(DataPoint):
+    def __init__(self, canId):
+        self.volt = 0
+        self.amp = 0
+        self.temperature = 0
+        return super().__init__(canId, "BM", 3, 6) # 8 data, 8 bytes
+    def packString(self):
+        resultList = self._packStringDefault()
+        resultList[2] = str(self.volt)
+        resultList[3] = str(self.amp)
+        resultList[4] = str(self.temperature)
+        result = "\t".join(resultList)
+        return result
+    def unpackString(self, inputStr):
+        resultList = self._unpackStringDefault(inputStr)
+        if(resultList):
+            self.volt = int(resultList[2])
+            self.amp = int(resultList[3])
+            self.temperature = int(resultList[4])
+            # TODO: commit converted parameters into data array
+            print("Received BMS")
+            print("volt amp temperature:", self.volt, self.amp, self.temperature)
+        else:
+            print("Did not unpack anything.")

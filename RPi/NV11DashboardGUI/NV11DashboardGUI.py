@@ -5,10 +5,13 @@ except:
 import time
 import colorsys
 import serial
-from DataPoint import NV11DataAccessories, NV11DataSpeedo
+from DataPoint import NV11DataAccessories, NV11DataSpeedo, NV11DataBMS
+import RPi.GPIO as GPIO
 
 
 
+
+RESET_PIN = 16
 
 ELEMENT_SIZE = 125
 DEFAULT_LIGHT_COLOR = "#000000"
@@ -35,7 +38,9 @@ import traceback
 #threading imports
 from threading import Thread
 
-
+#for logging
+##import logging
+##logging.basicConfig(format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
 
 NO_OF_TELEMETRYCAGES = 10 
 
@@ -59,6 +64,17 @@ pouch_pannel_configuration[6] = [5,1,1,3, "voltage",ELEMENT_SIZE, ELEMENT_WIDTH 
 pouch_pannel_configuration[7] = [5,2,1,3, "cycletime",ELEMENT_SIZE, ELEMENT_WIDTH * 3] #cycle time
 pouch_pannel_configuration[8] = [5,3,1,3, "totaltime",ELEMENT_SIZE, ELEMENT_WIDTH * 3] #total time
 pouch_pannel_configuration[9] = [0,3,1,2, "error",ELEMENT_SIZE, ELEMENT_WIDTH*2] #total time
+
+
+def return_map(myArray):
+    myDict = {}
+    for i in range(len(myArray)):
+        myDict[myArray[i][4]] = i
+    return myDict
+    
+dict_map = return_map(pouch_pannel_configuration)
+
+
 
 
 
@@ -123,19 +139,24 @@ class DriveUserInterface(tk.Frame):
         self.UISelector("error").setText(error_message)
 
 
-    def updateDriveUI(self, dataAccessory, dataSpeed):
+    def updateDriveUI(self, dataAccessory, dataSpeed, dataBMS):
         ##pass
-        self.UISelector("speed").setText(round(dataSpeed.speedKmh))
+        self.UISelector("speed").setText(abs(round(dataSpeed.speedKmh)))
         self.UISelector("left").setText(dataAccessory.lsig)
         self.UISelector("right").setText(dataAccessory.rsig)
         self.UISelector("brake").setText(dataAccessory.brake)
+        self.UISelector("left").setText(dataAccessory.brake)
+        #self.UISelector("left").toggle(dataAccessory.hazard) #pass in True to toggle on or off
+        #self.UISelector("right").toggle(dataAccessory.hazard) #pass in True to toggle on or off
+        self.UISelector("left").sync(self.UISelector("right")) #sync indicator light. Will only sync if hazard toggle is on
+        #TODO: Integrate hazard
+        #TODO: Integrate BMS
+
 
                 
         
     def UISelector(self, description):
-        for cage in self.telemetrycages:
-            if cage.description == description:
-                return cage
+        return self.telemetrycages[dict_map[description]]
 
 
 
@@ -183,18 +204,6 @@ class TelemetryElement(tk.Canvas):
             self.setColor(DEFAULT_LIGHT_COLOR)
         
 
-#switch case python style
-
-
-##    elif description == "left":
-##        return left_indcator
-##    elif description == "right":
-##        return right_indcator
-##    elif description == "throttle":
-##        throttle_element()
-##    elif description == "brake":
-##        return brake_element
-
 
 def UI_switcher(parent, height, width, description):
     if description == "speed":
@@ -207,24 +216,6 @@ def UI_switcher(parent, height, width, description):
         return TelemetryElement(parent, height, width, description)
     
 
-
-
-#funciton to find the horizontal center
-
-
-
-##class TurnIndicator(TelemetryElement):
-##    def __init__(self,parent, passWidth, passHeight, description):
-##        TelemetryElement.__init__(self,parent, passWidth, passHeight, description)
-####        if is_left:
-####            points = [55, 85, 55, 155, 0, 120, 55, 85]
-####        else:
-####            points = [55, 85,  55, 155, 105, 120, 55, 85]
-####        self.create_polygon(points, outline='#f11', 
-####            fill='#1f1', width=2)
-####        self.pack(fill=tk.BOTH, expand=1)
-##        self.indicate()
-##    
 
 class Speedometer(TelemetryElement):
     def __init__(self, parent, passWidth, passHeight, description):
@@ -245,8 +236,48 @@ class Indicator(TelemetryElement):
         self.text_id = self.create_text((self.width/2,self.height), text=self.description, font=("Courier", FONT_SIZE), anchor=tk.CENTER)
 ##        self.move(self.text_id, 0, -10)
         xOffset = self.findXCenter(self, self.text_id)
+        self.hazard_toggle = True
+        self.prev_time = time.time()
+        self.blinkspeed = 0.5 #in seconds
+
+    def setText(self, text_to_change ): #override
+        if self.hazard_toggle: #if hazard is on
+            #ignore the setText
+            self.blink() #call blinking function
+        else:
+            text_to_change = str(text_to_change)
+            self.itemconfigure(self.text_id, text=text_to_change)
+            self.text = text_to_change
+            self.indicate()
+
+
+    def toggle_hazard(self, toToggle):
+        if toToggle:
+            if self.hazard_toggle == True:
+                self.hazard_toogle = False
+            else:
+                self.hazard_toogle = True
+    
+    def blink(self):
+        curr_time = time.time()
+        time_elapse = curr_time - self.prev_time
+        if time_elapse > self.blinkspeed:
+            #time to toggle the light
+            self.prev_time = curr_time #reset timer.
+            if self.text == "1":
+                self.text = "0"
+                self.indicate()
+            else:
+                self.text = "1"
+                self.indicate()
+
+    def sync(self, otherIndicator):
+        if self.hazard_toggle: #only in hazard mode then sync
+            self.text = otherIndicator.text        
+                    
 
     def indicate(self):
+        self.delete(tk.ALL)
         padding = 10
         center_y = self.height / 2
         center_x = self.width / 2
@@ -341,6 +372,28 @@ def hsv_hex_conversion(h, s, v):
 
 mode = "run"
 
+def reset_arduino(s=''):
+    #pulse the reset pin
+    app.showError("Reseting \n arduino")
+    app.update()
+    GPIO.output(RESET_PIN, GPIO.LOW)
+    time.sleep(0.1)
+    GPIO.output(RESET_PIN, GPIO.HIGH)
+    time.sleep(3)
+    app.showError("No error")
+    app.update()
+    print(s,"resetting Arduino")
+
+
+def log_error(exctype, value, tb):
+    with open("error_log.txt", "a+") as f:
+        f.write(datetime.datetime.now() + "\n")
+        f.write("Type:" + str(exctype) + + "\n")
+        f.write("Value:" +  str(value) +  "\n")
+        f.write("Traceback:" +  str(tb) +  "\n"), 
+
+    
+
 
 def try_connect():
     while True:
@@ -353,19 +406,28 @@ def try_connect():
                 else:
                     raise serial.serialutil.SerialException
             else:
-                s = serial.Serial("/dev/serial0", baudrate=9600, timeout=2)  
+                print("connecting to serial0")
+                s = serial.Serial("/dev/serial0", baudrate=9600, timeout=1) 
+                print("after connecting serial0") 
             dataSpeed = NV11DataSpeedo(0x0A)
             dataAcc = NV11DataAccessories(0x10)
+            dataBMS = NV11DataBMS(0x0B)
             app.showError("No error")
-            return s, dataSpeed, dataAcc
+            return s, dataSpeed, dataAcc, dataBMS
         except serial.serialutil.SerialException:
+            reset_arduino("serial port not found")
             app.showError("Error opening \n serial port")
             time.sleep(1)
             app.update()
             print("Trying to restart serial")
     
 
+
+
+
 print("Display")
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(RESET_PIN, GPIO.OUT)
 while True:
     try:
         root = tk.Tk()
@@ -375,39 +437,66 @@ while True:
         app = DriveUserInterface(root)
         app.background = DEFAULT_LIGHT_COLOR
         ##app.master.title('DRIVE GUI')
+        app.update()
         break
     except tk.TclError as e:
+        print("error starting window")
         time.sleep(1)
         traceback.print_exc()
-            
-s, dataSpeed, dataAcc = try_connect()
+        
+
+prev_time = time.time()
+
+reset_arduino()
+app.showError("Reboot Arduino")
+app.showError("Booting serial port...")
+app.update()
+s, dataSpeed, dataAcc, dataBMS = try_connect()
 canTimeout = False
+canTimeoutCount = 0 
 while True:
+    curr_time = time.time()
+    print("Cycle time: " + str(curr_time - prev_time))
+    prev_time = curr_time
+        
     try:
+        
         line = s.readline().decode()
-        if line != "":
-            if canTimeout:
-                canTimeout = False
-                app.showError("No error");
+        s.flushInput()
+        
+        if line != '':                    
             if dataSpeed.checkMatchString(line):
-                dataSpeed.unpackString(line)
-                
+                dataSpeed.unpackString(line)                
             elif dataAcc.checkMatchString(line):
                 dataAcc.unpackString(line)
+            elif dataBMS.checkMatchString(line):
+                dataBMS.unpackString(line)
             
-            for i in range(NO_OF_TELEMETRYCAGES):
-                app.updateDriveUI(dataAcc, dataSpeed)
+            app.updateDriveUI(dataAcc, dataSpeed, dataBMS)
+            canTimeoutCount = 0
+            if canTimeout:
+                canTimeout= False
+                app.showError("No error")
+                
         else:
-            canTimeout = True
-            app.showError("Can't read \n CAN bus")
+            canTimeoutCount += 1
+            if canTimeoutCount > 5:
+                print("Can error")
+                app.showError("Can't read \n CAN bus.")
+                canTimeout = True
+                reset_arduino("no CAN msg,")
+                canTimeoutCount = 0 
         app.update()
-    except serial.serialutil.SerialException:
+    except serial.serialutil.SerialException as e:
+        print(e)
         print("Serial Error")
         app.showError("Can't read \n serial port")
+        app.update()
         s, dataSpeed, dataAcc = try_connect()
-
-
-
+    except UnicodeDecodeError as e:
+        print("Decode error")
+        app.showError("Decode Error")
+        app.update()
         
 
 ##if __name__ == '__main__':
