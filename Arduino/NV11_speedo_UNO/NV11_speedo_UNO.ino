@@ -20,6 +20,7 @@ NV11DataSpeedo dataSpeedo = NV11DataSpeedo(0x0A);
 Speedometer speedoBL = Speedometer(SPEEDO_BL_A, SPEEDO_BL_B, 545, 500, true);
 Speedometer speedoBR = Speedometer(SPEEDO_BR_A, SPEEDO_BR_B, 545, 500, false);
 
+bool CAN_avail;
 //ros::NodeHandle nh;//_<ArduinoHardware, 10, 10, 100, 105, ros::DefaultReadOutBuffer_>
 //std_msgs::Float32MultiArray speedData;
 //std_msgs::UInt32MultiArray distData;
@@ -27,16 +28,25 @@ Speedometer speedoBR = Speedometer(SPEEDO_BR_A, SPEEDO_BR_B, 545, 500, false);
 //ros::Subscriber 
 
 void setup() {
+	delay(500);
+	Serial.begin(9600);
 	pinMode(CANENABLE_OUTPUT, OUTPUT);
-	if (serializer.init(CAN_CS))
+	CAN_avail = serializer.init(CAN_CS);
+	if (CAN_avail)
+	{
 		digitalWrite(CANENABLE_OUTPUT, HIGH);
+		Serial.println("CAN init");
+	}
 	else
+	{
 		digitalWrite(CANENABLE_OUTPUT, LOW);
+		Serial.println("CAN fail");
+	}
 
 	attachInterrupt(digitalPinToInterrupt(SPEEDO_BL_A), tickL, FALLING);
 	attachInterrupt(digitalPinToInterrupt(SPEEDO_BR_A), tickR, FALLING);
 
-	Serial.begin(9600);
+	//Serial.println("NV11 Speedo");
 	
 	//nh.getHardware()->setBaud(9600);
 
@@ -56,13 +66,15 @@ void loop() {
 	static uint32_t dist[2];
 	counter++;
 
-	Serial.print(speedoBL.getSpeedKmh()); Serial.print("\t");
-	Serial.print(speedoBL.getTotalDistTravelled()); Serial.print("\t");
-	Serial.print(speedoBR.getSpeedKmh()); Serial.print("\t");
-	Serial.print(speedoBR.getTotalDistTravelled()); Serial.println();
+	//Serial.print(speedoBL.getSpeedKmh()); Serial.print("\t");
+	//Serial.print(speedoBL.getTotalDistTravelled()); Serial.print("\t");
+	//Serial.print(speedoBR.getSpeedKmh()); Serial.print("\t");
+	//Serial.print(speedoBR.getTotalDistTravelled()); Serial.println();
 
-	//speed[0] = speedoBL.getSpeedKmh();
-	//speed[1] = speedoBR.getSpeedKmh();
+	speed[0] = speedoBL.getSpeedKmh();
+	speed[1] = speedoBR.getSpeedKmh();
+
+	// ------------------ ROS SERIAL thingy ---------------------
 	//speedData.data = speed;
 	//speedPublisher.publish(&speedData);
 	//dist[0] = speedoBL.getTotalDistTravelled();
@@ -73,13 +85,17 @@ void loop() {
 	//distPublisher.publish(&distData);
 	//nh.spinOnce();
 
-	if (counter % 8 == 0)
+	if (counter % 4 == 0)
 	{
 		CANFrame f;
 		dataSpeedo.insertData((speed[0]+speed[1])/2);
 		dataSpeedo.packCAN(&f);
 		serializer.sendCanFrame(&f);
+		CAN_avail = serializer.checkNoError();
 	}
+	digitalWrite(CANENABLE_OUTPUT, HIGH^CAN_avail);
+	delay(100);
+	digitalWrite(CANENABLE_OUTPUT, LOW^CAN_avail);
 	delay(100);
 }
 
