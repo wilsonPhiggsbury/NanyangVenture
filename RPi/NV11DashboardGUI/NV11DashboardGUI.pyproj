@@ -21,7 +21,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="DataPoint.py" />
     <Compile Include="NV11DashboardGUI.py" />
+    <Compile Include="SerialTest.py" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DataPoint\DataPoint.pyproj">

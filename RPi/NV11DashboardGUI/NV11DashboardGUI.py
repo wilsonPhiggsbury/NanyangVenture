@@ -7,6 +7,9 @@ import colorsys
 import serial
 from DataPoint import NV11DataAccessories, NV11DataSpeedo, NV11DataBMS
 import RPi.GPIO as GPIO
+import os
+import traceback
+import logging 
 
 
 
@@ -32,7 +35,6 @@ ERROR_FONT_SIZE = 15
 ## serial imports
 import sys
 import glob
-import traceback
 
 
 #threading imports
@@ -145,12 +147,18 @@ class DriveUserInterface(tk.Frame):
         self.UISelector("left").setText(dataAccessory.lsig)
         self.UISelector("right").setText(dataAccessory.rsig)
         self.UISelector("brake").setText(dataAccessory.brake)
-        self.UISelector("left").setText(dataAccessory.brake)
-        #self.UISelector("left").toggle(dataAccessory.hazard) #pass in True to toggle on or off
-        #self.UISelector("right").toggle(dataAccessory.hazard) #pass in True to toggle on or off
+        self.UISelector("left").toggle_hazard(dataAccessory.hazard) #pass in True to toggle on or off
+        self.UISelector("right").toggle_hazard(dataAccessory.hazard) #pass in True to toggle on or off
         self.UISelector("left").sync(self.UISelector("right")) #sync indicator light. Will only sync if hazard toggle is on
         #TODO: Integrate hazard
         #TODO: Integrate BMS
+        self.UISelector("voltage").setText(round(dataBMS.volt,1))
+        self.UISelector("current").setText(round(dataBMS.amp,1))
+        #cycle times
+        self.UISelector("cycletime").displayTime()
+        self.UISelector("totaltime").displayTime()
+        
+        #self.UISelector("temperature").setText(round(dataBMS.temperature,2))
 
 
                 
@@ -212,6 +220,8 @@ def UI_switcher(parent, height, width, description):
         return Indicator(parent, height, width, description)
     elif description == "error":
         return ErrorBox(parent, height, width, description)
+    elif description == "cycletime" or description == "totaltime":
+        return TimeBoxes(parent, height, width, description)
     else:
         return TelemetryElement(parent, height, width, description)
     
@@ -230,13 +240,38 @@ class Speedometer(TelemetryElement):
         self.setColor(rgb)
 
 
+class TimeBoxes(TelemetryElement):
+    def initText(self): #overide to start the time 
+        super().initText()
+        self.start_time = time.time() #in seconds
+
+    def toggleTime(self, toggle):
+        #resets start time, new laptime or 
+        if toggle:
+            self.start_time = time.time()
+
+
+    def displayTime(self):
+        current_time = time.time()
+        elapse_time = int(current_time - self.start_time)
+        seconds = elapse_time % 60
+        minutes = elapse_time // 60
+        self.setText("{0}:{1}".format(minutes, seconds))
+
+        
+        
+    
+        
+        
+        
+
 
 class Indicator(TelemetryElement):
     def initText(self): #override
         self.text_id = self.create_text((self.width/2,self.height), text=self.description, font=("Courier", FONT_SIZE), anchor=tk.CENTER)
 ##        self.move(self.text_id, 0, -10)
         xOffset = self.findXCenter(self, self.text_id)
-        self.hazard_toggle = True
+        self.hazard_toggle = False
         self.prev_time = time.time()
         self.blinkspeed = 0.5 #in seconds
 
@@ -392,6 +427,9 @@ def log_error(exctype, value, tb):
         f.write("Value:" +  str(value) +  "\n")
         f.write("Traceback:" +  str(tb) +  "\n"), 
 
+
+def shut_down():
+    os.system("sudo shutdown -h now")
     
 
 
@@ -411,7 +449,7 @@ def try_connect():
                 print("after connecting serial0") 
             dataSpeed = NV11DataSpeedo(0x0A)
             dataAcc = NV11DataAccessories(0x10)
-            dataBMS = NV11DataBMS(0x0B)
+            dataBMS = NV11DataBMS(0x11)
             app.showError("No error")
             return s, dataSpeed, dataAcc, dataBMS
         except serial.serialutil.SerialException:
@@ -446,18 +484,19 @@ while True:
         
 
 prev_time = time.time()
-
+logging.basicConfig(filename='log.txt', filemode='w', format='%(levelname)s-%(asctime)s-%(message)s', level = logging.DEBUG)
+logging.debug("Starting logs")
 reset_arduino()
 app.showError("Reboot Arduino")
 app.showError("Booting serial port...")
 app.update()
 s, dataSpeed, dataAcc, dataBMS = try_connect()
 canTimeout = False
-canTimeoutCount = 0 
+canTimeoutCount = 0
 while True:
-    curr_time = time.time()
-    print("Cycle time: " + str(curr_time - prev_time))
-    prev_time = curr_time
+    #curr_time = time.time()
+    #print("Cycle time: " + str(curr_time - prev_time))
+    #prev_time = curr_time
         
     try:
         
@@ -488,14 +527,22 @@ while True:
                 canTimeoutCount = 0 
         app.update()
     except serial.serialutil.SerialException as e:
+        logging.error("Serial exception occured", exc_info = True)
         print(e)
         print("Serial Error")
         app.showError("Can't read \n serial port")
         app.update()
         s, dataSpeed, dataAcc = try_connect()
     except UnicodeDecodeError as e:
+        logging.error("Decode exception occured", exc_info = True)
         print("Decode error")
         app.showError("Decode Error")
+        app.update()
+    except:
+        logging.error("Unexpected exception occured", exc_info = True)
+        traceback.print_exc()
+        print("unexpected error occured")
+        app.showError("Unexpected error")
         app.update()
         
 

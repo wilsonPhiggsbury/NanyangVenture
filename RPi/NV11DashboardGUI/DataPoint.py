@@ -35,8 +35,12 @@ class DataPoint:
     def _unpackStringDefault(self, inputStr):
         resultList = inputStr.split("\t")
         if(len(resultList) != self.numParameters):
-            print("String segment number inadequate! Expecting", self.numParameters, "received", len(resultList))
+            print("[ERROR] String segment number inadequate! Expecting", self.numParameters, "received", len(resultList))
             return None
+        for thisStr in resultList:
+            if thisStr == '':
+                print("[ERROR] Received a blank entry.")
+                return None
         self.timeStamp = resultList[1]
         return resultList
 
@@ -101,11 +105,6 @@ class NV11DataAccessories(DataPoint):
             self.wiper = int(resultList[7])
             self.fourWS = int(resultList[8])
             self.regen = int(resultList[9])
-            # TODO: commit converted parameters into data array
-##            print("Received Accessories")
-##            print("lsig rsig hazard headlight brake wiper fourWS regen:", self.lsig, self.rsig, self.hazard, self.headlights, self.brake, self.wiper, self.fourWS,self.regen)
-        else:
-            print("Did not unpack anything.")
 
 class NV11DataBMS(DataPoint):
     def __init__(self, canId):
@@ -129,24 +128,20 @@ class NV11DataBMS(DataPoint):
             self.amp = float(resultList[3])
             self.temperature = float(resultList[4])
             self.minCellVolt = float(resultList[5])
-            # TODO: commit converted parameters into data array
-##            print("Received BMS")
-##            print("volt amp temperature:", self.volt, self.amp, self.temperature, self.minCellVolt)
-        else:
-            print("Did not unpack anything.")
-
             
 class NV11DataCommands(DataPoint):
     def __init__(self, canId):
         self.horn = 0
         self.lapCounter = 0
+        self.lapCounterReset = 0
         self.shutdownPi = 0
-        return super().__init__(canId, "CM", 3, 3) # 3 data, 3 bytes
+        return super().__init__(canId, "CM", 4, 4) # 3 data, 3 bytes
     def packString(self):
         resultList = self._packStringDefault()
         resultList[2] = str(self.horn)
         resultList[3] = str(self.lapCounter)
-        resultList[4] = str(self.shutdownPi)
+        resultList[4] = str(self.lapCounterReset)
+        resultList[5] = str(self.shutdownPi)
         result = "\t".join(resultList)
         return result
     def unpackString(self, inputStr):
@@ -154,4 +149,5 @@ class NV11DataCommands(DataPoint):
         if(resultList):
             self.horn = int(resultList[2])
             self.lapCounter = int(resultList[3])
-            self.shutdownPi = int(resultList[4])
+            self.lapCounterReset = int(resultList[4])
+            self.shutdownPi = int(resultList[5])
