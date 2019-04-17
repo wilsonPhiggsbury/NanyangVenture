@@ -31,10 +31,6 @@ const char* STRING_HEADER[] = { "FC","CS","Cs","SM","H2","ST","CM","HB" };
 //	
 //	if (overFlow > 8)
 //		errorFlag = 1;
-//} 
-//bool DataPoint::checkError()
-//{
-//	return errorFlag;
 //}
 // TODO: see DataPoint.h file
 
@@ -58,6 +54,8 @@ const char * DataPoint::getStringHeader()
 
 bool DataPoint::checkMatchCAN(const CANFrame * f)
 {
+	//Serial.print("ID: "); Serial.print(f->id); Serial.print(" "); Serial.println(CANId);
+	//Serial.print("Len: "); Serial.print(f->length); Serial.print(" "); Serial.println(CANLength);
 	if (f->id == this->CANId && f->length == this->CANLength)
 	{
 		return true;
@@ -68,11 +66,11 @@ void DataPoint::packCAN(CANFrame *f)
 {
 	f->id = CANId;
 	f->length = this->CANLength;
-	memcpy(f->payload, data.Byte, 8);
+	memcpy(f->payload, data.Byte, CANLength);
 }
 void DataPoint::unpackCAN(const CANFrame *f)
 {
-	memcpy(data.Byte, f->payload, 8);
+	memcpy(data.Byte, f->payload, CANLength);
 }
 
 char* DataPoint::packStringDefault(char * str)
@@ -123,6 +121,14 @@ bool DataPoint::dataHasChanged()
 	return changed;
 }
 
+void DataPoint::printRaw()
+{
+	for (int i = 0; i < CANLength; i++)
+	{
+		Serial.print(" 0x");
+		Serial.print(data.Byte[i], HEX);
+	}
+}
 void debugPrint(char * toPrint, int len)
 {
 #if DEBUG

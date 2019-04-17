@@ -27,6 +27,7 @@ public:
 	bool sendCanFrame(CANFrame*);
 	// Populates Packet only if data is available.
 	bool receiveCanFrame(CANFrame*);
+	bool checkNoError();
 };
 
 #endif

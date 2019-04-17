@@ -9,8 +9,10 @@
 #include "Pins_steeringwheel.h"
 CANSerializer serializer;
 NV11AccesoriesStatus dataAcc(0x10);
+NV11Commands dataCommands(0x12);
 
 bool canAvail;
+uint8_t prevRead[20] = { 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 }; // store previous digitalReads to artificially detect "Rising edge"
 // the setup function runs once when you press reset or power the board
 void setup() {
 	Serial.begin(9600);
@@ -26,8 +28,8 @@ void setup() {
 	pinMode(FOURWSS_INPUT2, INPUT_PULLUP);
 	pinMode(REGEN_INPUT, INPUT_PULLUP);
 
-	pinMode(SPARE1_INPUT, INPUT_PULLUP);
-	pinMode(SPARE2_INPUT, INPUT_PULLUP);
+	pinMode(SHUTDOWNPI_INPUT, INPUT_PULLUP);
+	pinMode(LAPCOUNTER_INPUT, INPUT_PULLUP);
 	pinMode(STATUSLED_OUTPUT, OUTPUT);
 
 	delay(1000); // wait for all other Arduinos to startup
@@ -46,27 +48,101 @@ void setup() {
 void loop() {
 	CANFrame f;
 
+	// ... code to populate dataCommands (eg: dataCommands.activateHorn())
+	dataCommands.clearActivationHistory();
+	if (!digitalRead(SHUTDOWNPI_INPUT) && prevRead[SHUTDOWNPI_INPUT])
+	{
+		dataCommands.triggerShutdownRPi();
+		prevRead[SHUTDOWNPI_INPUT] = 0;
+	}
+	else
+	{
+		prevRead[SHUTDOWNPI_INPUT] = digitalRead(SHUTDOWNPI_INPUT);
+	}
+	if (!digitalRead(LAPCOUNTER_INPUT) && prevRead[LAPCOUNTER_INPUT])
+	{
+		dataCommands.triggerLaps();
+		prevRead[LAPCOUNTER_INPUT] = 0;
+	}
+	else
+	{
+		prevRead[LAPCOUNTER_INPUT] = digitalRead(LAPCOUNTER_INPUT);
+	}
+	
+	if (dataCommands.dataHasChanged())
+	{
+		dataCommands.packCAN(&f);
+		serializer.sendCanFrame(&f);
+	}
 	// ... code to populate dataAcc (eg: dataAcc.setLsig(STATE_EN))
 
-	if (!digitalRead(LSIG_INPUT))
-		dataAcc.setLsig(NV11AccesoriesStatus::enable);
+	if (!digitalRead(LSIG_INPUT) && prevRead[LSIG_INPUT])
+	{
+		if (dataAcc.getLsig())
+		{
+			dataAcc.setLsig(NV11AccesoriesStatus::disable);
+		}
+		else
+		{
+			dataAcc.setLsig(NV11AccesoriesStatus::enable);
+		}
+		prevRead[LSIG_INPUT] = 0;
+	}
 	else
-		dataAcc.setLsig(NV11AccesoriesStatus::disable);
+	{
+		prevRead[LSIG_INPUT] = digitalRead(LSIG_INPUT);
+	}
 
-	if (!digitalRead(RSIG_INPUT))
-		dataAcc.setRsig(NV11AccesoriesStatus::enable);
+	if (!digitalRead(RSIG_INPUT) && prevRead[RSIG_INPUT])
+	{
+		if (dataAcc.getRsig())
+		{
+			dataAcc.setRsig(NV11AccesoriesStatus::disable);
+		}
+		else
+		{
+			dataAcc.setRsig(NV11AccesoriesStatus::enable);
+		}
+		prevRead[RSIG_INPUT] = 0;
+	}
 	else
-		dataAcc.setRsig(NV11AccesoriesStatus::disable);
+	{
+		prevRead[RSIG_INPUT] = digitalRead(RSIG_INPUT);
+	}
 
-	if (!digitalRead(HAZARD_INPUT))
-		dataAcc.setHazard(NV11AccesoriesStatus::enable);
+	if (!digitalRead(HAZARD_INPUT) && prevRead[HAZARD_INPUT])
+	{
+		if (dataAcc.getHazard())
+		{
+			dataAcc.setHazard(NV11AccesoriesStatus::disable);
+		}
+		else
+		{
+			dataAcc.setHazard(NV11AccesoriesStatus::enable);
+		}
+		prevRead[HAZARD_INPUT] = 0;
+	}
 	else
-		dataAcc.setHazard(NV11AccesoriesStatus::disable);
+	{
+		prevRead[HAZARD_INPUT] = digitalRead(HAZARD_INPUT);
+	}
 
-	if (!digitalRead(HEADLIGHT_INPUT))
-		dataAcc.setHeadlights(NV11AccesoriesStatus::enable);
+	if (!digitalRead(HEADLIGHT_INPUT) && prevRead[HEADLIGHT_INPUT])
+	{
+		if (dataAcc.getHeadlights())
+		{
+			dataAcc.setHeadlights(NV11AccesoriesStatus::disable);
+		}
+		else
+		{
+			dataAcc.setHeadlights(NV11AccesoriesStatus::enable);
+		}
+		prevRead[HEADLIGHT_INPUT] = 0;
+	}
 	else
-		dataAcc.setHeadlights(NV11AccesoriesStatus::disable);
+	{
+		prevRead[HEADLIGHT_INPUT] = digitalRead(HEADLIGHT_INPUT);
+	}
 
 	if (!digitalRead(BRAKE_INPUT))
 		dataAcc.setBrake(NV11AccesoriesStatus::enable);
@@ -94,12 +170,13 @@ void loop() {
 
 	if (dataAcc.dataHasChanged())
 	{
-		digitalWrite(STATUSLED_OUTPUT, HIGH^canAvail); // invert output if can is unavailable
+		digitalWrite(STATUSLED_OUTPUT, HIGH^canAvail);
 		dataAcc.packCAN(&f);
 		serializer.sendCanFrame(&f);
+		canAvail = serializer.checkNoError();
 	}
 	delay(100);
-	digitalWrite(STATUSLED_OUTPUT, LOW^canAvail); // invert output if can is unavailable
+	digitalWrite(STATUSLED_OUTPUT, LOW^canAvail); // light up default when CAN is available
 }
 void CAN_ISR()
 {

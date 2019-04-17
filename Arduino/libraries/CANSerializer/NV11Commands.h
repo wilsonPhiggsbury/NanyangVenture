@@ -8,9 +8,12 @@ class NV11Commands:public DataPoint
 {
  protected:
 	 uint8_t& horn = data.Byte[0];
+	 uint8_t& lapCounter = data.Byte[1];
+	 uint8_t& lapCounterReset = data.Byte[2];
+	 uint8_t& shutdownPi = data.Byte[3];
 	 enum eActivateStats {
-		 notActivated,
-		 activated
+		 notTriggered,
+		 triggered
 	 };
 
  public:
@@ -19,10 +22,15 @@ class NV11Commands:public DataPoint
 	void insertData(uint8_t horn);
 	// call this to deactivate all states. You should use this before activating the states one by one again.
 	void clearActivationHistory();
-	void activateHorn();
+	void triggerHorn();
+	void triggerLaps();
+	void triggerLapsReset();
+	void triggerShutdownRPi();
 	uint8_t getHorn();
 	void packString(char*);
 	void unpackString(char * str);
+	// return true on any triggered
+	bool dataHasChanged();
 };
 
 #endif

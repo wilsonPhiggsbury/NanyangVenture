@@ -60,6 +60,7 @@ public:
 	virtual void unpackString(char * str);
 	// used to see if any data has changed since last call
 	bool dataHasChanged();
+	void printRaw();
 protected:
 	DataPoint(const char* strHeader, uint8_t CANId, const uint8_t CANLength);
 	char strHeader[3];

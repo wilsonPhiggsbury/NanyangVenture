@@ -63,6 +63,10 @@ bool CANSerializer::receiveCanFrame(CANFrame *f)
 	}
 	return false;
 }
+bool CANSerializer::checkNoError()
+{
+	return CAN->checkError() == CAN_OK;
+}
 //void 
 //	CANFrame f;
 //	char toSerialPort[100];

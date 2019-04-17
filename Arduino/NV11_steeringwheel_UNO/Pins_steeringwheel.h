@@ -8,10 +8,10 @@
 #define HAZARD_INPUT A1
 #define HEADLIGHT_INPUT A0
 //#define RADIO_INPUT
-#define BRAKE_INPUT 3 // to become brake
+#define BRAKE_INPUT 3
 #define LSIG_INPUT 9
 #define RSIG_INPUT 5
 #define REGEN_INPUT 8
-#define SPARE1_INPUT 7
-#define SPARE2_INPUT 6
+#define SHUTDOWNPI_INPUT 7
+#define LAPCOUNTER_INPUT 6
 #define STATUSLED_OUTPUT 4 // NC yet

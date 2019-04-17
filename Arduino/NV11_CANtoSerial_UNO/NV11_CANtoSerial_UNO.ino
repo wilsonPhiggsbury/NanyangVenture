@@ -9,11 +9,13 @@
 #include <NV11AccesoriesStatus.h>
 #include <NV11BMS.h>
 #include <NV11DataSpeedo.h>
+#include <NV11Commands.h>
 CANSerializer serializer;
 NV11DataSpeedo dataSpeedo = NV11DataSpeedo(0x0A);
-NV11BMS dataBMS = NV11BMS(0x0B);
 NV11AccesoriesStatus dataAccesories = NV11AccesoriesStatus(0x10);
-DataPoint* canListenList[] = { &dataSpeedo, &dataBMS }; // incoming messages: speedo and BMS
+NV11BMS dataBMS = NV11BMS(0x11);
+NV11Commands dataCommands = NV11Commands(0x12);
+DataPoint* canListenList[] = { &dataSpeedo, &dataBMS, &dataCommands, &dataAccesories }; // incoming messages: speedo BMS
 DataPoint* serialListenList[] = { &dataAccesories }; // outgoing messages: accessories
 void setup()
 {
