@@ -5,7 +5,7 @@ except:
 import time
 import colorsys
 import serial
-from DataPoint import NV11DataAccessories, NV11DataSpeedo, NV11DataBMS
+from DataPoint import NV11DataAccessories, NV11DataSpeedo, NV11DataBMS, NV11DataCommands
 import RPi.GPIO as GPIO
 import os
 import traceback
@@ -141,7 +141,7 @@ class DriveUserInterface(tk.Frame):
         self.UISelector("error").setText(error_message)
 
 
-    def updateDriveUI(self, dataAccessory, dataSpeed, dataBMS):
+    def updateDriveUI(self, dataAccessory, dataSpeed, dataBMS, dataCommands):
         ##pass
         self.UISelector("speed").setText(abs(round(dataSpeed.speedKmh)))
         self.UISelector("left").setText(dataAccessory.lsig)
@@ -156,6 +156,9 @@ class DriveUserInterface(tk.Frame):
         self.UISelector("current").setText(round(dataBMS.amp,1))
         #cycle times
         self.UISelector("cycletime").displayTime()
+        if dataCommands.lapCounter:
+            dataCommands.lapCounter = 0
+            self.UISelector("cycletime").toggleTime()
         self.UISelector("totaltime").displayTime()
         
         #self.UISelector("temperature").setText(round(dataBMS.temperature,2))
@@ -245,10 +248,9 @@ class TimeBoxes(TelemetryElement):
         super().initText()
         self.start_time = time.time() #in seconds
 
-    def toggleTime(self, toggle):
+    def toggleTime(self):
         #resets start time, new laptime or 
-        if toggle:
-            self.start_time = time.time()
+        self.start_time = time.time()
 
 
     def displayTime(self):
@@ -450,8 +452,9 @@ def try_connect():
             dataSpeed = NV11DataSpeedo(0x0A)
             dataAcc = NV11DataAccessories(0x10)
             dataBMS = NV11DataBMS(0x11)
+            dataCommands = NV11DataCommands(0x12)
             app.showError("No error")
-            return s, dataSpeed, dataAcc, dataBMS
+            return s, dataSpeed, dataAcc, dataBMS, dataCommands
         except serial.serialutil.SerialException:
             reset_arduino("serial port not found")
             app.showError("Error opening \n serial port")
@@ -490,7 +493,7 @@ reset_arduino()
 app.showError("Reboot Arduino")
 app.showError("Booting serial port...")
 app.update()
-s, dataSpeed, dataAcc, dataBMS = try_connect()
+s, dataSpeed, dataAcc, dataBMS, dataCommands = try_connect()
 canTimeout = False
 canTimeoutCount = 0
 while True:
@@ -510,8 +513,14 @@ while True:
                 dataAcc.unpackString(line)
             elif dataBMS.checkMatchString(line):
                 dataBMS.unpackString(line)
+            elif dataCommands.checkMatchString(line):
+                dataCommands.unpackString(line)
             
-            app.updateDriveUI(dataAcc, dataSpeed, dataBMS)
+            if dataCommands.shutdownPi:
+                dataCommands.shutdownPi = 0
+                shut_down()
+
+            app.updateDriveUI(dataAcc, dataSpeed, dataBMS, dataCommands)
             canTimeoutCount = 0
             if canTimeout:
                 canTimeout= False
@@ -532,7 +541,7 @@ while True:
         print("Serial Error")
         app.showError("Can't read \n serial port")
         app.update()
-        s, dataSpeed, dataAcc = try_connect()
+        s, dataSpeed, dataAcc, dataCommands = try_connect()
     except UnicodeDecodeError as e:
         logging.error("Decode exception occured", exc_info = True)
         print("Decode error")
