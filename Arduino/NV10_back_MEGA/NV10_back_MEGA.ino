@@ -48,7 +48,7 @@ Adafruit_NeoPixel rstrip = Adafruit_NeoPixel(7, RSIG_OUTPUT, NEO_GRB + NEO_KHZ80
 Adafruit_NeoPixel lightstrip = Adafruit_NeoPixel(7, RUNNINGLIGHT_OUTPUT, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel brakestrip = Adafruit_NeoPixel(7, BRAKELIGHT_OUTPUT, NEO_GRB + NEO_KHZ800);
 const uint8_t PIXELS = 7;
-const uint32_t LIGHT_COLOR = Adafruit_NeoPixel::Color(255, 255, 255);
+const uint32_t LIGHT_COLOR = Adafruit_NeoPixel::Color(32, 0, 0);
 const uint32_t BRAKE_COLOR = Adafruit_NeoPixel::Color(255, 0, 0);
 const uint32_t SIG_COLOR = Adafruit_NeoPixel::Color(255, 165, 0);
 const uint32_t NO_COLOR = Adafruit_NeoPixel::Color(0, 0, 0);
@@ -318,7 +318,7 @@ void TaskBlink(void* pvParameters)
 	// initialize light strips
 	lightstrip.begin();
 	brakestrip.begin();
-	lightstrip.setBrightness(50);
+	lightstrip.setBrightness(200);
 	brakestrip.setBrightness(200);
 	setRGB(lightstrip, PIXELS, LIGHT_COLOR);
 	setRGB(brakestrip, PIXELS, BRAKE_COLOR);

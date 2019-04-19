@@ -8,12 +8,12 @@
 #define LCDCENTER_SPI_CS 11
 #define LCDRIGHT_SPI_CS 12
 
-#define BTN_HAZARD 46
-#define BTN_WIPER 52
-#define BTN_LSIG 50
-#define BTN_RSIG 44
-#define BTN_HEADLIGHT 48
-#define BTN_HORN 42
-//#define BTN_RADIO 54
+#define BTN_LSIG 53 // red wire
+#define BTN_RSIG 51 // yellow wire
+#define BTN_HAZARD 45 // grey wire
+#define BTN_HORN 49 // blue wire
+#define BTN_HEADLIGHT 39 // TBD
+#define BTN_WIPER 47 // green wire
+#define BTN_STOPWATCH 41
 
 #define NUM_BUTTONS NUMSTATES
