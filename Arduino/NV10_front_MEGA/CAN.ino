@@ -25,6 +25,7 @@ xTaskCreate(
 // kept in .ino file for now, due to function signature consistency. No idea yet how to port it out into a separate project/library
 
 void TaskCAN(void *pvParameters){
+	char tmp[100];
 	Packet in, out;
 	bool sent, received;
 	unsigned long lastTime = 0;
@@ -41,12 +42,25 @@ void TaskCAN(void *pvParameters){
 			{
 				Serial.println(F("!!"));
 			}
+#if DEBUG
+			else
+			{
+				out.toString(tmp);
+				debug_(F("Sent CAN ")); debug(tmp);
+				tmp[0] = 0;
+			}
+#endif
 		}
 		// anything to receive?
 		received = serializer.receiveCanPacket(&in);
 		if (received)
 		{
 			doReceiveAction(&in);
+#if DEBUG
+			in.toString(tmp);
+			debug_(F("Recv CAN ")); debug(tmp);
+			tmp[0] = 0;
+#endif
 		}
 		//debug(millis() - lastTime);
 		lastTime = millis();

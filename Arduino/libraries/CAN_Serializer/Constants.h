@@ -2,7 +2,7 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-#define DEBUG 0
+#define DEBUG 1
 #if DEBUG
 #define debug_(str) Serial.print(str)
 #define debug(str)  Serial.println(str)

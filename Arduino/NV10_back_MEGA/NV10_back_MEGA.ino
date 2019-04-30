@@ -382,11 +382,13 @@ void doReceiveAction(Packet* q)
 		brakeOn = q->data[0][0] == STATE_EN;
 		if (brakeOn == STATE_EN)
 		{
+			debug("Brake ON");
 			setRGB(brakestrip, PIXELS, BRAKE_COLOR);
 			setRGB(lightstrip, PIXELS, BRAKE_COLOR);
 		}
 		else if (brakeOn == STATE_DS)
 		{
+			debug("Brake OFF");
 			setRGB(brakestrip, PIXELS, NO_COLOR);
 			setRGB(lightstrip, PIXELS, LIGHT_COLOR);
 		}

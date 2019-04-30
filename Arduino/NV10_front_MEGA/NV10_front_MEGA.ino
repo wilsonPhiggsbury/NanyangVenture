@@ -72,13 +72,13 @@ void setup() {
 		, NULL
 		, 3
 		, &taskBlink);
-	//xTaskCreate(
-	//	TaskMoveWiper
-	//	, (const portCHAR *)"WIPE"
-	//	, 150 // -25
-	//	, NULL
-	//	, 3
-	//	, &taskMoveWiper);
+	xTaskCreate(
+		TaskMoveWiper
+		, (const portCHAR *)"WIPE"
+		, 150 // -25
+		, NULL
+		, 3
+		, &taskMoveWiper);
 	
 }
 
@@ -165,10 +165,14 @@ void TaskBlink(void* pvParameters)
 void TaskMoveWiper(void* pvParameters)
 {
 	Servo wiper;
-	wiper.attach(WIPER_PWM_SERVO);
+	bool wiperActivated = false;
 	int wiperPos = 0;
 	while (1)
 	{
+		if (!wiper.attached() && peripheralStates[Wiper] == STATE_EN)
+		{
+			wiper.attach(WIPER_PWM_SERVO);
+		}
 		if (peripheralStates[Wiper] == STATE_EN)
 		{
 			if (wiperPos == 0)
@@ -218,8 +222,11 @@ void doReceiveAction(Packet* q)
 				case Wiper:
 					if (peripheralStates[Wiper] == STATE_EN)debug(F("WIPER ON"));
 					else debug(F("WIPER OFF"));
+					peripheralStates[i] = q->data[0][i];
 					break;
 				case Hazard:
+					if (peripheralStates[Hazard] == STATE_EN)debug(F("Hzd ON"));
+					else debug(F("Hzd OFF"));
 					peripheralStates[i] = q->data[0][i];
 					break;
 				case Lsig:

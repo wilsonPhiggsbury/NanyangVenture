@@ -57,11 +57,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DUE_button_test_raw", "Ardu
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DUE_comms_test", "Arduino\#TestSuites\DUE_comms_test\DUE_comms_test.vcxproj", "{5A47E880-02C4-4D12-86BE-AD3C4B9A28CD}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TEST", "Arduino\#TestSuites\TEST\TEST.vcxproj", "{624F3193-4E5E-46D1-856F-F7236D7894CC}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ScratchPad", "Arduino\#TestSuites\ScratchPad\ScratchPad.vcxproj", "{330B096A-65CF-4CAC-946A-E4648966A305}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MotorDiagnostics", "Arduino\#TestSuites\MotorDiagnostics\MotorDiagnostics.vcxproj", "{9A237D3E-070C-4D33-A444-0B1CDA33FE67}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Adafruit_ADS1X15", "..\libraries\Adafruit_ADS1X15\Adafruit_ADS1X15.vcxitems", "{EE96D38B-689A-49EC-B661-4BC019E7D9AC}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RGBtest", "Arduino\#TestSuites\RGBtest\RGBtest.vcxproj", "{624F3193-4E5E-46D1-856F-F7236D7894CC}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -95,6 +97,7 @@ Global
 		Arduino\libraries\CAN_Serializer\CAN_Serializer.vcxitems*{d0053034-7ef4-451e-b6fa-bb852a3b0799}*SharedItemsImports = 9
 		..\libraries\FreeRTOS\FreeRTOS.vcxitems*{e0f75ac7-15bb-4c7a-98cd-37a96c9641a3}*SharedItemsImports = 4
 		Arduino\libraries\CAN_Serializer\CAN_Serializer.vcxitems*{e0f75ac7-15bb-4c7a-98cd-37a96c9641a3}*SharedItemsImports = 4
+		..\libraries\Adafruit_ADS1X15\Adafruit_ADS1X15.vcxitems*{ee96d38b-689a-49ec-b661-4bc019e7d9ac}*SharedItemsImports = 9
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -163,12 +166,6 @@ Global
 		{5A47E880-02C4-4D12-86BE-AD3C4B9A28CD}.Release|x64.ActiveCfg = Release|Win32
 		{5A47E880-02C4-4D12-86BE-AD3C4B9A28CD}.Release|x86.ActiveCfg = Release|Win32
 		{5A47E880-02C4-4D12-86BE-AD3C4B9A28CD}.Release|x86.Build.0 = Release|Win32
-		{624F3193-4E5E-46D1-856F-F7236D7894CC}.Debug|x64.ActiveCfg = Debug|Win32
-		{624F3193-4E5E-46D1-856F-F7236D7894CC}.Debug|x86.ActiveCfg = Debug|Win32
-		{624F3193-4E5E-46D1-856F-F7236D7894CC}.Debug|x86.Build.0 = Debug|Win32
-		{624F3193-4E5E-46D1-856F-F7236D7894CC}.Release|x64.ActiveCfg = Release|Win32
-		{624F3193-4E5E-46D1-856F-F7236D7894CC}.Release|x86.ActiveCfg = Release|Win32
-		{624F3193-4E5E-46D1-856F-F7236D7894CC}.Release|x86.Build.0 = Release|Win32
 		{330B096A-65CF-4CAC-946A-E4648966A305}.Debug|x64.ActiveCfg = Debug|Win32
 		{330B096A-65CF-4CAC-946A-E4648966A305}.Debug|x86.ActiveCfg = Debug|Win32
 		{330B096A-65CF-4CAC-946A-E4648966A305}.Debug|x86.Build.0 = Debug|Win32
@@ -181,6 +178,12 @@ Global
 		{9A237D3E-070C-4D33-A444-0B1CDA33FE67}.Release|x64.ActiveCfg = Release|Win32
 		{9A237D3E-070C-4D33-A444-0B1CDA33FE67}.Release|x86.ActiveCfg = Release|Win32
 		{9A237D3E-070C-4D33-A444-0B1CDA33FE67}.Release|x86.Build.0 = Release|Win32
+		{624F3193-4E5E-46D1-856F-F7236D7894CC}.Debug|x64.ActiveCfg = Debug|Win32
+		{624F3193-4E5E-46D1-856F-F7236D7894CC}.Debug|x86.ActiveCfg = Debug|Win32
+		{624F3193-4E5E-46D1-856F-F7236D7894CC}.Debug|x86.Build.0 = Debug|Win32
+		{624F3193-4E5E-46D1-856F-F7236D7894CC}.Release|x64.ActiveCfg = Release|Win32
+		{624F3193-4E5E-46D1-856F-F7236D7894CC}.Release|x86.ActiveCfg = Release|Win32
+		{624F3193-4E5E-46D1-856F-F7236D7894CC}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -207,9 +210,10 @@ Global
 		{76730D7A-EB6C-438E-9690-BAB51E44A4B6} = {D73944EA-C027-4B9A-B26C-CF8857527539}
 		{5963340C-E528-496D-9AA8-FA1990261313} = {D73944EA-C027-4B9A-B26C-CF8857527539}
 		{5A47E880-02C4-4D12-86BE-AD3C4B9A28CD} = {D73944EA-C027-4B9A-B26C-CF8857527539}
-		{624F3193-4E5E-46D1-856F-F7236D7894CC} = {D73944EA-C027-4B9A-B26C-CF8857527539}
 		{330B096A-65CF-4CAC-946A-E4648966A305} = {D73944EA-C027-4B9A-B26C-CF8857527539}
 		{9A237D3E-070C-4D33-A444-0B1CDA33FE67} = {D73944EA-C027-4B9A-B26C-CF8857527539}
+		{EE96D38B-689A-49EC-B661-4BC019E7D9AC} = {B731DFF7-A7B2-4F18-831B-D04250650B2F}
+		{624F3193-4E5E-46D1-856F-F7236D7894CC} = {D73944EA-C027-4B9A-B26C-CF8857527539}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D50621B3-45DA-4D63-A156-3461EB4C4703}
