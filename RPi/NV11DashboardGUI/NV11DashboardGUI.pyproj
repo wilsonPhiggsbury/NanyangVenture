@@ -22,9 +22,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="DataPoint.py" />
-    <Compile Include="module1.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="NV11DashboardGUI.py" />
     <Compile Include="SerialTest.py" />
   </ItemGroup>
