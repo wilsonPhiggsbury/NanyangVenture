@@ -65,6 +65,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Adafruit_ADS1X15", "..\libr
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RGBtest", "Arduino\#TestSuites\RGBtest\RGBtest.vcxproj", "{624F3193-4E5E-46D1-856F-F7236D7894CC}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ScratchPad", "ScratchPad\ScratchPad.vcxproj", "{99BEC857-A5C0-417B-80D0-D85A73D6C140}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\libraries\FreeRTOS_ARM\FreeRTOS_ARM.vcxitems*{1a2bb78a-9ab3-45b7-abfc-2430b4752132}*SharedItemsImports = 9
@@ -184,6 +186,12 @@ Global
 		{624F3193-4E5E-46D1-856F-F7236D7894CC}.Release|x64.ActiveCfg = Release|Win32
 		{624F3193-4E5E-46D1-856F-F7236D7894CC}.Release|x86.ActiveCfg = Release|Win32
 		{624F3193-4E5E-46D1-856F-F7236D7894CC}.Release|x86.Build.0 = Release|Win32
+		{99BEC857-A5C0-417B-80D0-D85A73D6C140}.Debug|x64.ActiveCfg = Debug|Win32
+		{99BEC857-A5C0-417B-80D0-D85A73D6C140}.Debug|x86.ActiveCfg = Debug|Win32
+		{99BEC857-A5C0-417B-80D0-D85A73D6C140}.Debug|x86.Build.0 = Debug|Win32
+		{99BEC857-A5C0-417B-80D0-D85A73D6C140}.Release|x64.ActiveCfg = Release|Win32
+		{99BEC857-A5C0-417B-80D0-D85A73D6C140}.Release|x86.ActiveCfg = Release|Win32
+		{99BEC857-A5C0-417B-80D0-D85A73D6C140}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

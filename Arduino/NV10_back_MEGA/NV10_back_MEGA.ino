@@ -101,13 +101,13 @@ void setup() {
 		, hydroCells
 		, 3
 		, NULL);
-	xTaskCreate(
-		TaskLogCurrentSensor
-		, (const portCHAR *)"CSensor"
-		, 200
-		, motors
-		, 3
-		, NULL);
+	//xTaskCreate(
+	//	TaskLogCurrentSensor
+	//	, (const portCHAR *)"CSensor"
+	//	, 200
+	//	, motors
+	//	, 3
+	//	, NULL);
 	xTaskCreate(
 		QueueOutputData
 		, (const portCHAR *)"Enqueue"  // A name just for humans
@@ -183,7 +183,7 @@ void TaskLogCurrentSensor(void* pvParameters)
 void QueueOutputData(void *pvParameters)
 {
 	const uint16_t fuelcell_logsend = FUELCELL_LOGSEND_INTERVAL / QUEUE_DATA_INTERVAL;
-	const uint16_t motor_logsend = MOTOR_LOGSEND_INTERVAL / QUEUE_DATA_INTERVAL;
+	//const uint16_t motor_logsend = MOTOR_LOGSEND_INTERVAL / QUEUE_DATA_INTERVAL;
 	const uint16_t speedo_refresh_interval = SPEEDOMETER_REFRESH_INTERVAL / QUEUE_DATA_INTERVAL;
 
 	Packet outgoing;
@@ -231,32 +231,32 @@ void QueueOutputData(void *pvParameters)
 		*: only for display, not for logsend
 		--------------------------------------------------*/
 		// send one outgoing current sensor (CS) every x ms
-		if (syncCounter % motor_logsend == 0)
-		{
-			// Arrange for outgoing current sensor payload
-			outgoing.ID = CS;
-			AttopilotCurrentSensor::dumpTimestampInto(&outgoing.timeStamp);
-			for (int i = 0; i < NUM_CURRENTSENSORS; i++)
-			{
-				motors[i].dumpDataInto(outgoing.data);//len 5
-			}
-			xQueueSend(queueForLogSend, &outgoing, 100);
-			if (CAN_avail)
-				xQueueSend(queueForCAN, &outgoing, 100);
-			//if (syncCounter % (back_lcd_refresh) == 0)
-			//{
-			//	for (int i = 0; i < NUM_CURRENTSENSORS; i++)
-			//	{
-			//		strcat(outgoing.payload, "\t");
-			//		motors[i].dumpAmpPeakInto(outgoing.payload);//len 5
-			//	}
-			//	for (int i = 0; i < NUM_CURRENTSENSORS; i++)
-			//	{
-			//		strcat(outgoing.payload, "\t");
-			//		motors[i].dumpTotalEnergyInto(outgoing.payload);//len 7
-			//	}
-			//}
-		}
+		//if (syncCounter % motor_logsend == 0)
+		//{
+		//	// Arrange for outgoing current sensor payload
+		//	outgoing.ID = CS;
+		//	AttopilotCurrentSensor::dumpTimestampInto(&outgoing.timeStamp);
+		//	for (int i = 0; i < NUM_CURRENTSENSORS; i++)
+		//	{
+		//		motors[i].dumpDataInto(outgoing.data);//len 5
+		//	}
+		//	xQueueSend(queueForLogSend, &outgoing, 100);
+		//	if (CAN_avail)
+		//		xQueueSend(queueForCAN, &outgoing, 100);
+		//	//if (syncCounter % (back_lcd_refresh) == 0)
+		//	//{
+		//	//	for (int i = 0; i < NUM_CURRENTSENSORS; i++)
+		//	//	{
+		//	//		strcat(outgoing.payload, "\t");
+		//	//		motors[i].dumpAmpPeakInto(outgoing.payload);//len 5
+		//	//	}
+		//	//	for (int i = 0; i < NUM_CURRENTSENSORS; i++)
+		//	//	{
+		//	//		strcat(outgoing.payload, "\t");
+		//	//		motors[i].dumpTotalEnergyInto(outgoing.payload);//len 7
+		//	//	}
+		//	//}
+		//}
 		// send one outgoing speedometer (SM) every x ms
 		if (syncCounter % speedo_refresh_interval == 0)
 		{

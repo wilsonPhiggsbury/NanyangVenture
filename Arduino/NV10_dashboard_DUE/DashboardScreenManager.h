@@ -13,7 +13,7 @@ class DashboardScreenManager
 {
 private:
 	ILI9488* screens[NUMSCREENS];
-	DisplayElement* dataWidgets[14]; // each array element points to a linked list of screencontents
+	DisplayElement* dataWidgets[15]; // each array element points to a linked list of screencontents
 	Packet* q;
 	DisplayArrow* lSigArrow;
 	DisplayArrow* rSigArrow;

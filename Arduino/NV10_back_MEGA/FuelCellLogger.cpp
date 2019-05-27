@@ -44,16 +44,16 @@ void HESFuelCell::logData()
 			return;
 
 		readPtr = strtok(readPtr, " ");
-		//loggedParams[volts] = atof(readPtr);
+		//loggedParams[motorVolts] = atof(readPtr);
 
 		readPtr = strtok(NULL, " ");
-		//loggedParams[amps] = atof(readPtr);
+		loggedParams[amps] = atof(readPtr);
 
 		readPtr = strtok(NULL, " ");
 		//loggedParams[watts] = atof(readPtr);
 
 		readPtr = strtok(NULL, " ");
-		loggedParams[energy] = atof(readPtr);
+		// skip watt hour
 
 		// take max stack temperature out of 4 readings
 		float thisMaxTemp = 0;
@@ -65,23 +65,40 @@ void HESFuelCell::logData()
 		loggedParams[maxTemperature] = thisMaxTemp;
 
 		readPtr = strtok(NULL, " ");
-		loggedParams[pressure] = atof(readPtr);
+		// skip pressure
 
 		readPtr = strtok(NULL, " ");
-		//loggedParams[capacitorVolts] = atof(readPtr);
+		loggedParams[motorVolts] = atof(readPtr);
 
 		readPtr = strtok(NULL, " ");
 		// skip average temperature
 
 		readPtr = strtok(NULL, " ");
-		if (strcmp(readPtr, "OP") != 0)
-			loggedParams[status] = 0;	// died
-		else
+		if (!strcmp(readPtr, "OP"))
 			loggedParams[status] = 1;	// alive
-		
+		else if (!strcmp(readPtr, "IN") || !strcmp(readPtr, "SS"))
+			loggedParams[status] = 2;	// init
+		else
+			loggedParams[status] = 0;	// shutting down or died
+
+		//// FOR YELLOW FC
+		//readPtr = strtok(NULL, " ");
+		//readPtr = strtok(NULL, " ");
+		//readPtr = strtok(NULL, " ");
+		//// skip 3 unknown params
+
+		//readPtr = strtok(NULL, " ");
+		//loggedParams[motorVolts] = atof(readPtr);
+
 		//>>00.0V 00.0A 0000W 00000Wh 021.1C 028.3C 028.5C 031.6C 0.90B 59.0V 028.0C IN 00.0C 00 0000
 		//  ^   * ^   * ^   * ^    *  ^    * ^    * ^    * ^    * ^   * ^   *        ^ *
 		//  ".........:.........:.........:.........:.........".........:.........:.........:.........:........."
+		//debug_(F("FC read V Tp A St: "));
+		//debug(buffer);
+	}
+	else
+	{
+		debug_(F("FC insuf bytes: ")); debug(bytesRead);
 	}
 }
 void HESFuelCell::dumpTimestampInto(unsigned long* location)

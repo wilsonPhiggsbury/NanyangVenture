@@ -42,25 +42,12 @@ void TaskCAN(void *pvParameters){
 			{
 				Serial.println(F("!!"));
 			}
-#if DEBUG
-			else
-			{
-				out.toString(tmp);
-				debug_(F("Sent CAN ")); debug(tmp);
-				tmp[0] = 0;
-			}
-#endif
 		}
 		// anything to receive?
 		received = serializer.receiveCanPacket(&in);
 		if (received)
 		{
 			doReceiveAction(&in);
-#if DEBUG
-			in.toString(tmp);
-			debug_(F("Recv CAN ")); debug(tmp);
-			tmp[0] = 0;
-#endif
 		}
 		//debug(millis() - lastTime);
 		lastTime = millis();
