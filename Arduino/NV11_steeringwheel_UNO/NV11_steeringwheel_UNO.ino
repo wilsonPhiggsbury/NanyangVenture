@@ -69,7 +69,7 @@ void loop() {
 		prevRead[LAPCOUNTER_INPUT] = digitalRead(LAPCOUNTER_INPUT);
 	}
 	
-	if (dataCommands.dataHasChanged())
+	if (dataCommands.dataRequiresBroadcast())
 	{
 		dataCommands.packCAN(&f);
 		serializer.sendCanFrame(&f);
@@ -168,7 +168,7 @@ void loop() {
 	else
 		dataAcc.setWiper(NV11AccesoriesStatus::wiperSlow); // center
 
-	if (dataAcc.dataHasChanged())
+	if (dataAcc.dataRequiresBroadcast())
 	{
 		digitalWrite(STATUSLED_OUTPUT, HIGH^canAvail);
 		dataAcc.packCAN(&f);

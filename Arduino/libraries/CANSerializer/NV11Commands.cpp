@@ -65,7 +65,7 @@ void NV11Commands::unpackString(char * str)
 	shutdownPi = atoi(ptr);
 }
 
-bool NV11Commands::dataHasChanged()
+bool NV11Commands::dataRequiresBroadcast()
 {
 	for (int i = 0; i < CANLength; i++)
 	{

@@ -103,9 +103,9 @@ void NV10FuelCellClass::packString(char * str)
 	char* shiftedStr = DataPoint::packStringDefault(str);
 	// p = 4.2, t = 2, w = 4, st = 2
 #ifdef __AVR__
-	char tmp[8];
-	dtostrf(pressure, 3, 1, tmp);
-	sprintf(shiftedStr, "%04d\t%s\t%2d\t%s", watts, tmp, temperature, statusTxt);
+	char pressureString[8];
+	dtostrf(pressure, 3, 1, pressureString);
+	sprintf(shiftedStr, "%04d\t%s\t%2d\t%s", watts, pressureString, temperature, statusTxt);
 
 #elif defined _SAM3XA_
 	sprintf(shiftedStr, "%04d\t%4.1f\t%2d\t%s", watts, pressure, temperature, statusTxt);

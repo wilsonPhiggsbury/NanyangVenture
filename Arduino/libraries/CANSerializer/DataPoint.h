@@ -58,8 +58,8 @@ public:
 	virtual void unpackCAN(const CANFrame*);
 	virtual void packString(char * str);
 	virtual void unpackString(char * str);
-	// used to see if any data has changed since last call
-	bool dataHasChanged();
+	// by default, data requires broadcast when changed since last call
+	bool dataRequiresBroadcast();
 	void printRaw();
 protected:
 	DataPoint(const char* strHeader, uint8_t CANId, const uint8_t CANLength);

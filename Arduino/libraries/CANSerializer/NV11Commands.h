@@ -29,8 +29,8 @@ class NV11Commands:public DataPoint
 	uint8_t getHorn();
 	void packString(char*);
 	void unpackString(char * str);
-	// return true on any triggered
-	bool dataHasChanged();
+	// commands only require broadcast when any of it is triggered
+	bool dataRequiresBroadcast();
 };
 
 #endif

@@ -39,6 +39,36 @@ void NV10AccesoriesStatus::setBrake(uint8_t status)
 	brake = status;
 }
 
+void NV10AccesoriesStatus::toggleLsig()
+{
+	lsig = !lsig;
+}
+
+void NV10AccesoriesStatus::toggleRsig()
+{
+	rsig = !rsig;
+}
+
+void NV10AccesoriesStatus::toggleWiper()
+{
+	wiper = !wiper;
+}
+
+void NV10AccesoriesStatus::toggleHazard()
+{
+	hazard = !hazard;
+}
+
+void NV10AccesoriesStatus::toggleHeadlights()
+{
+	headlights = !headlights;
+}
+
+void NV10AccesoriesStatus::toggleBrake()
+{
+	brake = !brake;
+}
+
 uint8_t NV10AccesoriesStatus::getLsig()
 {
 	return lsig;

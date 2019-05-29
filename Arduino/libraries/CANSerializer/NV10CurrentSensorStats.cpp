@@ -3,10 +3,9 @@
 // 
 #include "NV10CurrentSensorStats.h"
 const uint32_t MS_PER_HOUR = 3600000;
-const float ATTOPILOT180A_VOLTAGE_SCALE = 50 / (3.3 / 5 * 1024);
-const float ATTOPILOT180A_CURRENT_SCALE = 180 / (3.3 / 5 * 1024);
-const float SHUNT200A_CURRENT_SCALE = 1 / 32.0;
-const float SHUNT50A_CURRENT_SCALE = 1 / 256.0;
+const float SHUNT_100A75mV_SCALE = 0.0078125 * (100.0 / 75);
+const float SHUNT_200A75mV_SCALE = 0.0078125 * (200.0 / 75);
+const float VOLTAGEDIVIDER_SCALE = 1;
 // parameter(CANbytes, stringChars)
 // wattHour(2,4), ampPeak(1,2)
 NV10CurrentSensorStatsClass::NV10CurrentSensorStatsClass(uint8_t CANId) :DataPoint("cs", CANId, 8)
@@ -17,8 +16,8 @@ NV10CurrentSensorStatsClass::NV10CurrentSensorStatsClass(uint8_t CANId) :DataPoi
 void NV10CurrentSensorStatsClass::insertData(uint32_t voltRaw, uint32_t ampMotorRaw)
 {
 	timeStamp = millis();
-	const float volt = voltRaw * ATTOPILOT180A_VOLTAGE_SCALE; // conversion from Attopilot voltage pin
-	const float ampMotor = ampMotorRaw * SHUNT200A_CURRENT_SCALE; // conversion from 50mV-200A shunt
+	const float volt = voltRaw * SHUNT_100A75mV_SCALE; // conversion from Attopilot voltage pin
+	const float ampMotor = ampMotorRaw * SHUNT_100A75mV_SCALE; // conversion from 50mV-200A shunt
 	
 	uint32_t wattMsDelta = volt * ampMotor * getTimeDiff();
 	wattMs += wattMsDelta;

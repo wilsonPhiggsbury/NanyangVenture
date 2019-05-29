@@ -1,6 +1,6 @@
-#include "DisplayElement.h"
+#include "Widget.h"
 void __cxa_pure_virtual(void) {};
-DisplayElement::DisplayElement(ILI9488* screen, uint16_t xPos, uint16_t yPos, uint16_t width, uint16_t height, Alignment xAlign, Alignment yAlign) :screen(screen), xPos(xPos), yPos(yPos), width(width), height(height)
+Widget::Widget(ILI9488* screen, uint16_t xPos, uint16_t yPos, uint16_t width, uint16_t height, Alignment xAlign, Alignment yAlign) :screen(screen), xPos(xPos), yPos(yPos), width(width), height(height)
 {
 	switch (xAlign)
 	{
@@ -20,23 +20,18 @@ DisplayElement::DisplayElement(ILI9488* screen, uint16_t xPos, uint16_t yPos, ui
 		this->yPos -= height;
 		break;
 	}
-	xPos = constrain(xPos, 0, 480);
-	yPos = constrain(yPos, 0, 320);
+	xPos = constrain(xPos, 0, SCREENWIDTH);
+	yPos = constrain(yPos, 0, SCREENHEIGHT);
 }
 
-DisplayElement::~DisplayElement()
+Widget::~Widget()
 {
-	
 }
-void DisplayElement::init(PacketID targetID, PacketID* varID, float* value)
+void Widget::init()
 {
 	drawBorder(borderStroke, borderFill);
-	this->targetID = targetID;
-	trackedID = varID;
-	trackedValue = value;
-
 }
-void DisplayElement::drawBorder(uint8_t stroke, uint16_t fill)
+void Widget::drawBorder(uint8_t stroke, uint16_t fill)
 {
 	for (uint8_t pixels = 0; pixels < borderStroke; pixels++)
 		screen->drawRect(xPos + pixels, yPos + pixels, width - 2 * pixels, height - 2 * pixels, ILI9488_BLACK);
@@ -47,12 +42,12 @@ void DisplayElement::drawBorder(uint8_t stroke, uint16_t fill)
 	for (uint8_t pixels = 0; pixels < borderStroke; pixels++)
 		screen->drawRect(xPos + pixels, yPos + pixels, width - 2 * pixels, height - 2 * pixels, borderFill);
 }
-void DisplayElement::setMargin(uint8_t margin)
+void Widget::setMargin(uint8_t margin)
 {
 	this->margin = margin;
 	refreshSettings();
 }
-void DisplayElement::setColors(uint16_t foreground, uint16_t background)
+void Widget::setColors(uint16_t foreground, uint16_t background)
 {
 	bool bgChanged = this->background != background;
 	this->foreground = foreground;
@@ -64,14 +59,7 @@ void DisplayElement::setColors(uint16_t foreground, uint16_t background)
 		drawBorder(borderStroke, borderFill);
 	}
 }
-void DisplayElement::update()
-{
-	if (*trackedID == targetID)
-	{
-		updateFloat(*trackedValue);
-	}
-}
-void DisplayElement::wipe()
+void Widget::wipe()
 {
 	screen->fillRect(xPos, yPos, width, height, background);
 }

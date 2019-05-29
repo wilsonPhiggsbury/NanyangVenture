@@ -25,6 +25,12 @@ public:
 	void setHazard(uint8_t status);
 	void setHeadlights(uint8_t status);
 	void setBrake(uint8_t status);
+	void toggleLsig();
+	void toggleRsig();
+	void toggleWiper();
+	void toggleHazard();
+	void toggleHeadlights();
+	void toggleBrake();
 	uint8_t getLsig();
 	uint8_t getRsig();
 	uint8_t getWiper();

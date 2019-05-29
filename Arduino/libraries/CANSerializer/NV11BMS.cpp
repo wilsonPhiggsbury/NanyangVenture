@@ -40,12 +40,17 @@ void NV11BMS::packString(char *str)
 {
 	char* shiftedStr = DataPoint::packStringDefault(str);
 
+
+#ifdef __AVR__
 	char voltStr[5], ampStr[5], minCellVoltStr[5];
 	dtostrf(volt, 4, 1, voltStr);
 	dtostrf(amp, 4, 1, ampStr);
 	dtostrf(minCellVolt, 4, 2, minCellVoltStr);
-	Serial.print("Status: "); Serial.println(minCellVolt);
 	sprintf(shiftedStr, "%s\t%s\t%d\t%s", voltStr, ampStr, temperature, minCellVoltStr);
+
+#elif defined _SAM3XA_
+	sprintf(shiftedStr, "%4.1f\t%4.1f\t%d\t%4.2f", volt, amp, temperature, minCellVolt);
+#endif
 }
 
 void NV11BMS::unpackString(char * str)
