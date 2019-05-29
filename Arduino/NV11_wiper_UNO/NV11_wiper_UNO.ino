@@ -13,7 +13,7 @@
 #define WIPERRELAY_OUTPUT2 3
 #define WIPERRELAY_OUTPUT1 4
 CANSerializer serializer;
-NV11AccesoriesStatus acc = NV11AccesoriesStatus(0x10);
+NV11AccesoriesStatus dataAcc = NV11AccesoriesStatus(0x10);
 // the setup function runs once when you press reset or power the board
 void setup() {
 	serializer.init(CAN_CS);
@@ -34,10 +34,10 @@ void loop() {
 	if (!digitalRead(CAN_INT))
 	{
 		serializer.receiveCanFrame(&f);
-		if (acc.checkMatchCAN(&f))
+		if (dataAcc.checkMatchCAN(&f))
 		{
 			wdt_reset(); // kick watchdog to avoid resetting arduino
-			acc.unpackCAN(&f);
+			dataAcc.unpackCAN(&f);
 			// H = logic high relay light on
 			// L = logic low relay light off
 			// --------------------------------------------------
@@ -46,7 +46,7 @@ void loop() {
 			// HL: rest
 			// LH: slow
 			// LL: fast
-			switch (acc.getWiper())
+			switch (dataAcc.getWiper())
 			{
 			case NV11AccesoriesStatus::wiperOff:
 				digitalWrite(WIPERRELAY_OUTPUT2, HIGH);

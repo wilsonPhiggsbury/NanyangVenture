@@ -3,6 +3,7 @@
  Created:	3/21/2019 8:01:28 PM
  Author:	MX
 */
+#include "DashboardScreens.h"
 #include "ArrowWidget.h"
 #include "BarWidget.h"
 #include "TextWidget.h"
@@ -10,11 +11,18 @@
 #include "Pins_dashboard.h"
 #include <FreeRTOS_ARM.h>
 
+#include <NV10FuelCell.h>
+#include <NV10CurrentSensor.h>
+#include <NV10CurrentSensorStats.h>
 #include <NV10AccesoriesStatus.h>
+#include <NV11DataSpeedo.h>
 
-NV10AccesoriesStatus acc = NV10AccesoriesStatus(0x10);
-ILI9488 centerScreen = ILI9488(LCDCENTER_SPI_CS, LCD_OUTPUT_DC, LCD_OUTPUT_RST);
-// center screen x offset: +25, -5
+NV10FuelCell dataFC = NV10FuelCell(0x13);
+NV10CurrentSensor dataCS = NV10CurrentSensor(0x11);
+NV10CurrentSensorStats dataCSStats = NV10CurrentSensorStats(0x12);
+NV11DataSpeedo dataSpeedo = NV11DataSpeedo(0x0A);
+NV10AccesoriesStatus dataAcc = NV10AccesoriesStatus(0x10);
+
 //TextWidget t = TextWidget(&centerScreen, 475, 0, 200, 50, alignRight, alignTop);
 //BarWidget b = BarWidget(&centerScreen, 475, 200, 200, 40, RIGHT_TO_LEFT);
 //void setup() {
@@ -67,25 +75,27 @@ void setup()
 {
 	Serial1.begin(9600);
 	Serial1.setTimeout(500);
+
+	dashboardInit();
 	// I tried putting attachinterrupt in the for loop above but failed. Lambda functions complain.
 	// So here, have some wall text.
 	attachInterrupt(digitalPinToInterrupt(BTN_HAZARD), [] {
-		acc.toggleHazard();
+		dataAcc.toggleHazard();
 	}, FALLING);
 	attachInterrupt(digitalPinToInterrupt(BTN_WIPER), [] {
-		acc.toggleWiper();
+		dataAcc.toggleWiper();
 	}, FALLING);
 	//attachInterrupt(digitalPinToInterrupt(BTN_HORN), [] {
 	//	
 	//}, FALLING);
 	attachInterrupt(digitalPinToInterrupt(BTN_HEADLIGHT), [] {
-		acc.toggleHeadlights();
+		dataAcc.toggleHeadlights();
 	}, FALLING);
 	attachInterrupt(digitalPinToInterrupt(BTN_LSIG), [] {
-		acc.toggleLsig();
+		dataAcc.toggleLsig();
 	}, FALLING);
 	attachInterrupt(digitalPinToInterrupt(BTN_RSIG), [] {
-		acc.toggleRsig();
+		dataAcc.toggleRsig();
 	}, FALLING);
 }
 void loop()
@@ -96,16 +106,26 @@ void loop()
 	if (bytesRead > 0)
 	{
 		s[bytesRead - 1] = '\0';
-		if (acc.checkMatchString(s))
+		if (dataFC.checkMatchString(s))
 		{
-			acc.unpackString(s);
-			dashboardNextValues();
+			dataFC.unpackString(s);
+			dashboardNextValuesFC(dataFC.getWatts(), dataFC.getPressure(), dataFC.getTemperature(), dataFC.getStatus());
+		}
+		else if (dataCS.checkMatchString(s))
+		{
+			dataCS.unpackString(s);
+			dashboardNextValuesCS(dataCS.getVolt(), dataCS.getAmpCapIn(), dataCS.getAmpCapOut(), dataCS.getAmpMotor());
+		}
+		else if (dataSpeedo.checkMatchString(s))
+		{
+			dataSpeedo.unpackString(s);
+			dashboardNextValuesSpeed(dataSpeedo.getSpeed());
 		}
 	}
 	// output CAN strings based on buttons inputs (already handled by interrupts)
-	if (acc.dataRequiresBroadcast())
+	if (dataAcc.dataRequiresBroadcast())
 	{
-		acc.packString(s);
+		dataAcc.packString(s);
 		Serial1.println(s);
 	}
 
@@ -114,12 +134,4 @@ void loop()
 	static unsigned long lastTime;
 	while (millis() - lastTime < 100);
 	lastTime = millis();
-}
-void dashboardNextFrame()
-{
-
-}
-void dashboardNextValues()
-{
-
 }

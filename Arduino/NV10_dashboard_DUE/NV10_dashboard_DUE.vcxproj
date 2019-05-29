@@ -116,6 +116,7 @@
     <ClInclude Include="BarWidget.h">
       <FileType>CppCode</FileType>
     </ClInclude>
+    <ClInclude Include="DashboardScreens.h" />
     <ClInclude Include="DataWidget.h">
       <FileType>CppCode</FileType>
     </ClInclude>
@@ -131,6 +132,7 @@
   <ItemGroup>
     <ClCompile Include="ArrowWidget.cpp" />
     <ClCompile Include="BarWidget.cpp" />
+    <ClCompile Include="DashboardScreens.cpp" />
     <ClCompile Include="DataWidget.cpp" />
     <ClCompile Include="TextWidget.cpp" />
     <ClCompile Include="Widget.cpp" />

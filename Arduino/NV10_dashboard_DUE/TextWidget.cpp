@@ -81,7 +81,7 @@ void TextWidget::updateFloat(float value)
 	updateText(tmp);
 }
 
-void TextWidget::updateText(char* text)
+void TextWidget::updateText(const char* text)
 {
 	this->text = text;
 	textWidth = strlen(text);

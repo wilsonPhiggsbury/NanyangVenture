@@ -24,7 +24,7 @@ class TextWidget:public DataWidget
 	void updateFrame();
 	void updateNull();
 	void updateFloat(float value);
-	void updateText(char* text);
+	void updateText(const char* text);
 };
 
 #endif
