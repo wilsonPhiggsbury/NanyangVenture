@@ -101,9 +101,9 @@ void setDebounce(const unsigned int pins[], uint8_t numPins, uint16_t waitTimeMu
 //centerLCD.fillRect(240, 80, 120, 80, ILI9488_RED);
 //void TaskTest(void* pvParameters)
 //{
-//	pinMode(LCD_BACKLIGHT, OUTPUT);
-//	digitalWrite(LCD_BACKLIGHT, HIGH);
-//	ILI9488 scr = ILI9488(LCD_LEFT_CS, LCD_DC, LCD_RIGHT_RST);
+//	pinMode(LCD_OUTPUT_BACKLIGHT, OUTPUT);
+//	digitalWrite(LCD_OUTPUT_BACKLIGHT, HIGH);
+//	ILI9488 scr = ILI9488(LCDLEFT_SPI_CS, LCD_OUTPUT_DC, LCD_RIGHT_RST);
 //	scr.begin();
 //	scr.setRotation(1);
 //	scr.fillScreen(ILI9488_PURPLE);

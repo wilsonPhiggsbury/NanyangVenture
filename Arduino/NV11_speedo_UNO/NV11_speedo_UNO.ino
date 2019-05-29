@@ -3,50 +3,107 @@
  Created:	2/18/2019 3:14:55 PM
  Author:	MX
 */
+#include <CANSerializer.h>
+#include <NV11DataSpeedo.h>
 
 #include <ros.h>
-#include <std_msgs/Float32.h>
-#include <std_msgs/UInt32.h>
+#include <std_msgs/Float32MultiArray.h>
+#include <std_msgs/UInt32MultiArray.h>
+
 #include "Speedometer.h"
 #include "Pins_speedo.h"
+
+
+CANSerializer serializer;
+NV11DataSpeedo dataSpeedo = NV11DataSpeedo(0x0A);
+
 Speedometer speedoBL = Speedometer(SPEEDO_BL_A, SPEEDO_BL_B, 545, 500, true);
 Speedometer speedoBR = Speedometer(SPEEDO_BR_A, SPEEDO_BR_B, 545, 500, false);
-ros::NodeHandle nh;//_<ArduinoHardware, 10, 10, 100, 105, ros::DefaultReadOutBuffer_>
-std_msgs::Float32 blSpeed, brSpeed;
-std_msgs::UInt32 blDist, brDist;
-ros::Publisher blSpeedPublisher("blSpeed",&blSpeed), blDistPublisher("blDist",&blDist),brSpeedPublisher("brSpeed",&brSpeed), brDistPublisher("brDist",&brDist);
-uint32_t lastTime = 0;
+
+bool CAN_avail;
+//ros::NodeHandle nh;//_<ArduinoHardware, 10, 10, 100, 105, ros::DefaultReadOutBuffer_>
+//std_msgs::Float32MultiArray speedData;
+//std_msgs::UInt32MultiArray distData;
+//ros::Publisher speedPublisher("speedKmh", &speedData), distPublisher("distMm", &distData);
+//ros::Subscriber 
 
 void setup() {
-	//Serial.begin(9600);
-	attachInterrupt(digitalPinToInterrupt(SPEEDO_BL_A), tick, FALLING);
-	attachInterrupt(digitalPinToInterrupt(SPEEDO_BR_A), tick, FALLING);
-	//handle.getHardware()->setBaud(9600);
-	nh.initNode();
-	nh.advertise(blSpeedPublisher);
-	nh.advertise(blDistPublisher);
-	nh.advertise(brSpeedPublisher);
-	nh.advertise(brDistPublisher);
+	delay(500);
+	Serial.begin(9600);
+	pinMode(CANENABLE_OUTPUT, OUTPUT);
+	CAN_avail = serializer.init(CAN_CS);
+	if (CAN_avail)
+	{
+		digitalWrite(CANENABLE_OUTPUT, HIGH);
+		Serial.println("CAN init");
+	}
+	else
+	{
+		digitalWrite(CANENABLE_OUTPUT, LOW);
+		Serial.println("CAN fail");
+	}
+
+	attachInterrupt(digitalPinToInterrupt(SPEEDO_BL_A), tickL, FALLING);
+	attachInterrupt(digitalPinToInterrupt(SPEEDO_BR_A), tickR, FALLING);
+
+	//Serial.println("NV11 Speedo");
+	
+	//nh.getHardware()->setBaud(9600);
+
+	//nh.initNode();
+	//nh.advertise(speedPublisher);
+	//nh.advertise(distPublisher);
+	// in RosSerial AVR port, only a length and a pointer is supplied. Pointer should point towards a pre-allocated array
+	//speedData.data_length = 2;
+	//distData.data_length = 2;
+	//nh.subscribe(&dummyScr);
 }
 
 // the loop function runs over and over again until power down or reset
 void loop() {
+	static uint8_t counter = 0;
+	static float speed[2];
+	static uint32_t dist[2];
+	counter++;
+
+	//Serial.print(speedoBL.getSpeedKmh()); Serial.print("\t");
+	//Serial.print(speedoBL.getTotalDistTravelled()); Serial.print("\t");
+	//Serial.print(speedoBR.getSpeedKmh()); Serial.print("\t");
+	//Serial.print(speedoBR.getTotalDistTravelled()); Serial.println();
+
+	speed[0] = speedoBL.getSpeedKmh();
+	speed[1] = speedoBR.getSpeedKmh();
+
+	// ------------------ ROS SERIAL thingy ---------------------
+	//speedData.data = speed;
+	//speedPublisher.publish(&speedData);
+	//dist[0] = speedoBL.getTotalDistTravelled();
+	//dist[1] = speedoBR.getTotalDistTravelled();
+	//distData.data = dist;
+	//
+	//speedPublisher.publish(&speedData);
+	//distPublisher.publish(&distData);
+	//nh.spinOnce();
+
+	if (counter % 4 == 0)
+	{
+		CANFrame f;
+		dataSpeedo.insertData((speed[0]+speed[1])/2);
+		dataSpeedo.packCAN(&f);
+		serializer.sendCanFrame(&f);
+		CAN_avail = serializer.checkNoError();
+	}
+	digitalWrite(CANENABLE_OUTPUT, HIGH^CAN_avail);
 	delay(100);
-	blSpeed.data = speedoBL.getSpeedKmh();
-	blDist.data = speedoBL.getTotalDistTravelled();
-	brSpeed.data = speedoBR.getSpeedKmh();
-	brDist.data = speedoBR.getTotalDistTravelled();
-  
-	blSpeedPublisher.publish(&blSpeed);
-	blDistPublisher.publish(&blDist);
-	brSpeedPublisher.publish(&brSpeed);
-	brDistPublisher.publish(&brDist);
-  
-	nh.spinOnce();
+	digitalWrite(CANENABLE_OUTPUT, LOW^CAN_avail);
+	delay(100);
 }
 
-void tick()
+void tickL()
 {
 	speedoBL.trip();
+}
+void tickR()
+{
 	speedoBR.trip();
 }

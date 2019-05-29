@@ -34,19 +34,19 @@ QueueHandle_t queueForCAN = xQueueCreate(1, sizeof(Packet));
 TaskHandle_t taskBlink;
 // define instances of main modules
 HESFuelCell hydroCells[NUM_FUELCELLS] = {
-	HESFuelCell(0, &FC_MASTER_PORT)
+	HESFuelCell(0, &FCLEFT_SERIAL)
 };
 AttopilotCurrentSensor motors[NUM_CURRENTSENSORS] = {
-	AttopilotCurrentSensor(0,CAP_IN_VPIN,CAP_IN_APIN),
-	AttopilotCurrentSensor(1,CAP_OUT_VPIN,CAP_OUT_APIN),
-	AttopilotCurrentSensor(2,MOTOR_VPIN,MOTOR_APIN)
+	AttopilotCurrentSensor(0,CAPIN_INPUT_VOLT,CAPIN_INPUT_AMP),
+	AttopilotCurrentSensor(1,CAPOUT_INPUT_VOLT,CAPOUT_INPUT_AMP),
+	AttopilotCurrentSensor(2,MOTOR_INPUT_VOLT,MOTOR_INPUT_AMP)
 };
 // wheel diameter is 545 mm, feed into speedo
 Speedometer speedo = Speedometer(0, 545/2);
-Adafruit_NeoPixel lstrip = Adafruit_NeoPixel(7, LSIG_PIN, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel rstrip = Adafruit_NeoPixel(7, RSIG_PIN, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel lightstrip = Adafruit_NeoPixel(7, RUNNINGLIGHT_PIN, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel brakestrip = Adafruit_NeoPixel(7, BRAKELIGHT_PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel lstrip = Adafruit_NeoPixel(7, LSIG_OUTPUT, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel rstrip = Adafruit_NeoPixel(7, RSIG_OUTPUT, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel lightstrip = Adafruit_NeoPixel(7, RUNNINGLIGHT_OUTPUT, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel brakestrip = Adafruit_NeoPixel(7, BRAKELIGHT_OUTPUT, NEO_GRB + NEO_KHZ800);
 const uint8_t PIXELS = 7;
 const uint32_t LIGHT_COLOR = Adafruit_NeoPixel::Color(255, 255, 255);
 const uint32_t BRAKE_COLOR = Adafruit_NeoPixel::Color(255, 0, 0);
@@ -80,7 +80,7 @@ void setup() {
 	Serial.begin(9600);
 	delay(100);
 
-	CAN_avail = serializer.init(CAN_CS_PIN);
+	CAN_avail = serializer.init(CAN_SPI_CS);
 	// create all files in a new directory
 	SD_avail = initSD(card);
 	Serial.print("SD avail: ");
@@ -89,8 +89,8 @@ void setup() {
 	Serial.println(CAN_avail);
 
 	// initialize speedometer
-	pinMode(SPEEDOMETER_INTERRUPT_PIN, INPUT_PULLUP);
-	attachInterrupt(digitalPinToInterrupt(SPEEDOMETER_INTERRUPT_PIN), storeWheelInterval_ISR, FALLING);
+	pinMode(SPEEDOMETER_INTERRUPT, INPUT_PULLUP);
+	attachInterrupt(digitalPinToInterrupt(SPEEDOMETER_INTERRUPT), storeWheelInterval_ISR, FALLING);
 
 	// Now set up all Tasks to run independently. Task functions are found in Tasks.ino
 	xTaskCreate(

@@ -15,13 +15,7 @@
 #endif
 
 #include <mcp_can.h>
-class CANFrame
-{
-public:
-	unsigned long id;
-	byte length;
-	byte payload[8]; // TODO: extend payload byte length, then perform slicing in CANSerializer
-};
+#include <DataPoint.h>
 class CANSerializer
 {
 private:
@@ -29,9 +23,11 @@ private:
 	//DataPoint* dataPoints[1]; // TODO: implement convertion to raw CAN bytes only inside CANSerializer
 public:
 	bool init(uint8_t cs);
+	bool init(uint8_t cs, uint16_t speed);
 	bool sendCanFrame(CANFrame*);
 	// Populates Packet only if data is available.
 	bool receiveCanFrame(CANFrame*);
+	bool checkNoError();
 };
 
 #endif

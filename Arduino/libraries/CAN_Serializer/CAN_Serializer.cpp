@@ -1,5 +1,9 @@
 #include "CAN_Serializer.h"
 
+/*
+WARNING
+This library has been depreceated. It is only used in old NV10 code.
+*/
 bool CAN_Serializer::init(byte pin)
 {
 	CAN = new MCP_CAN(pin);

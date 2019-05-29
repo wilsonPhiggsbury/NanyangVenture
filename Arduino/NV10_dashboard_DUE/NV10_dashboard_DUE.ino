@@ -39,18 +39,18 @@ void setup() {
 	}
 	// I tried putting attachinterrupt in the for loop above but failed. Lambda functions complain.
 	// So here, have some wall text.
-	//attachInterrupt(digitalPinToInterrupt(BTN_HAZARD), [] {
-	//	if (peripheralStates[Hazard] == STATE_EN)
-	//		peripheralStates[Hazard] = STATE_DS;
-	//	else
-	//		peripheralStates[Hazard] = STATE_EN;
-	//}, FALLING);
-	//attachInterrupt(digitalPinToInterrupt(BTN_WIPER), [] {
-	//	if (peripheralStates[Wiper] == STATE_EN)
-	//		peripheralStates[Wiper] = STATE_DS;
-	//	else
-	//		peripheralStates[Wiper] = STATE_EN;
-	//}, FALLING);
+	attachInterrupt(digitalPinToInterrupt(BTN_HAZARD), [] {
+		if (peripheralStates[Hazard] == STATE_EN)
+			peripheralStates[Hazard] = STATE_DS;
+		else
+			peripheralStates[Hazard] = STATE_EN;
+	}, FALLING);
+	attachInterrupt(digitalPinToInterrupt(BTN_WIPER), [] {
+		if (peripheralStates[Wiper] == STATE_EN)
+			peripheralStates[Wiper] = STATE_DS;
+		else
+			peripheralStates[Wiper] = STATE_EN;
+	}, FALLING);
 	attachInterrupt(digitalPinToInterrupt(BTN_HORN), [] {
 		if (peripheralStates[Horn] == STATE_EN)
 			peripheralStates[Horn] = STATE_DS;
@@ -133,10 +133,10 @@ void TaskRefreshScreen(void* pvParameters)
 	const uint8_t CAN_resetThreshold = 30;
 	uint8_t CAN_resetCounter = 0;
 
-	pinMode(LCD_BACKLIGHT, OUTPUT);
-	digitalWrite(LCD_BACKLIGHT, HIGH);
-	pinMode(CAN_RST_PIN, OUTPUT);
-	digitalWrite(CAN_RST_PIN, HIGH);
+	pinMode(LCD_OUTPUT_BACKLIGHT, OUTPUT);
+	digitalWrite(LCD_OUTPUT_BACKLIGHT, HIGH);
+	pinMode(CAN_OUTPUT_RST, OUTPUT);
+	digitalWrite(CAN_OUTPUT_RST, HIGH);
 
 	Packet received;
 	char content[FLOAT_TO_STRING_LEN + 1];
@@ -163,9 +163,9 @@ void TaskRefreshScreen(void* pvParameters)
 			if (CAN_resetCounter++ >= CAN_resetThreshold)
 			{
 				screens.refreshDataWidgets(NULL);
-				digitalWrite(CAN_RST_PIN, LOW);
+				digitalWrite(CAN_OUTPUT_RST, LOW);
 				vTaskDelay(delay);
-				digitalWrite(CAN_RST_PIN, HIGH);
+				digitalWrite(CAN_OUTPUT_RST, HIGH);
 				CAN_resetCounter = 0; debug("Resetting 328P...");
 			}
 		}
@@ -185,7 +185,7 @@ void TaskReadSerial(void* pvParameters)
 #if DEBUG
 			char payload[MAX_STRING_LEN];
 			outgoing.toString(payload);
-			debug(payload);
+			//debug(payload);
 #endif
 		}
 		vTaskDelay(delay);
@@ -195,8 +195,10 @@ void TaskCaptureButtons(void* pvParameters)
 {
 	Packet buttonCommand;
 	buttonCommand.ID = BT;
-	peripheralStates[Horn] = peripheralStates[Wiper] = peripheralStates[Hazard] = STATE_DS;
-	buttonCommand.data[0][Horn] = buttonCommand.data[0][Wiper] = buttonCommand.data[0][Hazard] = STATE_DS;
+	peripheralStates[Headlights] = STATE_EN;
+	buttonCommand.data[0][Headlights] = STATE_EN;
+	peripheralStates[Horn] = peripheralStates[Wiper] = peripheralStates[Hazard] = peripheralStates[Lsig] = peripheralStates[Rsig] = STATE_DS;
+	buttonCommand.data[0][Horn] = buttonCommand.data[0][Wiper] = buttonCommand.data[0][Hazard] = buttonCommand.data[0][Lsig] = buttonCommand.data[0][Rsig] = STATE_DS;
 	const TickType_t delay = pdMS_TO_TICKS(100);
 	setDebounce(buttonPins, NUM_BUTTONS, 900); // for some reason, setDebounce() if called in setup() seems to have no effect
 	while (1)

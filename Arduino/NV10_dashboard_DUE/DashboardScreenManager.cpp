@@ -11,9 +11,9 @@ DashboardScreenManager::DashboardScreenManager(Packet* Packet)
 	q = Packet;
 	PacketID* trackIDaddr = &(Packet->ID);
 	// initialize screens
-	ILI9488* leftScreen = new ILI9488(LCD_LEFT_CS, LCD_DC, LCD_RST);
-	ILI9488* centerScreen = new ILI9488(LCD_CENTER_CS, LCD_DC);
-	ILI9488* rightScreen = new ILI9488(LCD_RIGHT_CS, LCD_DC);
+	ILI9488* leftScreen = new ILI9488(LCDLEFT_SPI_CS, LCD_OUTPUT_DC, LCD_OUTPUT_RST);
+	ILI9488* centerScreen = new ILI9488(LCDCENTER_SPI_CS, LCD_OUTPUT_DC);
+	ILI9488* rightScreen = new ILI9488(LCDRIGHT_SPI_CS, LCD_OUTPUT_DC);
 	leftScreen->begin();
 	centerScreen->begin();
 	rightScreen->begin();
@@ -30,33 +30,33 @@ DashboardScreenManager::DashboardScreenManager(Packet* Packet)
 	// ---------------------------- LEFT SCREEN -----------------------------
 	// initialize widgets
 	DisplayText* capOutAmp_txt = new DisplayText(leftScreen, 0, 0, 90, 75, alignLeft, alignTop);
-	//DisplayText* capInAmp_txt = new DisplayText(leftScreen, screenWidth, 0, 90, 75, alignRight, alignTop);
+	DisplayText* capInAmp_txt = new DisplayText(leftScreen, screenWidth, 0, 90, 75, alignRight, alignTop);
 	DisplayText* motorAmp_txt = new DisplayText(leftScreen, 0, screenHeight, 90, 75, alignLeft, alignBtm);
 	DisplayText* motorVolt_txt = new DisplayText(leftScreen, screenWidth, screenHeight, 90, 75, alignRight, alignBtm);
 	DisplayBar* capOutAmp_bar = new DisplayBar(leftScreen, 480/2-10, 100, 220, 35, DisplayBar::RIGHT_TO_LEFT);
-	//DisplayBar* capInAmp_bar = new DisplayBar(leftScreen, 480/2+10, 100, 220, 35, DisplayBar::LEFT_TO_RIGHT);
+	DisplayBar* capInAmp_bar = new DisplayBar(leftScreen, 480/2+10, 100, 220, 35, DisplayBar::LEFT_TO_RIGHT);
 	DisplayBar* motorAmp_bar = new DisplayBar(leftScreen, 480/2-10, 160, 220, 90, DisplayBar::RIGHT_TO_LEFT);
-	DisplayBar* motorVolt_bar = new DisplayBar(leftScreen, 480/2+10, 140, 220, 120, DisplayBar::LEFT_TO_RIGHT); // original y=180, h=70
+	DisplayBar* motorVolt_bar = new DisplayBar(leftScreen, 480/2+10, 160, 220, 90, DisplayBar::LEFT_TO_RIGHT); // original y=180, h=70
 	// listen to data on a pointer
-	//capInAmp_txt->init(CS, trackIDaddr, &(Packet->data[0][1]));
-	//capInAmp_bar->init(CS, trackIDaddr, &(Packet->data[0][1]));
+	capInAmp_txt->init(CS, trackIDaddr, &(Packet->data[0][1]));
+	capInAmp_bar->init(CS, trackIDaddr, &(Packet->data[0][1]));
 	capOutAmp_txt->init(CS, trackIDaddr, &(Packet->data[1][1]));
 	capOutAmp_bar->init(CS, trackIDaddr, &(Packet->data[1][1]));
-	motorVolt_txt->init(CS, trackIDaddr, &(Packet->data[2][0]));
-	motorVolt_bar->init(CS, trackIDaddr, &(Packet->data[2][0]));
+	motorVolt_txt->init(CS, trackIDaddr, &(Packet->data[1][0]));
+	motorVolt_bar->init(CS, trackIDaddr, &(Packet->data[1][0]));
 	motorAmp_txt->init(CS, trackIDaddr, &(Packet->data[2][1]));
 	motorAmp_bar->init(CS, trackIDaddr, &(Packet->data[2][1]));
 	// customize each widget
 	capOutAmp_txt->setMargin(0);
-	//capInAmp_txt->setMargin(0);
+	capInAmp_txt->setMargin(0);
 	motorAmp_txt->setMargin(0);
 	motorVolt_txt->setMargin(2);
-	capOutAmp_bar->setRange(0, 10);
-	//capInAmp_bar->setRange(0, 10);
+	capOutAmp_bar->setRange(0, 40);
+	capInAmp_bar->setRange(0, 40);
 	motorAmp_bar->setRange(0, 40);
 	motorVolt_bar->setRange(45, 60);
 	capOutAmp_bar->setColors(ILI9488_RED, ILI9488_MAROON);
-	//capInAmp_bar->setColors(ILI9488_CYAN, ILI9488_DARKCYAN);
+	capInAmp_bar->setColors(ILI9488_CYAN, ILI9488_DARKCYAN);
 	motorAmp_bar->setColors(ILI9488_RED, ILI9488_MAROON);
 	motorVolt_bar->setColors(ILI9488_CYAN, ILI9488_DARKCYAN);
 
@@ -96,8 +96,8 @@ DashboardScreenManager::DashboardScreenManager(Packet* Packet)
 	energy_bar->setColors(ILI9488_YELLOW, ILI9488_BLACK);
 
 	// ---------------------------- tie up references for updating later -----------------------------
-	dataWidgets[0] = NULL;// capInAmp_txt;
-	dataWidgets[1] = NULL;// capInAmp_bar;
+	dataWidgets[0] = capInAmp_txt;
+	dataWidgets[1] = capInAmp_bar;
 	dataWidgets[2] = capOutAmp_txt;
 	dataWidgets[3] = capOutAmp_bar;
 	dataWidgets[4] = motorAmp_txt;
@@ -115,7 +115,7 @@ DashboardScreenManager::DashboardScreenManager(Packet* Packet)
 }
 void DashboardScreenManager::refreshDataWidgets()
 {
-	for (int i = 2; i < 14; i++)
+	for (int i = 0; i < 14; i++)
 	{
 		DisplayText* box;
 		if (q->ID == FC)
@@ -187,7 +187,7 @@ void DashboardScreenManager::refreshDataWidgets()
 }
 void DashboardScreenManager::refreshDataWidgets(void* null)
 {
-	for (int i = 2; i < 14; i++)
+	for (int i = 0; i < 14; i++)
 		dataWidgets[i]->updateNull();
 }
 void DashboardScreenManager::refreshAnimatedWidgets()

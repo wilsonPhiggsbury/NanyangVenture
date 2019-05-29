@@ -6,6 +6,10 @@
 
 #elif defined _SAM3XA_
 #endif
+/*
+WARNING
+This library has been depreceated. It is only used in old NV10 code.
+*/
 class CAN_Serializer
 {
 public:

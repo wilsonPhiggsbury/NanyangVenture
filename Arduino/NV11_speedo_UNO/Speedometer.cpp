@@ -4,7 +4,7 @@
 
 #include "Speedometer.h"
 
-Speedometer::Speedometer(uint16_t pinA, uint16_t pinB, uint16_t diameterInMM, uint16_t ticksPerRot, bool positivePhaseshiftWhenForward):pinA(pinA), pinB(pinB), diameter(diameterInMM), ticksPerRot(ticksPerRot)
+Speedometer::Speedometer(uint16_t pinA, uint16_t pinB, uint16_t diameterInMM, uint16_t ticksPerRot, bool positivePhaseshiftWhenForward):pinA(pinA), pinB(pinB), diameter(diameterInMM), ticksPerRot(ticksPerRot), phaseShift(positivePhaseshiftWhenForward)
 {
 	int pinNo = digitalPinToInterrupt(pinA);
 	if (pinNo == NOT_AN_INTERRUPT)
@@ -20,7 +20,7 @@ Speedometer::Speedometer(uint16_t pinA, uint16_t pinB, uint16_t diameterInMM, ui
 void Speedometer::trip()
 {
 	counter++;
-	if (digitalRead(pinB))
+	if (digitalRead(pinB) ^ phaseShift)
 		positiveIndicator = 1;
 	else
 		positiveIndicator = -1;

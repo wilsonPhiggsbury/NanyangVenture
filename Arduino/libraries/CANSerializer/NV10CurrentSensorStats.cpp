@@ -9,9 +9,9 @@ const float SHUNT200A_CURRENT_SCALE = 1 / 32.0;
 const float SHUNT50A_CURRENT_SCALE = 1 / 256.0;
 // parameter(CANbytes, stringChars)
 // wattHour(2,4), ampPeak(1,2)
-NV10CurrentSensorStatsClass::NV10CurrentSensorStatsClass(uint8_t CANId) :DataPoint(CANId, 2+1)
+NV10CurrentSensorStatsClass::NV10CurrentSensorStatsClass(uint8_t CANId) :DataPoint("cs", CANId, 8)
 {
-	strcpy(strHeader, "cs");
+	debug(F("DataPoint cs:\t0x0D\t8"));
 }
 
 void NV10CurrentSensorStatsClass::insertData(uint32_t voltRaw, uint32_t ampMotorRaw)
@@ -33,22 +33,6 @@ uint16_t NV10CurrentSensorStatsClass::getWattHours()
 float NV10CurrentSensorStatsClass::getAmpPeak()
 {
 	return ampPeak;
-}
-
-void NV10CurrentSensorStatsClass::packCAN(CANFrame *f)
-{
-	DataPoint::packCANDefault(f);
-	uint16_t wattHours = wattMs / MS_PER_HOUR;
-	memcpy(f->payload, &wattHours, sizeof(uint16_t));
-	memcpy(f->payload + sizeof(uint16_t), &ampPeak, sizeof(uint8_t));
-}
-
-void NV10CurrentSensorStatsClass::unpackCAN(const CANFrame *f)
-{
-	uint16_t wattHours;
-	memcpy(&wattHours, f->payload, sizeof(uint16_t));
-	wattMs = wattHours * MS_PER_HOUR;
-	memcpy(&ampPeak, f->payload + sizeof(uint16_t), sizeof(uint8_t));
 }
 
 void NV10CurrentSensorStatsClass::packString(char *str)

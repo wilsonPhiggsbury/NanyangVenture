@@ -4,8 +4,8 @@ Created:	6/24/2018 11:37:49 PM
 Author:	MX
 */
 #include <CAN_Serializer.h>
-#define CAN_CS_PIN 4
-#define CAN_INT_PIN 3
+#define CAN_SPI_CS 4
+#define CAN_INTERRUPT 3
 // This sketch is meant for ATmega328P on breadboard, see "files for Arduino IDE" for the "ATmega328 on a breadboard (8 MHz internal clock)" board option
 // Also useable on a normal Arduino UNO if the board option not found
 // extended fuse:	0x05
@@ -20,13 +20,13 @@ void CAN_ISR();
 void setup() {
 	Serial.begin(9600);
 	delay(100);
-	if (!serializer.init(CAN_CS_PIN))
+	if (!serializer.init(CAN_SPI_CS))
 	{
 		delay(1000);
 		asm volatile ("  jmp 0");
 	}
-	pinMode(CAN_INT_PIN, INPUT_PULLUP);
-	attachInterrupt(digitalPinToInterrupt(CAN_INT_PIN), CAN_ISR, FALLING);
+	pinMode(CAN_INTERRUPT, INPUT_PULLUP);
+	attachInterrupt(digitalPinToInterrupt(CAN_INTERRUPT), CAN_ISR, FALLING);
 }
 
 void loop() {

@@ -5,9 +5,9 @@
 #include "NV10FuelCell.h"
 // parameter(CANbytes, stringChars)
 // Watts(2,4), pressure(4,4), temperature(1,2), status(1,2)
-NV10FuelCellClass::NV10FuelCellClass(uint8_t CANId):DataPoint(CANId, 4 + 2 + 1 + 1)
+NV10FuelCellClass::NV10FuelCellClass(uint8_t CANId):DataPoint("FC", CANId, 8)
 {
-	strcpy(strHeader, "FC");
+	debug(F("DataPoint FC:\t0x0B\t8"));
 }
 
 float NV10FuelCellClass::getPressure()
@@ -75,12 +75,15 @@ void NV10FuelCellClass::insertData(char* str)
 
 		readPtr = strtok(NULL, " ");
 		strcpy(statusTxt, readPtr);
+
 		if (strcmp(readPtr, "OP") == 0)
-			status = 1;	// alive
+			status = OP;	// alive
 		else if (strcmp(readPtr, "SD") == 0)
-			status = 0;	// SHUTDOWN! 
+			status = SD;	// SHUTDOWN! 
+		else if (strcmp(readPtr, "IN") == 0)
+			status = IN; // initializing
 		else
-			status = 255; // initializing
+			status = UNKNOWN;
 
 		//>>00.0V 00.0A 0000W 00000Wh 021.1C 028.3C 028.5C 031.6C 0.90B 59.0V 028.0C IN 00.0C 00 0000
 		//  ^   * ^   * ^   * ^    *  ^    * ^    * ^    * ^    * ^   * ^   *        ^ *
@@ -89,21 +92,10 @@ void NV10FuelCellClass::insertData(char* str)
 	// TODO: remember to terminate the string in the main code!
 }
 
-void NV10FuelCellClass::packCAN(CANFrame *f)
+void NV10FuelCellClass::unpackCAN(const CANFrame* f)
 {
-	DataPoint::packCANDefault(f);
-	memcpy(f->payload, &pressure, sizeof(float));
-	memcpy(f->payload + sizeof(float), &watts, sizeof(uint16_t));
-	memcpy(f->payload + sizeof(uint16_t), &temperature, sizeof(uint8_t));
-	memcpy(f->payload + sizeof(uint8_t), &status, sizeof(uint8_t));
-}
-
-void NV10FuelCellClass::unpackCAN(const CANFrame *f)
-{
-	memcpy(&pressure, f->payload, sizeof(float));
-	memcpy(&watts, f->payload + sizeof(float), sizeof(uint16_t));
-	memcpy(&temperature, f->payload + sizeof(uint16_t), sizeof(uint8_t));
-	memcpy(&status, f->payload + sizeof(uint8_t), sizeof(uint8_t));
+	DataPoint::unpackCAN(f);
+	strcpy(statusTxt, cStatus[status]); // status takes on enum value, match with constant Status array string
 }
 
 void NV10FuelCellClass::packString(char * str)
