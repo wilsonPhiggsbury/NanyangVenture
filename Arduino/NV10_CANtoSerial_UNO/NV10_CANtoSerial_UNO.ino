@@ -25,7 +25,7 @@ NV11DataSpeedo dataSpeedo = NV11DataSpeedo(0x0A);
 NV10AccesoriesStatus dataAcc = NV10AccesoriesStatus(0x10);
 
 // dashboard UNO will only send button commands, will only receive all other logging stats
-DataPoint dpListen[] = { dataFC, dataCS, dataCSStats, dataSpeedo };
+DataPoint dpRecv[] = { dataFC, dataCS, dataCSStats, dataSpeedo };
 DataPoint dpSend[] = { dataAcc };
 
 CANSerializer serializer;
@@ -64,12 +64,12 @@ void loop() {
 	// any CAN to receive?
 	if (serializer.receiveCanFrame(&f))
 	{
-		for (int i = 0; i < sizeof(dpListen) / sizeof(dpListen[0]); i++)
+		for (int i = 0; i < sizeof(dpRecv) / sizeof(dpRecv[0]); i++)
 		{
-			if (dpListen[i].checkMatchString(str))
+			if (dpRecv[i].checkMatchString(str))
 			{
-				dpListen[i].unpackCAN(&f);
-				dpListen[i].packString(str);
+				dpRecv[i].unpackCAN(&f);
+				dpRecv[i].packString(str);
 				Serial.println(str);
 				break;
 			}

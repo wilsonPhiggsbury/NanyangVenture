@@ -97,6 +97,9 @@ void setup()
 	attachInterrupt(digitalPinToInterrupt(BTN_RSIG), [] {
 		dataAcc.toggleRsig();
 	}, FALLING);
+
+	const unsigned int pins[] = { BTN_HAZARD, BTN_WIPER, BTN_HORN, BTN_HEADLIGHT, BTN_LSIG, BTN_RSIG };
+	setDebounce(pins, sizeof(pins) / sizeof(pins[0]));
 }
 void loop()
 {
