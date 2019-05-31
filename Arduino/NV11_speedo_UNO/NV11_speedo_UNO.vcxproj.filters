@@ -21,16 +21,8 @@
     <ClInclude Include="__vm\.NV11_speedo_UNO.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Speedometer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Pins_speedo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Speedometer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

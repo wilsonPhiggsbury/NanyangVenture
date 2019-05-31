@@ -42,7 +42,10 @@ void setup() {
 		digitalWrite(CANENABLE_OUTPUT, LOW);
 		Serial.println("CAN fail");
 	}
-
+	pinMode(SPEEDO_BL_A, INPUT_PULLUP);
+	pinMode(SPEEDO_BL_B, INPUT_PULLUP);
+	pinMode(SPEEDO_BR_A, INPUT_PULLUP);
+	pinMode(SPEEDO_BR_B, INPUT_PULLUP);
 	attachInterrupt(digitalPinToInterrupt(SPEEDO_BL_A), tickL, FALLING);
 	attachInterrupt(digitalPinToInterrupt(SPEEDO_BR_A), tickR, FALLING);
 
