@@ -3,20 +3,28 @@
  Created:	11/1/2018 1:31:02 AM
  Author:	MX
 */
-#include <CAN_Serializer.h>
+#include <CANSerializer.h>
 #include <Servo.h>
 #include <Adafruit_NeoPixel.h>
 #include <Arduino_FreeRTOS.h>
 #include <queue.h>
 #include "Pins_front.h"
 
+#include <NV10AccesoriesStatus.h>
+
+NV10AccesoriesStatus dataAcc = NV10AccesoriesStatus(0x10);
+/*
+hl
+sig (blink)
+horn
+brake in & CAN send
+CAN recv
+*/
 #define PIXELS 6
 Adafruit_NeoPixel lstrip = Adafruit_NeoPixel(PIXELS, LSIG_OUTPUT, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel rstrip = Adafruit_NeoPixel(PIXELS, RSIG_OUTPUT, NEO_GRB + NEO_KHZ800);
 const uint32_t SIG_COLOR = Adafruit_NeoPixel::Color(255, 165, 0);
 const uint32_t NO_COLOR = Adafruit_NeoPixel::Color(0, 0, 0);
-
-CAN_Serializer serializer;
 
 /*
 peripheralStates:
@@ -38,47 +46,42 @@ void TaskToggle(void* pvParameters);
 void TaskBlink(void* pvParameters);
 void TaskMoveWiper(void* pvParameters);
 void TaskCAN(void* pvParameters);
-QueueHandle_t queueForCAN = xQueueCreate(1, sizeof(Packet));
+QueueHandle_t queueForCAN = xQueueCreate(1, sizeof(int));
 TaskHandle_t taskBlink, taskMoveWiper, taskToggle;
 
-static bool brakeOn = false;
 void setup() {
 	Serial.begin(9600);
 
-	serializer.init(CAN_SPI_CS);
-	serializer.onlyListenFor(BT);
-
-	pinMode(PEDALBRAKE_INTERRUPT, INPUT_PULLUP);
-	attachInterrupt(digitalPinToInterrupt(PEDALBRAKE_INTERRUPT), BRAKE_ISR, CHANGE);
+	//attachInterrupt(digitalPinToInterrupt(PEDALBRAKE_INTERRUPT), BRAKE_ISR, CHANGE);
 	
 	xTaskCreate(
 		TaskToggle
 		, (const portCHAR *)"HEAD"
-		, 300 // -25
+		, 300
 		, NULL
 		, 2
 		, &taskToggle);
 	xTaskCreate(
 		TaskCAN
 		, (const portCHAR *)"CAN la"
-		, 1200 // -25
+		, 400
 		, NULL
-		, 1
+		, 2
 		, NULL);
 	xTaskCreate(
 		TaskBlink
 		, (const portCHAR *)"SIG"
-		, 150 // -25
+		, 150
 		, NULL
 		, 3
 		, &taskBlink);
-	//xTaskCreate(
-	//	TaskMoveWiper
-	//	, (const portCHAR *)"WIPE"
-	//	, 150 // -25
-	//	, NULL
-	//	, 3
-	//	, &taskMoveWiper);
+	xTaskCreate(
+		TaskMoveWiper
+		, (const portCHAR *)"WIPE"
+		, 150
+		, NULL
+		, 3
+		, &taskMoveWiper);
 	
 }
 
@@ -88,45 +91,46 @@ void loop() {
 }
 void TaskToggle(void* pvParameters)
 {
-	Packet brakeOrders;
-	brakeOrders.ID = BK;
 	pinMode(HORN_OUTPUT, OUTPUT);
 	pinMode(HEADLIGHTS_OUTPUT, OUTPUT);
+	pinMode(PEDALBRAKE_INTERRUPT, INPUT_PULLUP);
+	bool brakeOff = true;
 	while (1)
 	{
-		// ** hotfix for brake status **
-		bool brakeOnNew = !digitalRead(PEDALBRAKE_INTERRUPT);
-		if (brakeOnNew != brakeOn)
+		if (brakeOff ^ digitalRead(PEDALBRAKE_INTERRUPT))
 		{
-			brakeOn = brakeOnNew;
-			brakeOrders.timeStamp = millis();
-			brakeOrders.data[0][0] = brakeOn ? STATE_EN : STATE_DS;
-			xQueueSend(queueForCAN, &brakeOrders, 100);
-		}
-		// ** end hotfix **
-		if (peripheralStates[Horn] == STATE_EN)
-		{
-			debug("BEEEP!");
-			digitalWrite(HORN_OUTPUT, LOW);
-			vTaskDelay(pdMS_TO_TICKS(500));
-			digitalWrite(HORN_OUTPUT, HIGH);
-			peripheralStates[Horn] = STATE_DS;
-			debug("beep off.");
-		}
-		else if (peripheralStates[Horn] == STATE_DS)
-		{
-			digitalWrite(HORN_OUTPUT, HIGH);
+			// toggle brake
+			brakeOff = !brakeOff;
+			// send a dataAcc frame. 0 is dataAcc's index in dpSend[] 
+			const int dataAccIndex = 0;
+			xQueueSend(queueForCAN, &dataAccIndex, 0);
+
 		}
 
-		if (peripheralStates[Headlights] == STATE_EN)
+
+		//if (dataAcc.getHorn() == STATE_EN)
+		//{
+		//	debug("BEEEP!");
+		//	digitalWrite(HORN_OUTPUT, LOW);
+		//	vTaskDelay(pdMS_TO_TICKS(500));
+		//	digitalWrite(HORN_OUTPUT, HIGH);
+		//	peripheralStates[Horn] = STATE_DS;
+		//	debug("beep off.");
+		//}
+		//else if (peripheralStates[Horn] == STATE_DS)
+		//{
+		//	digitalWrite(HORN_OUTPUT, HIGH);
+		//}
+
+		if (dataAcc.getHeadlights() == STATE_EN)
 		{
 			digitalWrite(HEADLIGHTS_OUTPUT, HIGH);
 		}
-		else if (peripheralStates[Headlights] == STATE_DS)
+		else if (dataAcc.getHeadlights() == STATE_DS)
 		{
 			digitalWrite(HEADLIGHTS_OUTPUT, LOW);
 		}
-		vTaskDelay(pdMS_TO_TICKS(200));
+		vTaskDelay(pdMS_TO_TICKS(10));
 	}
 }
 void TaskBlink(void* pvParameters)
@@ -147,12 +151,12 @@ void TaskBlink(void* pvParameters)
 		}
 		else
 		{
-			if (peripheralStates[Hazard] == STATE_EN || peripheralStates[Lsig] == STATE_EN)
+			if (dataAcc.getHazard() == STATE_EN || dataAcc.getLsig() == STATE_EN)
 			{
 				sigOn = true;
 				setRGB(lstrip, PIXELS, SIG_COLOR);
 			}
-			if (peripheralStates[Hazard] == STATE_EN || peripheralStates[Rsig] == STATE_EN)
+			if (dataAcc.getHazard() == STATE_EN || dataAcc.getRsig() == STATE_EN)
 			{
 				sigOn = true;
 				setRGB(rstrip, PIXELS, SIG_COLOR);
@@ -168,88 +172,53 @@ void TaskMoveWiper(void* pvParameters)
 	int wiperPos = 0;
 	while (1)
 	{
-		if (peripheralStates[Wiper] == STATE_EN)
+		if (dataAcc.getWiper() == STATE_EN)
 		{
 			if (wiperPos == 0)
 				wiperPos = 180;
 			else
 				wiperPos = 0;
 		}
-		else if (peripheralStates[Wiper] == STATE_DS)
+		else if (dataAcc.getWiper() == STATE_DS)
 		{
 			wiperPos = 0;
 		}
 		wiper.write(wiperPos);
-		vTaskDelay(pdMS_TO_TICKS(1000));
+		vTaskDelay(pdMS_TO_TICKS(800));
 	}
 }
-void BRAKE_ISR()
-{
-	//static unsigned long brakePinDebounceLastTime = 0;
-	//if (millis() - brakePinDebounceLastTime < 100)
-	//	return;
-	//brakePinDebounceLastTime = millis();
+void TaskCAN(void *pvParameters) {
 
-	// toggle the status whenever pin change detected. the status is kept up to sync in taskToggle.
-	brakeOn = !brakeOn;
-	float brake = brakeOn ? STATE_EN : STATE_DS;
-	Packet out;
-	out.ID = BK;
-	out.timeStamp = millis();// brakePinDebounceLastTime;
-	out.data[0][0] = brake;
-	// xQueueSendFromISR writes to an extra parameter, indicating if it has woken up a higher priority task
-	// in our case the only task being woken up is taskCAN, which is lowest priority, hence the extra parameter is not used
-	xQueueSendFromISR(queueForCAN, &out, NULL);
-}
-void doReceiveAction(Packet* q)
-{
-	if (q->ID == BT)
+	CANFrame f;
+	CANSerializer serializer;
+	serializer.init(CAN_SPI_CS);
+
+	while (1)
 	{
-		for (int i = 0; i < NUMSTATES; i++)
+		// anything to send
+		int dpIndex;
+		BaseType_t recvQueue = xQueueReceive(queueForCAN, &dpIndex, 100);// WARNING ptr may be faulty
+		if (recvQueue == pdTRUE)
 		{
-			if (peripheralStates[i] != q->data[0][i])
+			dataAcc.packCAN(&f);
+			serializer.sendCanFrame(&f);
+		}
+		// anything to recv
+		if (serializer.receiveCanFrame(&f))
+		{
+			if (dataAcc.checkMatchCAN(&f))
 			{
-				switch (i)
-				{
-				case Horn:
-					peripheralStates[i] = q->data[0][i];
-					break;
-				case Wiper:
-					peripheralStates[i] = q->data[0][i];
-					break;
-				case Hazard:
-					peripheralStates[i] = q->data[0][i];
-					break;
-				case Lsig:
-					if (peripheralStates[Lsig] == STATE_EN)debug(F("Lsig ON"));
-					else debug(F("Lsig OFF"));
-					peripheralStates[i] = q->data[0][i];
-					break;
-				case Rsig:
-					if (peripheralStates[Rsig] == STATE_EN)debug(F("Rsig ON"));
-					else debug(F("Rsig OFF"));
-					peripheralStates[i] = q->data[0][i];
-					break;
-				case Headlights:
-					if (peripheralStates[Headlights] == STATE_EN)debug(F("Headlights ON"));
-					else debug(F("Headlights OFF"));
-					peripheralStates[i] = q->data[0][i];
-					break;
-				}
+				dataAcc.unpackCAN(&f);
+				xTaskAbortDelay(taskBlink);
+				xTaskAbortDelay(taskMoveWiper);
 			}
 		}
-		// kick up taskToggle to toggle accessories such as Headlights Horn etc
-		xTaskAbortDelay(taskToggle);
-		// kick up time-controlled tasks so they respond immediately.
-		// Example: "turn off blinking signal lights" should apply immediately instead of happening at the end of a blink cycle
-		xTaskAbortDelay(taskBlink);
+		vTaskDelay(pdMS_TO_TICKS(50));
 	}
 }
 void setRGB(Adafruit_NeoPixel& strip, uint8_t numLights, uint32_t color)
 {
 	for (int i = 0; i < numLights; i++)
-	{
 		strip.setPixelColor(i, color);
-	}
 	strip.show();
 }
