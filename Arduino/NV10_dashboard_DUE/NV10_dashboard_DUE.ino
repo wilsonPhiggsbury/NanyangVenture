@@ -124,6 +124,10 @@ void loop()
 			dataSpeedo.unpackString(s);
 			dashboardNextValuesSpeed(dataSpeedo.getSpeed());
 		}
+		else if (dataAcc.checkMatchString(s))
+		{
+			dataAcc.unpackString(s);
+		}
 	}
 	// output CAN strings based on buttons inputs (already handled by interrupts)
 	if (dataAcc.dataRequiresBroadcast())

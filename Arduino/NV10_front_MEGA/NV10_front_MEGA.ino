@@ -3,6 +3,15 @@
  Created:	11/1/2018 1:31:02 AM
  Author:	MX
 */
+#define DEBUG 1
+#if DEBUG
+#define debug_(str) Serial.print(str)
+#define debug(str)  Serial.println(str)
+#else
+#define debug_(...)
+#define debug(...)
+#endif
+
 #include <CANSerializer.h>
 #include <Servo.h>
 #include <Adafruit_NeoPixel.h>
@@ -46,13 +55,14 @@ void TaskToggle(void* pvParameters);
 void TaskBlink(void* pvParameters);
 void TaskMoveWiper(void* pvParameters);
 void TaskCAN(void* pvParameters);
-QueueHandle_t queueForCAN = xQueueCreate(1, sizeof(int));
+QueueHandle_t queueForCAN = xQueueCreate(1, sizeof(CANFrame));
 TaskHandle_t taskBlink, taskMoveWiper, taskToggle;
 
 void setup() {
 	Serial.begin(9600);
 
-	//attachInterrupt(digitalPinToInterrupt(PEDALBRAKE_INTERRUPT), BRAKE_ISR, CHANGE);
+	pinMode(PEDALBRAKE_INTERRUPT, INPUT_PULLUP);
+	attachInterrupt(digitalPinToInterrupt(PEDALBRAKE_INTERRUPT), BRAKE_ISR, FALLING);
 	
 	xTaskCreate(
 		TaskToggle
@@ -91,22 +101,22 @@ void loop() {
 }
 void TaskToggle(void* pvParameters)
 {
+	CANFrame f;
 	pinMode(HORN_OUTPUT, OUTPUT);
 	pinMode(HEADLIGHTS_OUTPUT, OUTPUT);
-	pinMode(PEDALBRAKE_INTERRUPT, INPUT_PULLUP);
 	bool brakeOff = true;
 	while (1)
 	{
-		if (brakeOff ^ digitalRead(PEDALBRAKE_INTERRUPT))
+		// poll to disable brake if brake is on
+		if (dataAcc.getBrake() == STATE_EN)
 		{
-			// toggle brake
-			brakeOff = !brakeOff;
-			// send a dataAcc frame. 0 is dataAcc's index in dpSend[] 
-			const int dataAccIndex = 0;
-			xQueueSend(queueForCAN, &dataAccIndex, 0);
-
+			if (!digitalRead(PEDALBRAKE_INTERRUPT))
+			{
+				dataAcc.setBrake(STATE_DS);
+				dataAcc.packCAN(&f);
+				xQueueSend(queueForCAN, &f, 100);
+			}
 		}
-
 
 		//if (dataAcc.getHorn() == STATE_EN)
 		//{
@@ -191,16 +201,15 @@ void TaskCAN(void *pvParameters) {
 
 	CANFrame f;
 	CANSerializer serializer;
-	serializer.init(CAN_SPI_CS);
+	if (!serializer.init(CAN_SPI_CS))
+		debug("CAN FAIL!");
 
 	while (1)
 	{
 		// anything to send
-		int dpIndex;
-		BaseType_t recvQueue = xQueueReceive(queueForCAN, &dpIndex, 100);// WARNING ptr may be faulty
+		BaseType_t recvQueue = xQueueReceive(queueForCAN, &f, 100);
 		if (recvQueue == pdTRUE)
 		{
-			dataAcc.packCAN(&f);
 			serializer.sendCanFrame(&f);
 		}
 		// anything to recv
@@ -221,4 +230,11 @@ void setRGB(Adafruit_NeoPixel& strip, uint8_t numLights, uint32_t color)
 	for (int i = 0; i < numLights; i++)
 		strip.setPixelColor(i, color);
 	strip.show();
+}
+void BRAKE_ISR()
+{
+	CANFrame f;
+	dataAcc.setBrake(STATE_EN);
+	dataAcc.packCAN(&f);
+	xQueueSendFromISR(queueForCAN, &f, pdFALSE);
 }
