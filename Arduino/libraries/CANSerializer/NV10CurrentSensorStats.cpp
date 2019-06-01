@@ -8,7 +8,7 @@ const float SHUNT_200A75mV_SCALE = 0.0078125 * (200.0 / 75);
 const float VOLTAGEDIVIDER_SCALE = 1;
 // parameter(CANbytes, stringChars)
 // wattHour(2,4), ampPeak(1,2)
-NV10CurrentSensorStats::NV10CurrentSensorStats(uint8_t CANId) :DataPoint("cs", CANId, 8)
+NV10CurrentSensorStats::NV10CurrentSensorStats() :DataPoint("cs", 0x12, 8)
 {
 	debug(F("DataPoint cs:\t0x0D\t8"));
 }

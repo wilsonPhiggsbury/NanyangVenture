@@ -7,8 +7,8 @@
 #include <NV11AccesoriesStatus.h>
 #include <RelayModule.h>
 #include "Pins_lights.h"
-CANSerializer Can;
-NV11AccesoriesStatus dataAcc = NV11AccesoriesStatus(0x10);
+CANSerializer serializer;
+NV11AccesoriesStatus dataAcc;
 RelayModule brakeRelay(BRAKELIGHT_OUTPUT, RelayModule::NO);
 RelayModule runninglightRelay(RUNNINGLIGHT_OUTPUT, RelayModule::NC);
 RelayModule lsigRelay(LSIG_OUTPUT, RelayModule::NO);
@@ -25,7 +25,7 @@ void setup() {
 
 	runninglightRelay.activate();
 
-	Can.init(CAN_SPI_CS);
+	serializer.init(CAN_SPI_CS);
 	pinMode(CAN_INTERRUPT, INPUT_PULLUP);
 	attachInterrupt(digitalPinToInterrupt(CAN_INTERRUPT), CAN_ISR, FALLING);
 
@@ -68,7 +68,7 @@ void loop() {
 void CAN_ISR()
 {
 	CANFrame f;
-	Can.receiveCanFrame(&f);
+	serializer.receiveCanFrame(&f);
 	if (dataAcc.checkMatchCAN(&f))
 	{
 		dataAcc.unpackCAN(&f);

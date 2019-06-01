@@ -17,11 +17,11 @@
 #include <NV10AccesoriesStatus.h>
 #include <NV11DataSpeedo.h>
 
-NV10FuelCell dataFC = NV10FuelCell(0x13);
-NV10CurrentSensor dataCS = NV10CurrentSensor(0x11);
-NV10CurrentSensorStats dataCSStats = NV10CurrentSensorStats(0x12);
-NV11DataSpeedo dataSpeedo = NV11DataSpeedo(0x0A);
-NV10AccesoriesStatus dataAcc = NV10AccesoriesStatus(0x10);
+NV10FuelCell dataFC;
+NV10CurrentSensor dataCS;
+NV10CurrentSensorStats dataCSStats;
+NV11DataSpeedo dataSpeedo;
+NV10AccesoriesStatus dataAcc;
 
 //TextWidget t = TextWidget(&centerScreen, 475, 0, 200, 50, alignRight, alignTop);
 //BarWidget b = BarWidget(&centerScreen, 475, 200, 200, 40, RIGHT_TO_LEFT);

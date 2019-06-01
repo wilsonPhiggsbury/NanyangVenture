@@ -3,7 +3,7 @@
 // 
 #include "NV11Commands.h"
 
-NV11Commands::NV11Commands(uint8_t CANId) :DataPoint("CM", CANId, 4)
+NV11Commands::NV11Commands() :DataPoint("CM", 0x12, 4)
 {
 }
 

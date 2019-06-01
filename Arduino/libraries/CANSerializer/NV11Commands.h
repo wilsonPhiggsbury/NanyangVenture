@@ -17,7 +17,7 @@ class NV11Commands:public DataPoint
 	 };
 
  public:
-	NV11Commands(uint8_t CANId);
+	NV11Commands();
 
 	void insertData(uint8_t horn);
 	// call this to deactivate all states. You should use this before activating the states one by one again.

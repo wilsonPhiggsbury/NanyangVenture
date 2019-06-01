@@ -13,7 +13,7 @@
 #define WIPERRELAY_OUTPUT2 3
 #define WIPERRELAY_OUTPUT1 4
 CANSerializer serializer;
-NV11AccesoriesStatus dataAcc = NV11AccesoriesStatus(0x10);
+NV11AccesoriesStatus dataAcc;
 // the setup function runs once when you press reset or power the board
 void setup() {
 	serializer.init(CAN_CS);

@@ -8,8 +8,8 @@
 #include <NV11Commands.h>
 #include "Pins_steeringwheel.h"
 CANSerializer serializer;
-NV11AccesoriesStatus dataAcc(0x10);
-NV11Commands dataCommands(0x12);
+NV11AccesoriesStatus dataAcc;
+NV11Commands dataCommands;
 
 bool canAvail;
 uint8_t prevRead[20] = { 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 }; // store previous digitalReads to artificially detect "Rising edge"

@@ -15,7 +15,7 @@
 
 
 CANSerializer serializer;
-NV11DataSpeedo dataSpeedo = NV11DataSpeedo(0x0A);
+NV11DataSpeedo dataSpeedo;
 
 Speedometer speedoBL = Speedometer(SPEEDO_BL_A, SPEEDO_BL_B, 545, 500, true);
 Speedometer speedoBR = Speedometer(SPEEDO_BR_A, SPEEDO_BR_B, 545, 500, false);

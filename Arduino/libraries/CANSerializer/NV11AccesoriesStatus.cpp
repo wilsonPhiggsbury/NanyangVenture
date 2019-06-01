@@ -4,7 +4,7 @@
 #include "NV11AccesoriesStatus.h"
 // parameter(CANbytes, stringChars)
 // param1(2,4), param2(1,2)
-NV11AccesoriesStatus::NV11AccesoriesStatus(uint8_t CANId) :DataPoint("ST", CANId, 8)
+NV11AccesoriesStatus::NV11AccesoriesStatus() :DataPoint("ST", 0x10, 8)
 {
 	debug(F("DataPoint ST:\t0x10\t8"));
 }

@@ -2,7 +2,7 @@
 #include "NV10CurrentSensor.h"
 // parameter(CANbytes, stringChars)
 // volts(1,2), ampCapIn(1,2), ampCapOut(1,2), ampMotor(1,2)
-NV10CurrentSensor::NV10CurrentSensor(uint8_t CANId):DataPoint("CS", CANId, 8)
+NV10CurrentSensor::NV10CurrentSensor():DataPoint("CS", 0x11, 8)
 {
 	debug(F("DataPoint CS:\t0x0C\t8"));
 }

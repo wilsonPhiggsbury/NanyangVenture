@@ -10,7 +10,7 @@ class NV11DataSpeedo:public DataPoint
 	 float& speed = data.Float[0];
 
  public:
-	NV11DataSpeedo(uint8_t CANId);
+	NV11DataSpeedo();
 	// implement parent class
 	void insertData(float speed);
 	float getSpeed();

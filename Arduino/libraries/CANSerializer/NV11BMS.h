@@ -17,7 +17,7 @@ class NV11BMS:public DataPoint
 	 float volt, amp, minCellVolt;
 
  public:
-	NV11BMS(uint8_t CANId);
+	NV11BMS();
 	void insertData(float volt, float amp, float temperature, float minCellVolt);
 	uint16_t getVolt();
 	uint16_t getAmp();

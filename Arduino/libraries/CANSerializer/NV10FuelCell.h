@@ -23,7 +23,7 @@ private:
 	 };
 	 const char* cStatus[4] = { "SD", "OP", "IN", "UN" };
  public:
-	 NV10FuelCell(uint8_t CANId);
+	 NV10FuelCell();
 
 	float getPressure();
 	uint16_t getWatts();

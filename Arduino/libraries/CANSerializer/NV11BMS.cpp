@@ -3,7 +3,7 @@
 // 
 #include "NV11BMS.h"
 
-NV11BMS::NV11BMS(uint8_t CANId):DataPoint("BM", CANId, 8)
+NV11BMS::NV11BMS():DataPoint("BM", 0x11, 8)
 {
 }
 

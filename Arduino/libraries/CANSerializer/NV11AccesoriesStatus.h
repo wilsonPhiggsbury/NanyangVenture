@@ -19,7 +19,7 @@ class NV11AccesoriesStatus:public DataPoint
 	uint8_t& regen = data.Byte[7];
 	
 public:
-	NV11AccesoriesStatus(uint8_t CANId);
+	NV11AccesoriesStatus();
 
 	void setLsig(uint8_t status);
 	void setRsig(uint8_t status);

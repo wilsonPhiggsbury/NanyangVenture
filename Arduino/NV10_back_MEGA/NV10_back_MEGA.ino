@@ -31,11 +31,11 @@
 
 #include "Pins_back.h"
 
-NV10FuelCell dataFC = NV10FuelCell(0x13);
-NV10CurrentSensor dataCS = NV10CurrentSensor(0x11);
-NV10CurrentSensorStats dataCSStats = NV10CurrentSensorStats(0x12);
-NV11DataSpeedo dataSpeedo = NV11DataSpeedo(0x0A);
-NV10AccesoriesStatus dataAcc = NV10AccesoriesStatus(0x10);
+NV10FuelCell dataFC;
+NV10CurrentSensor dataCS;
+NV10CurrentSensorStats dataCSStats;
+NV11DataSpeedo dataSpeedo;
+NV10AccesoriesStatus dataAcc;
 
 // struct for log send exists to wrap strings properly with path names
 typedef struct  {

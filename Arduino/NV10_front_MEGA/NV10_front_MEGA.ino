@@ -21,7 +21,7 @@
 
 #include <NV10AccesoriesStatus.h>
 
-NV10AccesoriesStatus dataAcc = NV10AccesoriesStatus(0x10);
+NV10AccesoriesStatus dataAcc;
 /*
 hl
 sig (blink)
