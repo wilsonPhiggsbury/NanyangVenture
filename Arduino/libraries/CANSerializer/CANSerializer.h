@@ -22,11 +22,10 @@ private:
 	MCP_CAN* CAN;
 	//DataPoint* dataPoints[1]; // TODO: implement convertion to raw CAN bytes only inside CANSerializer
 public:
-	bool init(uint8_t cs, uint16_t speed);
+	bool init(uint8_t cs, uint16_t speed = 1000);
 	bool sendCanFrame(CANFrame*);
 	// Populates Packet only if data is available.
 	bool receiveCanFrame(CANFrame*);
 	bool checkNoError();
 };
-
 #endif

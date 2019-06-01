@@ -29,8 +29,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FreeRTOS", "..\libraries\Fr
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NV10_front_MEGA", "Arduino\NV10_front_MEGA\NV10_front_MEGA.vcxproj", "{E0F75AC7-15BB-4C7A-98CD-37A96C9641A3}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NV10_back_MEGA", "Arduino\NV10_back_MEGA\NV10_back_MEGA.vcxproj", "{8B3A2447-325C-473E-A84C-45B578507BD3}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MCP_CAN_lib", "..\libraries\MCP_CAN_lib\MCP_CAN_lib.vcxitems", "{BF888B28-EEF3-4922-A68F-36A1FD54B965}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MemoryFree", "..\libraries\MemoryFree\MemoryFree.vcxitems", "{86486CE1-3D43-4D25-8616-4E6372AC1896}"
@@ -87,6 +85,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "#NV10_dashboard_DUE", "Ardu
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Speedometer", "Arduino\libraries\Speedometer\Speedometer.vcxitems", "{CDDCD64E-35B1-4C6B-B6FE-187D977DCCC4}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NV10_back_MEGA", "Arduino\NV10_back_MEGA\NV10_back_MEGA.vcxproj", "{E316FC1D-40FB-4C9C-AC5C-C37CBA7D30A7}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\libraries\Rosserial_Arduino_Library\Rosserial_Arduino_Library.vcxitems*{16d6d2c9-e2d8-437f-80bf-3e1b32b814f4}*SharedItemsImports = 9
@@ -114,15 +114,6 @@ Global
 		..\libraries\MemoryFree\MemoryFree.vcxitems*{7ed24bf0-127d-4fc9-843e-85d8ba0529c7}*SharedItemsImports = 4
 		Arduino\libraries\CANSerializer\CANSerializer.vcxitems*{7ed24bf0-127d-4fc9-843e-85d8ba0529c7}*SharedItemsImports = 4
 		..\libraries\MemoryFree\MemoryFree.vcxitems*{86486ce1-3d43-4d25-8616-4e6372ac1896}*SharedItemsImports = 9
-		..\..\ide\hardware\arduino\avr\libraries\SPI\SPI.vcxitems*{8b3a2447-325c-473e-a84c-45b578507bd3}*SharedItemsImports = 4
-		..\..\ide\hardware\arduino\avr\libraries\Wire\Wire.vcxitems*{8b3a2447-325c-473e-a84c-45b578507bd3}*SharedItemsImports = 4
-		..\libraries\Adafruit_ADS1X15\Adafruit_ADS1X15.vcxitems*{8b3a2447-325c-473e-a84c-45b578507bd3}*SharedItemsImports = 4
-		..\libraries\Adafruit_NeoPixel\Adafruit_NeoPixel.vcxitems*{8b3a2447-325c-473e-a84c-45b578507bd3}*SharedItemsImports = 4
-		..\libraries\FreeRTOS_AVR\FreeRTOS_AVR.vcxitems*{8b3a2447-325c-473e-a84c-45b578507bd3}*SharedItemsImports = 4
-		..\libraries\MCP_CAN_lib\MCP_CAN_lib.vcxitems*{8b3a2447-325c-473e-a84c-45b578507bd3}*SharedItemsImports = 4
-		..\libraries\SdFat\SdFat.vcxitems*{8b3a2447-325c-473e-a84c-45b578507bd3}*SharedItemsImports = 4
-		Arduino\libraries\CANSerializer\CANSerializer.vcxitems*{8b3a2447-325c-473e-a84c-45b578507bd3}*SharedItemsImports = 4
-		Arduino\libraries\Speedometer\Speedometer.vcxitems*{8b3a2447-325c-473e-a84c-45b578507bd3}*SharedItemsImports = 4
 		..\libraries\Adafruit_GFX_Library\Adafruit_GFX_Library.vcxitems*{8c1a22a5-7653-42a6-b3dd-80639fa902d1}*SharedItemsImports = 9
 		Arduino\libraries\RelayModule\RelayModule.vcxitems*{a57a3d44-d0d0-4d27-aac1-ba3f7124ecc6}*SharedItemsImports = 9
 		..\..\ide\portable\packages\arduino\hardware\sam\1.6.11\libraries\Wire\Wire.vcxitems*{a7192e66-f105-4569-885c-47923cd5f91a}*SharedItemsImports = 9
@@ -132,6 +123,16 @@ Global
 		Arduino\libraries\Speedometer\Speedometer.vcxitems*{cddcd64e-35b1-4c6b-b6fe-187d977dccc4}*SharedItemsImports = 9
 		..\libraries\FreeRTOS\FreeRTOS.vcxitems*{e0f75ac7-15bb-4c7a-98cd-37a96c9641a3}*SharedItemsImports = 4
 		Arduino\libraries\CANSerializer\CANSerializer.vcxitems*{e0f75ac7-15bb-4c7a-98cd-37a96c9641a3}*SharedItemsImports = 4
+		..\..\ide\hardware\arduino\avr\libraries\SPI\SPI.vcxitems*{e316fc1d-40fb-4c9c-ac5c-c37cba7d30a7}*SharedItemsImports = 4
+		..\..\ide\hardware\arduino\avr\libraries\Wire\Wire.vcxitems*{e316fc1d-40fb-4c9c-ac5c-c37cba7d30a7}*SharedItemsImports = 4
+		..\libraries\Adafruit_ADS1X15\Adafruit_ADS1X15.vcxitems*{e316fc1d-40fb-4c9c-ac5c-c37cba7d30a7}*SharedItemsImports = 4
+		..\libraries\Adafruit_NeoPixel\Adafruit_NeoPixel.vcxitems*{e316fc1d-40fb-4c9c-ac5c-c37cba7d30a7}*SharedItemsImports = 4
+		..\libraries\FreeRTOS\FreeRTOS.vcxitems*{e316fc1d-40fb-4c9c-ac5c-c37cba7d30a7}*SharedItemsImports = 4
+		..\libraries\MCP_CAN_lib\MCP_CAN_lib.vcxitems*{e316fc1d-40fb-4c9c-ac5c-c37cba7d30a7}*SharedItemsImports = 4
+		..\libraries\MemoryFree\MemoryFree.vcxitems*{e316fc1d-40fb-4c9c-ac5c-c37cba7d30a7}*SharedItemsImports = 4
+		..\libraries\SdFat\SdFat.vcxitems*{e316fc1d-40fb-4c9c-ac5c-c37cba7d30a7}*SharedItemsImports = 4
+		Arduino\libraries\CANSerializer\CANSerializer.vcxitems*{e316fc1d-40fb-4c9c-ac5c-c37cba7d30a7}*SharedItemsImports = 4
+		Arduino\libraries\Speedometer\Speedometer.vcxitems*{e316fc1d-40fb-4c9c-ac5c-c37cba7d30a7}*SharedItemsImports = 4
 		Arduino\libraries\CANSerializer\CANSerializer.vcxitems*{e3af1d76-18e9-4f28-86fc-56cdf2ebcdc0}*SharedItemsImports = 4
 		..\libraries\Adafruit_ADS1X15\Adafruit_ADS1X15.vcxitems*{ee96d38b-689a-49ec-b661-4bc019e7d9ac}*SharedItemsImports = 9
 		..\..\ide\hardware\arduino\avr\libraries\SPI\SPI.vcxitems*{fb3d2b90-7b26-4b2c-a8d1-70df5e5460b6}*SharedItemsImports = 4
@@ -157,14 +158,6 @@ Global
 		{E0F75AC7-15BB-4C7A-98CD-37A96C9641A3}.Release|x64.ActiveCfg = Release|Win32
 		{E0F75AC7-15BB-4C7A-98CD-37A96C9641A3}.Release|x86.ActiveCfg = Release|Win32
 		{E0F75AC7-15BB-4C7A-98CD-37A96C9641A3}.Release|x86.Build.0 = Release|Win32
-		{8B3A2447-325C-473E-A84C-45B578507BD3}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{8B3A2447-325C-473E-A84C-45B578507BD3}.Debug|x64.ActiveCfg = Debug|Win32
-		{8B3A2447-325C-473E-A84C-45B578507BD3}.Debug|x86.ActiveCfg = Debug|Win32
-		{8B3A2447-325C-473E-A84C-45B578507BD3}.Debug|x86.Build.0 = Debug|Win32
-		{8B3A2447-325C-473E-A84C-45B578507BD3}.Release|Any CPU.ActiveCfg = Release|Win32
-		{8B3A2447-325C-473E-A84C-45B578507BD3}.Release|x64.ActiveCfg = Release|Win32
-		{8B3A2447-325C-473E-A84C-45B578507BD3}.Release|x86.ActiveCfg = Release|Win32
-		{8B3A2447-325C-473E-A84C-45B578507BD3}.Release|x86.Build.0 = Release|Win32
 		{6D4787D1-DF84-488E-9DCE-5608BC9B2777}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{6D4787D1-DF84-488E-9DCE-5608BC9B2777}.Debug|x64.ActiveCfg = Debug|Win32
 		{6D4787D1-DF84-488E-9DCE-5608BC9B2777}.Debug|x86.ActiveCfg = Debug|Win32
@@ -315,6 +308,14 @@ Global
 		{8B76109D-38BB-4C78-BC70-C973A24E3EDF}.Release|x64.ActiveCfg = Release|Win32
 		{8B76109D-38BB-4C78-BC70-C973A24E3EDF}.Release|x86.ActiveCfg = Release|Win32
 		{8B76109D-38BB-4C78-BC70-C973A24E3EDF}.Release|x86.Build.0 = Release|Win32
+		{E316FC1D-40FB-4C9C-AC5C-C37CBA7D30A7}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{E316FC1D-40FB-4C9C-AC5C-C37CBA7D30A7}.Debug|x64.ActiveCfg = Debug|Win32
+		{E316FC1D-40FB-4C9C-AC5C-C37CBA7D30A7}.Debug|x86.ActiveCfg = Debug|Win32
+		{E316FC1D-40FB-4C9C-AC5C-C37CBA7D30A7}.Debug|x86.Build.0 = Debug|Win32
+		{E316FC1D-40FB-4C9C-AC5C-C37CBA7D30A7}.Release|Any CPU.ActiveCfg = Release|Win32
+		{E316FC1D-40FB-4C9C-AC5C-C37CBA7D30A7}.Release|x64.ActiveCfg = Release|Win32
+		{E316FC1D-40FB-4C9C-AC5C-C37CBA7D30A7}.Release|x86.ActiveCfg = Release|Win32
+		{E316FC1D-40FB-4C9C-AC5C-C37CBA7D30A7}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

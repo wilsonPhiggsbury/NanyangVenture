@@ -4,16 +4,16 @@
 #define _NV10CURRENTSENSORSTATS_h
 
 #include <NV10CurrentSensor.h>
-class NV10CurrentSensorStatsClass:public DataPoint
+class NV10CurrentSensorStats:public DataPoint
 {
  protected:
 	 uint32_t& wattMs = data.Long[0];
 	 float& ampPeak = data.Float[1];
 
  public:
-	NV10CurrentSensorStatsClass(uint8_t CANId);
+	NV10CurrentSensorStats(uint8_t CANId);
 
-	void insertData(uint32_t voltRaw, uint32_t ampMotorRaw);
+	void insertData(uint32_t volt, uint32_t ampMotor);
 	uint16_t getWattHours();
 	float getAmpPeak();
 	void packString(char*);
@@ -23,8 +23,6 @@ private:
 	uint32_t lastTime;
 	uint32_t getTimeDiff();
 };
-
-typedef NV10CurrentSensorStatsClass NV10CurrentSensorStats;
 
 #endif
 

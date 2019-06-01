@@ -4,7 +4,7 @@
 #define _NV10FUELCELL_h
 
 #include <DataPoint.h>
-class NV10FuelCellClass:public DataPoint
+class NV10FuelCell:public DataPoint
 {
  protected:
 	 float& pressure = data.Float[0];
@@ -23,7 +23,7 @@ private:
 	 };
 	 const char* cStatus[4] = { "SD", "OP", "IN", "UN" };
  public:
-	 NV10FuelCellClass(uint8_t CANId);
+	 NV10FuelCell(uint8_t CANId);
 
 	float getPressure();
 	uint16_t getWatts();
@@ -35,8 +35,6 @@ private:
 	void packString(char*);
 	void unpackString(char * str);
 };
-
-typedef NV10FuelCellClass NV10FuelCell;
 
 #endif
 

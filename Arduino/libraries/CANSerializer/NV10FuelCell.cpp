@@ -5,32 +5,32 @@
 #include "NV10FuelCell.h"
 // parameter(CANbytes, stringChars)
 // Watts(2,4), pressure(4,4), temperature(1,2), status(1,2)
-NV10FuelCellClass::NV10FuelCellClass(uint8_t CANId):DataPoint("FC", CANId, 8)
+NV10FuelCell::NV10FuelCell(uint8_t CANId):DataPoint("FC", CANId, 8)
 {
 	debug(F("DataPoint FC:\t0x0B\t8"));
 }
 
-float NV10FuelCellClass::getPressure()
+float NV10FuelCell::getPressure()
 {
 	return pressure;
 }
 
-uint16_t NV10FuelCellClass::getWatts()
+uint16_t NV10FuelCell::getWatts()
 {
 	return watts;
 }
 
-uint8_t NV10FuelCellClass::getTemperature()
+uint8_t NV10FuelCell::getTemperature()
 {
 	return temperature;
 }
 
-const char * NV10FuelCellClass::getStatus()
+const char * NV10FuelCell::getStatus()
 {
 	return statusTxt;
 }
 
-void NV10FuelCellClass::insertData(char* str)
+void NV10FuelCell::insertData(char* str)
 {
 	// slice up the string
 	if (strlen(str) >= 77)
@@ -92,13 +92,13 @@ void NV10FuelCellClass::insertData(char* str)
 	// TODO: remember to terminate the string in the main code!
 }
 
-void NV10FuelCellClass::unpackCAN(const CANFrame* f)
+void NV10FuelCell::unpackCAN(const CANFrame* f)
 {
 	DataPoint::unpackCAN(f);
 	strcpy(statusTxt, cStatus[status]); // status takes on enum value, match with constant Status array string
 }
 
-void NV10FuelCellClass::packString(char * str)
+void NV10FuelCell::packString(char * str)
 {
 	char* shiftedStr = DataPoint::packStringDefault(str);
 	// p = 4.2, t = 2, w = 4, st = 2
@@ -112,7 +112,7 @@ void NV10FuelCellClass::packString(char * str)
 #endif
 }
 
-void NV10FuelCellClass::unpackString(char * str)
+void NV10FuelCell::unpackString(char * str)
 {
 	char* ptr = strtok(str, "\t");
 	ptr = strtok(NULL, "\t");
