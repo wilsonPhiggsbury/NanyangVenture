@@ -3,14 +3,6 @@
  Created:	6/19/2018 1:42:24 PM
  Author:	MX
 */
-#define DEBUG 1
-#if DEBUG
-#define debug_(str) Serial.print(str)
-#define debug(str)  Serial.println(str)
-#else
-#define debug_(...)
-#define debug(...)
-#endif
 
 #include <MemoryFree.h>
 #include <Arduino_FreeRTOS.h>
@@ -119,7 +111,7 @@ void setup() {
 	xTaskCreate(
 		TaskLogSendData
 		, (const portCHAR *) "LogSend"
-		, 800  // Stack size
+		, 1000  // Stack size
 		, NULL
 		, 1  // Priority
 		, NULL);
@@ -157,19 +149,30 @@ void TaskLogFuelCell(void *pvParameters)
 	HardwareSerial& fcPort = Serial3;
 	fcPort.begin(19200);
 	fcPort.setTimeout(50);
+
 	while (1)
 	{
-		if (fcPort.available())
+		uint8_t bytesRead = fcPort.readBytesUntil('\n', s.data, 100);
+		if (bytesRead > 0)
 		{
-			uint8_t bytesRead = fcPort.readBytesUntil('\n', s.data, 100);
+			s.data[bytesRead - 1] = '\0'; // manually null-terminate. Rewrite '\r' into '\0'
+			s.logThis = true;
+			s.sendThis = false;
+			strcpy(s.path, "FCraw.txt");
 			// log the raw data
 			xQueueSend(queueForLogSend, &s, 100);
 			// CAN the processed fc data
 			dataFC.insertData(s.data); // THIS will destroy s.data! Don't send s anymore after this line
 			dataFC.packCAN(&f);
 			xQueueSend(queueForCAN, &f, 100);
+			// subsequently, do not log the processed data, but still send it
+			s.logThis = false;
+			s.sendThis = true;
+			strcpy(s.path, "FC.txt");
+			dataFC.packString(s.data);
+			xQueueSend(queueForLogSend, &s, 100);
 		}
-		vTaskDelay(pdMS_TO_TICKS(1000));
+		vTaskDelay(pdMS_TO_TICKS(450));
 	}
 }
 void TaskLogCurrentSensor(void *pvParameters)
@@ -199,17 +202,20 @@ void TaskLogCurrentSensor(void *pvParameters)
 	const float VOLTAGEDIVIDER_SCALE = 1.024 / 60; // scale 60V to 1.024V maybe?
 	/*
 	ADS1115 i2c address
-	Addr -> GND = 72 (default if not connected)
-	Addr -> VDD = 73
-	Addr -> SDA = 74 (may be problematic)
-	Addr -> SCL = 75
+	Addr -> VDD = 0x49
+	Addr -> GND = 0x48 (default if not connected)
+	Addr -> SCL = 0x4B
+	Addr -> SDA = 0x4A
 	*/
-	Adafruit_ADS1115 capCurrentADC = Adafruit_ADS1115(72);
-	Adafruit_ADS1115 motorCurrentADC = Adafruit_ADS1115(73);
-	Adafruit_ADS1115 capVoltageADC = Adafruit_ADS1115(75);
+	Adafruit_ADS1115 capCurrentADC = Adafruit_ADS1115(0x49);
+	Adafruit_ADS1115 motorCurrentADC = Adafruit_ADS1115(0x48);
+	Adafruit_ADS1115 capVoltageADC = Adafruit_ADS1115(0x4B);
 	capCurrentADC.setGain(GAIN_SIXTEEN);
 	motorCurrentADC.setGain(GAIN_SIXTEEN);
-	capVoltageADC.setGain(GAIN_FOUR); // scale 60V to 1.024V maybe?
+	capVoltageADC.setGain(GAIN_FOUR); // GAIN_FOUR can take 1024mV max. Consult FSR column from the FSR table above
+	capCurrentADC.begin();
+	motorCurrentADC.begin();
+	capVoltageADC.begin();
 
 	dataCSStats.syncTime(); // reset the internal millis count for better 1st reading
 	uint8_t syncCounter = 0; // incr on every loop, for less frequent logsend messages
@@ -221,6 +227,8 @@ void TaskLogCurrentSensor(void *pvParameters)
 		float capVoltage = capVoltageADC.readADC_Differential_0_1() * VOLTAGEDIVIDER_SCALE;
 		dataCS.insertData(capVoltage, capInCurrent, capOutCurrent, motorCurrent);
 		dataCSStats.insertData(capVoltage, motorCurrent);
+		//dataCS.insertData(55, 0, 0, motorCurrent);
+		//dataCSStats.insertData(55, motorCurrent);
 
 		s.logThis = true;
 		s.sendThis = true;
@@ -231,7 +239,7 @@ void TaskLogCurrentSensor(void *pvParameters)
 		dataCS.packCAN(&f);
 		xQueueSend(queueForCAN, &f, 100);
 
-		if (syncCounter % 16 == 0)
+		if (syncCounter % 8 == 0)
 		{
 			s.logThis = true;
 			s.sendThis = true;
@@ -241,6 +249,7 @@ void TaskLogCurrentSensor(void *pvParameters)
 		}
 
 		syncCounter++;
+
 		vTaskDelay(pdMS_TO_TICKS(300));
 	}
 }
@@ -273,7 +282,6 @@ void TaskSpeedo(void *pvParameters)
 }
 void TaskBlink(void* pvParameters)
 {
-	debug(F("Blink task started."));
 	// initialize light strips
 	lightstrip.begin();
 	brakestrip.begin();
@@ -336,7 +344,7 @@ void TaskLogSendData(void *pvParameters)
 				Serial.println(s.data);
 			}
 		}
-		vTaskDelay(pdMS_TO_TICKS(10));
+		vTaskDelay(pdMS_TO_TICKS(50));
 	}
 }
 void TaskCAN(void *pvParameters)
@@ -352,37 +360,39 @@ void TaskCAN(void *pvParameters)
 	while (1)
 	{
 		canMsgToSend = xQueueReceive(queueForCAN, &f, 0);
-		if (canMsgToSend == pdTRUE)
+		if (CAN_avail)
 		{
-			serializer.sendCanFrame(&f);
-		}
-
-		if (serializer.receiveCanFrame(&f))
-		{
-			if (dataAcc.checkMatchCAN(&f))
+			if (canMsgToSend == pdTRUE)
 			{
-				dataAcc.unpackCAN(&f);
-				// react to brake command
-				if (dataAcc.getBrake() == STATE_EN)
+				serializer.sendCanFrame(&f);
+			}
+			if (serializer.receiveCanFrame(&f))
+			{
+				if (dataAcc.checkMatchCAN(&f))
 				{
-					setRGB(brakestrip, PIXELS, BRAKE_COLOR);
-					setRGB(lightstrip, PIXELS, BRAKE_COLOR);
+					dataAcc.unpackCAN(&f);
+					// react to brake command
+					if (dataAcc.getBrake() == STATE_EN)
+					{
+						setRGB(brakestrip, PIXELS, BRAKE_COLOR);
+						setRGB(lightstrip, PIXELS, BRAKE_COLOR);
+					}
+					else
+					{
+						setRGB(brakestrip, PIXELS, NO_COLOR);
+						setRGB(lightstrip, PIXELS, LIGHT_COLOR);
+					}
+					// react to signal lights command only when sigOn state does not follow dataAcc
+					if (sigOn != dataAcc.getLsig() || dataAcc.getRsig() || dataAcc.getHazard())
+						xTaskAbortDelay(taskBlink);
 				}
 				else
 				{
-					setRGB(brakestrip, PIXELS, NO_COLOR);
-					setRGB(lightstrip, PIXELS, LIGHT_COLOR);
+					debug_(F("Unrecognized CAN id: "));
+					debug(f.id);
 				}
-				// react to signal lights command only when sigOn state does not follow dataAcc
-				if (sigOn != dataAcc.getLsig() || dataAcc.getRsig() || dataAcc.getHazard())
-					xTaskAbortDelay(taskBlink);
-			}
-			else
-			{
-				debug_(F("Unrecognized CAN id: "));
-				debug(f.id);
 			}
 		}
-		vTaskDelay(pdMS_TO_TICKS(100));
+		vTaskDelay(pdMS_TO_TICKS(50));
 	}
 }

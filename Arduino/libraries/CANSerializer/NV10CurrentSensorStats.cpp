@@ -36,7 +36,7 @@ void NV10CurrentSensorStats::packString(char *str)
 {
 	char* shiftedStr = DataPoint::packStringDefault(str);
 	// wattHour = 4, aPeak = 2
-	sprintf(shiftedStr, "%04d\t%02d", getWattHours(), ampPeak);
+	sprintf(shiftedStr, "%04d\t%d", getWattHours(), ampPeak);
 }
 
 void NV10CurrentSensorStats::unpackString(char * str)

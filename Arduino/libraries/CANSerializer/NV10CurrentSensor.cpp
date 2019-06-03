@@ -20,7 +20,7 @@ void NV10CurrentSensor::packString(char *str)
 {
 	char* shiftedStr = DataPoint::packStringDefault(str);
 	// v = 2, aCin = 2, aCout = 2, aMotor = 2
-	sprintf(shiftedStr, "%02d\t%02d\t%02d\t%02d", volt, ampCapIn, ampCapOut, ampMotor);
+	sprintf(shiftedStr, "%02d\t%d\t%d\t%d", volt, ampCapIn, ampCapOut, ampMotor);
 }
 
 void NV10CurrentSensor::unpackString(char * str)

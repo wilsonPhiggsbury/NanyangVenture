@@ -87,6 +87,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Speedometer", "Arduino\libr
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NV10_back_MEGA", "Arduino\NV10_back_MEGA\NV10_back_MEGA.vcxproj", "{E316FC1D-40FB-4C9C-AC5C-C37CBA7D30A7}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "I2C_scanner", "..\I2C_scanner\I2C_scanner.vcxproj", "{A4BA4F94-F4D3-4EEB-B64D-F51EB69681E4}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\libraries\Rosserial_Arduino_Library\Rosserial_Arduino_Library.vcxitems*{16d6d2c9-e2d8-437f-80bf-3e1b32b814f4}*SharedItemsImports = 9
@@ -316,6 +318,14 @@ Global
 		{E316FC1D-40FB-4C9C-AC5C-C37CBA7D30A7}.Release|x64.ActiveCfg = Release|Win32
 		{E316FC1D-40FB-4C9C-AC5C-C37CBA7D30A7}.Release|x86.ActiveCfg = Release|Win32
 		{E316FC1D-40FB-4C9C-AC5C-C37CBA7D30A7}.Release|x86.Build.0 = Release|Win32
+		{A4BA4F94-F4D3-4EEB-B64D-F51EB69681E4}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{A4BA4F94-F4D3-4EEB-B64D-F51EB69681E4}.Debug|x64.ActiveCfg = Debug|Win32
+		{A4BA4F94-F4D3-4EEB-B64D-F51EB69681E4}.Debug|x86.ActiveCfg = Debug|Win32
+		{A4BA4F94-F4D3-4EEB-B64D-F51EB69681E4}.Debug|x86.Build.0 = Debug|Win32
+		{A4BA4F94-F4D3-4EEB-B64D-F51EB69681E4}.Release|Any CPU.ActiveCfg = Release|Win32
+		{A4BA4F94-F4D3-4EEB-B64D-F51EB69681E4}.Release|x64.ActiveCfg = Release|Win32
+		{A4BA4F94-F4D3-4EEB-B64D-F51EB69681E4}.Release|x86.ActiveCfg = Release|Win32
+		{A4BA4F94-F4D3-4EEB-B64D-F51EB69681E4}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

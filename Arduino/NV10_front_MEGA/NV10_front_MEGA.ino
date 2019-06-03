@@ -127,7 +127,7 @@ void TaskToggle(void* pvParameters)
 		//	peripheralStates[Horn] = STATE_DS;
 		//	debug("beep off.");
 		//}
-		//else if (peripheralStates[Horn] == STATE_DS)
+		//else
 		//{
 		//	digitalWrite(HORN_OUTPUT, HIGH);
 		//}
