@@ -3,14 +3,6 @@
  Created:	11/1/2018 1:31:02 AM
  Author:	MX
 */
-#define DEBUG 1
-#if DEBUG
-#define debug_(str) Serial.print(str)
-#define debug(str)  Serial.println(str)
-#else
-#define debug_(...)
-#define debug(...)
-#endif
 
 #include <CANSerializer.h>
 #include <Servo.h>
@@ -34,6 +26,9 @@ Adafruit_NeoPixel lstrip = Adafruit_NeoPixel(PIXELS, LSIG_OUTPUT, NEO_GRB + NEO_
 Adafruit_NeoPixel rstrip = Adafruit_NeoPixel(PIXELS, RSIG_OUTPUT, NEO_GRB + NEO_KHZ800);
 const uint32_t SIG_COLOR = Adafruit_NeoPixel::Color(255, 165, 0);
 const uint32_t NO_COLOR = Adafruit_NeoPixel::Color(0, 0, 0);
+
+// define globals
+CANSerializer serializer;
 
 /*
 peripheralStates:
@@ -63,7 +58,9 @@ void setup() {
 
 	pinMode(PEDALBRAKE_INTERRUPT, INPUT_PULLUP);
 	attachInterrupt(digitalPinToInterrupt(PEDALBRAKE_INTERRUPT), BRAKE_ISR, FALLING);
-	
+
+	if (!serializer.init(CAN_SPI_CS))
+		debug("CAN FAIL!");
 	xTaskCreate(
 		TaskToggle
 		, (const portCHAR *)"HEAD"
@@ -110,7 +107,7 @@ void TaskToggle(void* pvParameters)
 		// poll to disable brake if brake is on
 		if (dataAcc.getBrake() == STATE_EN)
 		{
-			if (!digitalRead(PEDALBRAKE_INTERRUPT))
+			if (digitalRead(PEDALBRAKE_INTERRUPT))
 			{
 				dataAcc.setBrake(STATE_DS);
 				dataAcc.packCAN(&f);
@@ -140,7 +137,7 @@ void TaskToggle(void* pvParameters)
 		{
 			digitalWrite(HEADLIGHTS_OUTPUT, LOW);
 		}
-		vTaskDelay(pdMS_TO_TICKS(10));
+		vTaskDelay(pdMS_TO_TICKS(100));
 	}
 }
 void TaskBlink(void* pvParameters)
@@ -158,6 +155,7 @@ void TaskBlink(void* pvParameters)
 			sigOn = false;
 			setRGB(lstrip, PIXELS, NO_COLOR);
 			setRGB(rstrip, PIXELS, NO_COLOR);
+			debug("SIG OFF");
 		}
 		else
 		{
@@ -165,11 +163,13 @@ void TaskBlink(void* pvParameters)
 			{
 				sigOn = true;
 				setRGB(lstrip, PIXELS, SIG_COLOR);
+				debug("LSIG ON");
 			}
 			if (dataAcc.getHazard() == STATE_EN || dataAcc.getRsig() == STATE_EN)
 			{
 				sigOn = true;
 				setRGB(rstrip, PIXELS, SIG_COLOR);
+				debug("RSIG ON");
 			}
 		}
 		vTaskDelay(pdMS_TO_TICKS(500));
@@ -188,10 +188,12 @@ void TaskMoveWiper(void* pvParameters)
 				wiperPos = 180;
 			else
 				wiperPos = 0;
+			debug("WIPE ON");
 		}
 		else if (dataAcc.getWiper() == STATE_DS)
 		{
 			wiperPos = 0;
+			debug("WIPE OFF");
 		}
 		wiper.write(wiperPos);
 		vTaskDelay(pdMS_TO_TICKS(800));
@@ -200,10 +202,6 @@ void TaskMoveWiper(void* pvParameters)
 void TaskCAN(void *pvParameters) {
 
 	CANFrame f;
-	CANSerializer serializer;
-	if (!serializer.init(CAN_SPI_CS))
-		debug("CAN FAIL!");
-
 	while (1)
 	{
 		// anything to send
@@ -211,6 +209,11 @@ void TaskCAN(void *pvParameters) {
 		if (recvQueue == pdTRUE)
 		{
 			serializer.sendCanFrame(&f);
+#if DEBUG
+			char str[100];
+			dataAcc.packString(str);
+			debug(str);
+#endif
 		}
 		// anything to recv
 		if (serializer.receiveCanFrame(&f))

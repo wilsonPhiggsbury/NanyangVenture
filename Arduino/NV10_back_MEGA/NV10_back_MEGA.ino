@@ -54,7 +54,6 @@ Adafruit_NeoPixel lstrip = Adafruit_NeoPixel(7, LSIG_PIN, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel rstrip = Adafruit_NeoPixel(7, RSIG_PIN, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel lightstrip = Adafruit_NeoPixel(7, RUNNINGLIGHT_PIN, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel brakestrip = Adafruit_NeoPixel(7, BRAKE_PIN, NEO_GRB + NEO_KHZ800);
-bool sigOn = false;
 
 // define globals
 bool SD_avail = false, CAN_avail = false;
@@ -278,6 +277,7 @@ void TaskSpeedo(void *pvParameters)
 }
 void TaskBlink(void* pvParameters)
 {
+	bool sigOn = false;
 	// initialize light strips
 	lightstrip.begin();
 	brakestrip.begin();
