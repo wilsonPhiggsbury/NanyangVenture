@@ -1,4 +1,11 @@
-#include <EEPROM.h>
+
+void StructForLogSend::setLogSend(bool log, bool send, const char* path)
+{
+	logThis = log;
+	sendThis = send;
+	strncpy(this->path, path, 10);
+	this->path[10-1] = '\0';
+}
 /// <summary>
 /// Initializes SD card if present. Also creates a new folder to store this session's data into.
 /// </summary>

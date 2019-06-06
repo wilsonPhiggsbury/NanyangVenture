@@ -31,10 +31,13 @@ NV10AccesoriesStatus dataAcc;
 
 // struct for log send exists to wrap strings properly with path names
 typedef struct  {
+private:
+public:
+	char data[100];
 	bool logThis;
 	bool sendThis;
 	char path[10];
-	char data[100];
+	void setLogSend(bool log, bool send, const char* path);
 }StructForLogSend;
 QueueHandle_t queueForLogSend = xQueueCreate(1, sizeof(StructForLogSend));
 QueueHandle_t queueForCAN = xQueueCreate(1, sizeof(CANFrame));
@@ -56,6 +59,7 @@ bool sigOn = false;
 // define globals
 bool SD_avail = false, CAN_avail = false;
 SdFat card;
+CANSerializer serializer;
 
 // wheel diameter is 545 mm, feed into speedo
 Speedometer speedo = Speedometer(SPEEDOMETER_INTERRUPT_PIN, 545, 2);
@@ -85,6 +89,9 @@ void setup() {
 	SD_avail = initSD(card);
 	Serial.print("SD avail: ");
 	Serial.println(SD_avail);
+	CAN_avail = serializer.init(CAN_CS_PIN);
+	Serial.print("CAN avail: ");
+	Serial.println(CAN_avail);
 
 	// Now set up all Tasks to run independently. Task functions are found in Tasks.ino
 	xTaskCreate(
@@ -125,7 +132,7 @@ void setup() {
 	xTaskCreate(
 		TaskCAN
 		, (const portCHAR *) "CAN la!" // where got cannot?
-		, 300  // Stack size
+		, 600  // Stack size
 		, NULL
 		, 2  // Priority
 		, NULL);
@@ -142,9 +149,7 @@ void TaskLogFuelCell(void *pvParameters)
 {
 	CANFrame f;
 	StructForLogSend s; // this is only for logging FC raw data
-	s.logThis = true;
-	s.sendThis = false;
-	strcpy(s.path, "FCraw.txt");
+	s.setLogSend(true, false, "FCraw.txt");
 
 	HardwareSerial& fcPort = Serial3;
 	fcPort.begin(19200);
@@ -156,9 +161,7 @@ void TaskLogFuelCell(void *pvParameters)
 		if (bytesRead > 0)
 		{
 			s.data[bytesRead - 1] = '\0'; // manually null-terminate. Rewrite '\r' into '\0'
-			s.logThis = true;
-			s.sendThis = false;
-			strcpy(s.path, "FCraw.txt");
+			s.setLogSend(true, false, "FCraw.txt");
 			// log the raw data
 			xQueueSend(queueForLogSend, &s, 100);
 			// CAN the processed fc data
@@ -166,9 +169,7 @@ void TaskLogFuelCell(void *pvParameters)
 			dataFC.packCAN(&f);
 			xQueueSend(queueForCAN, &f, 100);
 			// subsequently, do not log the processed data, but still send it
-			s.logThis = false;
-			s.sendThis = true;
-			strcpy(s.path, "FC.txt");
+			s.setLogSend(false, true, "FC.txt");
 			dataFC.packString(s.data);
 			xQueueSend(queueForLogSend, &s, 100);
 		}
@@ -179,9 +180,7 @@ void TaskLogCurrentSensor(void *pvParameters)
 {
 	CANFrame f;
 	StructForLogSend s;
-	s.logThis = true;
-	s.sendThis = true;
-	strcpy(s.path, "CS.txt");
+	s.setLogSend(true, true, "CS.txt");
 	/* 
 	ADS1115 full scale range (FSR) table
 	GAIN	FSR(mV)	LSB size(microV)
@@ -230,9 +229,7 @@ void TaskLogCurrentSensor(void *pvParameters)
 		//dataCS.insertData(55, 0, 0, motorCurrent);
 		//dataCSStats.insertData(55, motorCurrent);
 
-		s.logThis = true;
-		s.sendThis = true;
-		strcpy(s.path, "CS.txt");
+		s.setLogSend(true, true, "CS.txt");
 		dataCS.packString(s.data);
 		xQueueSend(queueForLogSend, &s, 100);
 
@@ -241,11 +238,12 @@ void TaskLogCurrentSensor(void *pvParameters)
 
 		if (syncCounter % 8 == 0)
 		{
-			s.logThis = true;
-			s.sendThis = true;
-			strcpy(s.path, "CSstats.txt");
+			s.setLogSend(true, true, "CSst.txt");
 			dataCSStats.packString(s.data);
 			xQueueSend(queueForLogSend, &s, 100);
+
+			dataCSStats.packCAN(&f);
+			xQueueSend(queueForCAN, &f, 100);
 		}
 
 		syncCounter++;
@@ -267,9 +265,7 @@ void TaskSpeedo(void *pvParameters)
 		float speedKmh = speedo.getSpeedKmh();
 		dataSpeedo.insertData(speedKmh);
 
-		s.logThis = true;
-		s.sendThis = true;
-		strcpy(s.path, "SM.txt");
+		s.setLogSend(true, true, "SM.txt");
 		dataSpeedo.packString(s.data);
 		xQueueSend(queueForLogSend, &s, 100);
 
@@ -351,12 +347,9 @@ void TaskCAN(void *pvParameters)
 {
 	CANFrame f;
 
-	CANSerializer serializer;
-	CAN_avail = serializer.init(CAN_CS_PIN);
-	debug_("CAN avail: ");
-	debug(CAN_avail);
 
 	BaseType_t canMsgToSend;
+	bool prevSigOn = false, thisSigOn = false; // sigOn should be true if any of sig is on (left / right / hazard)
 	while (1)
 	{
 		canMsgToSend = xQueueReceive(queueForCAN, &f, 0);
@@ -374,17 +367,24 @@ void TaskCAN(void *pvParameters)
 					// react to brake command
 					if (dataAcc.getBrake() == STATE_EN)
 					{
+						debug(F("BRAKE on"));
 						setRGB(brakestrip, PIXELS, BRAKE_COLOR);
 						setRGB(lightstrip, PIXELS, BRAKE_COLOR);
 					}
 					else
 					{
+						debug(F("BRAKE off"));
 						setRGB(brakestrip, PIXELS, NO_COLOR);
 						setRGB(lightstrip, PIXELS, LIGHT_COLOR);
 					}
-					// react to signal lights command only when sigOn state does not follow dataAcc
-					if (sigOn != dataAcc.getLsig() || dataAcc.getRsig() || dataAcc.getHazard())
+					// react to signal lights command only when sigOn state has changed
+					thisSigOn = dataAcc.getLsig() || dataAcc.getRsig() || dataAcc.getHazard();
+					if (prevSigOn != thisSigOn)
+					{
+						debug(F("Trig Sig"));
+						prevSigOn = thisSigOn;
 						xTaskAbortDelay(taskBlink);
+					}
 				}
 				else
 				{
