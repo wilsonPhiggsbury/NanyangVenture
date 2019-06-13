@@ -7,7 +7,7 @@
 
 #include "CANSerializer.h"
 
-bool CANSerializer::init(uint8_t cs, uint16_t kbps = 1000)
+bool CANSerializer::init(uint8_t cs, uint16_t kbps)
 {
 	byte speedset;
 	switch (kbps)

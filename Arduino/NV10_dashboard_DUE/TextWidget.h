@@ -11,7 +11,7 @@ class TextWidget:public DataWidget
 	 uint8_t textSize = 2;
 	 int16_t cursorX = 0;
 	 int16_t cursorY = 0;
-	 char* text;
+	 const char* text;
 	 uint8_t textWidth = 1;
 	 uint8_t textHeight = 1;
 	 uint8_t prevTextWidth = 0;

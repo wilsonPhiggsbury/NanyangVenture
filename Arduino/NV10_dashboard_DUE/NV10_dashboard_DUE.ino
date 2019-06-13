@@ -23,6 +23,8 @@ NV10CurrentSensorStats dataCSStats;
 NV11DataSpeedo dataSpeedo;
 NV10AccesoriesStatus dataAcc;
 
+DashboardScreens d;
+
 //TextWidget t = TextWidget(&centerScreen, 475, 0, 200, 50, alignRight, alignTop);
 //BarWidget b = BarWidget(&centerScreen, 475, 200, 200, 40, RIGHT_TO_LEFT);
 //void setup() {
@@ -70,13 +72,13 @@ NV10AccesoriesStatus dataAcc;
 //
 //	delay(1000);
 //}
-
+void setDebounce(const unsigned int pins[], uint8_t numPins, uint16_t waitTimeMultiplier = 500);
 void setup()
 {
-	Serial1.begin(9600);
-	Serial1.setTimeout(500);
+	Serial.begin(9600);
+	Serial.setTimeout(500);
 
-	dashboardInit();
+	d.dashboardInit();
 	// I tried putting attachinterrupt in the for loop above but failed. Lambda functions complain.
 	// So here, have some wall text.
 	attachInterrupt(digitalPinToInterrupt(BTN_HAZARD), [] {
@@ -105,24 +107,24 @@ void loop()
 {
 	char s[100];
 	// output dashboard display based on incoming CAN strings
-	uint8_t bytesRead = Serial1.readBytesUntil('\n', s, 100);
+	uint8_t bytesRead = Serial.readBytesUntil('\n', s, 100);
 	if (bytesRead > 0)
 	{
 		s[bytesRead - 1] = '\0';
 		if (dataFC.checkMatchString(s))
 		{
 			dataFC.unpackString(s);
-			dashboardNextValuesFC(dataFC.getWatts(), dataFC.getPressure(), dataFC.getTemperature(), dataFC.getStatus());
+			d.dashboardNextValuesFC(dataFC.getWatts(), dataFC.getPressure(), dataFC.getTemperature(), dataFC.getStatus());
 		}
 		else if (dataCS.checkMatchString(s))
 		{
 			dataCS.unpackString(s);
-			dashboardNextValuesCS(dataCS.getVolt(), dataCS.getAmpCapIn(), dataCS.getAmpCapOut(), dataCS.getAmpMotor());
+			d.dashboardNextValuesCS(dataCS.getVolt(), dataCS.getAmpCapIn(), dataCS.getAmpCapOut(), dataCS.getAmpMotor());
 		}
 		else if (dataSpeedo.checkMatchString(s))
 		{
 			dataSpeedo.unpackString(s);
-			dashboardNextValuesSpeed(dataSpeedo.getSpeed());
+			d.dashboardNextValuesSpeed(dataSpeedo.getSpeed());
 		}
 		else if (dataAcc.checkMatchString(s))
 		{
@@ -132,11 +134,12 @@ void loop()
 	// output CAN strings based on buttons inputs (already handled by interrupts)
 	if (dataAcc.dataRequiresBroadcast())
 	{
+		d.dashboardToggleSig(dataAcc.getLsig(), dataAcc.getRsig());
 		dataAcc.packString(s);
-		Serial1.println(s);
+		Serial.println(s);
 	}
 
-	dashboardNextFrame();
+	d.dashboardNextFrame();
 	// wait until 100ms elapsed
 	static unsigned long lastTime;
 	while (millis() - lastTime < 100);

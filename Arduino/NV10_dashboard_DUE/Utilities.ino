@@ -1,5 +1,5 @@
 ﻿
-void setDebounce(const unsigned int pins[], uint8_t numPins, uint16_t waitTimeMultiplier = 500)
+void setDebounce(const unsigned int pins[], uint8_t numPins, uint16_t waitTimeMultiplier)
 {
 	/*
 	http://ww1.microchip.com/downloads/en/devicedoc/atmel-11057-32-bit-cortex-m3-microcontroller-sam3x-sam3a_datasheet.pdf

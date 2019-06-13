@@ -33,7 +33,6 @@ protected:
 	uint16_t foreground = ILI9488_WHITE;
 	uint16_t background = ILI9488_BLACK;
 	bool stuck = false;
-	void drawBorder(uint8_t stroke, uint16_t color);
 	virtual void refreshSettings() = 0;
 	virtual void draw() = 0;
 public:
@@ -41,6 +40,7 @@ public:
 	~Widget();
 	void init();
 	virtual void setMargin(uint8_t margin);
+	void drawBorder(uint8_t stroke, uint16_t color);
 	virtual void setColors(uint16_t foreground, uint16_t background);
 	virtual void updateFrame() = 0;
 	virtual void updateNull() = 0;

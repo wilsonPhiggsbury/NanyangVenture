@@ -41,4 +41,14 @@ void ArrowWidget::updateNull()
 {
 }
 
+void ArrowWidget::activate()
+{
+	draw();
+}
+
+void ArrowWidget::deactivate()
+{
+	wipe();
+}
+
 

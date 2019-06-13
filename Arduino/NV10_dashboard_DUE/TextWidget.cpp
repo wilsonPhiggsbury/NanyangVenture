@@ -28,7 +28,7 @@ void TextWidget::refreshSettings()
 	if (width > height * 3 / 4)
 	{
 		// take text size using height, margin excluded 
-		textSize = (height - margin) / textHeightPerSize / textWidth / textHeight;
+		textSize = (height - margin) / textHeightPerSize / max(textWidth, textHeight);
 		//Serial.print(textSize);
 		//Serial.print(" ");
 		//Serial.print(textWidth);
@@ -40,7 +40,7 @@ void TextWidget::refreshSettings()
 	else
 	{
 		// take text size using width, margin excluded 
-		textSize = (width - margin) / textWidthPerSize / textWidth / textHeight;
+		textSize = (width - margin) / textWidthPerSize / max(textWidth, textHeight);
 		//Serial.print(textSize);
 		//Serial.print(" ");
 		//Serial.print(textWidth);
@@ -51,7 +51,8 @@ void TextWidget::refreshSettings()
 	}
 	//Serial.print("Text size: ");
 	//Serial.println(textSize);
-	textSize *= 3;
+	if (textSize < 4)
+		textSize *= 2;
 	cursorX = constrain(xPos + width / 2 - textWidth * textSize * textWidthPerSize / 2, 0, SCREENWIDTH);
 	cursorY = constrain(yPos + height / 2 - textHeight * textSize * textHeightPerSize / 2, 0, SCREENHEIGHT);
 }
@@ -77,7 +78,7 @@ void TextWidget::updateNull()
 void TextWidget::updateFloat(float value)
 {
 	char tmp[5];
-	sprintf(tmp, "%4.2f", value);
+	sprintf(tmp, "%3.0f", value);
 	updateText(tmp);
 }
 
@@ -92,6 +93,3 @@ void TextWidget::updateText(const char* text)
 	prevTextWidth = textWidth;
 	draw();
 }
-
-
-

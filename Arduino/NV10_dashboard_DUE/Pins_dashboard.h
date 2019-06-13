@@ -6,8 +6,8 @@
 #define LCD_OUTPUT_DC 7
 #define LCD_OUTPUT_RST 8
 #define LCD_OUTPUT_BACKLIGHT 9
-#define LCDLEFT_SPI_CS 10
-#define LCDCENTER_SPI_CS 11
+#define LCDLEFT_SPI_CS 11
+#define LCDCENTER_SPI_CS 10
 #define LCDRIGHT_SPI_CS 12
 
 #define BTN_LSIG 50 // red wire
