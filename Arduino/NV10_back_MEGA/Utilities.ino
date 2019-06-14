@@ -21,9 +21,9 @@ bool initSD(SdFat& card)
 	char folderPath[18] = "/NV10_";	// max 8 chars. len("NV10_") = 5, pad 3 digits to the new folder
 	do {
 		sprintf(folderPath + 6, "%03d/", ++folderEntries);	// pad '0' on the front if number contains less than 3 digits
-		debug_("Checking: "); debug(folderPath);
+		debugSerialPort.print("Checking: "); debugSerialPort.println(folderPath);
 	} while (card.exists(folderPath));
-	debug_(folderPath); debug(" does not exist!");
+	debugSerialPort.print(folderPath); debugSerialPort.println(" does not exist!");
 	// Wipe when too full, or on user request ('~' char)
 	if (folderEntries > 30)
 	{
@@ -53,7 +53,7 @@ bool initSD(SdFat& card)
 	// Make new directory and operate within it.
 	card.mkdir(folderPath);
 	card.chdir(folderPath);
-	debug_("Created dir "); debug(folderPath);
+	debugSerialPort.print("Created dir "); debugSerialPort.println(folderPath);
 	//File f;
 	//// initialize FC column text
 	//f = card.open("FC.txt", FILE_WRITE);

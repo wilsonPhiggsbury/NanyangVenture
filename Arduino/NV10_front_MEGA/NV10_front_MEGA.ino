@@ -53,25 +53,26 @@ void TaskCAN(void* pvParameters);
 QueueHandle_t queueForCAN = xQueueCreate(1, sizeof(CANFrame));
 TaskHandle_t taskBlink, taskMoveWiper, taskToggle;
 
+HardwareSerial& debugSerialPort = Serial;
 void setup() {
-	Serial.begin(9600);
+	debugSerialPort.begin(9600);
 
 	pinMode(PEDALBRAKE_INTERRUPT, INPUT_PULLUP);
 	attachInterrupt(digitalPinToInterrupt(PEDALBRAKE_INTERRUPT), BRAKE_ISR, FALLING);
 
-	if (!serializer.init(CAN_SPI_CS))
-		debug("CAN FAIL!");
+	if (!serializer.init(CAN_SPI_CS, 1000))
+		debugSerialPort.println("CAN FAIL!");
 	xTaskCreate(
 		TaskToggle
 		, (const portCHAR *)"HEAD"
 		, 300
 		, NULL
-		, 2
+		, 1
 		, &taskToggle);
 	xTaskCreate(
 		TaskCAN
 		, (const portCHAR *)"CAN la"
-		, 400
+		, 600
 		, NULL
 		, 2
 		, NULL);
@@ -117,12 +118,12 @@ void TaskToggle(void* pvParameters)
 
 		//if (dataAcc.getHorn() == STATE_EN)
 		//{
-		//	debug("BEEEP!");
+		//	debugSerialPort.println("BEEEP!");
 		//	digitalWrite(HORN_OUTPUT, LOW);
 		//	vTaskDelay(pdMS_TO_TICKS(500));
 		//	digitalWrite(HORN_OUTPUT, HIGH);
 		//	peripheralStates[Horn] = STATE_DS;
-		//	debug("beep off.");
+		//	debugSerialPort.println("beep off.");
 		//}
 		//else
 		//{
@@ -155,7 +156,7 @@ void TaskBlink(void* pvParameters)
 			sigOn = false;
 			setRGB(lstrip, PIXELS, NO_COLOR);
 			setRGB(rstrip, PIXELS, NO_COLOR);
-			debug("SIG OFF");
+			debugSerialPort.println("SIG OFF");
 		}
 		else
 		{
@@ -163,13 +164,13 @@ void TaskBlink(void* pvParameters)
 			{
 				sigOn = true;
 				setRGB(lstrip, PIXELS, SIG_COLOR);
-				debug("LSIG ON");
+				debugSerialPort.println("LSIG ON");
 			}
 			if (dataAcc.getHazard() == STATE_EN || dataAcc.getRsig() == STATE_EN)
 			{
 				sigOn = true;
 				setRGB(rstrip, PIXELS, SIG_COLOR);
-				debug("RSIG ON");
+				debugSerialPort.println("RSIG ON");
 			}
 		}
 		vTaskDelay(pdMS_TO_TICKS(500));
@@ -178,24 +179,33 @@ void TaskBlink(void* pvParameters)
 void TaskMoveWiper(void* pvParameters)
 {
 	Servo wiper;
-	wiper.attach(WIPER_PWM_SERVO, 900, 2000);
 	int wiperPos = 0;
+
+	uint8_t prevWiperOn = STATE_DS;
 	while (1)
 	{
-		if (dataAcc.getWiper() == STATE_EN)
+		if (wiperPos == 0)
 		{
-			if (wiperPos == 0)
+			if (dataAcc.getWiper() == STATE_EN)
+			{
+				if(!wiper.attached())
+					wiper.attach(WIPER_PWM_SERVO, 900, 2000);
 				wiperPos = 180;
-			else
-				wiperPos = 0;
-			debug("WIPE ON");
+				wiper.write(wiperPos);
+			}
+			else if (dataAcc.getWiper() == STATE_DS)
+			{
+				if(wiper.attached())
+					wiper.detach();
+			}
 		}
-		else if (dataAcc.getWiper() == STATE_DS)
+		else
 		{
 			wiperPos = 0;
-			debug("WIPE OFF");
+			wiper.write(wiperPos);
 		}
-		wiper.write(wiperPos);
+		debugSerialPort.print("WIPER ");
+		debugSerialPort.println(wiperPos);
 		vTaskDelay(pdMS_TO_TICKS(800));
 	}
 }
@@ -205,25 +215,33 @@ void TaskCAN(void *pvParameters) {
 	while (1)
 	{
 		// anything to send
-		BaseType_t recvQueue = xQueueReceive(queueForCAN, &f, 100);
+		BaseType_t recvQueue = xQueueReceive(queueForCAN, &f, 0);
 		if (recvQueue == pdTRUE)
 		{
 			serializer.sendCanFrame(&f);
-#if DEBUG
 			char str[100];
 			dataAcc.packString(str);
-			debug(str);
-#endif
+			debugSerialPort.print(F("<S> "));
+			debugSerialPort.println(str);
 		}
 		// anything to recv
 		if (serializer.receiveCanFrame(&f))
 		{
+			char str[100];
 			if (dataAcc.checkMatchCAN(&f))
 			{
 				dataAcc.unpackCAN(&f);
+				debugSerialPort.print("<R> ");
+				dataAcc.packString(str);
+				debugSerialPort.println(str);
 				xTaskAbortDelay(taskBlink);
 				xTaskAbortDelay(taskMoveWiper);
 			}
+		}
+		else
+		{
+			if(!serializer.checkNoError())
+				debugSerialPort.println("CAN error");
 		}
 		vTaskDelay(pdMS_TO_TICKS(50));
 	}

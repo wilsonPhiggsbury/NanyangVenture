@@ -63,6 +63,10 @@ CANSerializer serializer;
 // wheel diameter is 545 mm, feed into speedo
 Speedometer speedo = Speedometer(SPEEDOMETER_INTERRUPT_PIN, 545, 2);
 
+HardwareSerial& fcSerialPort = Serial3;
+HardwareSerial& dataSerialPort = Serial1;
+HardwareSerial& debugSerialPort = Serial2;
+
 // define tasks, types are: input, control, output
 void TaskLogFuelCell(void *pvParameters);		// Input task:		Refreshes class variables for fuel cell Volts, Amps, Watts and Energy
 void TaskLogCurrentSensor(void *pvParameters);	// Input task:		Refreshes class variables for motor Volts and Amps
@@ -81,16 +85,16 @@ void TaskBlink(void *pvParameters);			//
 /// Manages running lights, brake lights, signal lights.
 /// </summary>
 void setup() {
-	Serial.begin(9600);
-	while (!Serial);
+	debugSerialPort.begin(9600);
+	while (!debugSerialPort);
 
 	// create all files in a new directory
 	SD_avail = initSD(card);
-	Serial.print("SD avail: ");
-	Serial.println(SD_avail);
+	debugSerialPort.print("SD avail: ");
+	debugSerialPort.println(SD_avail);
 	CAN_avail = serializer.init(CAN_CS_PIN);
-	Serial.print("CAN avail: ");
-	Serial.println(CAN_avail);
+	debugSerialPort.print("CAN avail: ");
+	debugSerialPort.println(CAN_avail);
 
 	// Now set up all Tasks to run independently. Task functions are found in Tasks.ino
 	xTaskCreate(
@@ -136,8 +140,8 @@ void setup() {
 		, 2  // Priority
 		, NULL);
 	//vTaskStartScheduler();
-	debug_(F("Free Memory in Bytes: "));
-	debug(freeMemory());
+	debugSerialPort.print(F("Free Memory in Bytes: "));
+	debugSerialPort.println(freeMemory());
 }
 
 void loop()
@@ -150,24 +154,23 @@ void TaskLogFuelCell(void *pvParameters)
 	StructForLogSend s; // this is only for logging FC raw data
 	s.setLogSend(true, false, "FCraw.txt");
 
-	HardwareSerial& fcPort = Serial3;
-	fcPort.begin(19200);
-	fcPort.setTimeout(50);
+	fcSerialPort.begin(19200);
+	fcSerialPort.setTimeout(50);
 
 	while (1)
 	{
-		uint8_t bytesRead = fcPort.readBytesUntil('\n', s.data, 100);
+		uint8_t bytesRead = fcSerialPort.readBytesUntil('\n', s.data, 100);
 		if (bytesRead > 0)
 		{
 			s.data[bytesRead - 1] = '\0'; // manually null-terminate. Rewrite '\r' into '\0'
-			s.setLogSend(true, false, "FCraw.txt");
 			// log the raw data
+			s.setLogSend(true, false, "FCraw.txt");
 			xQueueSend(queueForLogSend, &s, 100);
 			// CAN the processed fc data
 			dataFC.insertData(s.data); // THIS will destroy s.data! Don't send s anymore after this line
 			dataFC.packCAN(&f);
 			xQueueSend(queueForCAN, &f, 100);
-			// subsequently, do not log the processed data, but still send it
+			// subsequently, do not log the processed data, but still send CAN to the dashboard
 			s.setLogSend(false, true, "FC.txt");
 			dataFC.packString(s.data);
 			xQueueSend(queueForLogSend, &s, 100);
@@ -299,7 +302,6 @@ void TaskBlink(void* pvParameters)
 			sigOn = false;
 			setRGB(lstrip, PIXELS, NO_COLOR);
 			setRGB(rstrip, PIXELS, NO_COLOR);
-			debug(F("Sig OFF"));
 		}
 		else
 		{
@@ -307,13 +309,13 @@ void TaskBlink(void* pvParameters)
 			{
 				sigOn = true;
 				setRGB(lstrip, PIXELS, SIG_COLOR);
-				debug(F("lSig ON"));
+				debugSerialPort.println(F("lSig ON"));
 			}
 			if (dataAcc.getHazard() == STATE_EN || dataAcc.getRsig() == STATE_EN)
 			{
 				sigOn = true;
 				setRGB(rstrip, PIXELS, SIG_COLOR);
-				debug(F("rSig ON"));
+				debugSerialPort.println(F("rSig ON"));
 			}
 		}
 		vTaskDelay(pdMS_TO_TICKS(500));
@@ -321,6 +323,7 @@ void TaskBlink(void* pvParameters)
 }
 void TaskLogSendData(void *pvParameters)
 {
+	dataSerialPort.begin(9600);
 	StructForLogSend s;
 
 	BaseType_t stringToLog;
@@ -340,7 +343,7 @@ void TaskLogSendData(void *pvParameters)
 			}
 			if (s.sendThis)
 			{
-				Serial.println(s.data);
+				dataSerialPort.println(s.data);
 			}
 		}
 		vTaskDelay(pdMS_TO_TICKS(50));
@@ -370,13 +373,13 @@ void TaskCAN(void *pvParameters)
 					// react to brake command
 					if (dataAcc.getBrake() == STATE_EN)
 					{
-						debug(F("BRAKE on"));
+						debugSerialPort.println(F("BRAKE on"));
 						setRGB(brakestrip, PIXELS, BRAKE_COLOR);
 						setRGB(lightstrip, PIXELS, BRAKE_COLOR);
 					}
 					else
 					{
-						debug(F("BRAKE off"));
+						debugSerialPort.println(F("BRAKE off"));
 						setRGB(brakestrip, PIXELS, NO_COLOR);
 						setRGB(lightstrip, PIXELS, LIGHT_COLOR);
 					}
@@ -390,8 +393,8 @@ void TaskCAN(void *pvParameters)
 				}
 				else
 				{
-					debug_(F("Unrecognized CAN id: "));
-					debug(f.id);
+					debugSerialPort.print(F("Unrecognized CAN id: "));
+					debugSerialPort.println(f.id);
 				}
 			}
 		}

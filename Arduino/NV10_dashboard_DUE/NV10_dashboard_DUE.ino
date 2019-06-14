@@ -31,6 +31,7 @@ NV10AccesoriesStatus dataAcc;
 
 DashboardScreens d;
 HardwareSerial& CANSerialPort = Serial1;
+HardwareSerial& debugSerialPort = Serial;
 //TextWidget t = TextWidget(&centerScreen, 475, 0, 200, 50, alignRight, alignTop);
 //BarWidget b = BarWidget(&centerScreen, 475, 200, 200, 40, RIGHT_TO_LEFT);
 //void setup() {
@@ -81,7 +82,7 @@ HardwareSerial& CANSerialPort = Serial1;
 void setDebounce(const unsigned int pins[], uint8_t numPins, uint16_t waitTimeMultiplier = 500);
 void setup()
 {
-	Serial.begin(9600);
+	debugSerialPort.begin(9600);
 	CANSerialPort.begin(9600);
 	CANSerialPort.setTimeout(500);
 
@@ -114,6 +115,8 @@ void setup()
 
 	const unsigned int pins[] = { BTN_HAZARD, BTN_WIPER, BTN_HORN, BTN_HEADLIGHT, BTN_LSIG, BTN_RSIG };
 	setDebounce(pins, sizeof(pins) / sizeof(pins[0]));
+
+	dataAcc.insertData(0, 0, 0, 0, 0, 0);
 }
 void loop()
 {
@@ -123,8 +126,8 @@ void loop()
 	if (bytesRead > 0)
 	{
 		s[bytesRead - 1] = '\0';
-		Serial.print("<R> ");
-		Serial.println(s);
+		debugSerialPort.print("<R> ");
+		debugSerialPort.println(s);
 		if (dataFC.checkMatchString(s))
 		{
 			dataFC.unpackString(s);
@@ -151,8 +154,8 @@ void loop()
 		d.dashboardToggleSig(dataAcc.getLsig(), dataAcc.getRsig());
 		dataAcc.packString(s);
 		CANSerialPort.println(s);
-		Serial.print("<S> ");
-		Serial.println(s);
+		debugSerialPort.print("<S> ");
+		debugSerialPort.println(s);
 	}
 
 	d.dashboardNextFrame();
