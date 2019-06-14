@@ -49,7 +49,17 @@ void DashboardScreens::dashboardInit()
 }
 void DashboardScreens::dashboardNextFrame()
 {
-
+	if (fcTimeoutCounter < fcTimeout)
+	{
+		fcTimeoutCounter++;
+	}
+	else if (fcTimeoutCounter == fcTimeout)
+	{
+		fcTimeoutCounter++;
+		// deactivate fc widgets
+		status_txt.setColors(ILI9488_WHITE, ILI9488_BLUE);
+		status_txt.updateText("--");
+	}
 }
 void DashboardScreens::dashboardNextValuesFC(int watts, float pressure, int temperature, const char * status)
 {
@@ -57,6 +67,12 @@ void DashboardScreens::dashboardNextValuesFC(int watts, float pressure, int temp
 	//energy_txt.updateFloat(watts);
 	//pressure_txt.updateFloat(pressure);
 	//stackTemperature_txt.updateFloat(temperature);
+	if (fcTimeoutCounter > fcTimeout)
+	{
+		// reactivate FC widgets if previously disabled
+		// ...
+	}
+	fcTimeoutCounter = 0; // reset FC timeout everytime FC data arrives
 	if (!strcmp(status, "OP"))
 	{
 		status_txt.setColors(ILI9488_GREEN, ILI9488_DARKGREEN);

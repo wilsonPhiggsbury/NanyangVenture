@@ -47,6 +47,9 @@ class DashboardScreens
 	//TextWidget pressure_txt = TextWidget(&rightScreen, SCREENWIDTH, 0, 140, 80, alignRight, alignTop);
 	//TextWidget energy_txt = TextWidget(&rightScreen, SCREENWIDTH / 2, SCREENHEIGHT / 2 - 40 + 20, 400, 80, alignCenter, alignCenter);
 	//BarWidget energy_bar = BarWidget(&rightScreen, SCREENWIDTH / 2, SCREENHEIGHT / 2 + 40 + 20, 400, 80, alignCenter, alignCenter);
+
+	const uint8_t fcTimeout = 20;
+	uint8_t fcTimeoutCounter = 0;
 public:
 	DashboardScreens();
 	void dashboardInit();

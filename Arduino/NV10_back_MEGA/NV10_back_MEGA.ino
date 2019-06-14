@@ -299,6 +299,7 @@ void TaskBlink(void* pvParameters)
 			sigOn = false;
 			setRGB(lstrip, PIXELS, NO_COLOR);
 			setRGB(rstrip, PIXELS, NO_COLOR);
+			debug(F("Sig OFF"));
 		}
 		else
 		{
@@ -306,11 +307,13 @@ void TaskBlink(void* pvParameters)
 			{
 				sigOn = true;
 				setRGB(lstrip, PIXELS, SIG_COLOR);
+				debug(F("lSig ON"));
 			}
 			if (dataAcc.getHazard() == STATE_EN || dataAcc.getRsig() == STATE_EN)
 			{
 				sigOn = true;
 				setRGB(rstrip, PIXELS, SIG_COLOR);
+				debug(F("rSig ON"));
 			}
 		}
 		vTaskDelay(pdMS_TO_TICKS(500));
@@ -381,7 +384,6 @@ void TaskCAN(void *pvParameters)
 					thisSigOn = dataAcc.getLsig() || dataAcc.getRsig() || dataAcc.getHazard();
 					if (prevSigOn != thisSigOn)
 					{
-						debug(F("Trig Sig"));
 						prevSigOn = thisSigOn;
 						xTaskAbortDelay(taskBlink);
 					}

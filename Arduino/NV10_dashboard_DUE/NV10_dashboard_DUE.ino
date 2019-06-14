@@ -3,6 +3,12 @@
  Created:	3/21/2019 8:01:28 PM
  Author:	MX
 */
+
+/*
+WARNING
+
+	DO NOT ENABLE debug(...) in this script. Verified to malfunction.
+*/
 #include "DashboardScreens.h"
 #include "ArrowWidget.h"
 #include "BarWidget.h"
@@ -24,7 +30,7 @@ NV11DataSpeedo dataSpeedo;
 NV10AccesoriesStatus dataAcc;
 
 DashboardScreens d;
-
+HardwareSerial& CANSerialPort = Serial1;
 //TextWidget t = TextWidget(&centerScreen, 475, 0, 200, 50, alignRight, alignTop);
 //BarWidget b = BarWidget(&centerScreen, 475, 200, 200, 40, RIGHT_TO_LEFT);
 //void setup() {
@@ -76,7 +82,13 @@ void setDebounce(const unsigned int pins[], uint8_t numPins, uint16_t waitTimeMu
 void setup()
 {
 	Serial.begin(9600);
-	Serial.setTimeout(500);
+	CANSerialPort.begin(9600);
+	CANSerialPort.setTimeout(500);
+
+	pinMode(CAN_OUTPUT_RST, OUTPUT);
+	digitalWrite(CAN_OUTPUT_RST, LOW);
+	delay(100);
+	digitalWrite(CAN_OUTPUT_RST, HIGH);
 
 	d.dashboardInit();
 	// I tried putting attachinterrupt in the for loop above but failed. Lambda functions complain.
@@ -107,10 +119,12 @@ void loop()
 {
 	char s[100];
 	// output dashboard display based on incoming CAN strings
-	uint8_t bytesRead = Serial.readBytesUntil('\n', s, 100);
+	uint8_t bytesRead = CANSerialPort.readBytesUntil('\n', s, 100);
 	if (bytesRead > 0)
 	{
 		s[bytesRead - 1] = '\0';
+		Serial.print("<R> ");
+		Serial.println(s);
 		if (dataFC.checkMatchString(s))
 		{
 			dataFC.unpackString(s);
@@ -136,10 +150,21 @@ void loop()
 	{
 		d.dashboardToggleSig(dataAcc.getLsig(), dataAcc.getRsig());
 		dataAcc.packString(s);
+		CANSerialPort.println(s);
+		Serial.print("<S> ");
 		Serial.println(s);
 	}
 
 	d.dashboardNextFrame();
+
+	static uint8_t canRstCounter = 0;
+	if (canRstCounter++ > 30)
+	{
+		canRstCounter = 0;
+		digitalWrite(CAN_OUTPUT_RST, LOW);
+		delay(100);
+		digitalWrite(CAN_OUTPUT_RST, HIGH);
+	}
 	// wait until 100ms elapsed
 	static unsigned long lastTime;
 	while (millis() - lastTime < 100);

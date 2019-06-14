@@ -128,22 +128,23 @@ void NV10FuelCell::unpackString(char * str)
 	temperature = atoi(ptr);
 
 	ptr = strtok(NULL, "\t");
-	eStatus statusCode = (eStatus)atoi(ptr);
-	switch (statusCode)
-	{
-	case OP:
-		strcpy(statusTxt, "OP");
-		break;
-	case IN:
-		strcpy(statusTxt, "IN");
-		break;
-	case SD:
-		strcpy(statusTxt, "SD");
-		break;
-	default:
-		strcpy(statusTxt, "--");
-		break;
-	}
+	strcpy(statusTxt, ptr);
+	//eStatus statusCode = (eStatus)atoi(ptr);
+	//switch (statusCode)
+	//{
+	//case OP:
+	//	strcpy(statusTxt, "OP");
+	//	break;
+	//case IN:
+	//	strcpy(statusTxt, "IN");
+	//	break;
+	//case SD:
+	//	strcpy(statusTxt, "SD");
+	//	break;
+	//default:
+	//	strcpy(statusTxt, "--");
+	//	break;
+	//}
 
 }
 
