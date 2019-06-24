@@ -77,8 +77,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RelayModule", "Arduino\libr
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NV10_dashboard_DUE", "Arduino\NV10_dashboard_DUE\NV10_dashboard_DUE.vcxproj", "{C5F80730-F44F-4478-BDAE-6634EFC2CA88}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "#NV10_dashboard_DUE", "Arduino\#NV10_dashboard_DUE\#NV10_dashboard_DUE.vcxproj", "{8B76109D-38BB-4C78-BC70-C973A24E3EDF}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Speedometer", "Arduino\libraries\Speedometer\Speedometer.vcxitems", "{CDDCD64E-35B1-4C6B-B6FE-187D977DCCC4}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NV10_back_MEGA", "Arduino\NV10_back_MEGA\NV10_back_MEGA.vcxproj", "{E316FC1D-40FB-4C9C-AC5C-C37CBA7D30A7}"
@@ -90,6 +88,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CANSerializerV2_sender", "Arduino\#TestSuites\CANSerializerV2_sender\CANSerializerV2_sender.vcxproj", "{3F8B2017-8E31-43FB-BC4C-A95680CA7683}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CANSerializerV2_receiver", "Arduino\#TestSuites\CANSerializerV2_receiver\CANSerializerV2_receiver.vcxproj", "{3E3DAF3B-9BCE-4BA7-AAC5-B5BE3B96B653}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ADCShuntTest", "Arduino\#TestSuites\ADCShuntTest\ADCShuntTest.vcxproj", "{C9BC5C57-E50B-4D50-8C9E-A679C4D22EF5}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -128,6 +128,8 @@ Global
 		..\libraries\FreeRTOS_ARM\FreeRTOS_ARM.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		..\libraries\MCP_CAN_lib\MCP_CAN_lib.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		Arduino\libraries\CANSerializer\CANSerializer.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		..\..\ide\hardware\arduino\avr\libraries\Wire\Wire.vcxitems*{c9bc5c57-e50b-4d50-8c9e-a679c4d22ef5}*SharedItemsImports = 4
+		..\libraries\Adafruit_ADS1X15\Adafruit_ADS1X15.vcxitems*{c9bc5c57-e50b-4d50-8c9e-a679c4d22ef5}*SharedItemsImports = 4
 		Arduino\libraries\Speedometer\Speedometer.vcxitems*{cddcd64e-35b1-4c6b-b6fe-187d977dccc4}*SharedItemsImports = 9
 		..\libraries\FreeRTOS\FreeRTOS.vcxitems*{e0f75ac7-15bb-4c7a-98cd-37a96c9641a3}*SharedItemsImports = 4
 		Arduino\libraries\CANSerializer\CANSerializer.vcxitems*{e0f75ac7-15bb-4c7a-98cd-37a96c9641a3}*SharedItemsImports = 4
@@ -292,14 +294,6 @@ Global
 		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Release|x64.ActiveCfg = Release|Win32
 		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Release|x86.ActiveCfg = Release|Win32
 		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Release|x86.Build.0 = Release|Win32
-		{8B76109D-38BB-4C78-BC70-C973A24E3EDF}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{8B76109D-38BB-4C78-BC70-C973A24E3EDF}.Debug|x64.ActiveCfg = Debug|Win32
-		{8B76109D-38BB-4C78-BC70-C973A24E3EDF}.Debug|x86.ActiveCfg = Debug|Win32
-		{8B76109D-38BB-4C78-BC70-C973A24E3EDF}.Debug|x86.Build.0 = Debug|Win32
-		{8B76109D-38BB-4C78-BC70-C973A24E3EDF}.Release|Any CPU.ActiveCfg = Release|Win32
-		{8B76109D-38BB-4C78-BC70-C973A24E3EDF}.Release|x64.ActiveCfg = Release|Win32
-		{8B76109D-38BB-4C78-BC70-C973A24E3EDF}.Release|x86.ActiveCfg = Release|Win32
-		{8B76109D-38BB-4C78-BC70-C973A24E3EDF}.Release|x86.Build.0 = Release|Win32
 		{E316FC1D-40FB-4C9C-AC5C-C37CBA7D30A7}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{E316FC1D-40FB-4C9C-AC5C-C37CBA7D30A7}.Debug|x64.ActiveCfg = Debug|Win32
 		{E316FC1D-40FB-4C9C-AC5C-C37CBA7D30A7}.Debug|x86.ActiveCfg = Debug|Win32
@@ -340,6 +334,14 @@ Global
 		{3E3DAF3B-9BCE-4BA7-AAC5-B5BE3B96B653}.Release|x64.ActiveCfg = Release|Win32
 		{3E3DAF3B-9BCE-4BA7-AAC5-B5BE3B96B653}.Release|x86.ActiveCfg = Release|Win32
 		{3E3DAF3B-9BCE-4BA7-AAC5-B5BE3B96B653}.Release|x86.Build.0 = Release|Win32
+		{C9BC5C57-E50B-4D50-8C9E-A679C4D22EF5}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{C9BC5C57-E50B-4D50-8C9E-A679C4D22EF5}.Debug|x64.ActiveCfg = Debug|Win32
+		{C9BC5C57-E50B-4D50-8C9E-A679C4D22EF5}.Debug|x86.ActiveCfg = Debug|Win32
+		{C9BC5C57-E50B-4D50-8C9E-A679C4D22EF5}.Debug|x86.Build.0 = Debug|Win32
+		{C9BC5C57-E50B-4D50-8C9E-A679C4D22EF5}.Release|Any CPU.ActiveCfg = Release|Win32
+		{C9BC5C57-E50B-4D50-8C9E-A679C4D22EF5}.Release|x64.ActiveCfg = Release|Win32
+		{C9BC5C57-E50B-4D50-8C9E-A679C4D22EF5}.Release|x86.ActiveCfg = Release|Win32
+		{C9BC5C57-E50B-4D50-8C9E-A679C4D22EF5}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -373,6 +375,7 @@ Global
 		{CDDCD64E-35B1-4C6B-B6FE-187D977DCCC4} = {B731DFF7-A7B2-4F18-831B-D04250650B2F}
 		{3F8B2017-8E31-43FB-BC4C-A95680CA7683} = {D73944EA-C027-4B9A-B26C-CF8857527539}
 		{3E3DAF3B-9BCE-4BA7-AAC5-B5BE3B96B653} = {D73944EA-C027-4B9A-B26C-CF8857527539}
+		{C9BC5C57-E50B-4D50-8C9E-A679C4D22EF5} = {D73944EA-C027-4B9A-B26C-CF8857527539}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D50621B3-45DA-4D63-A156-3461EB4C4703}

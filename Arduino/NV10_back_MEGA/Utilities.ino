@@ -118,3 +118,25 @@ void setRGB(Adafruit_NeoPixel& strip, uint8_t numLights, uint32_t color)
 	}
 	strip.show();
 }
+
+float getMedian(float floatArray[], int n)
+{
+	if (n == 1)
+		return floatArray[0];
+	// sort the float array 
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < n - i - 1; j++)
+		{
+			if (floatArray[j] > floatArray[j + 1])
+			{
+				float temp = floatArray[j + 1];//swapping element 
+				floatArray[j + 1] = floatArray[j];
+				floatArray[j] = temp;
+			}
+		}
+	}
+	// pick the median
+	return floatArray[n / 2];
+	//return n % 2 == 1 ? floatArray[n / 2 - 1] : (floatArray[n / 2 - 1] + floatArray[n / 2]) / 2;
+}

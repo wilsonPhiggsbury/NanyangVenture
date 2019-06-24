@@ -64,8 +64,8 @@ CANSerializer serializer;
 Speedometer speedo = Speedometer(SPEEDOMETER_INTERRUPT_PIN, 545, 2);
 
 HardwareSerial& fcSerialPort = Serial3;
-HardwareSerial& dataSerialPort = Serial1;
-HardwareSerial& debugSerialPort = Serial2;
+HardwareSerial& dataSerialPort = Serial;
+HardwareSerial& debugSerialPort = Serial;
 
 // define tasks, types are: input, control, output
 void TaskLogFuelCell(void *pvParameters);		// Input task:		Refreshes class variables for fuel cell Volts, Amps, Watts and Energy
@@ -86,6 +86,7 @@ void TaskBlink(void *pvParameters);			//
 /// </summary>
 void setup() {
 	debugSerialPort.begin(9600);
+	dataSerialPort.begin(9600);
 	while (!debugSerialPort);
 
 	// create all files in a new directory
@@ -109,7 +110,7 @@ void setup() {
 		, (const portCHAR *)"CSensor"
 		, 550
 		, NULL
-		, 2
+		, 3
 		, NULL);
 	xTaskCreate(
 		TaskSpeedo
@@ -180,6 +181,8 @@ void TaskLogFuelCell(void *pvParameters)
 }
 void TaskLogCurrentSensor(void *pvParameters)
 {
+#define SAMPLES 11
+	float getMedian(float floatArray[], int n = SAMPLES);
 	CANFrame f;
 	StructForLogSend s;
 	s.setLogSend(true, true, "CS.txt");
@@ -193,14 +196,23 @@ void TaskLogCurrentSensor(void *pvParameters)
 	8		512		15.625
 	16		256		7.8125 <-- we are using setGain(GAIN_SIXTEEN) when measuring current, for highest resolution. 
 	Keeping FSR small increases resolution, but it must be larger than shunt mV or the ADC may be damaged.
+
+	## SHUNTS ##
 	75mV 200A shunt: 200A maps to - 75mV / 0.0078125mV per raw unit = 9600 raw unit
 	75mV 200A shunt: 1A maps to - 9600 raw unit / 200 amp = 48 raw units per amp
 	Hence, amp = raw * ADC scale
-	where ADC scale = 0.0078125 * shuntA / shuntmV 
+	where ADC scale = 0.0078125 * shuntA / shuntmV
+	## VOLTAGE DIV ##
+	700k and 10k resistors. Using GAIN_FOUR with FSR of 1024 mV and LSB size of 31.25 microV
+	SCap volt = divided volt * (total ohm / this resistor ohm)
+	divided volt = raw * LSB size
+	Merge above 2 eq:
+	Scap volt = raw * LSB size * (total ohm / this resistor ohm)
+	In this case,
+	SCap volt = raw * 0.03125 * 72
 	*/
 	const float SHUNT_100A75mV_SCALE = 0.0078125 * (100.0 / 75);
-	const float SHUNT_200A75mV_SCALE = 0.0078125 * (200.0 / 75);
-	const float VOLTAGEDIVIDER_SCALE = 1.024 / 60; // scale 60V to 1.024V maybe?
+	const float VOLTAGEDIVIDER_SCALE = 0.03125 * (720000 / 10000.0) / 1000; // scale 60V to 1.024V maybe?
 	/*
 	ADS1115 i2c address
 	Addr -> VDD = 0x49
@@ -208,26 +220,34 @@ void TaskLogCurrentSensor(void *pvParameters)
 	Addr -> SCL = 0x4B
 	Addr -> SDA = 0x4A
 	*/
-	Adafruit_ADS1115 capCurrentADC = Adafruit_ADS1115(0x49);
-	Adafruit_ADS1115 motorCurrentADC = Adafruit_ADS1115(0x48);
-	Adafruit_ADS1115 capVoltageADC = Adafruit_ADS1115(0x4B);
-	capCurrentADC.setGain(GAIN_SIXTEEN);
-	motorCurrentADC.setGain(GAIN_SIXTEEN);
-	capVoltageADC.setGain(GAIN_FOUR); // GAIN_FOUR can take 1024mV max. Consult FSR column from the FSR table above
-	capCurrentADC.begin();
-	motorCurrentADC.begin();
-	capVoltageADC.begin();
+	Adafruit_ADS1115 currentADC = Adafruit_ADS1115(0x49);
+	Adafruit_ADS1115 voltageADC = Adafruit_ADS1115(0x48);
+	currentADC.setGain(GAIN_SIXTEEN);
+	voltageADC.setGain(GAIN_FOUR); // GAIN_FOUR can take 1024mV max. Consult FSR column from the FSR table above
+	currentADC.begin();
+	voltageADC.begin();
+
+	float capCurrent, motorCurrent, motorVoltage;
+	float capCurrents[SAMPLES], motorCurrents[SAMPLES], motorVoltages[SAMPLES];
 
 	dataCSStats.syncTime(); // reset the internal millis count for better 1st reading
 	uint8_t syncCounter = 0; // incr on every loop, for less frequent logsend messages
 	while (1)
 	{
-		float capInCurrent = capCurrentADC.readADC_Differential_0_1() * SHUNT_100A75mV_SCALE;
-		float capOutCurrent = capCurrentADC.readADC_Differential_2_3() * SHUNT_100A75mV_SCALE;
-		float motorCurrent = motorCurrentADC.readADC_Differential_0_1() * SHUNT_100A75mV_SCALE;
-		float capVoltage = capVoltageADC.readADC_Differential_0_1() * VOLTAGEDIVIDER_SCALE;
-		dataCS.insertData(capVoltage, capInCurrent, capOutCurrent, motorCurrent);
-		dataCSStats.insertData(capVoltage, motorCurrent);
+		for (int i = 0; i < SAMPLES; i++)
+		{
+			capCurrents[i] = currentADC.readADC_Differential_2_3() * SHUNT_100A75mV_SCALE;
+			motorCurrents[i] = currentADC.readADC_Differential_0_1() * SHUNT_100A75mV_SCALE;
+			motorVoltages[i] = voltageADC.readADC_Differential_0_1() * VOLTAGEDIVIDER_SCALE;
+			vTaskDelay(pdMS_TO_TICKS(5));
+		}
+		capCurrent = getMedian(capCurrents);
+		float capInCurrent = capCurrent > 0 ? capCurrent : 0;
+		float capOutCurrent = capCurrent > 0 ? 0 : -capCurrent;
+		motorCurrent = getMedian(motorCurrents);
+		motorVoltage = getMedian(motorVoltages);
+		dataCS.insertData(motorVoltage, capInCurrent, capOutCurrent, motorCurrent);
+		dataCSStats.insertData(motorVoltage, motorCurrent);
 		//dataCS.insertData(55, 0, 0, motorCurrent);
 		//dataCSStats.insertData(55, motorCurrent);
 
@@ -250,7 +270,7 @@ void TaskLogCurrentSensor(void *pvParameters)
 
 		syncCounter++;
 
-		vTaskDelay(pdMS_TO_TICKS(300));
+		vTaskDelay(pdMS_TO_TICKS(200));
 	}
 }
 void TaskSpeedo(void *pvParameters)

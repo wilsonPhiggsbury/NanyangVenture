@@ -19,14 +19,6 @@
 #define LSIG_PIN 46
 #define RSIG_PIN 47
 
-// current sensor inputs
-#define CAP_IN_VPIN A0
-#define CAP_IN_APIN A1
-#define CAP_OUT_VPIN A2
-#define CAP_OUT_APIN A3
-#define MOTOR_VPIN A4
-#define MOTOR_APIN A5
-
 // fuel cell inputs
 #define FC_MASTER_PORT Serial3
 #define FC_SLAVE_PORT Serial2
