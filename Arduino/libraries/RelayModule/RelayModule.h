@@ -23,8 +23,10 @@ public:
 	void init();
 	void activate();
 	void deactivate();
+	bool activated();
 private:
 	uint8_t pin, invert;
+	bool active;
 };
 
 #endif

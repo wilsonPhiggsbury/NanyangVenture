@@ -19,8 +19,15 @@ void RelayModule::init()
 void RelayModule::activate()
 {
 	digitalWrite(pin, !invert);
+	active = true;
 }
 void RelayModule::deactivate()
 {
 	digitalWrite(pin, invert);
+	active = false;
+}
+
+bool RelayModule::activated()
+{
+	return active;
 }

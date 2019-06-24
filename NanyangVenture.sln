@@ -91,6 +91,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CANSerializerV2_receiver", 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ADCShuntTest", "Arduino\#TestSuites\ADCShuntTest\ADCShuntTest.vcxproj", "{C9BC5C57-E50B-4D50-8C9E-A679C4D22EF5}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NV10_ElectroClutchSync", "Arduino\NV10_ElectroClutchSync\NV10_ElectroClutchSync.vcxproj", "{6A563B5C-3EEE-4724-9078-84B54760D65A}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\libraries\Rosserial_Arduino_Library\Rosserial_Arduino_Library.vcxitems*{16d6d2c9-e2d8-437f-80bf-3e1b32b814f4}*SharedItemsImports = 9
@@ -111,6 +113,8 @@ Global
 		Arduino\libraries\CANSerializer\CANSerializer.vcxitems*{4db19377-19de-4b9d-b8cc-d8769e8f8e82}*SharedItemsImports = 9
 		..\..\ide\hardware\arduino\avr\libraries\Wire\Wire.vcxitems*{50699b74-4b7a-418a-bcd4-33d264bfe581}*SharedItemsImports = 9
 		..\libraries\ILI9488\ILI9488.vcxitems*{5c6172fd-ce53-4a19-9733-98b83addeef5}*SharedItemsImports = 9
+		Arduino\libraries\RelayModule\RelayModule.vcxitems*{6a563b5c-3eee-4724-9078-84b54760d65a}*SharedItemsImports = 4
+		Arduino\libraries\Speedometer\Speedometer.vcxitems*{6a563b5c-3eee-4724-9078-84b54760d65a}*SharedItemsImports = 4
 		..\libraries\SdFat\SdFat.vcxitems*{6e24d44f-07af-4d66-8240-e716cc5aea32}*SharedItemsImports = 9
 		..\..\ide\hardware\arduino\avr\libraries\SPI\SPI.vcxitems*{6f81bc15-c478-45a4-a060-02d3eac23a77}*SharedItemsImports = 9
 		..\libraries\LiquidCrystal\LiquidCrystal.vcxitems*{71c8833b-db48-45fc-bf91-791068c94fb0}*SharedItemsImports = 9
@@ -342,6 +346,14 @@ Global
 		{C9BC5C57-E50B-4D50-8C9E-A679C4D22EF5}.Release|x64.ActiveCfg = Release|Win32
 		{C9BC5C57-E50B-4D50-8C9E-A679C4D22EF5}.Release|x86.ActiveCfg = Release|Win32
 		{C9BC5C57-E50B-4D50-8C9E-A679C4D22EF5}.Release|x86.Build.0 = Release|Win32
+		{6A563B5C-3EEE-4724-9078-84B54760D65A}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{6A563B5C-3EEE-4724-9078-84B54760D65A}.Debug|x64.ActiveCfg = Debug|Win32
+		{6A563B5C-3EEE-4724-9078-84B54760D65A}.Debug|x86.ActiveCfg = Debug|Win32
+		{6A563B5C-3EEE-4724-9078-84B54760D65A}.Debug|x86.Build.0 = Debug|Win32
+		{6A563B5C-3EEE-4724-9078-84B54760D65A}.Release|Any CPU.ActiveCfg = Release|Win32
+		{6A563B5C-3EEE-4724-9078-84B54760D65A}.Release|x64.ActiveCfg = Release|Win32
+		{6A563B5C-3EEE-4724-9078-84B54760D65A}.Release|x86.ActiveCfg = Release|Win32
+		{6A563B5C-3EEE-4724-9078-84B54760D65A}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
