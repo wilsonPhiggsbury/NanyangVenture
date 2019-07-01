@@ -133,7 +133,7 @@ void loop()
 		if (dataFC.checkMatchString(s))
 		{
 			dataFC.unpackString(s);
-			d.dashboardNextValuesFC(dataFC.getWatts(), dataFC.getPressure(), dataFC.getTemperature(), dataFC.getStatus());
+			d.dashboardNextValuesFC(dataFC.getVolts(), dataFC.getAmps(), dataFC.getPressure(), dataFC.getTemperature(), dataFC.getStatus());
 		}
 		else if (dataCS.checkMatchString(s))
 		{

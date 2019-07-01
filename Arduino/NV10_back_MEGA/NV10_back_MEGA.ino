@@ -231,6 +231,7 @@ void TaskLogCurrentSensor(void *pvParameters)
 
 	dataCSStats.syncTime(); // reset the internal millis count for better 1st reading
 	uint8_t syncCounter = 0; // incr on every loop, for less frequent logsend messages
+	TickType_t lastWakeTime = xTaskGetTickCount();
 	while (1)
 	{
 		for (int i = 0; i < SAMPLES; i++)
@@ -269,7 +270,7 @@ void TaskLogCurrentSensor(void *pvParameters)
 
 		syncCounter++;
 
-		vTaskDelay(pdMS_TO_TICKS(200));
+		vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(200));
 	}
 }
 void TaskSpeedo(void *pvParameters)

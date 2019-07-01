@@ -7,26 +7,29 @@
 class NV10FuelCell:public DataPoint
 {
  protected:
-	 float& pressure = data.Float[0];
-	 uint16_t& watts = data.UInt[2];
-	 uint8_t& temperature = data.Byte[6];
-	 uint8_t& status = data.Byte[7];
 
-	 char statusTxt[3];
+	uint8_t& volts = data.Byte[3];
+	uint8_t& amps = data.Byte[4];
+	uint8_t& pressure = data.Byte[5];
+	uint8_t& temperature = data.Byte[6];
+	uint8_t& status = data.Byte[7];
+	
+	char statusTxt[3];
 private:
-	 enum eStatus
-	 {
-		 SD,
-		 OP,
-		 IN,
-		 UNKNOWN
-	 };
-	 const char* cStatus[4] = { "SD", "OP", "IN", "UN" };
+	enum eStatus
+	{
+		SD,
+		OP,
+		IN,
+		UNKNOWN
+	};
+	const char* cStatus[4] = { "SD", "OP", "IN", "UN" };
  public:
-	 NV10FuelCell();
+	NV10FuelCell();
 
 	float getPressure();
-	uint16_t getWatts();
+	uint8_t getVolts();
+	uint8_t getAmps();
 	uint8_t getTemperature();
 	const char* getStatus();
 

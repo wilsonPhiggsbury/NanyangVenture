@@ -12,12 +12,16 @@ NV10FuelCell::NV10FuelCell():DataPoint("FC", 0x13, 8)
 
 float NV10FuelCell::getPressure()
 {
-	return pressure;
+	return pressure / 10.0;
 }
 
-uint16_t NV10FuelCell::getWatts()
+uint8_t NV10FuelCell::getVolts()
 {
-	return watts;
+	return volts;
+}
+uint8_t NV10FuelCell::getAmps()
+{
+	return amps;
 }
 
 uint8_t NV10FuelCell::getTemperature()
@@ -44,14 +48,16 @@ void NV10FuelCell::insertData(char* str)
 		// update respective variables
 
 		readPtr = strtok(readPtr, " ");
+		volts = atoi(readPtr);
 		//loggedParams[volts] = atof(readPtr);
 
 		readPtr = strtok(NULL, " ");
+		amps = atoi(readPtr);
 		//loggedParams[amps] = atof(readPtr);
 
 		readPtr = strtok(NULL, " ");
 		//loggedParams[watts] = atof(readPtr);
-		watts = atof(readPtr);
+
 		readPtr = strtok(NULL, " ");
 		//loggedParams[energy] = atof(readPtr);
 
@@ -66,7 +72,7 @@ void NV10FuelCell::insertData(char* str)
 		temperature = thisMaxTemp;
 		readPtr = strtok(NULL, " ");
 		//loggedParams[pressure] = atof(readPtr);
-		pressure = atof(readPtr);
+		pressure = atof(readPtr) * 10;
 		readPtr = strtok(NULL, " ");
 		//loggedParams[capacitorVolts] = atof(readPtr);
 
@@ -104,11 +110,11 @@ void NV10FuelCell::packString(char * str)
 	// p = 4.2, t = 2, w = 4, st = 2
 #ifdef __AVR__
 	char pressureString[8];
-	dtostrf(pressure, 3, 1, pressureString);
-	sprintf(shiftedStr, "%04d\t%s\t%2d\t%s", watts, pressureString, temperature, statusTxt);
+	dtostrf(pressure/10.0, 3, 1, pressureString);
+	sprintf(shiftedStr, "%d\t%d\t%s\t%2d\t%s", volts, amps, pressureString, temperature, statusTxt);
 
 #elif defined _SAM3XA_
-	sprintf(shiftedStr, "%04d\t%4.1f\t%2d\t%s", watts, pressure, temperature, statusTxt);
+	sprintf(shiftedStr, "%d\t%d\t%4.1f\t%2d\t%s", volts, amps, pressure/10.0, temperature, statusTxt);
 #endif
 }
 
@@ -119,10 +125,13 @@ void NV10FuelCell::unpackString(char * str)
 	timeStamp = strtoul(ptr, NULL, 16);
 
 	ptr = strtok(NULL, "\t");
-	watts = atoi(ptr);
+	volts = atoi(ptr);
 
 	ptr = strtok(NULL, "\t");
-	pressure = strtod(ptr, NULL);
+	amps = atoi(ptr);
+
+	ptr = strtok(NULL, "\t");
+	pressure = strtod(ptr, NULL) * 10;
 
 	ptr = strtok(NULL, "\t");
 	temperature = atoi(ptr);

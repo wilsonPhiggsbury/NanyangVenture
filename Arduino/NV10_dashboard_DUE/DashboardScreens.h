@@ -54,7 +54,7 @@ public:
 	DashboardScreens();
 	void dashboardInit();
 	void dashboardNextFrame();
-	void dashboardNextValuesFC(int watts, float pressure, int temperature, const char* status);
+	void dashboardNextValuesFC(int volts, int amps, float pressure, int temperature, const char* status);
 	void dashboardNextValuesCS(int volts, int ampCapIn, int ampCapOut, int ampMotor);
 	void dashboardNextValuesCS(int volts, int ampMotor);
 	void dashboardNextValuesSpeed(int speedKmh);
