@@ -41,6 +41,10 @@ uint8_t NV11Commands::getHorn()
 {
 	return horn;
 }
+uint8_t NV11Commands::getLapTrig()
+{
+	return lapCounter;
+}
 
 void NV11Commands::packString(char *str)
 {

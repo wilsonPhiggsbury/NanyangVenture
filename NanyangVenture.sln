@@ -125,9 +125,6 @@ Global
 		..\libraries\Adafruit_GFX_Library\Adafruit_GFX_Library.vcxitems*{8c1a22a5-7653-42a6-b3dd-80639fa902d1}*SharedItemsImports = 9
 		Arduino\libraries\RelayModule\RelayModule.vcxitems*{a57a3d44-d0d0-4d27-aac1-ba3f7124ecc6}*SharedItemsImports = 9
 		..\..\ide\portable\packages\arduino\hardware\sam\1.6.11\libraries\Wire\Wire.vcxitems*{a7192e66-f105-4569-885c-47923cd5f91a}*SharedItemsImports = 9
-		..\..\ide\portable\packages\arduino\hardware\sam\1.6.11\libraries\SPI\SPI.vcxitems*{b7b893c5-d92a-4e21-8f95-214c41c94420}*SharedItemsImports = 4
-		..\libraries\MCP_CAN_lib\MCP_CAN_lib.vcxitems*{b7b893c5-d92a-4e21-8f95-214c41c94420}*SharedItemsImports = 4
-		Arduino\libraries\CANSerializer\CANSerializer.vcxitems*{b7b893c5-d92a-4e21-8f95-214c41c94420}*SharedItemsImports = 4
 		..\libraries\MCP_CAN_lib\MCP_CAN_lib.vcxitems*{bf888b28-eef3-4922-a68f-36a1fd54b965}*SharedItemsImports = 9
 		..\libraries\FreeRTOS_ARM\FreeRTOS_ARM.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		..\libraries\MCP_CAN_lib\MCP_CAN_lib.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4

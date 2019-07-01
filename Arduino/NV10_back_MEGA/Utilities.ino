@@ -25,7 +25,7 @@ bool initSD(SdFat& card)
 	} while (card.exists(folderPath));
 	debugSerialPort.print(folderPath); debugSerialPort.println(" does not exist!");
 	// Wipe when too full, or on user request ('~' char)
-	if (folderEntries > 30)
+	if (false)//folderEntries > 30)
 	{
 		Serial.println(F("SD card is nearing threshold to crash Arduino."));
 		if (initiateWipe(card))

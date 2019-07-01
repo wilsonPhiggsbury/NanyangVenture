@@ -22,12 +22,14 @@ WARNING
 #include <NV10CurrentSensorStats.h>
 #include <NV10AccesoriesStatus.h>
 #include <NV11DataSpeedo.h>
+#include <NV11Commands.h>
 
 NV10FuelCell dataFC;
 NV10CurrentSensor dataCS;
 NV10CurrentSensorStats dataCSStats;
 NV11DataSpeedo dataSpeedo;
 NV10AccesoriesStatus dataAcc;
+NV11Commands dataCommands;
 
 DashboardScreens d;
 HardwareSerial& CANSerialPort = Serial1;
@@ -100,9 +102,9 @@ void setup()
 	attachInterrupt(digitalPinToInterrupt(BTN_WIPER), [] {
 		dataAcc.toggleWiper();
 	}, FALLING);
-	//attachInterrupt(digitalPinToInterrupt(BTN_HORN), [] {
-	//	
-	//}, FALLING);
+	attachInterrupt(digitalPinToInterrupt(BTN_HORN), [] {
+		dataCommands.triggerHorn();
+	}, FALLING);
 	attachInterrupt(digitalPinToInterrupt(BTN_HEADLIGHT), [] {
 		dataAcc.toggleHeadlights();
 	}, FALLING);
@@ -156,6 +158,15 @@ void loop()
 		CANSerialPort.println(s);
 		debugSerialPort.print("<S> ");
 		debugSerialPort.println(s);
+	}
+	if (dataCommands.dataRequiresBroadcast())
+	{
+		dataCommands.packString(s);
+		CANSerialPort.println(s);
+		debugSerialPort.print("<S> ");
+		debugSerialPort.println(s);
+
+		dataCommands.clearActivationHistory();
 	}
 
 	d.dashboardNextFrame();

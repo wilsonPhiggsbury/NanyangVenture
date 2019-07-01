@@ -53,6 +53,8 @@ void TextWidget::refreshSettings()
 	//Serial.println(textSize);
 	if (textSize < 4)
 		textSize *= 2;
+	else if (textSize < 6)
+		textSize *= 1.5;
 	cursorX = constrain(xPos + width / 2 - textWidth * textSize * textWidthPerSize / 2, 0, SCREENWIDTH);
 	cursorY = constrain(yPos + height / 2 - textHeight * textSize * textHeightPerSize / 2, 0, SCREENHEIGHT);
 }

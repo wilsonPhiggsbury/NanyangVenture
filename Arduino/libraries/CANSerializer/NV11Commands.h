@@ -27,6 +27,7 @@ class NV11Commands:public DataPoint
 	void triggerLapsReset();
 	void triggerShutdownRPi();
 	uint8_t getHorn();
+	uint8_t getLapTrig();
 	void packString(char*);
 	void unpackString(char * str);
 	// commands only require broadcast when any of it is triggered

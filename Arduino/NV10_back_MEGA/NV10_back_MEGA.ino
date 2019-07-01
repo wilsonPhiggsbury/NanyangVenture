@@ -64,7 +64,7 @@ CANSerializer serializer;
 Speedometer speedo = Speedometer(SPEEDOMETER_INTERRUPT_PIN, 545, 2);
 
 HardwareSerial& fcSerialPort = Serial3;
-HardwareSerial& dataSerialPort = Serial;
+HardwareSerial& dataSerialPort = Serial2;
 HardwareSerial& debugSerialPort = Serial;
 
 // define tasks, types are: input, control, output
@@ -86,7 +86,6 @@ void TaskBlink(void *pvParameters);			//
 /// </summary>
 void setup() {
 	debugSerialPort.begin(9600);
-	dataSerialPort.begin(9600);
 	while (!debugSerialPort);
 
 	// create all files in a new directory

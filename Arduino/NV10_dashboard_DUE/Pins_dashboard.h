@@ -1,7 +1,5 @@
 #pragma once
-#define CAN_CS_PIN 4
-#define CAN_INT_PIN 3
-#define CAN_OUTPUT_RST 17
+#define CAN_OUTPUT_RST 28//17
 
 #define LCD_OUTPUT_DC 7
 #define LCD_OUTPUT_RST 8

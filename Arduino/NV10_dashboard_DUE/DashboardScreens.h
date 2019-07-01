@@ -32,15 +32,15 @@ class DashboardScreens
 	TextWidget status_txt = TextWidget(&centerScreen, SCREENWIDTH / 2, SCREENHEIGHT / 2 + 0, 150, 75, alignCenter, alignTop);
 	//// left screen
 	uint8_t btmOffset = 70;
-	uint8_t centerSpacing = 75;
+	uint8_t centerSpacing = 80;
 	//TextWidget capOutAmp_txt = TextWidget(&leftScreen, 0, 0, 90, 75, alignLeft, alignTop);
 	//TextWidget capInAmp_txt = TextWidget(&leftScreen, SCREENWIDTH, 0, 90, 75, alignRight, alignTop);
-	TextWidget motorAmp_txt = TextWidget(&centerScreen, SCREENWIDTH/2, SCREENHEIGHT - btmOffset, 80, 40, alignRight, alignCenter);
-	TextWidget motorVolt_txt = TextWidget(&centerScreen, SCREENWIDTH/2, SCREENHEIGHT - btmOffset, 80, 40, alignLeft, alignCenter);
+	TextWidget motorAmp_txt = TextWidget(&centerScreen, SCREENWIDTH/2, SCREENHEIGHT - btmOffset, 80, 60, alignRight, alignCenter);
+	TextWidget motorVolt_txt = TextWidget(&centerScreen, SCREENWIDTH/2, SCREENHEIGHT - btmOffset, 80, 60, alignLeft, alignCenter);
 	//BarWidget capOutAmp_bar = BarWidget(&leftScreen, 480 / 2 - 10, 100, 220, 35, RIGHT_TO_LEFT);
 	//BarWidget capInAmp_bar = BarWidget(&leftScreen, 480 / 2 + 10, 100, 220, 35, LEFT_TO_RIGHT);
-	BarWidget motorAmp_bar = BarWidget(&centerScreen, SCREENWIDTH / 2 - centerSpacing, SCREENHEIGHT - btmOffset, 150, 30, RIGHT_TO_LEFT);
-	BarWidget motorVolt_bar = BarWidget(&centerScreen, SCREENWIDTH / 2 + centerSpacing, SCREENHEIGHT - btmOffset, 150, 30, LEFT_TO_RIGHT); // original y=180, h=70
+	BarWidget motorAmp_bar = BarWidget(&centerScreen, SCREENWIDTH / 2 - centerSpacing, SCREENHEIGHT - btmOffset, 150, 60, RIGHT_TO_LEFT);
+	BarWidget motorVolt_bar = BarWidget(&centerScreen, SCREENWIDTH / 2 + centerSpacing, SCREENHEIGHT - btmOffset, 150, 60, LEFT_TO_RIGHT); // original y=180, h=70
 	//// right screen
 	//TextWidget stackTemperature_txt = TextWidget(&rightScreen, 0, 0, 140, 80, alignLeft, alignTop);
 	//TextWidget status_txt = TextWidget(&rightScreen, SCREENWIDTH / 2, 0, 200, 80, alignCenter, alignTop);
@@ -48,8 +48,8 @@ class DashboardScreens
 	//TextWidget energy_txt = TextWidget(&rightScreen, SCREENWIDTH / 2, SCREENHEIGHT / 2 - 40 + 20, 400, 80, alignCenter, alignCenter);
 	//BarWidget energy_bar = BarWidget(&rightScreen, SCREENWIDTH / 2, SCREENHEIGHT / 2 + 40 + 20, 400, 80, alignCenter, alignCenter);
 
-	const uint8_t fcTimeout = 20;
-	uint8_t fcTimeoutCounter = 0;
+	const uint8_t fcTimeout = 20, csTimeout = 6, smTimeout = 6;
+	uint8_t fcTimeoutCounter, csTimeoutCounter, smTimeoutCounter;
 public:
 	DashboardScreens();
 	void dashboardInit();

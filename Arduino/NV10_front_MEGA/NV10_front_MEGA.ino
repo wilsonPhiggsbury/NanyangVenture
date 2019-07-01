@@ -10,10 +10,13 @@
 #include <Arduino_FreeRTOS.h>
 #include <queue.h>
 #include "Pins_front.h"
+#include <MemoryFree/MemoryFree.h>
 
 #include <NV10AccesoriesStatus.h>
+#include <NV11Commands.h>
 
 NV10AccesoriesStatus dataAcc;
+NV11Commands dataCommands;
 /*
 hl
 sig (blink)
@@ -46,6 +49,7 @@ peripheralStates:
 	This is a slave device. Its state is purely set to match the dashboard's commands.
 
  ------------------------------------------------------- */
+// toggles brake, headlights, horn
 void TaskToggle(void* pvParameters);
 void TaskBlink(void* pvParameters);
 void TaskMoveWiper(void* pvParameters);
@@ -65,14 +69,14 @@ void setup() {
 	xTaskCreate(
 		TaskToggle
 		, (const portCHAR *)"HEAD"
-		, 300
+		, 200
 		, NULL
 		, 1
 		, &taskToggle);
 	xTaskCreate(
 		TaskCAN
 		, (const portCHAR *)"CAN la"
-		, 600
+		, 300
 		, NULL
 		, 2
 		, NULL);
@@ -90,7 +94,8 @@ void setup() {
 		, NULL
 		, 3
 		, &taskMoveWiper);
-	
+	debugSerialPort.print("Free memory in bytes: ");
+	debugSerialPort.println(freeMemory());
 }
 
 // the loop function runs over and over again until power down or reset
@@ -116,19 +121,28 @@ void TaskToggle(void* pvParameters)
 			}
 		}
 
-		//if (dataAcc.getHorn() == STATE_EN)
-		//{
-		//	debugSerialPort.println("BEEEP!");
-		//	digitalWrite(HORN_OUTPUT, LOW);
-		//	vTaskDelay(pdMS_TO_TICKS(500));
-		//	digitalWrite(HORN_OUTPUT, HIGH);
-		//	peripheralStates[Horn] = STATE_DS;
-		//	debugSerialPort.println("beep off.");
-		//}
-		//else
-		//{
-		//	digitalWrite(HORN_OUTPUT, HIGH);
-		//}
+		if (dataCommands.getHorn())
+		{
+			debugSerialPort.println("BEEEP!");
+			digitalWrite(HORN_OUTPUT, LOW);
+			vTaskDelay(pdMS_TO_TICKS(500));
+			digitalWrite(HORN_OUTPUT, HIGH);
+
+			debugSerialPort.println("beep off.");
+		}
+		else
+		{
+			digitalWrite(HORN_OUTPUT, HIGH);
+		}
+		if (dataCommands.getLapTrig())
+		{
+
+		}
+		else
+		{
+
+		}
+		dataCommands.clearActivationHistory();
 
 		if (dataAcc.getHeadlights() == STATE_EN)
 		{
@@ -149,6 +163,7 @@ void TaskBlink(void* pvParameters)
 	rstrip.begin();
 	lstrip.setBrightness(255);
 	rstrip.setBrightness(255);
+	pinMode(LED_BUILTIN, OUTPUT);
 	while (1)
 	{
 		if (sigOn)
@@ -156,6 +171,7 @@ void TaskBlink(void* pvParameters)
 			sigOn = false;
 			setRGB(lstrip, PIXELS, NO_COLOR);
 			setRGB(rstrip, PIXELS, NO_COLOR);
+			digitalWrite(LED_BUILTIN, LOW);
 			debugSerialPort.println("SIG OFF");
 		}
 		else
@@ -164,12 +180,14 @@ void TaskBlink(void* pvParameters)
 			{
 				sigOn = true;
 				setRGB(lstrip, PIXELS, SIG_COLOR);
+				digitalWrite(LED_BUILTIN, HIGH);
 				debugSerialPort.println("LSIG ON");
 			}
 			if (dataAcc.getHazard() == STATE_EN || dataAcc.getRsig() == STATE_EN)
 			{
 				sigOn = true;
 				setRGB(rstrip, PIXELS, SIG_COLOR);
+				digitalWrite(LED_BUILTIN, HIGH);
 				debugSerialPort.println("RSIG ON");
 			}
 		}
@@ -236,6 +254,13 @@ void TaskCAN(void *pvParameters) {
 				debugSerialPort.println(str);
 				xTaskAbortDelay(taskBlink);
 				xTaskAbortDelay(taskMoveWiper);
+			}
+			else if (dataCommands.checkMatchCAN(&f))
+			{
+				dataCommands.unpackCAN(&f);
+				debugSerialPort.print("<R> ");
+				dataCommands.packString(str);
+				debugSerialPort.println(str);
 			}
 		}
 		else

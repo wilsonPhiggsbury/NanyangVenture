@@ -9,18 +9,29 @@ Author:	MX
 #include <NV10CurrentSensorStats.h>
 #include <NV10FuelCell.h>
 #include <NV11DataSpeedo.h>
+#include <NV11Commands.h>
 
+//#define SEEDSTUDIO_CAN_SHIELD
 // seedstudio CAN shield v1.2
+#ifdef SEEDSTUDIO_CAN_SHIELD
+#define CAN_CS 10
+#define CAN_INT 2
+#define CANSPEED 500
+#else
 #define CAN_CS 4
 #define CAN_INT 3
+#define CANSPEED 1000
+#endif
+
 NV10CurrentSensor dataCS;
 NV10CurrentSensorStats dataCSStats;
 NV10AccesoriesStatus dataAccessory;
 NV10FuelCell dataFC;
 NV11DataSpeedo dataSpeedo;
+NV11Commands dataCommands;
 
 DataPoint* dpRecv[] = { &dataFC, &dataCS, &dataCSStats, &dataSpeedo };
-DataPoint* dpSend[] = { &dataAccessory };
+DataPoint* dpSend[] = { &dataAccessory, &dataCommands };
 
 CANSerializer serializer;
 void setup()
@@ -28,8 +39,9 @@ void setup()
 	Serial.begin(9600);
 	pinMode(CAN_INT, INPUT_PULLUP);
 	attachInterrupt(digitalPinToInterrupt(CAN_INT), CAN_ISR, FALLING);
-	if (!serializer.init(CAN_CS, 1000))
+	if (!serializer.init(CAN_CS, CANSPEED))
 	{
+		Serial.println("CAN FAIL");
 		delay(1000);
 		asm volatile ("  jmp 0");
 	}

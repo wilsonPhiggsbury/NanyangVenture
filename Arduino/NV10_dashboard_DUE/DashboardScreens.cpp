@@ -29,14 +29,14 @@ void DashboardScreens::dashboardInit()
 	status_txt.setColors(ILI9488_WHITE, ILI9488_BLUE);
 	//capOutAmp_bar.setColors(ILI9488_RED, ILI9488_MAROON);
 	//capInAmp_bar.setColors(ILI9488_CYAN, ILI9488_DARKCYAN);
-	motorAmp_txt.setColors(ILI9488_RED, ILI9488_MAROON);
+	motorAmp_txt.setColors(ILI9488_WHITE, ILI9488_MAROON);
 	motorAmp_bar.setColors(ILI9488_RED, ILI9488_MAROON);
-	motorAmp_txt.drawBorder(0, ILI9488_BLACK);
+	motorAmp_txt.drawBorder(2, ILI9488_WHITE);
 	motorAmp_bar.drawBorder(0, ILI9488_BLACK);
 
-	motorVolt_txt.setColors(ILI9488_CYAN, ILI9488_DARKCYAN);
+	motorVolt_txt.setColors(ILI9488_WHITE, ILI9488_DARKCYAN);
 	motorVolt_bar.setColors(ILI9488_CYAN, ILI9488_DARKCYAN);
-	motorVolt_txt.drawBorder(0, ILI9488_BLACK);
+	motorVolt_txt.drawBorder(2, ILI9488_WHITE);
 	motorVolt_bar.drawBorder(0, ILI9488_BLACK);
 
 	motorAmp_bar.setRange(0, 40);
@@ -60,6 +60,31 @@ void DashboardScreens::dashboardNextFrame()
 		status_txt.setColors(ILI9488_WHITE, ILI9488_BLUE);
 		status_txt.updateText("--");
 	}
+	if (csTimeoutCounter < csTimeout)
+	{
+		csTimeoutCounter++;
+	}
+	else if (csTimeoutCounter == csTimeout)
+	{
+		csTimeoutCounter++;
+		// deactivate cs widgets
+		motorAmp_bar.setColors(ILI9488_WHITE, ILI9488_BLUE);
+		motorAmp_txt.setColors(ILI9488_WHITE, ILI9488_BLUE);
+		motorVolt_bar.setColors(ILI9488_WHITE, ILI9488_BLUE);
+		motorVolt_txt.setColors(ILI9488_WHITE, ILI9488_BLUE);
+	}
+	if (smTimeoutCounter < smTimeout)
+	{
+		smTimeoutCounter++;
+	}
+	else if (smTimeoutCounter == smTimeout)
+	{
+		smTimeoutCounter++;
+		// deactivate sm widgets
+		speedTxt.setColors(ILI9488_WHITE, ILI9488_BLUE);
+		speedTxt.updateText("---");
+	}
+
 }
 void DashboardScreens::dashboardNextValuesFC(int watts, float pressure, int temperature, const char * status)
 {
@@ -93,6 +118,15 @@ void DashboardScreens::dashboardNextValuesFC(int watts, float pressure, int temp
 }
 void DashboardScreens::dashboardNextValuesCS(int volts, int ampCapIn, int ampCapOut, int ampMotor)
 {
+	if (csTimeoutCounter > csTimeout)
+	{
+		// reactivate CS widgets if previously disabled
+		motorAmp_txt.setColors(ILI9488_RED, ILI9488_MAROON);
+		motorAmp_bar.setColors(ILI9488_RED, ILI9488_MAROON);
+		motorVolt_txt.setColors(ILI9488_CYAN, ILI9488_DARKCYAN);
+		motorVolt_bar.setColors(ILI9488_CYAN, ILI9488_DARKCYAN);
+	}
+	csTimeoutCounter = 0; // reset FC timeout everytime FC data arrives
 	motorVolt_bar.updateFloat(volts);
 	//capInAmp_bar.updateFloat(ampCapIn);
 	//capOutAmp_bar.updateFloat(ampCapOut);
@@ -111,6 +145,12 @@ void DashboardScreens::dashboardNextValuesCS(int volts, int ampMotor)
 
 void DashboardScreens::dashboardNextValuesSpeed(int speedKmh)
 {
+	if (smTimeoutCounter > smTimeout)
+	{
+		// reactivate SM widgets if previously disabled
+		speedTxt.setColors(ILI9488_WHITE, ILI9488_DARKGREEN);
+	}
+	smTimeoutCounter = 0;
 	speedTxt.updateFloat(speedKmh);
 }
 
