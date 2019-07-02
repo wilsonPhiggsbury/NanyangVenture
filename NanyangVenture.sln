@@ -93,6 +93,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ADCShuntTest", "Arduino\#Te
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NV10_ElectroClutchSync", "Arduino\NV10_ElectroClutchSync\NV10_ElectroClutchSync.vcxproj", "{6A563B5C-3EEE-4724-9078-84B54760D65A}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Dboard_Button_Test", "Arduino\#TestSuites\Dboard_Button_Test\Dboard_Button_Test.vcxproj", "{DA5BEF9F-4909-4F69-AAB7-C8DDB0C23E6A}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\libraries\Rosserial_Arduino_Library\Rosserial_Arduino_Library.vcxitems*{16d6d2c9-e2d8-437f-80bf-3e1b32b814f4}*SharedItemsImports = 9
@@ -351,6 +353,14 @@ Global
 		{6A563B5C-3EEE-4724-9078-84B54760D65A}.Release|x64.ActiveCfg = Release|Win32
 		{6A563B5C-3EEE-4724-9078-84B54760D65A}.Release|x86.ActiveCfg = Release|Win32
 		{6A563B5C-3EEE-4724-9078-84B54760D65A}.Release|x86.Build.0 = Release|Win32
+		{DA5BEF9F-4909-4F69-AAB7-C8DDB0C23E6A}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{DA5BEF9F-4909-4F69-AAB7-C8DDB0C23E6A}.Debug|x64.ActiveCfg = Debug|Win32
+		{DA5BEF9F-4909-4F69-AAB7-C8DDB0C23E6A}.Debug|x86.ActiveCfg = Debug|Win32
+		{DA5BEF9F-4909-4F69-AAB7-C8DDB0C23E6A}.Debug|x86.Build.0 = Debug|Win32
+		{DA5BEF9F-4909-4F69-AAB7-C8DDB0C23E6A}.Release|Any CPU.ActiveCfg = Release|Win32
+		{DA5BEF9F-4909-4F69-AAB7-C8DDB0C23E6A}.Release|x64.ActiveCfg = Release|Win32
+		{DA5BEF9F-4909-4F69-AAB7-C8DDB0C23E6A}.Release|x86.ActiveCfg = Release|Win32
+		{DA5BEF9F-4909-4F69-AAB7-C8DDB0C23E6A}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -385,6 +395,7 @@ Global
 		{3F8B2017-8E31-43FB-BC4C-A95680CA7683} = {D73944EA-C027-4B9A-B26C-CF8857527539}
 		{3E3DAF3B-9BCE-4BA7-AAC5-B5BE3B96B653} = {D73944EA-C027-4B9A-B26C-CF8857527539}
 		{C9BC5C57-E50B-4D50-8C9E-A679C4D22EF5} = {D73944EA-C027-4B9A-B26C-CF8857527539}
+		{DA5BEF9F-4909-4F69-AAB7-C8DDB0C23E6A} = {D73944EA-C027-4B9A-B26C-CF8857527539}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D50621B3-45DA-4D63-A156-3461EB4C4703}

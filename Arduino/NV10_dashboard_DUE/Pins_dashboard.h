@@ -1,17 +1,17 @@
 #pragma once
-#define CAN_OUTPUT_RST 28//17
+#define CAN_OUTPUT_RST 17//28
 
 #define LCD_OUTPUT_DC 7
 #define LCD_OUTPUT_RST 8
 #define LCD_OUTPUT_BACKLIGHT 9
-#define LCDLEFT_SPI_CS 11//10
-#define LCDCENTER_SPI_CS 10//11
+#define LCDLEFT_SPI_CS 10//11
+#define LCDCENTER_SPI_CS 11//10
 #define LCDRIGHT_SPI_CS 12
 
-#define BTN_LSIG 50//53
-#define BTN_RSIG 44//51
-#define BTN_HAZARD 46//45
-#define BTN_HORN 42//49
-#define BTN_HEADLIGHT 32//39
-#define BTN_WIPER 52//47
+#define BTN_LSIG 53//50
+#define BTN_RSIG 51//44
+#define BTN_HAZARD 45//46
+#define BTN_HORN 49//42
+#define BTN_HEADLIGHT 39//32
+#define BTN_WIPER 47//52
 #define BTN_STOPWATCH 41

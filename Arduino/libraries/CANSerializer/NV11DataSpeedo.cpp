@@ -11,6 +11,7 @@ NV11DataSpeedo::NV11DataSpeedo() :DataPoint("SM", 0x0A, 4)
 
 void NV11DataSpeedo::insertData(float speed)
 {
+	timeStamp = millis();
 	this->speed = speed;
 }
 

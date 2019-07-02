@@ -46,7 +46,7 @@ TaskHandle_t taskBlink;
 
 // RGB light related variables
 const uint8_t PIXELS = 7;
-const uint32_t LIGHT_COLOR = Adafruit_NeoPixel::Color(255, 255, 255);
+const uint32_t LIGHT_COLOR = Adafruit_NeoPixel::Color(128, 0, 0);
 const uint32_t BRAKE_COLOR = Adafruit_NeoPixel::Color(255, 0, 0);
 const uint32_t SIG_COLOR = Adafruit_NeoPixel::Color(255, 165, 0);
 const uint32_t NO_COLOR = Adafruit_NeoPixel::Color(0, 0, 0);
@@ -180,7 +180,7 @@ void TaskLogFuelCell(void *pvParameters)
 }
 void TaskLogCurrentSensor(void *pvParameters)
 {
-#define SAMPLES 11
+#define SAMPLES 5
 	float getMedian(float floatArray[], int n = SAMPLES);
 	CANFrame f;
 	StructForLogSend s;
@@ -270,7 +270,7 @@ void TaskLogCurrentSensor(void *pvParameters)
 
 		syncCounter++;
 
-		vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(200));
+		vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(400));
 	}
 }
 void TaskSpeedo(void *pvParameters)
@@ -294,7 +294,7 @@ void TaskSpeedo(void *pvParameters)
 		dataSpeedo.packCAN(&f);
 		xQueueSend(queueForCAN, &f, 100);
 
-		vTaskDelay(pdMS_TO_TICKS(500));
+		vTaskDelay(pdMS_TO_TICKS(600));
 	}
 
 }
@@ -372,7 +372,7 @@ void TaskLogSendData(void *pvParameters)
 void TaskCAN(void *pvParameters)
 {
 	CANFrame f;
-
+	char str[100];
 
 	BaseType_t canMsgToSend;
 	bool prevSigOn = false, thisSigOn = false; // sigOn should be true if any of sig is on (left / right / hazard)

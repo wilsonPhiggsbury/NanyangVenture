@@ -75,7 +75,7 @@ void DataPoint::unpackCAN(const CANFrame *f)
 
 char* DataPoint::packStringDefault(char * str)
 {
-	int charsPrinted = sprintf(str, "%s\t%x\t", getStringHeader(), timeStamp);
+	int charsPrinted = sprintf(str, "%s\t%lx\t", getStringHeader(), timeStamp);
 	str += charsPrinted;// incr counter of the calling function
 	return str;
 }

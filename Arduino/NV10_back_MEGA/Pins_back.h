@@ -9,10 +9,10 @@
 
 // rear peripherals
 #define SPEEDOMETER_INTERRUPT_PIN 18
-#define RUNNINGLIGHT_PIN 43
+#define RUNNINGLIGHT_PIN 47
 #define BRAKE_PIN 45
 #define LSIG_PIN 46
-#define RSIG_PIN 47
+#define RSIG_PIN 43
 
 // old red box
 //#define SD_SPI_CS_PIN 4			// used by shield for SD card

@@ -96,6 +96,13 @@ void setup()
 	d.dashboardInit();
 	// I tried putting attachinterrupt in the for loop above but failed. Lambda functions complain.
 	// So here, have some wall text.
+	pinMode(BTN_HAZARD, INPUT_PULLUP);
+	pinMode(BTN_WIPER, INPUT_PULLUP);
+	pinMode(BTN_HORN, INPUT_PULLUP);
+	pinMode(BTN_HEADLIGHT, INPUT_PULLUP);
+	pinMode(BTN_LSIG, INPUT_PULLUP);
+	pinMode(BTN_RSIG, INPUT_PULLUP);
+	pinMode(BTN_STOPWATCH, INPUT_PULLUP);
 	attachInterrupt(digitalPinToInterrupt(BTN_HAZARD), [] {
 		dataAcc.toggleHazard();
 	}, FALLING);
@@ -114,8 +121,11 @@ void setup()
 	attachInterrupt(digitalPinToInterrupt(BTN_RSIG), [] {
 		dataAcc.toggleRsig();
 	}, FALLING);
+	attachInterrupt(digitalPinToInterrupt(BTN_STOPWATCH), [] {
+		dataCommands.triggerLaps();
+	}, FALLING);
 
-	const unsigned int pins[] = { BTN_HAZARD, BTN_WIPER, BTN_HORN, BTN_HEADLIGHT, BTN_LSIG, BTN_RSIG };
+	const unsigned int pins[] = { BTN_HAZARD, BTN_WIPER, BTN_HORN, BTN_HEADLIGHT, BTN_LSIG, BTN_RSIG, BTN_STOPWATCH };
 	setDebounce(pins, sizeof(pins) / sizeof(pins[0]));
 
 	dataAcc.insertData(0, 0, 0, 0, 0, 0);
@@ -151,6 +161,7 @@ void loop()
 		}
 	}
 	// output CAN strings based on buttons inputs (already handled by interrupts)
+
 	if (dataAcc.dataRequiresBroadcast())
 	{
 		d.dashboardToggleSig(dataAcc.getLsig(), dataAcc.getRsig());
@@ -179,8 +190,8 @@ void loop()
 		delay(100);
 		digitalWrite(CAN_OUTPUT_RST, HIGH);
 	}
-	// wait until 100ms elapsed
+	// wait until 500ms elapsed
 	static unsigned long lastTime;
-	while (millis() - lastTime < 100);
+	while (millis() - lastTime < 200);
 	lastTime = millis();
 }

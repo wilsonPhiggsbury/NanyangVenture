@@ -12,61 +12,73 @@ NV10AccesoriesStatus::NV10AccesoriesStatus() :DataPoint("ST", 0x10, 6)
 void NV10AccesoriesStatus::setLsig(uint8_t status)
 {
 	lsig = status;
+	timeStamp = millis();
 }
 
 void NV10AccesoriesStatus::setRsig(uint8_t status)
 {
 	rsig = status;
+	timeStamp = millis();
 }
 
 void NV10AccesoriesStatus::setWiper(uint8_t status)
 {
 	wiper = status;
+	timeStamp = millis();
 }
 
 void NV10AccesoriesStatus::setHazard(uint8_t status)
 {
 	hazard = status;
+	timeStamp = millis();
 }
 
 void NV10AccesoriesStatus::setHeadlights(uint8_t status)
 {
 	headlights = status;
+	timeStamp = millis();
 }
 
 void NV10AccesoriesStatus::setBrake(uint8_t status)
 {
 	brake = status;
+	timeStamp = millis();
 }
 
 void NV10AccesoriesStatus::toggleLsig()
 {
 	lsig = !lsig;
+	timeStamp = millis();
 }
 
 void NV10AccesoriesStatus::toggleRsig()
 {
 	rsig = !rsig;
+	timeStamp = millis();
 }
 
 void NV10AccesoriesStatus::toggleWiper()
 {
 	wiper = !wiper;
+	timeStamp = millis();
 }
 
 void NV10AccesoriesStatus::toggleHazard()
 {
 	hazard = !hazard;
+	timeStamp = millis();
 }
 
 void NV10AccesoriesStatus::toggleHeadlights()
 {
 	headlights = !headlights;
+	timeStamp = millis();
 }
 
 void NV10AccesoriesStatus::toggleBrake()
 {
 	brake = !brake;
+	timeStamp = millis();
 }
 
 uint8_t NV10AccesoriesStatus::getLsig()

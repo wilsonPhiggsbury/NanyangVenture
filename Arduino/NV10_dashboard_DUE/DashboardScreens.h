@@ -48,7 +48,7 @@ class DashboardScreens
 	//TextWidget energy_txt = TextWidget(&rightScreen, SCREENWIDTH / 2, SCREENHEIGHT / 2 - 40 + 20, 400, 80, alignCenter, alignCenter);
 	//BarWidget energy_bar = BarWidget(&rightScreen, SCREENWIDTH / 2, SCREENHEIGHT / 2 + 40 + 20, 400, 80, alignCenter, alignCenter);
 
-	const uint8_t fcTimeout = 20, csTimeout = 6, smTimeout = 6;
+	const uint8_t fcTimeout = 20, csTimeout = 10, smTimeout = 10;
 	uint8_t fcTimeoutCounter, csTimeoutCounter, smTimeoutCounter;
 public:
 	DashboardScreens();

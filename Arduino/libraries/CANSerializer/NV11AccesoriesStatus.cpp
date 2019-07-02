@@ -12,41 +12,49 @@ NV11AccesoriesStatus::NV11AccesoriesStatus() :DataPoint("ST", 0x10, 8)
 void NV11AccesoriesStatus::setLsig(uint8_t status)
 {
 	lsig = status;
+	timeStamp = millis();
 }
 
 void NV11AccesoriesStatus::setRsig(uint8_t status)
 {
 	rsig = status;
+	timeStamp = millis();
 }
 
 void NV11AccesoriesStatus::setHazard(uint8_t status)
 {
 	hazard = status;
+	timeStamp = millis();
 }
 
 void NV11AccesoriesStatus::setHeadlights(uint8_t status)
 {
 	headlights = status;
+	timeStamp = millis();
 }
 
 void NV11AccesoriesStatus::setBrake(uint8_t status)
 {
 	brake = status;
+	timeStamp = millis();
 }
 
 void NV11AccesoriesStatus::setWiper(uint8_t status)
 {
 	wiper = status;
+	timeStamp = millis();
 }
 
 void NV11AccesoriesStatus::setFourWS(uint8_t status)
 {
 	fourWS = status;
+	timeStamp = millis();
 }
 
 void NV11AccesoriesStatus::setRegen(uint8_t status)
 {
 	regen = status;
+	timeStamp = millis();
 }
 
 uint8_t NV11AccesoriesStatus::getLsig()
