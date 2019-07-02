@@ -34,53 +34,7 @@ NV11Commands dataCommands;
 DashboardScreens d;
 HardwareSerial& CANSerialPort = Serial1;
 HardwareSerial& debugSerialPort = Serial;
-//TextWidget t = TextWidget(&centerScreen, 475, 0, 200, 50, alignRight, alignTop);
-//BarWidget b = BarWidget(&centerScreen, 475, 200, 200, 40, RIGHT_TO_LEFT);
-//void setup() {
-//	pinMode(LCD_OUTPUT_BACKLIGHT, OUTPUT);
-//	digitalWrite(LCD_OUTPUT_BACKLIGHT, HIGH);
-//
-//	centerScreen.begin();
-//	centerScreen.setRotation(1);
-//
-//	t.init();
-//	t.setColors(ILI9488_WHITE, ILI9488_BLACK);
-//	t.setMargin(2);
-//
-//	b.init();
-//	b.setRange(0, 10);
-//	b.setColors(ILI9488_CYAN, ILI9488_BLACK);
-//}
-//
-//// the loop function runs over and over again until power down or reset
-//void loop() {
-//	t.setMargin(0);
-//	t.updateFloat(12.0);
-//	delay(1000);
-//	t.updateFloat(12.1);
-//	delay(1000);
-//	t.updateText("FHAHA");
-//	delay(1000);
-//	t.updateText("FHAHAHA");
-//	delay(1000);
-//	t.updateText("FHAHAH");
-//	delay(1000);
-//
-//	delay(1000);
-//
-//	b.updateFloat(0.0);
-//	delay(1000);
-//	b.updateFloat(2.5);
-//	delay(1000);
-//	b.updateFloat(5.0);
-//	delay(1000);
-//	b.updateFloat(7.5);
-//	delay(1000);
-//	b.updateFloat(10.0);
-//	delay(1000);
-//
-//	delay(1000);
-//}
+
 void setDebounce(const unsigned int pins[], uint8_t numPins, uint16_t waitTimeMultiplier = 500);
 void setup()
 {

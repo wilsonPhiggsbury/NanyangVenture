@@ -9,8 +9,8 @@
 
 // rear peripherals
 #define SPEEDOMETER_INTERRUPT_PIN 18
-#define RUNNINGLIGHT_PIN 47
-#define BRAKE_PIN 45
+#define RUNNINGLIGHT_PIN 45
+#define BRAKE_PIN 47
 #define LSIG_PIN 46
 #define RSIG_PIN 43
 

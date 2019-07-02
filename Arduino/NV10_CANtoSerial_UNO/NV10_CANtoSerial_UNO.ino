@@ -41,7 +41,6 @@ void setup()
 	attachInterrupt(digitalPinToInterrupt(CAN_INT), CAN_ISR, FALLING);
 	if (!serializer.init(CAN_CS, CANSPEED))
 	{
-		Serial.println("CAN FAIL");
 		delay(1000);
 		asm volatile ("  jmp 0");
 	}
