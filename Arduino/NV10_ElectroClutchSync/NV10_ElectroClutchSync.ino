@@ -15,7 +15,7 @@
 Speedometer spWheel = Speedometer(SPEEDO_WHEEL_INT, 545, 2);
 Speedometer spGear = Speedometer(SPEEDO_GEAR_INT, 545, 2);
 RelayModule clutch = RelayModule(CLUTCH_OUTPUT, RelayModule::NO, RelayModule::activeLow);
-const float threshold = 1;
+const float threshold = 3;
 // the setup function runs once when you press reset or power the board
 void setup() {
 	Serial.begin(9600);
