@@ -6,7 +6,7 @@
 
 #include <CANSerializer.h>
 #include <NV11AccesoriesStatus.h>
-#include <avr\wdt.h>
+//#include <avr\wdt.h>
 
 #define CAN_CS 10
 #define CAN_INT 2
@@ -25,7 +25,7 @@ void setup() {
 	pinMode(CAN_INT, INPUT_PULLUP);
 	attachInterrupt(digitalPinToInterrupt(CAN_INT), CAN_ISR, FALLING);
 
-	wdt_enable(WDTO_2S);
+	//wdt_enable(WDTO_2S);
 }
 
 // the loop function runs over and over again until power down or reset
@@ -36,7 +36,7 @@ void loop() {
 		serializer.receiveCanFrame(&f);
 		if (dataAcc.checkMatchCAN(&f))
 		{
-			wdt_reset(); // kick watchdog to avoid resetting arduino
+			//wdt_reset(); // kick watchdog to avoid resetting arduino
 			dataAcc.unpackCAN(&f);
 			// H = logic high relay light on
 			// L = logic low relay light off

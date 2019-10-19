@@ -83,8 +83,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NV10_back_MEGA", "Arduino\N
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "I2C_scanner", "..\I2C_scanner\I2C_scanner.vcxproj", "{A4BA4F94-F4D3-4EEB-B64D-F51EB69681E4}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "temp", "..\temp\temp.vcxproj", "{B7B893C5-D92A-4E21-8F95-214C41C94420}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CANSerializerV2_sender", "Arduino\#TestSuites\CANSerializerV2_sender\CANSerializerV2_sender.vcxproj", "{3F8B2017-8E31-43FB-BC4C-A95680CA7683}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CANSerializerV2_receiver", "Arduino\#TestSuites\CANSerializerV2_receiver\CANSerializerV2_receiver.vcxproj", "{3E3DAF3B-9BCE-4BA7-AAC5-B5BE3B96B653}"
@@ -313,14 +311,6 @@ Global
 		{A4BA4F94-F4D3-4EEB-B64D-F51EB69681E4}.Release|x64.ActiveCfg = Release|Win32
 		{A4BA4F94-F4D3-4EEB-B64D-F51EB69681E4}.Release|x86.ActiveCfg = Release|Win32
 		{A4BA4F94-F4D3-4EEB-B64D-F51EB69681E4}.Release|x86.Build.0 = Release|Win32
-		{B7B893C5-D92A-4E21-8F95-214C41C94420}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{B7B893C5-D92A-4E21-8F95-214C41C94420}.Debug|x64.ActiveCfg = Debug|Win32
-		{B7B893C5-D92A-4E21-8F95-214C41C94420}.Debug|x86.ActiveCfg = Debug|Win32
-		{B7B893C5-D92A-4E21-8F95-214C41C94420}.Debug|x86.Build.0 = Debug|Win32
-		{B7B893C5-D92A-4E21-8F95-214C41C94420}.Release|Any CPU.ActiveCfg = Release|Win32
-		{B7B893C5-D92A-4E21-8F95-214C41C94420}.Release|x64.ActiveCfg = Release|Win32
-		{B7B893C5-D92A-4E21-8F95-214C41C94420}.Release|x86.ActiveCfg = Release|Win32
-		{B7B893C5-D92A-4E21-8F95-214C41C94420}.Release|x86.Build.0 = Release|Win32
 		{3F8B2017-8E31-43FB-BC4C-A95680CA7683}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{3F8B2017-8E31-43FB-BC4C-A95680CA7683}.Debug|x64.ActiveCfg = Debug|Win32
 		{3F8B2017-8E31-43FB-BC4C-A95680CA7683}.Debug|x86.ActiveCfg = Debug|Win32
